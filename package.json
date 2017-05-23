@@ -1,0 +1,22 @@
+{
+  "name": "toritoma_js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-kaneda/toritoma_js.git"
+  },
+  "author": "Akihiro Kaneda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/a-kaneda/toritoma_js/issues"
+  },
+  "homepage": "https://github.com/a-kaneda/toritoma_js#readme",
+  "devDependencies": {
+    "webpack": "^2.6.0"
+  }
+}
