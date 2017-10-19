@@ -14926,11 +14926,11 @@ phina.define('MainScene', {
         this.player = Sprite('player', 16, 16);
         this.player.x = this.gridX.center();
         this.player.y = this.gridY.center();
+        this.player.addChildTo(this.characterLayer);
+
+        // 自機のスプライトシートを作成する。
         this.player_ss = FrameAnimation('player_ss');
         this.player_ss.attachTo(this.player);
-//        this.player.addChildTo(this.characterLayer);
-        this.player.addChildTo(this);
-
         this.player_ss.gotoAndPlay('normal');
     },
 });
@@ -14942,8 +14942,9 @@ phina.main(function() {
     var app = GameApp({
         width: SCREEN_WIDTH,
         height: SCREEN_HEIGHT,
-        startLabel: 'main', // メインシーンから開始する。
-        assets: ASSETS
+        startLabel: 'main',
+        assets: ASSETS,
+        fit: false
     });
 
     // FPSを設定する。
