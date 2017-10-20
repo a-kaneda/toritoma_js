@@ -18,7 +18,7 @@ const ASSETS = {
     },
     spritesheet: {
         'player_ss': './images/player_ss.json'
-    }
+    },
 };
 
 // MainScene クラスを定義
@@ -41,11 +41,30 @@ phina.define('MainScene', {
         this.player.x = this.gridX.center();
         this.player.y = this.gridY.center();
         this.player.addChildTo(this.characterLayer);
+        this.player.SPEED = 4;
 
         // 自機のスプライトシートを作成する。
         this.player_ss = FrameAnimation('player_ss');
         this.player_ss.attachTo(this.player);
         this.player_ss.gotoAndPlay('normal');
+    },
+    update: function(app) {
+
+        var key = app.keyboard;
+
+        // カーソルキーの入力によって自機を移動する。
+        if (key.getKey('left')) {
+            this.player.x -= this.player.SPEED;
+        }
+        if (key.getKey('right')) {
+            this.player.x += this.player.SPEED;
+        }
+        if (key.getKey('up')) {
+            this.player.y -= this.player.SPEED;
+        }
+        if (key.getKey('down')) {
+            this.player.y += this.player.SPEED;
+        }
     },
 });
 
@@ -58,7 +77,7 @@ phina.main(function() {
         height: SCREEN_HEIGHT,
         startLabel: 'main',
         assets: ASSETS,
-        fit: false
+        fit: false,
     });
 
     // FPSを設定する。
