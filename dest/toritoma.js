@@ -14893,9 +14893,9 @@ phina.globalize();
 // モノクロの各色の定義
 const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 // スクリーンの幅
-const SCREEN_WIDTH = 480;
+const SCREEN_WIDTH = 240;
 // スクリーンの高さ
-const SCREEN_HEIGHT = 320;
+const SCREEN_HEIGHT = 160;
 
 // アセット
 const ASSETS = {
@@ -14927,7 +14927,7 @@ phina.define('MainScene', {
         this.player.x = this.gridX.center();
         this.player.y = this.gridY.center();
         this.player.addChildTo(this.characterLayer);
-        this.player.SPEED = 4;
+        this.player.SPEED = 2;
 
         // 自機のスプライトシートを作成する。
         this.player_ss = FrameAnimation('player_ss');
@@ -14963,7 +14963,6 @@ phina.main(function() {
         height: SCREEN_HEIGHT,
         startLabel: 'main',
         assets: ASSETS,
-        fit: false,
     });
 
     // FPSを設定する。
