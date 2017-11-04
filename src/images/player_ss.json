@@ -9,7 +9,7 @@
         "normal": {
             "frames": [0, 1],
             "next": "normal",
-            "frequencey": 12
+            "frequency": 12
         }
     }
 }
