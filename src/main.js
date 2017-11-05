@@ -33,6 +33,7 @@ const ASSETS = {
     },
 };
 
+
 // MainScene クラスを定義
 phina.define('MainScene', {
     superClass: 'DisplayScene',
@@ -41,6 +42,10 @@ phina.define('MainScene', {
             width: SCREEN_WIDTH,
             height: SCREEN_HEIGHT,
         });
+
+        // ゲームパッドを取得する。
+        this.gamepadManager = phina.input.GamepadManager();
+        this.gamepad = this.gamepadManager.get(0);
 
         // 背景色を指定する。
         this.backgroundColor = COLOR[0];
@@ -57,6 +62,7 @@ phina.define('MainScene', {
         // 自機の移動スピードを設定する。
         this.player.SPEED_BY_KEY = 2;
         this.player.SPEED_BY_TOUCH = 1.8;
+        this.player.SPEED_BY_GAMEPAD = 4;
 
         // 自機のスプライトシートを作成する。
         this.player_ss = FrameAnimation('player_ss');
@@ -67,6 +73,9 @@ phina.define('MainScene', {
         this.touch = {id: -1, x:0, y:0};
     },
     update: function(app) {
+
+        // ゲームパッドの状態を更新する。
+        this.gamepadManager.update();
 
         var key = app.keyboard;
 
@@ -119,6 +128,14 @@ phina.define('MainScene', {
             this.touch.x = 0;
             this.touch.y = 0;
         }
+
+        // アナログスティックの入力を取得する。
+        var stick = this.gamepad.getStickDirection(0);
+
+        if (stick.length() > 0.5) {
+            this.player.position.add(stick.mul(this.player.SPEED_BY_GAMEPAD));
+        }
+
     },
 });
 
