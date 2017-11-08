@@ -6,7 +6,6 @@ var isMouseUsed = false;
 
 function detectDeviceType(event) {
 	isMouseUsed = !event.changedTouches;
-    console.log('isMouseUsed=' + isMouseUsed);
 	document.removeEventListener('touchstart', detectDeviceType);
 	document.removeEventListener('mousemove', detectDeviceType);
 }
@@ -22,6 +21,8 @@ const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 const SCREEN_WIDTH = 240;
 // スクリーンの高さ
 const SCREEN_HEIGHT = 160;
+// 拡大率
+var zoomRatio = Math.floor(Math.min(window.innerHeight / SCREEN_HEIGHT, window.innerWidth / SCREEN_WIDTH));
 
 // アセット
 const ASSETS = {
@@ -39,8 +40,8 @@ phina.define('MainScene', {
     superClass: 'DisplayScene',
     init: function() {
         this.superInit({
-            width: SCREEN_WIDTH,
-            height: SCREEN_HEIGHT,
+            width: SCREEN_WIDTH * zoomRatio,
+            height: SCREEN_HEIGHT * zoomRatio,
         });
 
         // Canvasのスムージングを無効化する。
@@ -60,12 +61,14 @@ phina.define('MainScene', {
         this.player = Sprite('player', 16, 16);
         this.player.x = Math.round(this.gridX.center());
         this.player.y = Math.round(this.gridY.center());
+        this.player.scaleX = zoomRatio;
+        this.player.scaleY = zoomRatio;
         this.player.addChildTo(this.characterLayer);
 
         // 自機の移動スピードを設定する。
-        this.player.SPEED_BY_KEY = 2;
-        this.player.SPEED_BY_TOUCH = 1.8;
-        this.player.SPEED_BY_GAMEPAD = 4;
+        this.player.SPEED_BY_KEY = 2 * zoomRatio;
+        this.player.SPEED_BY_TOUCH = 1.8 * zoomRatio;
+        this.player.SPEED_BY_GAMEPAD = 4 * zoomRatio;
 
         // 自機のスプライトシートを作成する。
         this.player_ss = FrameAnimation('player_ss');
@@ -147,10 +150,11 @@ phina.main(function() {
 
     // アプリケーションを生成する。
     var app = GameApp({
-        width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT,
+        width: SCREEN_WIDTH * zoomRatio,
+        height: SCREEN_HEIGHT * zoomRatio,
         startLabel: 'main',
         assets: ASSETS,
+        fit: false,
     });
 
     // FPSを設定する。
