@@ -14929,6 +14929,9 @@ phina.define('MainScene', {
             height: SCREEN_HEIGHT,
         });
 
+        // Canvasのスムージングを無効化する。
+        this.canvas.imageSmoothingEnabled = false;
+
         // ゲームパッドを取得する。
         this.gamepadManager = phina.input.GamepadManager();
         this.gamepad = this.gamepadManager.get(0);
@@ -14941,8 +14944,8 @@ phina.define('MainScene', {
 
         // 自機画像を作成する。
         this.player = Sprite('player', 16, 16);
-        this.player.x = this.gridX.center();
-        this.player.y = this.gridY.center();
+        this.player.x = Math.round(this.gridX.center());
+        this.player.y = Math.round(this.gridY.center());
         this.player.addChildTo(this.characterLayer);
 
         // 自機の移動スピードを設定する。
@@ -14998,8 +15001,8 @@ phina.define('MainScene', {
 
                 // スライド操作をしている場合はスライド量に応じて自機を移動する。
                 if (this.touch.id == touches[i].id) {
-                    this.player.x += (touches[i].x - this.touch.x) * this.player.SPEED_BY_TOUCH;
-                    this.player.y += (touches[i].y - this.touch.y) * this.player.SPEED_BY_TOUCH;
+                    this.player.x += Math.round((touches[i].x - this.touch.x) * this.player.SPEED_BY_TOUCH);
+                    this.player.y += Math.round((touches[i].y - this.touch.y) * this.player.SPEED_BY_TOUCH);
                     this.touch.x = touches[i].x;
                     this.touch.y = touches[i].y;
                     sliding = true;
