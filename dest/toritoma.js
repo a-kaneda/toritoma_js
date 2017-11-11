@@ -14890,6 +14890,7 @@ var phina = __webpack_require__(0);
 // マウスが接続されているかどうか
 var isMouseUsed = false;
 
+// マウス移動とタッチ操作の際に呼ばれ、タッチ操作でない場合はマウス接続されていると判断する。
 function detectDeviceType(event) {
 	isMouseUsed = !event.changedTouches;
 	document.removeEventListener('touchstart', detectDeviceType);
@@ -15052,6 +15053,13 @@ phina.main(function() {
 
     // FPSを表示する。（デバッグ用）
     app.enableStats();
+
+    app.domElement.addEventListener('touchend', function dummy() {
+            var s = phina.asset.Sound();
+            s.loadFromBuffer();
+            s.play().stop();
+            app.domElement.removeEventListener('touchend', dummy);
+            });
 
     // アプリケーションを実行する。
     app.run();
