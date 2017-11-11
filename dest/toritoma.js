@@ -14903,20 +14903,23 @@ phina.globalize();
 
 // モノクロの各色の定義
 const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
-// スクリーンの幅
-const SCREEN_WIDTH = 240;
-// スクリーンの高さ
-const SCREEN_HEIGHT = 160;
 // 拡大率
-var zoomRatio = Math.floor(Math.min(window.innerHeight / SCREEN_HEIGHT, window.innerWidth / SCREEN_WIDTH));
+const ZOOM_RATIO = 2;
+// スクリーンの幅
+const SCREEN_WIDTH = 240 * ZOOM_RATIO;
+// スクリーンの高さ
+const SCREEN_HEIGHT = 160 * ZOOM_RATIO;
 
 // アセット
 const ASSETS = {
     image: {
-        'player': './images/player.png'
+        'player': './images/player.png',
     },
     spritesheet: {
-        'player_ss': './images/player_ss.json'
+        'player_ss': './images/player_ss.json',
+    },
+    sound: {
+        'stage1': './sound/stage1.mp3',
     },
 };
 
@@ -14926,8 +14929,8 @@ phina.define('MainScene', {
     superClass: 'DisplayScene',
     init: function() {
         this.superInit({
-            width: SCREEN_WIDTH * zoomRatio,
-            height: SCREEN_HEIGHT * zoomRatio,
+            width: SCREEN_WIDTH,
+            height: SCREEN_HEIGHT,
         });
 
         // Canvasのスムージングを無効化する。
@@ -14947,14 +14950,14 @@ phina.define('MainScene', {
         this.player = Sprite('player', 16, 16);
         this.player.x = Math.round(this.gridX.center());
         this.player.y = Math.round(this.gridY.center());
-        this.player.scaleX = zoomRatio;
-        this.player.scaleY = zoomRatio;
+        this.player.scaleX = ZOOM_RATIO;
+        this.player.scaleY = ZOOM_RATIO;
         this.player.addChildTo(this.characterLayer);
 
         // 自機の移動スピードを設定する。
-        this.player.SPEED_BY_KEY = 2 * zoomRatio;
-        this.player.SPEED_BY_TOUCH = 1.8 * zoomRatio;
-        this.player.SPEED_BY_GAMEPAD = 4 * zoomRatio;
+        this.player.SPEED_BY_KEY = 2 * ZOOM_RATIO;
+        this.player.SPEED_BY_TOUCH = 1.8 * ZOOM_RATIO;
+        this.player.SPEED_BY_GAMEPAD = 4 * ZOOM_RATIO;
 
         // 自機のスプライトシートを作成する。
         this.player_ss = FrameAnimation('player_ss');
@@ -14963,6 +14966,9 @@ phina.define('MainScene', {
 
         // タッチ情報を初期化する。
         this.touch = {id: -1, x:0, y:0};
+
+        // BGMを再生する。
+        SoundManager.playMusic('stage1');
     },
     update: function(app) {
 
@@ -15027,7 +15033,6 @@ phina.define('MainScene', {
         if (stick.length() > 0.5) {
             this.player.position.add(stick.mul(this.player.SPEED_BY_GAMEPAD));
         }
-
     },
 });
 
@@ -15036,11 +15041,10 @@ phina.main(function() {
 
     // アプリケーションを生成する。
     var app = GameApp({
-        width: SCREEN_WIDTH * zoomRatio,
-        height: SCREEN_HEIGHT * zoomRatio,
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT,
         startLabel: 'main',
         assets: ASSETS,
-        fit: false,
     });
 
     // FPSを設定する。
