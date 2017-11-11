@@ -106,6 +106,22 @@ phina.define('MainScene', {
             this.player.y += this.player.SPEED_BY_KEY;
         }
 
+        // '.'入力でコンソールコマンドを入力する。
+        if (key.getKeyDown('period')) {
+            var command = window.prompt('', '').split(' ');
+            switch (command[0]) {
+            case 'log':
+                var log = '';
+                for (var i = 1; i < command.length; i++) {
+                    log += command[i] + ' ';
+                }
+                console.log(log);
+                break;
+            default:
+                break;
+            }
+        }
+
         var touches = app.pointers;
         var sliding = false;
 
@@ -168,6 +184,8 @@ phina.main(function() {
     // FPSを表示する。（デバッグ用）
     app.enableStats();
 
+    // iOSのsafariではユーザが操作時のみ音の再生が可能なため、タッチ時にダミーで音声の再生を行う。
+    // https://github.com/phinajs/phina.js/issues/197
     app.domElement.addEventListener('touchend', function dummy() {
         var s = phina.asset.Sound();
         s.loadFromBuffer();
