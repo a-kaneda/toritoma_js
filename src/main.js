@@ -1,6 +1,9 @@
 // phina.jsを読み込む
 var phina = require('./vendor/phina.js');
 
+// 各ステージのマップデータを読み込む
+var tmx_stage1 = require('./stage1.js');
+
 // マウスが接続されているかどうか
 var isMouseUsed = false;
 
@@ -29,6 +32,8 @@ const SCREEN_HEIGHT = 160 * ZOOM_RATIO;
 const ASSETS = {
     image: {
         'player': './images/player.png',
+        'back': './images/back.png',
+        'block': './images/block.png',
     },
     spritesheet: {
         'player_ss': './images/player_ss.json',
@@ -38,6 +43,95 @@ const ASSETS = {
     },
 };
 
+var TileMapManager = TileMapManager || {}; 
+
+/**
+ * @function getIamge
+ * @brief レイヤー画像取得処理
+ * 指定したマップ、レイヤーの画像をテクスチャとして取得する。
+ *
+ * @param [in] mapName マップ名
+ * @param [in] layerName レイヤー名
+ * @return マップ画像のテクスチャ
+ */
+TileMapManager.getIamge = function(mapName, layerName) {
+
+    // マップ名に対応するマップを取得する。
+    var map = TileMaps[mapName];
+
+    // マップの幅と高さのドット数を求める。
+    var width = map.width * map.tilewidth;
+    var height = map.height * map.tileheight;
+
+    // canvasを作成する。
+    var canvas = phina.graphics.Canvas().setSize(width, height);
+
+    // レイヤー名に対応するレイヤーを取得する。
+    var layer;
+    for (var i = 0; i < map.layers.length; i++) {
+        if (map.layers[i].name == layerName) {
+            layer = map.layers[i];
+        }
+    }
+
+    // 各タイルを作成したcanvasに描画していく。
+    for (var i = 0; i < layer.data.length; i++) {
+
+        // タイルが配置されている場合
+        if (layer.data[i] > 0) {
+
+            // 一次元配列になっているので、x座標とy座標を計算する。
+            var x = i % layer.width;
+            var y = Math.floor(i / layer.width);
+
+            // タイルを描画する。
+            this._drawTile(canvas, map.tilesets, layer.data[i], x * map.tilewidth, y * map.tileheight);
+        }
+    }
+
+    // テクスチャを作成し、描画結果として返す。
+    var texture = phina.asset.Texture();
+    texture.domElement = canvas.domElement;
+    return texture;
+};
+
+/**
+ * @function _drawTile
+ * @brief タイル描画処理
+ * canvasにタイルを描画する。タイルセットの名前と同じ名前でphina.jsのassetに登録をしておくこと。
+ * 
+ * @param [in/out] canvas canvas
+ * @param [in] tilesets タイルセット配列
+ * @param [in] index タイルのgid
+ * @param [in] x 描画先x座標
+ * @param [in] y 描画先y座標
+ */
+TileMapManager._drawTile = function(canvas, tilesets, index, x, y) {
+
+    var imageName;
+    var tileX;
+    var tileY;
+    var tileWidth;
+    var tileHeight;
+
+    // gidに対応するタイルセットを検索する。
+    for (var i = 0; i < tilesets.length; i++) {
+        if (index >= tilesets[i].firstgid && index < tilesets[i].firstgid + tilesets[i].tilecount) {
+            imageName = tilesets[i].name;
+            tileX = ((index - tilesets[i].firstgid) % tilesets[i].columns) * tilesets[i].tilewidth;
+            tileY = Math.floor((index - tilesets[i].firstgid) / tilesets[i].columns) * tilesets[i].tileheight;
+            tileWidth = tilesets[i].tilewidth;
+            tileHeight = tilesets[i].tileheight;
+            break;
+        }
+    }
+
+    // 画像を取得する。
+    var image = phina.asset.AssetManager.get('image', imageName);
+
+    // 画像のタイルを切出してcanvasに描画する。
+    canvas.context.drawImage(image.domElement, tileX, tileY, tileWidth, tileHeight, x, y, tileWidth, tileHeight);
+};
 
 // MainScene クラスを定義
 phina.define('MainScene', {
@@ -58,8 +152,22 @@ phina.define('MainScene', {
         // 背景色を指定する。
         this.backgroundColor = COLOR[0];
 
+        // 背景レイヤーを作成する。
+        this.backgroundLayer = DisplayElement().setPosition(0, 0).addChildTo(this);
+
         // キャラクターレイヤーを作成する。
         this.characterLayer = DisplayElement().addChildTo(this);
+
+        // 背景画像を読み込む。
+        this.background = Sprite(TileMapManager.getIamge('stage1', 'background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
+        this.background.scaleX = ZOOM_RATIO;
+        this.background.scaleY = ZOOM_RATIO;
+        this.foreground = Sprite(TileMapManager.getIamge('stage1', 'foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
+        this.foreground.scaleX = ZOOM_RATIO;
+        this.foreground.scaleY = ZOOM_RATIO;
+        this.block = Sprite(TileMapManager.getIamge('stage1', 'block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
+        this.block.scaleX = ZOOM_RATIO;
+        this.block.scaleY = ZOOM_RATIO;
 
         // 自機画像を作成する。
         this.player = Sprite('player', 16, 16);
