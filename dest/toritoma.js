@@ -15240,6 +15240,16 @@ phina.define('MainScene', {
                 }
                 console.log(log);
                 break;
+            case 'save':
+                localStorage.setItem(command[1], command[2]);
+                break;
+            case 'load':
+                console.log(command[1] + '=' + localStorage.getItem(command[1]));
+                break;
+            case 'clear':
+                localStorage.clear();
+                console.log('Clear local storage.');
+                break;
             default:
                 break;
             }
