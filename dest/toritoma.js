@@ -15056,6 +15056,9 @@ const ASSETS = {
     sound: {
         'stage1': './sound/stage1.mp3',
     },
+    font: {
+        'noto': './fonts/NotoSansCJKjp-Regular.ttf',
+    },
 };
 
 var TileMapManager = TileMapManager || {}; 
@@ -15169,33 +15172,51 @@ phina.define('MainScene', {
 
         // 背景レイヤーを作成する。
         this.backgroundLayer = DisplayElement().setPosition(0, 0).addChildTo(this);
+        this.backgroundLayer.scaleX = ZOOM_RATIO;
+        this.backgroundLayer.scaleY = ZOOM_RATIO;
 
         // キャラクターレイヤーを作成する。
         this.characterLayer = DisplayElement().addChildTo(this);
+        this.characterLayer.scaleX = ZOOM_RATIO;
+        this.characterLayer.scaleY = ZOOM_RATIO;
+
+        // 情報レイヤーを作成する。
+        this.infoLayer = DisplayElement().addChildTo(this);
 
         // 背景画像を読み込む。
         this.background = Sprite(TileMapManager.getIamge('stage1', 'background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
-        this.background.scaleX = ZOOM_RATIO;
-        this.background.scaleY = ZOOM_RATIO;
         this.foreground = Sprite(TileMapManager.getIamge('stage1', 'foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
-        this.foreground.scaleX = ZOOM_RATIO;
-        this.foreground.scaleY = ZOOM_RATIO;
         this.block = Sprite(TileMapManager.getIamge('stage1', 'block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
-        this.block.scaleX = ZOOM_RATIO;
-        this.block.scaleY = ZOOM_RATIO;
+
+        // スコアラベルを作成する。
+        this.scoreLabelBase = RectangleShape({
+            height: 22,
+            width: 148,
+            fill: COLOR[0],
+            strokeWidth: 0,
+            x: Math.round(this.gridX.center()),
+            y: 14,
+        }).addChildTo(this.infoLayer);
+
+        this.scoreLabel = Label({
+            text: 'SCORE: 000000',
+            fontSize: 20,
+            fill: COLOR[3],
+            fontFamily: 'Noto',
+        }).addChildTo(this.scoreLabelBase);
+
+        this.score = 0;
 
         // 自機画像を作成する。
         this.player = Sprite('player', 16, 16);
-        this.player.x = Math.round(this.gridX.center());
-        this.player.y = Math.round(this.gridY.center());
-        this.player.scaleX = ZOOM_RATIO;
-        this.player.scaleY = ZOOM_RATIO;
+        this.player.x = Math.round(this.gridX.center() / ZOOM_RATIO);
+        this.player.y = Math.round(this.gridY.center() / ZOOM_RATIO);
         this.player.addChildTo(this.characterLayer);
 
         // 自機の移動スピードを設定する。
-        this.player.SPEED_BY_KEY = 2 * ZOOM_RATIO;
-        this.player.SPEED_BY_TOUCH = 1.8 * ZOOM_RATIO;
-        this.player.SPEED_BY_GAMEPAD = 4 * ZOOM_RATIO;
+        this.player.SPEED_BY_KEY = 2;
+        this.player.SPEED_BY_TOUCH = 1.8 / ZOOM_RATIO;
+        this.player.SPEED_BY_GAMEPAD = 4;
 
         // 自機のスプライトシートを作成する。
         this.player_ss = FrameAnimation('player_ss');
@@ -15234,11 +15255,7 @@ phina.define('MainScene', {
             var command = window.prompt('', '').split(' ');
             switch (command[0]) {
             case 'log':
-                var log = '';
-                for (var i = 1; i < command.length; i++) {
-                    log += command[i] + ' ';
-                }
-                console.log(log);
+                console.log('this.' + command[1] + '=' + this[command[1]]);
                 break;
             case 'save':
                 localStorage.setItem(command[1], command[2]);
@@ -15249,6 +15266,9 @@ phina.define('MainScene', {
             case 'clear':
                 localStorage.clear();
                 console.log('Clear local storage.');
+                break;
+            case 'score':
+                this.score = parseInt(command[1], 10);
                 break;
             default:
                 break;
@@ -15297,6 +15317,9 @@ phina.define('MainScene', {
         if (stick.length() > 0.5) {
             this.player.position.add(stick.mul(this.player.SPEED_BY_GAMEPAD));
         }
+
+        // スコア表示を更新する。
+        this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
     },
 });
 
