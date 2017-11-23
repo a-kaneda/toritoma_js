@@ -107,7 +107,7 @@ phina.define('MainScene', {
             text: 'SCORE: 000000',
             fontSize: 20,
             fill: COLOR[3],
-            fontFamily: 'Noto',
+            fontFamily: 'noto',
         }).addChildTo(this.scoreLabelBase);
 
         this.score = 0;

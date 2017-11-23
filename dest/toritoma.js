@@ -70,11 +70,29 @@
 /* 0 */
 /***/ (function(module, exports) {
 
+/**
+ * @class Stage
+ * @brief ステージ管理クラス
+ * 
+ * ステージのマップ、背景、イベント処理を管理する。
+ */
 phina.define('Stage', {
     _static: {
+        // タイルのサイズ
         TILE_SIZE: 16,
+        // 画面に表示されるステージの高さ
         STAGE_HEIGHT: 144,
     },
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * mapNameで指定されたマップを読み込み、background、foreground、blockのレイヤーの画像をlayerに配置する。
+     * stageWidthをメンバ変数に格納する。
+     * 
+     * @param [in] manName マップ名
+     * @param [in/out] layer ステージ画像を配置するレイヤー
+     * @param [in] stageWidth 画面に表示するステージの幅
+     */
     init: function(mapName, layer, stageWidth) {
 
         this.width = stageWidth;
@@ -88,6 +106,11 @@ phina.define('Stage', {
         this.x = 0;
         this.executedCol = 0;
     },
+    /**
+     * @function update
+     * @brief 更新処理
+     * ステージの状態を更新する。
+     */
     update: function() {
 
         // イベントを実行する。
@@ -96,6 +119,12 @@ phina.define('Stage', {
         // スピードに応じて移動する。
         this._move();
     },
+    /**
+     * @function _execEvent
+     * @brief イベント実行処理
+     * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
+     * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
+     */
     _execEvent: function() {
 
         // 画面外2個先の列まで処理を行う。
@@ -126,6 +155,11 @@ phina.define('Stage', {
             this.executedCol = maxCol;
         }
     },
+    /**
+     * @function _move
+     * @brief 移動処理
+     * スピードに応じてマップ全体を移動する。
+     */
     _move: function() {
 
         // スピードに応じて移動する。
@@ -303,8 +337,10 @@ phina.define('TileMapManager', {
 
     /**
      * @function init
+     * @brief 初期化処理
      *
      * 使用するマップの名前を指定する。
+     *
      * @param [in] mapName マップ名
      */
     init: function(mapName) {
@@ -316,6 +352,7 @@ phina.define('TileMapManager', {
     /**
      * @function getIamge
      * @brief レイヤー画像取得処理
+     *
      * 指定したレイヤーの画像をテクスチャとして取得する。
      *
      * @param [in] layerName レイヤー名
@@ -362,6 +399,7 @@ phina.define('TileMapManager', {
     /**
      * @function _drawTile
      * @brief タイル描画処理
+     *
      * canvasにタイルを描画する。タイルセットの名前と同じ名前でphina.jsのassetに登録をしておくこと。
      * 
      * @param [in/out] canvas canvas
@@ -399,6 +437,16 @@ phina.define('TileMapManager', {
 
     /**
      * @function getObjects
+     * @brief オブジェクト検索処理
+     * 
+     * layerNameで指定されたレイヤーの座標x, yから幅w、高さhの範囲内にあるオブジェクトを取得する。
+     *
+     * @param [in] layerName レイヤー名
+     * @param [in] x 検索範囲左上のx座標
+     * @param [in] y 検索範囲左上のy座標
+     * @apram [in] w 検索範囲幅
+     * @param [in] h 検索範囲高さ
+     * @return 検索結果のオブジェクトの配列
      */
     getObjects: function(layerName, x, y, w, h) {
         var objects = [];
@@ -15387,7 +15435,7 @@ phina.define('MainScene', {
             text: 'SCORE: 000000',
             fontSize: 20,
             fill: COLOR[3],
-            fontFamily: 'Noto',
+            fontFamily: 'noto',
         }).addChildTo(this.scoreLabelBase);
 
         this.score = 0;
