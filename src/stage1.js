@@ -53,8 +53,56 @@
          "width":100,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "name":"event",
+         "objects":[
+                {
+                 "height":16,
+                 "id":11,
+                 "name":"start",
+                 "properties":
+                    {
+                     "speed":0.5
+                    },
+                 "propertytypes":
+                    {
+                     "speed":"float"
+                    },
+                 "rotation":0,
+                 "type":"speed",
+                 "visible":true,
+                 "width":16,
+                 "x":0,
+                 "y":0
+                }, 
+                {
+                 "height":16,
+                 "id":13,
+                 "name":"stop",
+                 "properties":
+                    {
+                     "speed":0
+                    },
+                 "propertytypes":
+                    {
+                     "speed":"float"
+                    },
+                 "rotation":0,
+                 "type":"speed",
+                 "visible":true,
+                 "width":16,
+                 "x":1536,
+                 "y":0
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextobjectid":11,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",
@@ -63,7 +111,7 @@
         {
          "columns":8,
          "firstgid":1,
-         "image":"back.png",
+         "image":"images\/back.png",
          "imageheight":128,
          "imagewidth":128,
          "margin":0,
@@ -77,7 +125,7 @@
         {
          "columns":4,
          "firstgid":65,
-         "image":"block.png",
+         "image":"images\/block.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,

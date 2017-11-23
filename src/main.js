@@ -1,15 +1,20 @@
+var toritoma = toritoma || {};
+
 // phina.jsを読み込む
 var phina = require('./vendor/phina.js');
 
 // 各ステージのマップデータを読み込む
 var tmx_stage1 = require('./stage1.js');
 
+var tileMapManager = require('./tilemapmanager.js');
+var stage = require('./stage.js');
+
 // マウスが接続されているかどうか
-var isMouseUsed = false;
+toritoma.isMouseUsed = false;
 
 // マウス移動とタッチ操作の際に呼ばれ、タッチ操作でない場合はマウス接続されていると判断する。
 function detectDeviceType(event) {
-	isMouseUsed = !event.changedTouches;
+	toritoma.isMouseUsed = !event.changedTouches;
 	document.removeEventListener('touchstart', detectDeviceType);
 	document.removeEventListener('mousemove', detectDeviceType);
 }
@@ -27,6 +32,13 @@ const ZOOM_RATIO = 2;
 const SCREEN_WIDTH = 240 * ZOOM_RATIO;
 // スクリーンの高さ
 const SCREEN_HEIGHT = 160 * ZOOM_RATIO;
+// ゲーム画面のサイズ
+const STAGE_RECT = {
+    x: 24,
+    y: 0,
+    width: 192,
+    height: 144,
+};
 
 // アセット
 const ASSETS = {
@@ -44,96 +56,6 @@ const ASSETS = {
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular.ttf',
     },
-};
-
-var TileMapManager = TileMapManager || {}; 
-
-/**
- * @function getIamge
- * @brief レイヤー画像取得処理
- * 指定したマップ、レイヤーの画像をテクスチャとして取得する。
- *
- * @param [in] mapName マップ名
- * @param [in] layerName レイヤー名
- * @return マップ画像のテクスチャ
- */
-TileMapManager.getIamge = function(mapName, layerName) {
-
-    // マップ名に対応するマップを取得する。
-    var map = TileMaps[mapName];
-
-    // マップの幅と高さのドット数を求める。
-    var width = map.width * map.tilewidth;
-    var height = map.height * map.tileheight;
-
-    // canvasを作成する。
-    var canvas = phina.graphics.Canvas().setSize(width, height);
-
-    // レイヤー名に対応するレイヤーを取得する。
-    var layer;
-    for (var i = 0; i < map.layers.length; i++) {
-        if (map.layers[i].name == layerName) {
-            layer = map.layers[i];
-        }
-    }
-
-    // 各タイルを作成したcanvasに描画していく。
-    for (var i = 0; i < layer.data.length; i++) {
-
-        // タイルが配置されている場合
-        if (layer.data[i] > 0) {
-
-            // 一次元配列になっているので、x座標とy座標を計算する。
-            var x = i % layer.width;
-            var y = Math.floor(i / layer.width);
-
-            // タイルを描画する。
-            this._drawTile(canvas, map.tilesets, layer.data[i], x * map.tilewidth, y * map.tileheight);
-        }
-    }
-
-    // テクスチャを作成し、描画結果として返す。
-    var texture = phina.asset.Texture();
-    texture.domElement = canvas.domElement;
-    return texture;
-};
-
-/**
- * @function _drawTile
- * @brief タイル描画処理
- * canvasにタイルを描画する。タイルセットの名前と同じ名前でphina.jsのassetに登録をしておくこと。
- * 
- * @param [in/out] canvas canvas
- * @param [in] tilesets タイルセット配列
- * @param [in] index タイルのgid
- * @param [in] x 描画先x座標
- * @param [in] y 描画先y座標
- */
-TileMapManager._drawTile = function(canvas, tilesets, index, x, y) {
-
-    var imageName;
-    var tileX;
-    var tileY;
-    var tileWidth;
-    var tileHeight;
-
-    // gidに対応するタイルセットを検索する。
-    for (var i = 0; i < tilesets.length; i++) {
-        if (index >= tilesets[i].firstgid && index < tilesets[i].firstgid + tilesets[i].tilecount) {
-            imageName = tilesets[i].name;
-            tileX = ((index - tilesets[i].firstgid) % tilesets[i].columns) * tilesets[i].tilewidth;
-            tileY = Math.floor((index - tilesets[i].firstgid) / tilesets[i].columns) * tilesets[i].tileheight;
-            tileWidth = tilesets[i].tilewidth;
-            tileHeight = tilesets[i].tileheight;
-            break;
-        }
-    }
-
-    // 画像を取得する。
-    var image = phina.asset.AssetManager.get('image', imageName);
-
-    // 画像のタイルを切出してcanvasに描画する。
-    canvas.context.drawImage(image.domElement, tileX, tileY, tileWidth, tileHeight, x, y, tileWidth, tileHeight);
 };
 
 // MainScene クラスを定義
@@ -156,7 +78,7 @@ phina.define('MainScene', {
         this.backgroundColor = COLOR[0];
 
         // 背景レイヤーを作成する。
-        this.backgroundLayer = DisplayElement().setPosition(0, 0).addChildTo(this);
+        this.backgroundLayer = DisplayElement().setPosition(STAGE_RECT.x * ZOOM_RATIO, STAGE_RECT.y * ZOOM_RATIO).addChildTo(this);
         this.backgroundLayer.scaleX = ZOOM_RATIO;
         this.backgroundLayer.scaleY = ZOOM_RATIO;
 
@@ -168,10 +90,8 @@ phina.define('MainScene', {
         // 情報レイヤーを作成する。
         this.infoLayer = DisplayElement().addChildTo(this);
 
-        // 背景画像を読み込む。
-        this.background = Sprite(TileMapManager.getIamge('stage1', 'background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
-        this.foreground = Sprite(TileMapManager.getIamge('stage1', 'foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
-        this.block = Sprite(TileMapManager.getIamge('stage1', 'block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(this.backgroundLayer);
+        // ステージを作成する。
+        this.stage = Stage('stage1', this.backgroundLayer, STAGE_RECT.width);
 
         // スコアラベルを作成する。
         this.scoreLabelBase = RectangleShape({
@@ -266,7 +186,7 @@ phina.define('MainScene', {
         for (var i = 0; i < touches.length; i++) {
 
             // マウスが接続されていない場合はスライドの処理を行う。
-            if (!isMouseUsed) {
+            if (!toritoma.isMouseUsed) {
 
                 // スライド操作をしていない状態だった場合、最初のタッチ位置を記憶する。
                 if (this.touch.id < 0) {
@@ -305,6 +225,8 @@ phina.define('MainScene', {
 
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
+
+        this.stage.update();
     },
 });
 
