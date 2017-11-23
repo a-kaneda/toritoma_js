@@ -8,6 +8,7 @@ var tmx_stage1 = require('./stage1.js');
 
 var tileMapManager = require('./tilemapmanager.js');
 var stage = require('./stage.js');
+var controlSize = require('./controlsize.js');
 
 // マウスが接続されているかどうか
 toritoma.isMouseUsed = false;
@@ -46,6 +47,7 @@ const ASSETS = {
         'player': './images/player.png',
         'back': './images/back.png',
         'block': './images/block.png',
+        'control': './images/control.png',
     },
     spritesheet: {
         'player_ss': './images/player_ss.json',
@@ -87,8 +89,16 @@ phina.define('MainScene', {
         this.characterLayer.scaleX = ZOOM_RATIO;
         this.characterLayer.scaleY = ZOOM_RATIO;
 
+        // 枠レイヤーを作成する。
+        this.frameLayer = DisplayElement().addChildTo(this);
+        this.frameLayer.scaleX = ZOOM_RATIO;
+        this.frameLayer.scaleY = ZOOM_RATIO;
+
         // 情報レイヤーを作成する。
         this.infoLayer = DisplayElement().addChildTo(this);
+
+        // ステージの外枠を作成する。
+        this._createFrame();
 
         // ステージを作成する。
         this.stage = Stage('stage1', this.backgroundLayer, STAGE_RECT.width);
@@ -227,6 +237,168 @@ phina.define('MainScene', {
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
 
         this.stage.update();
+    },
+    /**
+     * @function _crateFrame
+     * @brief ステージ外枠背景作成
+     *
+     * ステージの外側の枠と背景を作成する。
+     */
+    _createFrame: function() {
+
+        // ステージの外側の背景を作成する。
+        this._createFrameBack();
+
+        // ステージの外側の枠を作成する。
+        this._createFrameBar();
+    },
+    /**
+     * @function _createFrameBack
+     * @brief ステージ外枠背景作成
+     *
+     * ステージの外側の背景を作成する。
+     */
+    _createFrameBack: function() {
+
+        // 左側の枠の座標を計算する。
+        var x = 0;
+        var y = 0;
+        var w = Math.ceil((SCREEN_WIDTH / ZOOM_RATIO - STAGE_RECT.width) / 2);
+        var h = SCREEN_HEIGHT / ZOOM_RATIO;
+
+        // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
+        if (w % ControlSize.frameBack.w > 0) {
+            x -= ControlSize.frameBack.w - w % ControlSize.frameBack.w;
+            w += ControlSize.frameBack.w - w % ControlSize.frameBack.w;
+        }
+
+        // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
+        if (STAGE_RECT.height % ControlSize.frameBack.h > 0) {
+            y -= ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
+            h += ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
+        }
+
+        // 背景を並べる。
+        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
+            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
+                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.setOrigin(0, 0);
+                back.setPosition(x + i, y + j);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.addChildTo(this.frameLayer);
+            }
+        }
+
+        // 右側の枠の座標を計算する。
+        var x = STAGE_RECT.x + STAGE_RECT.width;
+        var y = 0;
+        var w = Math.ceil((SCREEN_WIDTH / ZOOM_RATIO - STAGE_RECT.width) / 2);
+        var h = SCREEN_HEIGHT / ZOOM_RATIO;
+
+        // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
+        if (STAGE_RECT.height % ControlSize.frameBack.h > 0) {
+            y -= ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
+            h += ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
+        }
+
+        // 背景を並べる。
+        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
+            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
+                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.setOrigin(0, 0);
+                back.setPosition(x + i, y + j);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.addChildTo(this.frameLayer);
+            }
+        }
+
+        // 下側の枠の座標を計算する。
+        var x = Math.ceil((SCREEN_WIDTH / ZOOM_RATIO - STAGE_RECT.width) / 2);
+        var y = STAGE_RECT.height;
+        var w = STAGE_RECT.width;
+        var h = SCREEN_HEIGHT / ZOOM_RATIO - STAGE_RECT.height;
+
+
+        // 背景を並べる。
+        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
+            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
+                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.setOrigin(0, 0);
+                back.setPosition(x + i, y + j);
+                back.addChildTo(this.frameLayer);
+            }
+        }
+    },
+    /**
+     * @function _createFrameBar
+     * @brief ステージ外枠作成
+     *
+     * ステージの外側の枠を作成する。
+     */
+    _createFrameBar: function() {
+
+        // 左側の枠の位置を計算する。
+        var x = STAGE_RECT.x - ControlSize.frameLeft.w;
+        var h = STAGE_RECT.height;
+
+        // 枠を並べる。
+        for (var i = 0; i < h; i += ControlSize.frameLeft.h) {
+            var bar = Sprite('control', ControlSize.frameLeft.w, ControlSize.frameLeft.h);
+            bar.srcRect.set(ControlSize.frameLeft.x, ControlSize.frameLeft.y, ControlSize.frameLeft.w, ControlSize.frameLeft.h);
+            bar.setOrigin(0, 0);
+            bar.setPosition(x, i);
+            bar.addChildTo(this.frameLayer);
+        }
+
+        // 右側の枠の位置を計算する。
+        var x = STAGE_RECT.x + STAGE_RECT.width;
+        var h = STAGE_RECT.height;
+
+        // 枠を並べる。
+        for (var i = 0; i < h; i += ControlSize.frameRight.h) {
+            var bar = Sprite('control', ControlSize.frameRight.w, ControlSize.frameRight.h);
+            bar.srcRect.set(ControlSize.frameRight.x, ControlSize.frameRight.y, ControlSize.frameRight.w, ControlSize.frameRight.h);
+            bar.setOrigin(0, 0);
+            bar.setPosition(x, i);
+            bar.addChildTo(this.frameLayer);
+        }
+
+        // 下側の枠の位置を計算する。
+        var x = STAGE_RECT.x;
+        var y = STAGE_RECT.height;
+        var w = STAGE_RECT.width;
+
+        // 枠を並べる。
+        for (var i = 0; i < w; i += ControlSize.frameBottom.w) {
+            var bar = Sprite('control', ControlSize.frameBottom.w, ControlSize.frameBottom.h);
+            bar.srcRect.set(ControlSize.frameBottom.x, ControlSize.frameBottom.y, ControlSize.frameBottom.w, ControlSize.frameBottom.h);
+            bar.setOrigin(0, 0);
+            bar.setPosition(x + i, y);
+            bar.addChildTo(this.frameLayer);
+        }
+
+        // 左下の枠の位置を計算する。
+        var x = STAGE_RECT.x - ControlSize.frameBottomLeft.w;
+        var y = STAGE_RECT.height;
+
+        // 枠を並べる。
+        var bar = Sprite('control', ControlSize.frameBottomLeft.w, ControlSize.frameBottomLeft.h);
+        bar.srcRect.set(ControlSize.frameBottomLeft.x, ControlSize.frameBottomLeft.y, ControlSize.frameBottomLeft.w, ControlSize.frameBottomLeft.h);
+        bar.setOrigin(0, 0);
+        bar.setPosition(x, y);
+        bar.addChildTo(this.frameLayer);
+
+        // 右下の枠の位置を計算する。
+        var x = STAGE_RECT.x + STAGE_RECT.width;
+        var y = STAGE_RECT.height;
+
+        // 枠を並べる。
+        var bar = Sprite('control', ControlSize.frameBottomRight.w, ControlSize.frameBottomRight.h);
+        bar.srcRect.set(ControlSize.frameBottomRight.x, ControlSize.frameBottomRight.y, ControlSize.frameBottomRight.w, ControlSize.frameBottomRight.h);
+        bar.setOrigin(0, 0);
+        bar.setPosition(x, y);
+        bar.addChildTo(this.frameLayer);
     },
 });
 
