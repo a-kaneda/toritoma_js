@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -141,6 +141,63 @@ phina.define('ControlSize', {
 /***/ (function(module, exports) {
 
 /**
+ * @class Dragonfly
+ * @brief トンボ
+ * 左方向に直進する。
+ * 左方向に直進する弾を発射する。
+ */
+phina.define('Dragonfly', {
+    superClass: 'phina.display.Sprite',
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 座標の設定とスプライトシートの設定を行う。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     */
+    init: function(x, y) {
+        // 親クラスのコンストラクタを呼び出す。
+        this.superInit('enemy_16x16', 16, 16);
+
+        // 座標を設定する。
+        this.floatX = x;
+        this.floatY = y;
+
+        // スプライトシートの設定を行う。
+        this.spriteSheet = FrameAnimation('enemy_16x16_ss');
+        this.spriteSheet.attachTo(this);
+        this.spriteSheet.gotoAndPlay('dragonfly');
+    },
+    /**
+     * @function update
+     * @brief 更新処理
+     * 左方向に直進する。
+     * 左方向に直進する弾を発射する。
+     * 画面外に出ると自分自身を削除する。
+     */
+    update: function() {
+
+        // 左へ移動する。
+        this.floatX -= 1.0;
+
+        // 座標をスプライトに適用する。
+        this.x = Math.floor(this.floatX);
+        this.y = Math.floor(this.floatY);
+
+        // 画面外に出た場合は自分自身を削除する。
+        if (this.floatX < -32) {
+            this.remove();
+        }
+    }
+});
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+/**
  * @class Stage
  * @brief ステージ管理クラス
  * 
@@ -180,11 +237,13 @@ phina.define('Stage', {
      * @function update
      * @brief 更新処理
      * ステージの状態を更新する。
+     *
+     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
      */
-    update: function() {
+    update: function(characterLayer) {
 
         // イベントを実行する。
-        this._execEvent();
+        this._execEvent(characterLayer);
 
         // スピードに応じて移動する。
         this._move();
@@ -194,8 +253,10 @@ phina.define('Stage', {
      * @brief イベント実行処理
      * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
      * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
+     *
+     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
      */
-    _execEvent: function() {
+    _execEvent: function(characterLayer) {
 
         // 画面外2個先の列まで処理を行う。
         var maxCol = Math.floor((-this.x + this.width) / Stage.TILE_SIZE) + 2;
@@ -214,7 +275,13 @@ phina.define('Stage', {
             for (var i = 0; i < objects.length; i++) {
                 switch (objects[i].type) {
                 case 'speed':
-                    this.speed = objects[i].properties['speed'];
+                    this.speed = objects[i].properties.speed;
+                    break;
+                case 'enemy':
+                    this._createEnemy(objects[i].name,
+                                      this.x + objects[i].x + objects[i].width / 2,
+                                      objects[i].y + objects[i].height / 2,
+                                      characterLayer);
                     break;
                 default:
                     break;
@@ -240,11 +307,29 @@ phina.define('Stage', {
         this.foreground.x = Math.floor(this.x);
         this.block.x = Math.floor(this.x);
     },
+    /**
+     * @function _createEnemy
+     * @brief 敵生成
+     * 敵キャラクターを生成する。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     @ @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
+     */
+    _createEnemy: function(type, x, y, characterLayer) {
+        switch (type) {
+        case 'dragonfly':
+            Dragonfly(x, y).addChildTo(characterLayer);
+            break;
+        default:
+            break;
+        }
+    },
 });
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -344,6 +429,556 @@ phina.define('Stage', {
                  "width":16,
                  "x":1536,
                  "y":0
+                }, 
+                {
+                 "height":16,
+                 "id":14,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":240,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":15,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":256,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":16,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":272,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":17,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":304,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":18,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":320,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":19,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":352,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":20,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":352,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":21,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":384,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":22,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":400,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":23,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":416,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":24,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":448,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":25,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":464,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":26,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":464,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":27,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":496,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":28,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":512,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":29,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":544,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":30,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":592,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":31,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":608,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":32,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":656,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":33,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":672,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":34,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":688,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":35,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":704,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":36,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":736,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":37,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":800,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":38,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":816,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":39,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":848,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":40,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":864,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":41,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":880,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":42,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":896,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":43,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":928,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":44,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":928,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":45,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":944,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":46,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":992,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":47,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1008,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":48,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1024,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":49,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1136,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":50,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1152,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":51,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1152,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":52,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1216,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":53,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1216,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":54,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1232,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":55,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1248,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":56,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1280,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":57,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1296,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":58,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1296,
+                 "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":59,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1328,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":60,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1328,
+                 "y":32
+                }, 
+                {
+                 "height":16,
+                 "id":61,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1360,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":62,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1360,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":63,
+                 "name":"dragonfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1376,
+                 "y":32
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -351,7 +986,7 @@ phina.define('Stage', {
          "x":0,
          "y":0
         }],
- "nextobjectid":14,
+ "nextobjectid":64,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",
@@ -390,10 +1025,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /**
@@ -534,9 +1169,9 @@ phina.define('TileMapManager', {
             var object = layer.objects[i];
 
             // 指定した範囲内に存在するオブジェクトを戻り値に格納する。
-            if (object.x <= x + w &&
+            if (object.x < x + w &&
                 object.x + object.width - 1 >= x &&
-                object.y <= y + h &&
+                object.y < y + h &&
                 object.y + object.height - 1>= y) {
 
                 objects.push(object);
@@ -551,7 +1186,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15335,10 +15970,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 var g;
@@ -15365,7 +16000,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -15393,20 +16028,21 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var toritoma = toritoma || {};
 
 // phina.jsを読み込む
-var phina = __webpack_require__(4);
+var phina = __webpack_require__(5);
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(2);
+var tmx_stage1 = __webpack_require__(3);
 
-var tileMapManager = __webpack_require__(3);
-var stage = __webpack_require__(1);
+var tileMapManager = __webpack_require__(4);
+var stage = __webpack_require__(2);
 var controlSize = __webpack_require__(0);
+var dragonfly = __webpack_require__(1);
 
 // マウスが接続されているかどうか
 toritoma.isMouseUsed = false;
@@ -15446,9 +16082,11 @@ const ASSETS = {
         'back': './images/back.png',
         'block': './images/block.png',
         'control': './images/control.png',
+        'enemy_16x16': './images/enemy_16x16.png',
     },
     spritesheet: {
         'player_ss': './images/player_ss.json',
+        'enemy_16x16_ss': './images/enemy_16x16_ss.json',
     },
     sound: {
         'stage1': './sound/stage1.mp3',
@@ -15634,7 +16272,7 @@ phina.define('MainScene', {
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
 
-        this.stage.update();
+        this.stage.update(this.characterLayer);
     },
     /**
      * @function _crateFrame

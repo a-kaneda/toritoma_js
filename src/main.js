@@ -9,6 +9,7 @@ var tmx_stage1 = require('./stage1.js');
 var tileMapManager = require('./tilemapmanager.js');
 var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');
+var dragonfly = require('./dragonfly.js');
 
 // マウスが接続されているかどうか
 toritoma.isMouseUsed = false;
@@ -48,9 +49,11 @@ const ASSETS = {
         'back': './images/back.png',
         'block': './images/block.png',
         'control': './images/control.png',
+        'enemy_16x16': './images/enemy_16x16.png',
     },
     spritesheet: {
         'player_ss': './images/player_ss.json',
+        'enemy_16x16_ss': './images/enemy_16x16_ss.json',
     },
     sound: {
         'stage1': './sound/stage1.mp3',
@@ -236,7 +239,7 @@ phina.define('MainScene', {
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
 
-        this.stage.update();
+        this.stage.update(this.characterLayer);
     },
     /**
      * @function _crateFrame

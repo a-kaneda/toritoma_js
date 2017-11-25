@@ -136,9 +136,9 @@ phina.define('TileMapManager', {
             var object = layer.objects[i];
 
             // 指定した範囲内に存在するオブジェクトを戻り値に格納する。
-            if (object.x <= x + w &&
+            if (object.x < x + w &&
                 object.x + object.width - 1 >= x &&
-                object.y <= y + h &&
+                object.y < y + h &&
                 object.y + object.height - 1>= y) {
 
                 objects.push(object);

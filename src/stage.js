@@ -38,11 +38,13 @@ phina.define('Stage', {
      * @function update
      * @brief 更新処理
      * ステージの状態を更新する。
+     *
+     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
      */
-    update: function() {
+    update: function(characterLayer) {
 
         // イベントを実行する。
-        this._execEvent();
+        this._execEvent(characterLayer);
 
         // スピードに応じて移動する。
         this._move();
@@ -52,8 +54,10 @@ phina.define('Stage', {
      * @brief イベント実行処理
      * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
      * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
+     *
+     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
      */
-    _execEvent: function() {
+    _execEvent: function(characterLayer) {
 
         // 画面外2個先の列まで処理を行う。
         var maxCol = Math.floor((-this.x + this.width) / Stage.TILE_SIZE) + 2;
@@ -72,7 +76,13 @@ phina.define('Stage', {
             for (var i = 0; i < objects.length; i++) {
                 switch (objects[i].type) {
                 case 'speed':
-                    this.speed = objects[i].properties['speed'];
+                    this.speed = objects[i].properties.speed;
+                    break;
+                case 'enemy':
+                    this._createEnemy(objects[i].name,
+                                      this.x + objects[i].x + objects[i].width / 2,
+                                      objects[i].y + objects[i].height / 2,
+                                      characterLayer);
                     break;
                 default:
                     break;
@@ -97,5 +107,23 @@ phina.define('Stage', {
         this.background.x = Math.floor(this.x);
         this.foreground.x = Math.floor(this.x);
         this.block.x = Math.floor(this.x);
+    },
+    /**
+     * @function _createEnemy
+     * @brief 敵生成
+     * 敵キャラクターを生成する。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     @ @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
+     */
+    _createEnemy: function(type, x, y, characterLayer) {
+        switch (type) {
+        case 'dragonfly':
+            Dragonfly(x, y).addChildTo(characterLayer);
+            break;
+        default:
+            break;
+        }
     },
 });
