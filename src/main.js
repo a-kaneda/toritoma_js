@@ -144,6 +144,9 @@ phina.define('MainScene', {
         // タッチ情報を初期化する。
         this.touch = {id: -1, x:0, y:0};
 
+        // BGMの音量を設定する。
+        SoundManager.setVolumeMusic(0.2);
+
         // BGMを再生する。
         SoundManager.playMusic('stage1');
     },
