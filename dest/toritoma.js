@@ -16092,7 +16092,7 @@ const ASSETS = {
         'stage1': './sound/stage1.mp3',
     },
     font: {
-        'noto': './fonts/NotoSansCJKjp-Regular.ttf',
+        'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',
     },
 };
 
