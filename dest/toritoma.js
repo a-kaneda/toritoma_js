@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -179,7 +179,7 @@ phina.define('Dragonfly', {
     update: function() {
 
         // 左へ移動する。
-        this.floatX -= 1.0;
+        this.floatX -= 1;
 
         // 座標をスプライトに適用する。
         this.x = Math.floor(this.floatX);
@@ -198,6 +198,216 @@ phina.define('Dragonfly', {
 /***/ (function(module, exports) {
 
 /**
+ * @class Player
+ * @brief 自機
+ * ユーザー捜査に応じて移動する。
+ */
+phina.define('Player', {
+    _static: {
+        // キーボード入力による移動スピード
+        SPEED_BY_KEY: 2,
+        // タッチ操作による移動スピード
+        SPEED_BY_TOUCH: 1.8 / ScreenSize.ZOOM_RATIO,
+        // ゲームパッドによる移動スピード
+        SPEED_BY_GAMEPAD: 4,
+        // 自機弾発射間隔
+        SHOT_INTERVAL: 12,
+    },
+    superClass: 'phina.display.Sprite',
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 座標の設定とスプライトシートの設定を行う。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     * @param [in] characterLayer キャラクターを配置するレイヤー
+     */
+    init: function(x, y) {
+        // 親クラスのコンストラクタを呼び出す。
+        this.superInit('player', 16, 16);
+
+        // 座標を設定する。
+        this.floatX = x;
+        this.floatY = y;
+
+        // スプライトシートの設定を行う。
+        this.spriteSheet = FrameAnimation('player_ss');
+        this.spriteSheet.attachTo(this);
+        this.spriteSheet.gotoAndPlay('normal');
+
+        // メンバを初期化する。
+        this.shotInterval = 0;
+    },
+    /**
+     * @function update
+     * @brief 更新処理
+     * 座標をスプライトに適用する。
+     */
+    update : function() {
+
+        // 自機弾発射間隔が経過した場合は自機弾を発射する。
+        this.shotInterval++;
+        if (this.shotInterval >= Player.SHOT_INTERVAL) {
+            PlayerShot(this.floatX, this.floatY).addChildTo(this.parent);
+            this.shotInterval = 0;
+        }
+
+        // 座標をスプライトに適用する。
+        this.x = Math.floor(this.floatX);
+        this.y = Math.floor(this.floatY);
+    },
+    /**
+     * @function moveKeyLeft
+     * @brief 左キーによる移動
+     * キーボードの左キー入力による移動処理を行う。
+     */
+    moveKeyLeft: function() {
+        this.floatX -= Player.SPEED_BY_KEY;
+    },
+    /**
+     * @function moveKeyRight
+     * @brief 右キーによる移動
+     * キーボードの右キー入力による移動処理を行う。
+     */
+    moveKeyRight: function() {
+        this.floatX += Player.SPEED_BY_KEY;
+    },
+    /**
+     * @function moveKeyUp
+     * @brief 上キーによる移動
+     * キーボードの上キー入力による移動処理を行う。
+     */
+    moveKeyUp: function() {
+        this.floatY -= Player.SPEED_BY_KEY;
+    },
+    /**
+     * @function moveKeyDown
+     * @brief 下キーによる移動
+     * キーボードの下キー入力による移動処理を行う。
+     */
+    moveKeyDown: function() {
+        this.floatY += Player.SPEED_BY_KEY;
+    },
+    /**
+     * @function moveTouch
+     * @brief タッチによる移動
+     * タッチ入力による移動処理を行う。
+     *
+     * @param [in] x x座標方向のタッチ位置スライド量
+     * @param [in] y y座標方向のタッチ位置スライド量
+     */
+    moveTouch: function(x, y) {
+        this.floatX += x * Player.SPEED_BY_TOUCH;
+        this.floatY += y * Player.SPEED_BY_TOUCH;
+    },
+    /**
+     * @function moveTouch
+     * @brief ゲームパッドによる移動
+     * ゲームパッド入力による移動処理を行う。
+     *
+     * @param [in] x x座標方向のスティック入力値
+     * @param [in] y y座標方向のスティック入力値
+     */
+    moveGamepad: function(x, y) {
+        this.floatX += x * Player.SPEED_BY_GAMEPAD;
+        this.floatY += y * Player.SPEED_BY_GAMEPAD;
+    },
+});
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+/**
+ * @class PlayerShot
+ * @brief 自機弾
+ * 右方向に直進する。
+ */
+phina.define('PlayerShot', {
+    superClass: 'phina.display.Sprite',
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 座標の設定とスプライトシートの設定を行う。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     */
+    init: function(x, y) {
+        // 親クラスのコンストラクタを呼び出す。
+        this.superInit('image_8x8', 8, 8);
+
+        // 座標を設定する。
+        this.floatX = x;
+        this.floatY = y;
+
+        // スプライトシートの設定を行う。
+        this.spriteSheet = FrameAnimation('image_8x8_ss');
+        this.spriteSheet.attachTo(this);
+        this.spriteSheet.gotoAndPlay('player_shot');
+    },
+    /**
+     * @function update
+     * @brief 更新処理
+     * 右方向に直進する。
+     * 画面外に出ると自分自身を削除する。
+     */
+    update: function() {
+
+        // 右へ移動する。
+        this.floatX += 5;
+
+        // 座標をスプライトに適用する。
+        this.x = Math.floor(this.floatX);
+        this.y = Math.floor(this.floatY);
+
+        // 画面外に出た場合は自分自身を削除する。
+        if (this.floatX > ScreenSize.STAGE_RECT.width + 16) {
+            this.remove();
+        }
+    },
+});
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+// 拡大率
+const ZOOM_RATIO = 2;
+
+/**
+ * @class ScreenSize
+ * @brief 画面サイズ
+ * 画面サイズを管理する。
+ */
+phina.define('ScreenSize', {
+    _static: {
+        // 拡大率
+        ZOOM_RATIO: ZOOM_RATIO,
+        // スクリーンの幅
+        SCREEN_WIDTH: 240 * ZOOM_RATIO,
+        // スクリーンの高さ
+        SCREEN_HEIGHT: 160 * ZOOM_RATIO,
+        // ゲーム画面のサイズ
+        STAGE_RECT: {
+            x: 24,
+            y: 0,
+            width: 192,
+            height: 144,
+        },
+    },
+});
+
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+/**
  * @class Stage
  * @brief ステージ管理クラス
  * 
@@ -207,8 +417,6 @@ phina.define('Stage', {
     _static: {
         // タイルのサイズ
         TILE_SIZE: 16,
-        // 画面に表示されるステージの高さ
-        STAGE_HEIGHT: 144,
     },
     /**
      * @function init
@@ -218,11 +426,9 @@ phina.define('Stage', {
      * 
      * @param [in] manName マップ名
      * @param [in/out] layer ステージ画像を配置するレイヤー
-     * @param [in] stageWidth 画面に表示するステージの幅
      */
-    init: function(mapName, layer, stageWidth) {
+    init: function(mapName, layer) {
 
-        this.width = stageWidth;
         this.speed = 0;
         
         this.mapManager = TileMapManager(mapName);
@@ -259,7 +465,7 @@ phina.define('Stage', {
     _execEvent: function(characterLayer) {
 
         // 画面外2個先の列まで処理を行う。
-        var maxCol = Math.floor((-this.x + this.width) / Stage.TILE_SIZE) + 2;
+        var maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / Stage.TILE_SIZE) + 2;
 
         // イベント実行する範囲を計算する。
         var execPos = this.executedCol * Stage.TILE_SIZE;
@@ -269,7 +475,7 @@ phina.define('Stage', {
         if (execWidth > 0) {
 
             // イベントレイヤーのオブジェクトを検索する。
-            var objects = this.mapManager.getObjects('event', execPos, 0, execWidth, Stage.STAGE_HEIGHT);
+            var objects = this.mapManager.getObjects('event', execPos, 0, execWidth, ScreenSize.STAGE_RECT.height);
 
             // イベントを実行する。
             for (var i = 0; i < objects.length; i++) {
@@ -329,7 +535,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 3 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -1025,10 +1231,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module)))
 
 /***/ }),
-/* 4 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /**
@@ -1186,7 +1392,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 5 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15970,10 +16176,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, exports) {
 
 var g;
@@ -16000,7 +16206,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -16028,20 +16234,24 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var toritoma = toritoma || {};
 
 // phina.jsを読み込む
-var phina = __webpack_require__(5);
+var phina = __webpack_require__(8);
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(3);
+var tmx_stage1 = __webpack_require__(6);
 
-var tileMapManager = __webpack_require__(4);
-var stage = __webpack_require__(2);
+// 各クラス定義を読み込む。
+var screenSize = __webpack_require__(4);
+var tileMapManager = __webpack_require__(7);
+var stage = __webpack_require__(5);
 var controlSize = __webpack_require__(0);
+var player = __webpack_require__(2);
+var playerShot = __webpack_require__(3);
 var dragonfly = __webpack_require__(1);
 
 // マウスが接続されているかどうか
@@ -16061,19 +16271,6 @@ phina.globalize();
 
 // モノクロの各色の定義
 const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
-// 拡大率
-const ZOOM_RATIO = 2;
-// スクリーンの幅
-const SCREEN_WIDTH = 240 * ZOOM_RATIO;
-// スクリーンの高さ
-const SCREEN_HEIGHT = 160 * ZOOM_RATIO;
-// ゲーム画面のサイズ
-const STAGE_RECT = {
-    x: 24,
-    y: 0,
-    width: 192,
-    height: 144,
-};
 
 // アセット
 const ASSETS = {
@@ -16082,10 +16279,12 @@ const ASSETS = {
         'back': './images/back.png',
         'block': './images/block.png',
         'control': './images/control.png',
+        'image_8x8': './images/image_8x8.png',
         'enemy_16x16': './images/enemy_16x16.png',
     },
     spritesheet: {
         'player_ss': './images/player_ss.json',
+        'image_8x8_ss': './images/image_8x8_ss.json',
         'enemy_16x16_ss': './images/enemy_16x16_ss.json',
     },
     sound: {
@@ -16101,8 +16300,8 @@ phina.define('MainScene', {
     superClass: 'DisplayScene',
     init: function() {
         this.superInit({
-            width: SCREEN_WIDTH,
-            height: SCREEN_HEIGHT,
+            width: ScreenSize.SCREEN_WIDTH,
+            height: ScreenSize.SCREEN_HEIGHT,
         });
 
         // Canvasのスムージングを無効化する。
@@ -16116,19 +16315,23 @@ phina.define('MainScene', {
         this.backgroundColor = COLOR[0];
 
         // 背景レイヤーを作成する。
-        this.backgroundLayer = DisplayElement().setPosition(STAGE_RECT.x * ZOOM_RATIO, STAGE_RECT.y * ZOOM_RATIO).addChildTo(this);
-        this.backgroundLayer.scaleX = ZOOM_RATIO;
-        this.backgroundLayer.scaleY = ZOOM_RATIO;
+        this.backgroundLayer = DisplayElement().addChildTo(this);
+        this.backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,
+                                         ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
+        this.backgroundLayer.scaleX = ScreenSize.ZOOM_RATIO;
+        this.backgroundLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // キャラクターレイヤーを作成する。
         this.characterLayer = DisplayElement().addChildTo(this);
-        this.characterLayer.scaleX = ZOOM_RATIO;
-        this.characterLayer.scaleY = ZOOM_RATIO;
+        this.characterLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,
+                                        ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
+        this.characterLayer.scaleX = ScreenSize.ZOOM_RATIO;
+        this.characterLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // 枠レイヤーを作成する。
         this.frameLayer = DisplayElement().addChildTo(this);
-        this.frameLayer.scaleX = ZOOM_RATIO;
-        this.frameLayer.scaleY = ZOOM_RATIO;
+        this.frameLayer.scaleX = ScreenSize.ZOOM_RATIO;
+        this.frameLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // 情報レイヤーを作成する。
         this.infoLayer = DisplayElement().addChildTo(this);
@@ -16137,7 +16340,7 @@ phina.define('MainScene', {
         this._createFrame();
 
         // ステージを作成する。
-        this.stage = Stage('stage1', this.backgroundLayer, STAGE_RECT.width);
+        this.stage = Stage('stage1', this.backgroundLayer);
 
         // スコアラベルを作成する。
         this.scoreLabelBase = RectangleShape({
@@ -16158,21 +16361,10 @@ phina.define('MainScene', {
 
         this.score = 0;
 
-        // 自機画像を作成する。
-        this.player = Sprite('player', 16, 16);
-        this.player.x = Math.round(this.gridX.center() / ZOOM_RATIO);
-        this.player.y = Math.round(this.gridY.center() / ZOOM_RATIO);
+        // 自機を作成する。
+        this.player = Player(Math.round(ScreenSize.STAGE_RECT.width / 4),
+                             Math.round(ScreenSize.STAGE_RECT.height / 2));
         this.player.addChildTo(this.characterLayer);
-
-        // 自機の移動スピードを設定する。
-        this.player.SPEED_BY_KEY = 2;
-        this.player.SPEED_BY_TOUCH = 1.8 / ZOOM_RATIO;
-        this.player.SPEED_BY_GAMEPAD = 4;
-
-        // 自機のスプライトシートを作成する。
-        this.player_ss = FrameAnimation('player_ss');
-        this.player_ss.attachTo(this.player);
-        this.player_ss.gotoAndPlay('normal');
 
         // タッチ情報を初期化する。
         this.touch = {id: -1, x:0, y:0};
@@ -16192,16 +16384,16 @@ phina.define('MainScene', {
 
         // カーソルキーの入力によって自機を移動する。
         if (key.getKey('left')) {
-            this.player.x -= this.player.SPEED_BY_KEY;
+            this.player.moveKeyLeft();
         }
         if (key.getKey('right')) {
-            this.player.x += this.player.SPEED_BY_KEY;
+            this.player.moveKeyRight();
         }
         if (key.getKey('up')) {
-            this.player.y -= this.player.SPEED_BY_KEY;
+            this.player.moveKeyUp();
         }
         if (key.getKey('down')) {
-            this.player.y += this.player.SPEED_BY_KEY;
+            this.player.moveKeyDown();
         }
 
         // '.'入力でコンソールコマンドを入力する。
@@ -16248,8 +16440,7 @@ phina.define('MainScene', {
 
                 // スライド操作をしている場合はスライド量に応じて自機を移動する。
                 if (this.touch.id == touches[i].id) {
-                    this.player.x += Math.round((touches[i].x - this.touch.x) * this.player.SPEED_BY_TOUCH);
-                    this.player.y += Math.round((touches[i].y - this.touch.y) * this.player.SPEED_BY_TOUCH);
+                    this.player.moveTouch(touches[i].x - this.touch.x, touches[i].y - this.touch.y);
                     this.touch.x = touches[i].x;
                     this.touch.y = touches[i].y;
                     sliding = true;
@@ -16269,7 +16460,7 @@ phina.define('MainScene', {
         var stick = this.gamepad.getStickDirection(0);
 
         if (stick.length() > 0.5) {
-            this.player.position.add(stick.mul(this.player.SPEED_BY_GAMEPAD));
+            this.player.moveGamepad(stick.x, stick.y);
         }
 
         // スコア表示を更新する。
@@ -16302,8 +16493,8 @@ phina.define('MainScene', {
         // 左側の枠の座標を計算する。
         var x = 0;
         var y = 0;
-        var w = Math.ceil((SCREEN_WIDTH / ZOOM_RATIO - STAGE_RECT.width) / 2);
-        var h = SCREEN_HEIGHT / ZOOM_RATIO;
+        var w = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
         // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
         if (w % ControlSize.frameBack.w > 0) {
@@ -16312,9 +16503,9 @@ phina.define('MainScene', {
         }
 
         // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (STAGE_RECT.height % ControlSize.frameBack.h > 0) {
-            y -= ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
-            h += ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
+        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h > 0) {
+            y -= ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
+            h += ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
         }
 
         // 背景を並べる。
@@ -16329,15 +16520,15 @@ phina.define('MainScene', {
         }
 
         // 右側の枠の座標を計算する。
-        var x = STAGE_RECT.x + STAGE_RECT.width;
+        var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
         var y = 0;
-        var w = Math.ceil((SCREEN_WIDTH / ZOOM_RATIO - STAGE_RECT.width) / 2);
-        var h = SCREEN_HEIGHT / ZOOM_RATIO;
+        var w = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
         // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (STAGE_RECT.height % ControlSize.frameBack.h > 0) {
-            y -= ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
-            h += ControlSize.frameBack.h - STAGE_RECT.height % ControlSize.frameBack.h;
+        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h > 0) {
+            y -= ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
+            h += ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
         }
 
         // 背景を並べる。
@@ -16352,10 +16543,10 @@ phina.define('MainScene', {
         }
 
         // 下側の枠の座標を計算する。
-        var x = Math.ceil((SCREEN_WIDTH / ZOOM_RATIO - STAGE_RECT.width) / 2);
-        var y = STAGE_RECT.height;
-        var w = STAGE_RECT.width;
-        var h = SCREEN_HEIGHT / ZOOM_RATIO - STAGE_RECT.height;
+        var x = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+        var y = ScreenSize.STAGE_RECT.height;
+        var w = ScreenSize.STAGE_RECT.width;
+        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
 
 
         // 背景を並べる。
@@ -16378,8 +16569,8 @@ phina.define('MainScene', {
     _createFrameBar: function() {
 
         // 左側の枠の位置を計算する。
-        var x = STAGE_RECT.x - ControlSize.frameLeft.w;
-        var h = STAGE_RECT.height;
+        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameLeft.w;
+        var h = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
         for (var i = 0; i < h; i += ControlSize.frameLeft.h) {
@@ -16391,8 +16582,8 @@ phina.define('MainScene', {
         }
 
         // 右側の枠の位置を計算する。
-        var x = STAGE_RECT.x + STAGE_RECT.width;
-        var h = STAGE_RECT.height;
+        var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
+        var h = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
         for (var i = 0; i < h; i += ControlSize.frameRight.h) {
@@ -16404,9 +16595,9 @@ phina.define('MainScene', {
         }
 
         // 下側の枠の位置を計算する。
-        var x = STAGE_RECT.x;
-        var y = STAGE_RECT.height;
-        var w = STAGE_RECT.width;
+        var x = ScreenSize.STAGE_RECT.x;
+        var y = ScreenSize.STAGE_RECT.height;
+        var w = ScreenSize.STAGE_RECT.width;
 
         // 枠を並べる。
         for (var i = 0; i < w; i += ControlSize.frameBottom.w) {
@@ -16418,8 +16609,8 @@ phina.define('MainScene', {
         }
 
         // 左下の枠の位置を計算する。
-        var x = STAGE_RECT.x - ControlSize.frameBottomLeft.w;
-        var y = STAGE_RECT.height;
+        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameBottomLeft.w;
+        var y = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
         var bar = Sprite('control', ControlSize.frameBottomLeft.w, ControlSize.frameBottomLeft.h);
@@ -16429,8 +16620,8 @@ phina.define('MainScene', {
         bar.addChildTo(this.frameLayer);
 
         // 右下の枠の位置を計算する。
-        var x = STAGE_RECT.x + STAGE_RECT.width;
-        var y = STAGE_RECT.height;
+        var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
+        var y = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
         var bar = Sprite('control', ControlSize.frameBottomRight.w, ControlSize.frameBottomRight.h);
@@ -16446,8 +16637,8 @@ phina.main(function() {
 
     // アプリケーションを生成する。
     var app = GameApp({
-        width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT,
+        width: ScreenSize.SCREEN_WIDTH,
+        height: ScreenSize.SCREEN_HEIGHT,
         startLabel: 'main',
         assets: ASSETS,
     });

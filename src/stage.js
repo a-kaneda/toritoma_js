@@ -8,8 +8,6 @@ phina.define('Stage', {
     _static: {
         // タイルのサイズ
         TILE_SIZE: 16,
-        // 画面に表示されるステージの高さ
-        STAGE_HEIGHT: 144,
     },
     /**
      * @function init
@@ -19,11 +17,9 @@ phina.define('Stage', {
      * 
      * @param [in] manName マップ名
      * @param [in/out] layer ステージ画像を配置するレイヤー
-     * @param [in] stageWidth 画面に表示するステージの幅
      */
-    init: function(mapName, layer, stageWidth) {
+    init: function(mapName, layer) {
 
-        this.width = stageWidth;
         this.speed = 0;
         
         this.mapManager = TileMapManager(mapName);
@@ -60,7 +56,7 @@ phina.define('Stage', {
     _execEvent: function(characterLayer) {
 
         // 画面外2個先の列まで処理を行う。
-        var maxCol = Math.floor((-this.x + this.width) / Stage.TILE_SIZE) + 2;
+        var maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / Stage.TILE_SIZE) + 2;
 
         // イベント実行する範囲を計算する。
         var execPos = this.executedCol * Stage.TILE_SIZE;
@@ -70,7 +66,7 @@ phina.define('Stage', {
         if (execWidth > 0) {
 
             // イベントレイヤーのオブジェクトを検索する。
-            var objects = this.mapManager.getObjects('event', execPos, 0, execWidth, Stage.STAGE_HEIGHT);
+            var objects = this.mapManager.getObjects('event', execPos, 0, execWidth, ScreenSize.STAGE_RECT.height);
 
             // イベントを実行する。
             for (var i = 0; i < objects.length; i++) {

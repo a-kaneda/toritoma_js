@@ -1,10 +1,9 @@
 /**
- * @class Dragonfly
- * @brief トンボ
- * 左方向に直進する。
- * 左方向に直進する弾を発射する。
+ * @class PlayerShot
+ * @brief 自機弾
+ * 右方向に直進する。
  */
-phina.define('Dragonfly', {
+phina.define('PlayerShot', {
     superClass: 'phina.display.Sprite',
     /**
      * @function init
@@ -16,36 +15,35 @@ phina.define('Dragonfly', {
      */
     init: function(x, y) {
         // 親クラスのコンストラクタを呼び出す。
-        this.superInit('enemy_16x16', 16, 16);
+        this.superInit('image_8x8', 8, 8);
 
         // 座標を設定する。
         this.floatX = x;
         this.floatY = y;
 
         // スプライトシートの設定を行う。
-        this.spriteSheet = FrameAnimation('enemy_16x16_ss');
+        this.spriteSheet = FrameAnimation('image_8x8_ss');
         this.spriteSheet.attachTo(this);
-        this.spriteSheet.gotoAndPlay('dragonfly');
+        this.spriteSheet.gotoAndPlay('player_shot');
     },
     /**
      * @function update
      * @brief 更新処理
-     * 左方向に直進する。
-     * 左方向に直進する弾を発射する。
+     * 右方向に直進する。
      * 画面外に出ると自分自身を削除する。
      */
     update: function() {
 
-        // 左へ移動する。
-        this.floatX -= 1;
+        // 右へ移動する。
+        this.floatX += 5;
 
         // 座標をスプライトに適用する。
         this.x = Math.floor(this.floatX);
         this.y = Math.floor(this.floatY);
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX < -32) {
+        if (this.floatX > ScreenSize.STAGE_RECT.width + 16) {
             this.remove();
         }
-    }
+    },
 });
