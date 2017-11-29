@@ -16396,31 +16396,6 @@ phina.define('MainScene', {
             this.player.moveKeyDown();
         }
 
-        // '.'入力でコンソールコマンドを入力する。
-        if (key.getKeyDown('period')) {
-            var command = window.prompt('', '').split(' ');
-            switch (command[0]) {
-            case 'log':
-                console.log('this.' + command[1] + '=' + this[command[1]]);
-                break;
-            case 'save':
-                localStorage.setItem(command[1], command[2]);
-                break;
-            case 'load':
-                console.log(command[1] + '=' + localStorage.getItem(command[1]));
-                break;
-            case 'clear':
-                localStorage.clear();
-                console.log('Clear local storage.');
-                break;
-            case 'score':
-                this.score = parseInt(command[1], 10);
-                break;
-            default:
-                break;
-            }
-        }
-
         var touches = app.pointers;
         var sliding = false;
 
@@ -16635,12 +16610,18 @@ phina.define('MainScene', {
 // メイン処理
 phina.main(function() {
 
+    var isFit = true;
+    if (localStorage.disableFit) {
+        isFit = false;
+    }
+
     // アプリケーションを生成する。
     var app = GameApp({
         width: ScreenSize.SCREEN_WIDTH,
         height: ScreenSize.SCREEN_HEIGHT,
         startLabel: 'main',
         assets: ASSETS,
+        fit: isFit,
     });
 
     // FPSを設定する。
