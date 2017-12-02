@@ -64,7 +64,7 @@
                  "name":"start",
                  "properties":
                     {
-                     "speed":0.5
+                     "speed":0.25
                     },
                  "propertytypes":
                     {

@@ -28,6 +28,9 @@ phina.define('Player', {
         // 親クラスのコンストラクタを呼び出す。
         this.superInit('player', 16, 16);
 
+        // キャラクタータイプを設定する。
+        this.type = Character.type.PLAYER;
+
         // 座標を設定する。
         this.floatX = x;
         this.floatY = y;

@@ -63,11 +63,63 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 13);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+/**
+ * @class Character
+ * @brief キャラクター定数
+ * キャラクターに関する定数を管理する。
+ */
+phina.define('Character', {
+    _static: {
+        // キャラクター種別
+        type: {
+            // 自機
+            PLAYER: 1,
+            // 自機弾
+            PLAYER_SHOT: 2,
+            // 敵
+            ENEMY: 3,
+            // 敵弾
+            ENEMY_SHOT: 4,
+        },
+        // 敵キャラパラメータ
+        enemy: {
+            // トンボ
+            dragonfly: {
+                width: 16,
+                height: 16,
+                hp: 3,
+                defense: 0,
+                score: 100,
+            },
+        },
+        /**
+         * @function setEnemyParam
+         * @brief 敵キャラパラメータの設定
+         * 敵キャラの当たり判定、HP、防御力、スコアを設定する。
+         *
+         * @param enemyType 敵キャラの種類
+         * @param instance 敵キャラオブジェクト
+         */ 
+        setEnemyParam: function(enemyType, instance) {
+            instance.hitWidth = Character.enemy[enemyType].width;
+            instance.hitHeight = Character.enemy[enemyType].height;
+            instance.hp = Character.enemy[enemyType].hp;
+            instance.defense = Character.enemy[enemyType].defense;
+            instance.score = Character.enemy[enemyType].score;
+        },
+    },
+});
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 /**
@@ -137,7 +189,7 @@ phina.define('ControlSize', {
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports) {
 
 /**
@@ -160,9 +212,15 @@ phina.define('Dragonfly', {
         // 親クラスのコンストラクタを呼び出す。
         this.superInit('enemy_16x16', 16, 16);
 
+        // キャラクタータイプを設定する。
+        this.type = Character.type.ENEMY;
+
         // 座標を設定する。
         this.floatX = x;
         this.floatY = y;
+
+        // パラメータを設定する。
+        Character.setEnemyParam('dragonfly', this);
 
         // スプライトシートの設定を行う。
         this.spriteSheet = FrameAnimation('enemy_16x16_ss');
@@ -185,16 +243,37 @@ phina.define('Dragonfly', {
         this.x = Math.floor(this.floatX);
         this.y = Math.floor(this.floatY);
 
+        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
+        if (this.hp <= 0) {
+            this.remove();
+        }
+
         // 画面外に出た場合は自分自身を削除する。
         if (this.floatX < -32) {
             this.remove();
         }
-    }
+    },
+    /**
+     * @function hit
+     * @brief 衝突処理
+     * 他のキャラクターと衝突したときの処理を行う。
+     *
+     * @param character 衝突したキャラクター
+     */
+    hit: function(character) {
+        // 衝突したキャラクターが自機弾の場合
+        if (character.type === Character.type.PLAYER_SHOT) {
+            // 相手の攻撃力と自分の防御力の差をダメージとしてHPから減らす。
+            if (this.defense < character.power) {
+                this.hp -= character.power - this.defense;
+            }
+        }
+    },
 });
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 /**
@@ -226,6 +305,9 @@ phina.define('Player', {
     init: function(x, y) {
         // 親クラスのコンストラクタを呼び出す。
         this.superInit('player', 16, 16);
+
+        // キャラクタータイプを設定する。
+        this.type = Character.type.PLAYER;
 
         // 座標を設定する。
         this.floatX = x;
@@ -317,7 +399,7 @@ phina.define('Player', {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /**
@@ -326,6 +408,16 @@ phina.define('Player', {
  * 右方向に直進する。
  */
 phina.define('PlayerShot', {
+    _static: {
+        // 自機の攻撃力
+        PLAYER_POWER: 4,
+        // オプションの攻撃力
+        OPTION_POWER: 2,
+        // 当たり判定幅
+        HIT_WIDTH: 6,
+        // 当たり判定高さ
+        HIT_HEIGHT: 6,
+    },
     superClass: 'phina.display.Sprite',
     /**
      * @function init
@@ -334,19 +426,35 @@ phina.define('PlayerShot', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
+     * @param [in] isOption 発射元がオプションかどうか
      */
-    init: function(x, y) {
+    init: function(x, y, isOption) {
         // 親クラスのコンストラクタを呼び出す。
         this.superInit('image_8x8', 8, 8);
+
+        // キャラクタータイプを設定する。
+        this.type = Character.type.PLAYER_SHOT;
 
         // 座標を設定する。
         this.floatX = x;
         this.floatY = y;
 
+        // 当たり判定を設定する。
+        this.hitWidth = PlayerShot.HIT_WIDTH;
+        this.hitHeight = PlayerShot.HIT_HEIGHT;
+
         // スプライトシートの設定を行う。
         this.spriteSheet = FrameAnimation('image_8x8_ss');
         this.spriteSheet.attachTo(this);
         this.spriteSheet.gotoAndPlay('player_shot');
+
+        // 攻撃力を設定する。
+        if (isOption) {
+            this.power = PlayerShot.OPTION_POWER;
+        }
+        else {
+            this.power = PlayerShot.PLAYER_POWER;
+        }
     },
     /**
      * @function update
@@ -363,16 +471,48 @@ phina.define('PlayerShot', {
         this.x = Math.floor(this.floatX);
         this.y = Math.floor(this.floatY);
 
+        // 当たり判定処理を行う。
+        this._checkHitChacater();
+
         // 画面外に出た場合は自分自身を削除する。
         if (this.floatX > ScreenSize.STAGE_RECT.width + 16) {
             this.remove();
+        }
+    },
+    /**
+     * @function _checkHitChacater
+     * @breif 当たり判定処理
+     * 他のキャラクターとの当たり判定を処理する。
+     */
+    _checkHitChacater: function() {
+
+        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
+        var characters = this.parent.children;
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 対象が敵キャラクターの場合
+            if (characters[i].type === Character.type.ENEMY) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(this, characters[i])) {
+
+                    // 敵キャラクターの衝突処理を実行する。
+                    characters[i].hit(this);
+
+                    // 敵キャラクターに接触した場合は自分自身は削除する。
+                    this.remove();
+                    break;
+                }
+            }
         }
     },
 });
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -404,7 +544,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 /**
@@ -535,7 +675,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -604,7 +744,7 @@ phina.define('Stage', {
                  "name":"start",
                  "properties":
                     {
-                     "speed":0.5
+                     "speed":0.25
                     },
                  "propertytypes":
                     {
@@ -1231,10 +1371,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)(module)))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /**
@@ -1392,7 +1532,44 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
+/***/ (function(module, exports) {
+
+/**
+ * @class Util
+ * @brief ユーティリティ
+ * アプリ全体で使用する関数群を定義する。
+ */
+phina.define('Util', {
+    _static: {
+        /**
+         * @function isHitCharacter
+         * @brief キャラクター同士の当たり判定
+         * キャラクター同士が衝突しているかどうかを判定する。
+         *
+         * @param a キャラクター1
+         * @param b キャラクター2
+         * @retval true 衝突している
+         * @retval false 衝突していない
+         */
+        isHitCharacter: function(a, b) {
+            if (a.floatX <= b.floatX + b.hitWidth &&
+                a.floatX + a.hitWidth >= b.floatX &&
+                a.floatY <= b.floatY + b.hitHeight &&
+                a.floatY + b.hitWidth >= b.floatY) {
+
+                return true;
+            }
+            else {
+                return false;
+            }
+        },
+    },
+});
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16176,10 +16353,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports) {
 
 var g;
@@ -16206,7 +16383,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -16234,25 +16411,27 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var toritoma = toritoma || {};
 
 // phina.jsを読み込む
-var phina = __webpack_require__(8);
+var phina = __webpack_require__(10);
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(6);
+var tmx_stage1 = __webpack_require__(7);
 
 // 各クラス定義を読み込む。
-var screenSize = __webpack_require__(4);
-var tileMapManager = __webpack_require__(7);
-var stage = __webpack_require__(5);
-var controlSize = __webpack_require__(0);
-var player = __webpack_require__(2);
-var playerShot = __webpack_require__(3);
-var dragonfly = __webpack_require__(1);
+var util = __webpack_require__(9);
+var screenSize = __webpack_require__(5);
+var character = __webpack_require__(0);
+var tileMapManager = __webpack_require__(8);
+var stage = __webpack_require__(6);
+var controlSize = __webpack_require__(1);
+var player = __webpack_require__(3);
+var playerShot = __webpack_require__(4);
+var dragonfly = __webpack_require__(2);
 
 // マウスが接続されているかどうか
 toritoma.isMouseUsed = false;
@@ -16610,6 +16789,7 @@ phina.define('MainScene', {
 // メイン処理
 phina.main(function() {
 
+    // 画面サイズの補正の有効無効を切り替える。
     var isFit = true;
     if (localStorage.disableFit) {
         isFit = false;

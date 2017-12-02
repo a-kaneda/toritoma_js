@@ -7,7 +7,9 @@ var phina = require('./vendor/phina.js');
 var tmx_stage1 = require('./stage1.js');
 
 // 各クラス定義を読み込む。
+var util = require('./util.js');
 var screenSize = require('./screensize.js');
+var character = require('./character.js');
 var tileMapManager = require('./tilemapmanager.js');
 var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');
@@ -371,6 +373,7 @@ phina.define('MainScene', {
 // メイン処理
 phina.main(function() {
 
+    // 画面サイズの補正の有効無効を切り替える。
     var isFit = true;
     if (localStorage.disableFit) {
         isFit = false;
