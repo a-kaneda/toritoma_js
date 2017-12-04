@@ -40,9 +40,9 @@ phina.define('PlayerShot', {
         this.hitHeight = PlayerShot.HIT_HEIGHT;
 
         // スプライトシートの設定を行う。
-        this.spriteSheet = FrameAnimation('image_8x8_ss');
-        this.spriteSheet.attachTo(this);
-        this.spriteSheet.gotoAndPlay('player_shot');
+        this.animation = FrameAnimation('image_8x8_ss');
+        this.animation.attachTo(this);
+        this.animation.gotoAndPlay('player_shot');
 
         // 攻撃力を設定する。
         if (isOption) {

@@ -15,6 +15,7 @@ var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');
 var player = require('./player.js');
 var playerShot = require('./playershot.js');
+var explosion = require('./explosion.js');
 var dragonfly = require('./dragonfly.js');
 
 // マウスが接続されているかどうか
@@ -38,17 +39,15 @@ const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 // アセット
 const ASSETS = {
     image: {
-        'player': './images/player.png',
         'back': './images/back.png',
         'block': './images/block.png',
         'control': './images/control.png',
         'image_8x8': './images/image_8x8.png',
-        'enemy_16x16': './images/enemy_16x16.png',
+        'image_16x16': './images/image_16x16.png',
     },
     spritesheet: {
-        'player_ss': './images/player_ss.json',
         'image_8x8_ss': './images/image_8x8_ss.json',
-        'enemy_16x16_ss': './images/enemy_16x16_ss.json',
+        'image_16x16_ss': './images/image_16x16_ss.json',
     },
     sound: {
         'stage1': './sound/stage1.mp3',

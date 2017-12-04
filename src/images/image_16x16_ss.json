@@ -1,0 +1,25 @@
+{
+    "frame": {
+        "width": 16,
+        "height": 16,
+        "cols": 8,
+        "rows": 3
+    },
+    "animations": {
+        "player_normal": {
+            "frames": [0, 1],
+            "next": "player_normal",
+            "frequency": 12
+        },
+        "explosion": {
+            "frames": [8, 9, 10, 11, 12, 13, 14, 15],
+            "next": "",
+            "frequency": 6
+        },
+        "dragonfly": {
+            "frames": [16, 17],
+            "next": "dragonfly",
+            "frequency": 12
+        }
+    }
+}

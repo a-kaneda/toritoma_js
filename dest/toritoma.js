@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 13);
+/******/ 	return __webpack_require__(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -210,7 +210,7 @@ phina.define('Dragonfly', {
      */
     init: function(x, y) {
         // 親クラスのコンストラクタを呼び出す。
-        this.superInit('enemy_16x16', 16, 16);
+        this.superInit('image_16x16', 16, 16);
 
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY;
@@ -223,9 +223,9 @@ phina.define('Dragonfly', {
         Character.setEnemyParam('dragonfly', this);
 
         // スプライトシートの設定を行う。
-        this.spriteSheet = FrameAnimation('enemy_16x16_ss');
-        this.spriteSheet.attachTo(this);
-        this.spriteSheet.gotoAndPlay('dragonfly');
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this);
+        this.animation.gotoAndPlay('dragonfly');
     },
     /**
      * @function update
@@ -245,6 +245,11 @@ phina.define('Dragonfly', {
 
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this.hp <= 0) {
+
+            // 爆発アニメーションを作成する。
+            Explosion(this.x, this.y).addChildTo(this.parent);
+
+            // 自分自身を削除する。
             this.remove();
         }
 
@@ -277,6 +282,53 @@ phina.define('Dragonfly', {
 /***/ (function(module, exports) {
 
 /**
+ * @class Explosion
+ * @brief 爆発
+ * 爆発アニメーションを行う。
+ */
+phina.define('Explosion', {
+    superClass: 'phina.display.Sprite',
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 座標の設定とスプライトシートの設定を行う。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     */
+    init: function(x, y) {
+
+        // 親クラスのコンストラクタを呼び出す。
+        this.superInit('image_16x16', 16, 16);
+
+        // 座標を設定する。
+        this.x = Math.floor(x);
+        this.y = Math.floor(y);
+
+        // スプライトシートの設定を行う。
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this);
+        this.animation.gotoAndPlay('explosion');
+    },
+    /**
+     * @function update
+     * @brief 更新処理
+     * アニメーションが終了すると自分自身を削除する。
+     */
+    update: function() {
+        // アニメーションが終了すると自分自身を削除する。
+        if (this.animation.finished) {
+            this.remove();
+        }
+    },
+});
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+/**
  * @class Player
  * @brief 自機
  * ユーザー捜査に応じて移動する。
@@ -304,7 +356,7 @@ phina.define('Player', {
      */
     init: function(x, y) {
         // 親クラスのコンストラクタを呼び出す。
-        this.superInit('player', 16, 16);
+        this.superInit('image_16x16', 16, 16);
 
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER;
@@ -314,9 +366,9 @@ phina.define('Player', {
         this.floatY = y;
 
         // スプライトシートの設定を行う。
-        this.spriteSheet = FrameAnimation('player_ss');
-        this.spriteSheet.attachTo(this);
-        this.spriteSheet.gotoAndPlay('normal');
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this);
+        this.animation.gotoAndPlay('player_normal');
 
         // メンバを初期化する。
         this.shotInterval = 0;
@@ -399,7 +451,7 @@ phina.define('Player', {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 /**
@@ -444,9 +496,9 @@ phina.define('PlayerShot', {
         this.hitHeight = PlayerShot.HIT_HEIGHT;
 
         // スプライトシートの設定を行う。
-        this.spriteSheet = FrameAnimation('image_8x8_ss');
-        this.spriteSheet.attachTo(this);
-        this.spriteSheet.gotoAndPlay('player_shot');
+        this.animation = FrameAnimation('image_8x8_ss');
+        this.animation.attachTo(this);
+        this.animation.gotoAndPlay('player_shot');
 
         // 攻撃力を設定する。
         if (isOption) {
@@ -512,7 +564,7 @@ phina.define('PlayerShot', {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -544,7 +596,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /**
@@ -675,7 +727,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -1371,10 +1423,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)(module)))
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /**
@@ -1532,7 +1584,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 /**
@@ -1569,7 +1621,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16353,10 +16405,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 var g;
@@ -16383,7 +16435,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -16411,26 +16463,27 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var toritoma = toritoma || {};
 
 // phina.jsを読み込む
-var phina = __webpack_require__(10);
+var phina = __webpack_require__(11);
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(7);
+var tmx_stage1 = __webpack_require__(8);
 
 // 各クラス定義を読み込む。
-var util = __webpack_require__(9);
-var screenSize = __webpack_require__(5);
+var util = __webpack_require__(10);
+var screenSize = __webpack_require__(6);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(8);
-var stage = __webpack_require__(6);
+var tileMapManager = __webpack_require__(9);
+var stage = __webpack_require__(7);
 var controlSize = __webpack_require__(1);
-var player = __webpack_require__(3);
-var playerShot = __webpack_require__(4);
+var player = __webpack_require__(4);
+var playerShot = __webpack_require__(5);
+var explosion = __webpack_require__(3);
 var dragonfly = __webpack_require__(2);
 
 // マウスが接続されているかどうか
@@ -16454,17 +16507,15 @@ const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 // アセット
 const ASSETS = {
     image: {
-        'player': './images/player.png',
         'back': './images/back.png',
         'block': './images/block.png',
         'control': './images/control.png',
         'image_8x8': './images/image_8x8.png',
-        'enemy_16x16': './images/enemy_16x16.png',
+        'image_16x16': './images/image_16x16.png',
     },
     spritesheet: {
-        'player_ss': './images/player_ss.json',
         'image_8x8_ss': './images/image_8x8_ss.json',
-        'enemy_16x16_ss': './images/enemy_16x16_ss.json',
+        'image_16x16_ss': './images/image_16x16_ss.json',
     },
     sound: {
         'stage1': './sound/stage1.mp3',

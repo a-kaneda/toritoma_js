@@ -26,7 +26,7 @@ phina.define('Player', {
      */
     init: function(x, y) {
         // 親クラスのコンストラクタを呼び出す。
-        this.superInit('player', 16, 16);
+        this.superInit('image_16x16', 16, 16);
 
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER;
@@ -36,9 +36,9 @@ phina.define('Player', {
         this.floatY = y;
 
         // スプライトシートの設定を行う。
-        this.spriteSheet = FrameAnimation('player_ss');
-        this.spriteSheet.attachTo(this);
-        this.spriteSheet.gotoAndPlay('normal');
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this);
+        this.animation.gotoAndPlay('player_normal');
 
         // メンバを初期化する。
         this.shotInterval = 0;

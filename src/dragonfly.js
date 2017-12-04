@@ -16,7 +16,7 @@ phina.define('Dragonfly', {
      */
     init: function(x, y) {
         // 親クラスのコンストラクタを呼び出す。
-        this.superInit('enemy_16x16', 16, 16);
+        this.superInit('image_16x16', 16, 16);
 
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY;
@@ -29,9 +29,9 @@ phina.define('Dragonfly', {
         Character.setEnemyParam('dragonfly', this);
 
         // スプライトシートの設定を行う。
-        this.spriteSheet = FrameAnimation('enemy_16x16_ss');
-        this.spriteSheet.attachTo(this);
-        this.spriteSheet.gotoAndPlay('dragonfly');
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this);
+        this.animation.gotoAndPlay('dragonfly');
     },
     /**
      * @function update
@@ -51,6 +51,11 @@ phina.define('Dragonfly', {
 
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this.hp <= 0) {
+
+            // 爆発アニメーションを作成する。
+            Explosion(this.x, this.y).addChildTo(this.parent);
+
+            // 自分自身を削除する。
             this.remove();
         }
 
