@@ -1,7 +1,9 @@
-var toritoma = toritoma || {};
-
 // phina.jsを読み込む
 var phina = require('./vendor/phina.js');
+
+// グローバル変数定義用
+phina.define('toritoma', {
+});
 
 // 各ステージのマップデータを読み込む
 var tmx_stage1 = require('./stage1.js');
@@ -65,6 +67,9 @@ phina.define('MainScene', {
             width: ScreenSize.SCREEN_WIDTH,
             height: ScreenSize.SCREEN_HEIGHT,
         });
+
+        // デバッグ用にシーンをグローバル変数に入れる。
+        toritoma.scene = this;
 
         // Canvasのスムージングを無効化する。
         this.canvas.imageSmoothingEnabled = false;

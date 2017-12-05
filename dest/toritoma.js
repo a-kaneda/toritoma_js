@@ -404,7 +404,12 @@ phina.define('Player', {
      * キーボードの左キー入力による移動処理を行う。
      */
     moveKeyLeft: function() {
+
+        // x座標を変更する。
         this.floatX -= Player.SPEED_BY_KEY;
+
+        // 当たり判定処理を行う。
+        this._checkHit();
     },
     /**
      * @function moveKeyRight
@@ -412,7 +417,12 @@ phina.define('Player', {
      * キーボードの右キー入力による移動処理を行う。
      */
     moveKeyRight: function() {
+
+        // x座標を変更する。
         this.floatX += Player.SPEED_BY_KEY;
+
+        // 当たり判定処理を行う。
+        this._checkHit();
     },
     /**
      * @function moveKeyUp
@@ -420,7 +430,12 @@ phina.define('Player', {
      * キーボードの上キー入力による移動処理を行う。
      */
     moveKeyUp: function() {
+
+        // y座標を変更する。
         this.floatY -= Player.SPEED_BY_KEY;
+
+        // 当たり判定処理を行う。
+        this._checkHit();
     },
     /**
      * @function moveKeyDown
@@ -428,7 +443,12 @@ phina.define('Player', {
      * キーボードの下キー入力による移動処理を行う。
      */
     moveKeyDown: function() {
+
+        // y座標を変更する。
         this.floatY += Player.SPEED_BY_KEY;
+
+        // 当たり判定処理を行う。
+        this._checkHit();
     },
     /**
      * @function moveTouch
@@ -439,8 +459,13 @@ phina.define('Player', {
      * @param [in] y y座標方向のタッチ位置スライド量
      */
     moveTouch: function(x, y) {
+
+        // 座標を変更する。
         this.floatX += x * Player.SPEED_BY_TOUCH;
         this.floatY += y * Player.SPEED_BY_TOUCH;
+
+        // 当たり判定処理を行う。
+        this._checkHit();
     },
     /**
      * @function moveTouch
@@ -451,8 +476,35 @@ phina.define('Player', {
      * @param [in] y y座標方向のスティック入力値
      */
     moveGamepad: function(x, y) {
+
+        // 座標を変更する。
         this.floatX += x * Player.SPEED_BY_GAMEPAD;
         this.floatY += y * Player.SPEED_BY_GAMEPAD;
+
+        // 当たり判定処理を行う。
+        this._checkHit();
+    },
+    _checkHit: function() {
+
+        // 左側画面範囲外には移動させないようにする。
+        if (this.floatX < 0) {
+            this.floatX = 0;
+        }
+
+        // 右側画面範囲外には移動させないようにする。
+        if (this.floatX > ScreenSize.STAGE_RECT.width - 1) {
+            this.floatX = ScreenSize.STAGE_RECT.width - 1;
+        }
+
+        // 上側画面範囲外には移動させないようにする。
+        if (this.floatY < 0) {
+            this.floatY = 0;
+        }
+
+        // 下側画面範囲外には移動させないようにする。
+        if (this.floatY > ScreenSize.STAGE_RECT.height - 1) {
+            this.floatY = ScreenSize.STAGE_RECT.height - 1;
+        }
     },
 });
 
@@ -16480,10 +16532,12 @@ module.exports = function(module) {
 /* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toritoma = toritoma || {};
-
 // phina.jsを読み込む
 var phina = __webpack_require__(11);
+
+// グローバル変数定義用
+phina.define('toritoma', {
+});
 
 // 各ステージのマップデータを読み込む
 var tmx_stage1 = __webpack_require__(8);
@@ -16547,6 +16601,9 @@ phina.define('MainScene', {
             width: ScreenSize.SCREEN_WIDTH,
             height: ScreenSize.SCREEN_HEIGHT,
         });
+
+        // デバッグ用にシーンをグローバル変数に入れる。
+        toritoma.scene = this;
 
         // Canvasのスムージングを無効化する。
         this.canvas.imageSmoothingEnabled = false;
