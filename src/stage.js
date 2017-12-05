@@ -16,26 +16,31 @@ phina.define('Stage', {
      * stageWidthをメンバ変数に格納する。
      * 
      * @param [in] manName マップ名
+     * @param [in] scene シーン
      * @param [in/out] layer ステージ画像を配置するレイヤー
      */
-    init: function(mapName, layer) {
+    init: function(mapName, scene, layer) {
 
+        // メンバを初期化する。
         this.speed = 0;
+        this.x = 0;
+        this.executedCol = 0;
         
+        // タイルマップを読み込み、背景画像を配置する。
         this.mapManager = TileMapManager(mapName);
         this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
 
-        this.x = 0;
-        this.executedCol = 0;
+        // シーンを記憶する。
+        this.scene = scene;
     },
     /**
      * @function update
      * @brief 更新処理
      * ステージの状態を更新する。
      *
-     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
      */
     update: function(characterLayer) {
 
@@ -72,9 +77,11 @@ phina.define('Stage', {
             for (var i = 0; i < objects.length; i++) {
                 switch (objects[i].type) {
                 case 'speed':
+                    // スクロールスピードを変更する。
                     this.speed = objects[i].properties.speed;
                     break;
                 case 'enemy':
+                    // 敵キャラを生成する。
                     this._createEnemy(objects[i].name,
                                       this.x + objects[i].x + objects[i].width / 2,
                                       objects[i].y + objects[i].height / 2,
@@ -116,7 +123,7 @@ phina.define('Stage', {
     _createEnemy: function(type, x, y, characterLayer) {
         switch (type) {
         case 'dragonfly':
-            Dragonfly(x, y).addChildTo(characterLayer);
+            Dragonfly(x, y, this.scene).addChildTo(characterLayer);
             break;
         default:
             break;

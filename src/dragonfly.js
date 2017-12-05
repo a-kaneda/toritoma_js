@@ -13,8 +13,9 @@ phina.define('Dragonfly', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
+     * @param [in] scene シーン
      */
-    init: function(x, y) {
+    init: function(x, y, scene) {
         // 親クラスのコンストラクタを呼び出す。
         this.superInit('image_16x16', 16, 16);
 
@@ -24,6 +25,9 @@ phina.define('Dragonfly', {
         // 座標を設定する。
         this.floatX = x;
         this.floatY = y;
+
+        // シーンを記憶する。
+        this.scene = scene;
 
         // パラメータを設定する。
         Character.setEnemyParam('dragonfly', this);
@@ -54,6 +58,9 @@ phina.define('Dragonfly', {
 
             // 爆発アニメーションを作成する。
             Explosion(this.x, this.y).addChildTo(this.parent);
+
+            // スコアを加算する。
+            this.scene.addScore(this.score);
 
             // 自分自身を削除する。
             this.remove();

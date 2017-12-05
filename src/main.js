@@ -102,7 +102,7 @@ phina.define('MainScene', {
         this._createFrame();
 
         // ステージを作成する。
-        this.stage = Stage('stage1', this.backgroundLayer);
+        this.stage = Stage('stage1', this, this.backgroundLayer);
 
         // スコアラベルを作成する。
         this.scoreLabelBase = RectangleShape({
@@ -203,7 +203,11 @@ phina.define('MainScene', {
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
 
+        // ステージの状態を更新する。
         this.stage.update(this.characterLayer);
+    },
+    addScore: function(score) {
+        this.score += score;
     },
     /**
      * @function _crateFrame

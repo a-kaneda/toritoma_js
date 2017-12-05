@@ -71,7 +71,7 @@ phina.define('PlayerShot', {
         this._checkHitChacater();
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX > ScreenSize.STAGE_RECT.width + 16) {
+        if (this.floatX > ScreenSize.STAGE_RECT.width + 4) {
             this.remove();
         }
     },

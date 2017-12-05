@@ -207,8 +207,9 @@ phina.define('Dragonfly', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
+     * @param [in] scene シーン
      */
-    init: function(x, y) {
+    init: function(x, y, scene) {
         // 親クラスのコンストラクタを呼び出す。
         this.superInit('image_16x16', 16, 16);
 
@@ -218,6 +219,9 @@ phina.define('Dragonfly', {
         // 座標を設定する。
         this.floatX = x;
         this.floatY = y;
+
+        // シーンを記憶する。
+        this.scene = scene;
 
         // パラメータを設定する。
         Character.setEnemyParam('dragonfly', this);
@@ -248,6 +252,9 @@ phina.define('Dragonfly', {
 
             // 爆発アニメーションを作成する。
             Explosion(this.x, this.y).addChildTo(this.parent);
+
+            // スコアを加算する。
+            this.scene.addScore(this.score);
 
             // 自分自身を削除する。
             this.remove();
@@ -527,7 +534,7 @@ phina.define('PlayerShot', {
         this._checkHitChacater();
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX > ScreenSize.STAGE_RECT.width + 16) {
+        if (this.floatX > ScreenSize.STAGE_RECT.width + 4) {
             this.remove();
         }
     },
@@ -617,26 +624,31 @@ phina.define('Stage', {
      * stageWidthをメンバ変数に格納する。
      * 
      * @param [in] manName マップ名
+     * @param [in] scene シーン
      * @param [in/out] layer ステージ画像を配置するレイヤー
      */
-    init: function(mapName, layer) {
+    init: function(mapName, scene, layer) {
 
+        // メンバを初期化する。
         this.speed = 0;
+        this.x = 0;
+        this.executedCol = 0;
         
+        // タイルマップを読み込み、背景画像を配置する。
         this.mapManager = TileMapManager(mapName);
         this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
 
-        this.x = 0;
-        this.executedCol = 0;
+        // シーンを記憶する。
+        this.scene = scene;
     },
     /**
      * @function update
      * @brief 更新処理
      * ステージの状態を更新する。
      *
-     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
      */
     update: function(characterLayer) {
 
@@ -673,9 +685,11 @@ phina.define('Stage', {
             for (var i = 0; i < objects.length; i++) {
                 switch (objects[i].type) {
                 case 'speed':
+                    // スクロールスピードを変更する。
                     this.speed = objects[i].properties.speed;
                     break;
                 case 'enemy':
+                    // 敵キャラを生成する。
                     this._createEnemy(objects[i].name,
                                       this.x + objects[i].x + objects[i].width / 2,
                                       objects[i].y + objects[i].height / 2,
@@ -717,7 +731,7 @@ phina.define('Stage', {
     _createEnemy: function(type, x, y, characterLayer) {
         switch (type) {
         case 'dragonfly':
-            Dragonfly(x, y).addChildTo(characterLayer);
+            Dragonfly(x, y, this.scene).addChildTo(characterLayer);
             break;
         default:
             break;
@@ -16570,7 +16584,7 @@ phina.define('MainScene', {
         this._createFrame();
 
         // ステージを作成する。
-        this.stage = Stage('stage1', this.backgroundLayer);
+        this.stage = Stage('stage1', this, this.backgroundLayer);
 
         // スコアラベルを作成する。
         this.scoreLabelBase = RectangleShape({
@@ -16671,7 +16685,11 @@ phina.define('MainScene', {
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
 
+        // ステージの状態を更新する。
         this.stage.update(this.characterLayer);
+    },
+    addScore: function(score) {
+        this.score += score;
     },
     /**
      * @function _crateFrame
