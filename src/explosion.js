@@ -26,6 +26,9 @@ phina.define('Explosion', {
         this.animation = FrameAnimation('image_16x16_ss');
         this.animation.attachTo(this);
         this.animation.gotoAndPlay('explosion');
+        
+        // 爆発音を再生する。
+        SoundManager.play('bomb_min');
     },
     /**
      * @function update

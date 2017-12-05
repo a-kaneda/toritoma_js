@@ -53,6 +53,7 @@ const ASSETS = {
     },
     sound: {
         'stage1': './sound/stage1.mp3',
+        'bomb_min': './sound/bomb_min.mp3',
     },
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',

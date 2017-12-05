@@ -316,6 +316,9 @@ phina.define('Explosion', {
         this.animation = FrameAnimation('image_16x16_ss');
         this.animation.attachTo(this);
         this.animation.gotoAndPlay('explosion');
+        
+        // 爆発音を再生する。
+        SoundManager.play('bomb_min');
     },
     /**
      * @function update
@@ -484,6 +487,11 @@ phina.define('Player', {
         // 当たり判定処理を行う。
         this._checkHit();
     },
+    /**
+     * @function _checkHit
+     * @breif 当たり判定処理
+     * 当たり判定を処理する。
+     */
     _checkHit: function() {
 
         // 左側画面範囲外には移動させないようにする。
@@ -16587,6 +16595,7 @@ const ASSETS = {
     },
     sound: {
         'stage1': './sound/stage1.mp3',
+        'bomb_min': './sound/bomb_min.mp3',
     },
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',
