@@ -5,7 +5,6 @@
  * 左方向に直進する弾を発射する。
  */
 phina.define('Dragonfly', {
-    superClass: 'phina.display.Sprite',
     /**
      * @function init
      * @brief コンストラクタ
@@ -13,29 +12,30 @@ phina.define('Dragonfly', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
-     * @param [in] scene シーン
+     * @param [in/out] scene シーン
      */
     init: function(x, y, scene) {
-        // 親クラスのコンストラクタを呼び出す。
-        this.superInit('image_16x16', 16, 16);
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_16x16', 16, 16);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('dragonfly');
 
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY;
 
         // 座標を設定する。
-        this.floatX = x;
-        this.floatY = y;
-
-        // シーンを記憶する。
-        this.scene = scene;
+        this.rect = {
+            x: x,
+            y: y,
+        };
 
         // パラメータを設定する。
         Character.setEnemyParam('dragonfly', this);
-
-        // スプライトシートの設定を行う。
-        this.animation = FrameAnimation('image_16x16_ss');
-        this.animation.attachTo(this);
-        this.animation.gotoAndPlay('dragonfly');
     },
     /**
      * @function update
@@ -43,32 +43,35 @@ phina.define('Dragonfly', {
      * 左方向に直進する。
      * 左方向に直進する弾を発射する。
      * 画面外に出ると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
      */
-    update: function() {
+    update: function(scene) {
 
         // 左へ移動する。
-        this.floatX -= 1;
+        this.rect.x -= 1;
 
         // 座標をスプライトに適用する。
-        this.x = Math.floor(this.floatX);
-        this.y = Math.floor(this.floatY);
+        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
 
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this.hp <= 0) {
 
             // 爆発アニメーションを作成する。
-            Explosion(this.x, this.y).addChildTo(this.parent);
+            scene.addCharacter(Explosion(this.rect.x, this.rect.y, scene));
 
             // スコアを加算する。
-            this.scene.addScore(this.score);
+            scene.addScore(this.score);
 
             // 自分自身を削除する。
-            this.remove();
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
 
         // 画面外に出た場合は自分自身を削除する。
         if (this.floatX < -32) {
-            this.remove();
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
     },
     /**

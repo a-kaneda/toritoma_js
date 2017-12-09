@@ -42,7 +42,6 @@ const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 const ASSETS = {
     image: {
         'back': './images/back.png',
-        'block': './images/block.png',
         'control': './images/control.png',
         'image_8x8': './images/image_8x8.png',
         'image_16x16': './images/image_16x16.png',
@@ -108,7 +107,7 @@ phina.define('MainScene', {
         this._createFrame();
 
         // ステージを作成する。
-        this.stage = Stage('stage1', this, this.backgroundLayer);
+        this.stage = Stage('stage1', this.backgroundLayer);
 
         // スコアラベルを作成する。
         this.scoreLabelBase = RectangleShape({
@@ -129,10 +128,13 @@ phina.define('MainScene', {
 
         this.score = 0;
 
+        // キャラクター管理配列を作成する。
+        this.characters = [];
+
         // 自機を作成する。
         this.player = Player(Math.round(ScreenSize.STAGE_RECT.width / 4),
-                             Math.round(ScreenSize.STAGE_RECT.height / 2));
-        this.player.addChildTo(this.characterLayer);
+                             Math.round(ScreenSize.STAGE_RECT.height / 2),
+                             this);
 
         // タッチ情報を初期化する。
         this.touch = {id: -1, x:0, y:0};
@@ -152,16 +154,16 @@ phina.define('MainScene', {
 
         // カーソルキーの入力によって自機を移動する。
         if (key.getKey('left')) {
-            this.player.moveKeyLeft();
+            this.player.moveKeyLeft(this);
         }
         if (key.getKey('right')) {
-            this.player.moveKeyRight();
+            this.player.moveKeyRight(this);
         }
         if (key.getKey('up')) {
-            this.player.moveKeyUp();
+            this.player.moveKeyUp(this);
         }
         if (key.getKey('down')) {
-            this.player.moveKeyDown();
+            this.player.moveKeyDown(this);
         }
 
         var touches = app.pointers;
@@ -183,7 +185,7 @@ phina.define('MainScene', {
 
                 // スライド操作をしている場合はスライド量に応じて自機を移動する。
                 if (this.touch.id == touches[i].id) {
-                    this.player.moveTouch(touches[i].x - this.touch.x, touches[i].y - this.touch.y);
+                    this.player.moveTouch(touches[i].x - this.touch.x, touches[i].y - this.touch.y, this);
                     this.touch.x = touches[i].x;
                     this.touch.y = touches[i].y;
                     sliding = true;
@@ -203,17 +205,85 @@ phina.define('MainScene', {
         var stick = this.gamepad.getStickDirection(0);
 
         if (stick.length() > 0.5) {
-            this.player.moveGamepad(stick.x, stick.y);
+            this.player.moveGamepad(stick.x, stick.y, this);
+        }
+
+        // ステージの状態を更新する。
+        this.stage.update(this);
+
+        // プレイヤーの状態を更新する。
+        this.player.update(this);
+
+        // 各キャラクターの状態を更新する。
+        for (var i = 0; i < this.characters.length; i++) {
+            this.characters[i].update(this);
         }
 
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
-
-        // ステージの状態を更新する。
-        this.stage.update(this.characterLayer);
     },
+    /**
+     * @function addCharacter
+     * @brief キャラクター追加
+     * キャラクターを追加する。
+     *
+     * @param [in] character 追加するキャラクター
+     */
+    addCharacter: function(character) {
+        this.characters.push(character);
+    },
+    /**
+     * @function addCharacterSprite
+     * @brief キャラクタースプライトの追加
+     * キャラクターのスプライトを追加する。
+     *
+     * @param [in/out] sprite 追加するスプライト
+     */
+    addCharacterSprite: function(sprite) {
+        sprite.addChildTo(this.characterLayer);
+    },
+    /**
+     * @function removeCharacter
+     * @brief キャラクター削除
+     * キャラクターを削除する。
+     *
+     * @param [in/out] character 追加するキャラクター
+     */
+    removeCharacter: function(character) {
+        var i = this.characters.indexOf(character);
+        if (i >= 0) {
+            this.characters.splice(i, 1);
+        }
+    },
+    /**
+     * @function addScore
+     * @brief スコア追加
+     * スコアを追加する。
+     *
+     * @param [in] score 追加するスコア
+     */
     addScore: function(score) {
         this.score += score;
+    },
+    /**
+     * @function getBlockMap
+     * @brief ブロックマップ取得
+     * ブロックマップを取得する。
+     *
+     * @return ブロックマップ
+     */
+    getBlockMap: function() {
+        return this.stage.mapManager.objectMap.collision;
+    },
+    /**
+     * @function getStagePosition
+     * @brief ステージ位置取得
+     * ステージが左方向に何ドット移動しているかを取得する。
+     *
+     * @return ステージ位置
+     */
+    getStagePosition: function() {
+        return -this.stage.x;
     },
     /**
      * @function _crateFrame

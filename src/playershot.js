@@ -14,7 +14,6 @@ phina.define('PlayerShot', {
         // 当たり判定高さ
         HIT_HEIGHT: 6,
     },
-    superClass: 'phina.display.Sprite',
     /**
      * @function init
      * @brief コンストラクタ
@@ -23,26 +22,29 @@ phina.define('PlayerShot', {
      * @param [in] x x座標
      * @param [in] y y座標
      * @param [in] isOption 発射元がオプションかどうか
+     * @param [in/out] scene シーン
      */
-    init: function(x, y, isOption) {
-        // 親クラスのコンストラクタを呼び出す。
-        this.superInit('image_8x8', 8, 8);
+    init: function(x, y, isOption, scene) {
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_8x8', 8, 8);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_8x8_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('player_shot');
 
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER_SHOT;
 
-        // 座標を設定する。
-        this.floatX = x;
-        this.floatY = y;
-
-        // 当たり判定を設定する。
-        this.hitWidth = PlayerShot.HIT_WIDTH;
-        this.hitHeight = PlayerShot.HIT_HEIGHT;
-
-        // スプライトシートの設定を行う。
-        this.animation = FrameAnimation('image_8x8_ss');
-        this.animation.attachTo(this);
-        this.animation.gotoAndPlay('player_shot');
+        // 座標、サイズを設定する。
+        this.rect = {
+            x: x,
+            y: y,
+            width: PlayerShot.HIT_WIDTH,
+            height: PlayerShot.HIT_HEIGHT,
+        };
 
         // 攻撃力を設定する。
         if (isOption) {
@@ -57,33 +59,37 @@ phina.define('PlayerShot', {
      * @brief 更新処理
      * 右方向に直進する。
      * 画面外に出ると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
      */
-    update: function() {
+    update: function(scene) {
 
         // 右へ移動する。
-        this.floatX += 5;
+        this.rect.x += 5;
 
         // 座標をスプライトに適用する。
-        this.x = Math.floor(this.floatX);
-        this.y = Math.floor(this.floatY);
+        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
 
         // 当たり判定処理を行う。
-        this._checkHitChacater();
+        this._checkHitChacater(scene);
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX > ScreenSize.STAGE_RECT.width + 4) {
-            this.remove();
+        if (this.rect.x > ScreenSize.STAGE_RECT.width + 4) {
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
     },
     /**
      * @function _checkHitChacater
      * @breif 当たり判定処理
      * 他のキャラクターとの当たり判定を処理する。
+     *
+     * @param [in/out] scene シーン
      */
-    _checkHitChacater: function() {
+    _checkHitChacater: function(scene) {
 
         // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = this.parent.children;
+        var characters = scene.characters;
 
         // 各キャラクターとの当たり判定を処理する。
         for (var i = 0; i < characters.length; i++) {
@@ -92,13 +98,14 @@ phina.define('PlayerShot', {
             if (characters[i].type === Character.type.ENEMY) {
 
                 // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(this, characters[i])) {
+                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
 
                     // 敵キャラクターの衝突処理を実行する。
                     characters[i].hit(this);
 
                     // 敵キャラクターに接触した場合は自分自身は削除する。
-                    this.remove();
+                    scene.removeCharacter(this);
+                    this.sprite.remove();
                     break;
                 }
             }

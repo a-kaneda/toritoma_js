@@ -36,8 +36,8 @@ phina.define('Character', {
          * @param instance 敵キャラオブジェクト
          */ 
         setEnemyParam: function(enemyType, instance) {
-            instance.hitWidth = Character.enemy[enemyType].width;
-            instance.hitHeight = Character.enemy[enemyType].height;
+            instance.rect.width = Character.enemy[enemyType].width;
+            instance.rect.height = Character.enemy[enemyType].height;
             instance.hp = Character.enemy[enemyType].hp;
             instance.defense = Character.enemy[enemyType].defense;
             instance.score = Character.enemy[enemyType].score;

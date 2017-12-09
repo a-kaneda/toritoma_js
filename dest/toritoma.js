@@ -108,8 +108,8 @@ phina.define('Character', {
          * @param instance 敵キャラオブジェクト
          */ 
         setEnemyParam: function(enemyType, instance) {
-            instance.hitWidth = Character.enemy[enemyType].width;
-            instance.hitHeight = Character.enemy[enemyType].height;
+            instance.rect.width = Character.enemy[enemyType].width;
+            instance.rect.height = Character.enemy[enemyType].height;
             instance.hp = Character.enemy[enemyType].hp;
             instance.defense = Character.enemy[enemyType].defense;
             instance.score = Character.enemy[enemyType].score;
@@ -199,7 +199,6 @@ phina.define('ControlSize', {
  * 左方向に直進する弾を発射する。
  */
 phina.define('Dragonfly', {
-    superClass: 'phina.display.Sprite',
     /**
      * @function init
      * @brief コンストラクタ
@@ -207,29 +206,30 @@ phina.define('Dragonfly', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
-     * @param [in] scene シーン
+     * @param [in/out] scene シーン
      */
     init: function(x, y, scene) {
-        // 親クラスのコンストラクタを呼び出す。
-        this.superInit('image_16x16', 16, 16);
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_16x16', 16, 16);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('dragonfly');
 
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY;
 
         // 座標を設定する。
-        this.floatX = x;
-        this.floatY = y;
-
-        // シーンを記憶する。
-        this.scene = scene;
+        this.rect = {
+            x: x,
+            y: y,
+        };
 
         // パラメータを設定する。
         Character.setEnemyParam('dragonfly', this);
-
-        // スプライトシートの設定を行う。
-        this.animation = FrameAnimation('image_16x16_ss');
-        this.animation.attachTo(this);
-        this.animation.gotoAndPlay('dragonfly');
     },
     /**
      * @function update
@@ -237,32 +237,35 @@ phina.define('Dragonfly', {
      * 左方向に直進する。
      * 左方向に直進する弾を発射する。
      * 画面外に出ると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
      */
-    update: function() {
+    update: function(scene) {
 
         // 左へ移動する。
-        this.floatX -= 1;
+        this.rect.x -= 1;
 
         // 座標をスプライトに適用する。
-        this.x = Math.floor(this.floatX);
-        this.y = Math.floor(this.floatY);
+        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
 
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this.hp <= 0) {
 
             // 爆発アニメーションを作成する。
-            Explosion(this.x, this.y).addChildTo(this.parent);
+            scene.addCharacter(Explosion(this.rect.x, this.rect.y, scene));
 
             // スコアを加算する。
-            this.scene.addScore(this.score);
+            scene.addScore(this.score);
 
             // 自分自身を削除する。
-            this.remove();
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
 
         // 画面外に出た場合は自分自身を削除する。
         if (this.floatX < -32) {
-            this.remove();
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
     },
     /**
@@ -294,7 +297,6 @@ phina.define('Dragonfly', {
  * 爆発アニメーションを行う。
  */
 phina.define('Explosion', {
-    superClass: 'phina.display.Sprite',
     /**
      * @function init
      * @brief コンストラクタ
@@ -302,21 +304,22 @@ phina.define('Explosion', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
+     * @param [in/out] scene シーン
      */
-    init: function(x, y) {
+    init: function(x, y, scene) {
 
-        // 親クラスのコンストラクタを呼び出す。
-        this.superInit('image_16x16', 16, 16);
+        // スプライトを作成する。
+        this.sprite = Sprite('image_16x16', 16, 16);
+        scene.addCharacterSprite(this.sprite);
 
-        // 座標を設定する。
-        this.x = Math.floor(x);
-        this.y = Math.floor(y);
-
-        // スプライトシートの設定を行う。
+        // アニメーションの設定を行う。
         this.animation = FrameAnimation('image_16x16_ss');
-        this.animation.attachTo(this);
+        this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('explosion');
-        
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(x), Math.floor(y));
+
         // 爆発音を再生する。
         SoundManager.play('bomb_min');
     },
@@ -324,11 +327,15 @@ phina.define('Explosion', {
      * @function update
      * @brief 更新処理
      * アニメーションが終了すると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
      */
-    update: function() {
+    update: function(scene) {
+
         // アニメーションが終了すると自分自身を削除する。
         if (this.animation.finished) {
-            this.remove();
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
     },
 });
@@ -353,8 +360,11 @@ phina.define('Player', {
         SPEED_BY_GAMEPAD: 4,
         // 自機弾発射間隔
         SHOT_INTERVAL: 12,
+        // 当たり判定幅
+        HIT_WIDTH: 8,
+        // 当たり判定高さ
+        HIT_HEIGHT: 8,
     },
-    superClass: 'phina.display.Sprite',
     /**
      * @function init
      * @brief コンストラクタ
@@ -362,23 +372,29 @@ phina.define('Player', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
-     * @param [in] characterLayer キャラクターを配置するレイヤー
+     * @param [in/out] scene シーン
      */
-    init: function(x, y) {
-        // 親クラスのコンストラクタを呼び出す。
-        this.superInit('image_16x16', 16, 16);
+    init: function(x, y, scene) {
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_16x16', 16, 16);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('player_normal');
 
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER;
 
-        // 座標を設定する。
-        this.floatX = x;
-        this.floatY = y;
-
-        // スプライトシートの設定を行う。
-        this.animation = FrameAnimation('image_16x16_ss');
-        this.animation.attachTo(this);
-        this.animation.gotoAndPlay('player_normal');
+        // 座標、サイズを設定する。
+        this.rect = {
+            x: x,
+            y: y,
+            width: Player.HIT_WIDTH,
+            height: Player.HIT_HEIGHT,
+        };
 
         // メンバを初期化する。
         this.shotInterval = 0;
@@ -387,71 +403,68 @@ phina.define('Player', {
      * @function update
      * @brief 更新処理
      * 座標をスプライトに適用する。
+     *
+     * @param [in/out] scene シーン
      */
-    update : function() {
+    update: function(scene) {
 
         // 自機弾発射間隔が経過した場合は自機弾を発射する。
         this.shotInterval++;
         if (this.shotInterval >= Player.SHOT_INTERVAL) {
-            PlayerShot(this.floatX, this.floatY).addChildTo(this.parent);
+            scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
             this.shotInterval = 0;
         }
 
         // 座標をスプライトに適用する。
-        this.x = Math.floor(this.floatX);
-        this.y = Math.floor(this.floatY);
+        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
     },
     /**
      * @function moveKeyLeft
      * @brief 左キーによる移動
      * キーボードの左キー入力による移動処理を行う。
+     *
+     * @param [in/out] scene シーン
      */
-    moveKeyLeft: function() {
-
-        // x座標を変更する。
-        this.floatX -= Player.SPEED_BY_KEY;
-
-        // 当たり判定処理を行う。
-        this._checkHit();
+    moveKeyLeft: function(scene) {
+        this._move(this.rect.x - Player.SPEED_BY_KEY,
+                   this.rect.y,
+                   scene);
     },
     /**
      * @function moveKeyRight
      * @brief 右キーによる移動
      * キーボードの右キー入力による移動処理を行う。
+     *
+     * @param [in/out] scene シーン
      */
-    moveKeyRight: function() {
-
-        // x座標を変更する。
-        this.floatX += Player.SPEED_BY_KEY;
-
-        // 当たり判定処理を行う。
-        this._checkHit();
+    moveKeyRight: function(scene) {
+        this._move(this.rect.x + Player.SPEED_BY_KEY,
+                   this.rect.y,
+                   scene);
     },
     /**
      * @function moveKeyUp
      * @brief 上キーによる移動
      * キーボードの上キー入力による移動処理を行う。
+     *
+     * @param [in/out] scene シーン
      */
-    moveKeyUp: function() {
-
-        // y座標を変更する。
-        this.floatY -= Player.SPEED_BY_KEY;
-
-        // 当たり判定処理を行う。
-        this._checkHit();
+    moveKeyUp: function(scene) {
+        this._move(this.rect.x,
+                   this.rect.y - Player.SPEED_BY_KEY,
+                   scene);
     },
     /**
      * @function moveKeyDown
      * @brief 下キーによる移動
      * キーボードの下キー入力による移動処理を行う。
+     *
+     * @param [in/out] scene シーン
      */
-    moveKeyDown: function() {
-
-        // y座標を変更する。
-        this.floatY += Player.SPEED_BY_KEY;
-
-        // 当たり判定処理を行う。
-        this._checkHit();
+    moveKeyDown: function(scene) {
+        this._move(this.rect.x,
+                   this.rect.y + Player.SPEED_BY_KEY,
+                   scene);
     },
     /**
      * @function moveTouch
@@ -460,15 +473,12 @@ phina.define('Player', {
      *
      * @param [in] x x座標方向のタッチ位置スライド量
      * @param [in] y y座標方向のタッチ位置スライド量
+     * @param [in/out] scene シーン
      */
-    moveTouch: function(x, y) {
-
-        // 座標を変更する。
-        this.floatX += x * Player.SPEED_BY_TOUCH;
-        this.floatY += y * Player.SPEED_BY_TOUCH;
-
-        // 当たり判定処理を行う。
-        this._checkHit();
+    moveTouch: function(x, y, scene) {
+        this._move(this.rect.x + x * Player.SPEED_BY_TOUCH,
+                   this.rect.y + y * Player.SPEED_BY_TOUCH,
+                   scene);
     },
     /**
      * @function moveTouch
@@ -477,41 +487,71 @@ phina.define('Player', {
      *
      * @param [in] x x座標方向のスティック入力値
      * @param [in] y y座標方向のスティック入力値
+     * @param [in/out] scene シーン
      */
-    moveGamepad: function(x, y) {
-
-        // 座標を変更する。
-        this.floatX += x * Player.SPEED_BY_GAMEPAD;
-        this.floatY += y * Player.SPEED_BY_GAMEPAD;
-
-        // 当たり判定処理を行う。
-        this._checkHit();
+    moveGamepad: function(x, y, scene) {
+        this._move(this.rect.x + x * Player.SPEED_BY_GAMEPAD,
+                   this.rect.y + y * Player.SPEED_BY_GAMEPAD,
+                   scene);
     },
     /**
-     * @function _checkHit
-     * @breif 当たり判定処理
-     * 当たり判定を処理する。
+     * @function _move
+     * @brief 移動処理
+     * 座標を変更し、各種当たり判定処理を行う。
+     *
+     * @param [in] x 移動後のx座標
+     * @param [in] y 移動後のy座標
+     * @param [in/out] scene シーン
      */
-    _checkHit: function() {
+    _move: function(x, y, scene) {
+
+        // 前回値を保存する。
+        var prevX = this.rect.x;
+        var prevY = this.rect.y;
+
+        // 現在の座標を変更する。
+        this.rect.x = x;
+        this.rect.y = y;
+
+        // 衝突しているブロックがないか調べる。
+        var block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
+
+        // 衝突しているブロックがある場合は移動する。
+        if (block != null) {
+            var newPosition = Util.moveByBlock(this.rect, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
+            this.rect.x = newPosition.x;
+            this.rect.y = newPosition.y;
+        }
+
+        // 画面外に出ていないかチェックする。
+        this._checkScreenArea();
+    },
+    /**
+     * @function _checkScreenArea
+     * @breif 画面外に出ていないかチェックする
+     * 画面外に出ていないかチェックする。
+     * 画面外に出ていた場合は画面内に座標を補正する。
+     */
+    _checkScreenArea: function() {
 
         // 左側画面範囲外には移動させないようにする。
-        if (this.floatX < 0) {
-            this.floatX = 0;
+        if (this.rect.x < 0) {
+            this.rect.x = 0;
         }
 
         // 右側画面範囲外には移動させないようにする。
-        if (this.floatX > ScreenSize.STAGE_RECT.width - 1) {
-            this.floatX = ScreenSize.STAGE_RECT.width - 1;
+        if (this.rect.x > ScreenSize.STAGE_RECT.width - 1) {
+            this.rect.x = ScreenSize.STAGE_RECT.width - 1;
         }
 
         // 上側画面範囲外には移動させないようにする。
-        if (this.floatY < 0) {
-            this.floatY = 0;
+        if (this.rect.y < 0) {
+            this.rect.y = 0;
         }
 
         // 下側画面範囲外には移動させないようにする。
-        if (this.floatY > ScreenSize.STAGE_RECT.height - 1) {
-            this.floatY = ScreenSize.STAGE_RECT.height - 1;
+        if (this.rect.y > ScreenSize.STAGE_RECT.height - 1) {
+            this.rect.y = ScreenSize.STAGE_RECT.height - 1;
         }
     },
 });
@@ -537,7 +577,6 @@ phina.define('PlayerShot', {
         // 当たり判定高さ
         HIT_HEIGHT: 6,
     },
-    superClass: 'phina.display.Sprite',
     /**
      * @function init
      * @brief コンストラクタ
@@ -546,26 +585,29 @@ phina.define('PlayerShot', {
      * @param [in] x x座標
      * @param [in] y y座標
      * @param [in] isOption 発射元がオプションかどうか
+     * @param [in/out] scene シーン
      */
-    init: function(x, y, isOption) {
-        // 親クラスのコンストラクタを呼び出す。
-        this.superInit('image_8x8', 8, 8);
+    init: function(x, y, isOption, scene) {
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_8x8', 8, 8);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_8x8_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('player_shot');
 
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER_SHOT;
 
-        // 座標を設定する。
-        this.floatX = x;
-        this.floatY = y;
-
-        // 当たり判定を設定する。
-        this.hitWidth = PlayerShot.HIT_WIDTH;
-        this.hitHeight = PlayerShot.HIT_HEIGHT;
-
-        // スプライトシートの設定を行う。
-        this.animation = FrameAnimation('image_8x8_ss');
-        this.animation.attachTo(this);
-        this.animation.gotoAndPlay('player_shot');
+        // 座標、サイズを設定する。
+        this.rect = {
+            x: x,
+            y: y,
+            width: PlayerShot.HIT_WIDTH,
+            height: PlayerShot.HIT_HEIGHT,
+        };
 
         // 攻撃力を設定する。
         if (isOption) {
@@ -580,33 +622,37 @@ phina.define('PlayerShot', {
      * @brief 更新処理
      * 右方向に直進する。
      * 画面外に出ると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
      */
-    update: function() {
+    update: function(scene) {
 
         // 右へ移動する。
-        this.floatX += 5;
+        this.rect.x += 5;
 
         // 座標をスプライトに適用する。
-        this.x = Math.floor(this.floatX);
-        this.y = Math.floor(this.floatY);
+        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
 
         // 当たり判定処理を行う。
-        this._checkHitChacater();
+        this._checkHitChacater(scene);
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX > ScreenSize.STAGE_RECT.width + 4) {
-            this.remove();
+        if (this.rect.x > ScreenSize.STAGE_RECT.width + 4) {
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
     },
     /**
      * @function _checkHitChacater
      * @breif 当たり判定処理
      * 他のキャラクターとの当たり判定を処理する。
+     *
+     * @param [in/out] scene シーン
      */
-    _checkHitChacater: function() {
+    _checkHitChacater: function(scene) {
 
         // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = this.parent.children;
+        var characters = scene.characters;
 
         // 各キャラクターとの当たり判定を処理する。
         for (var i = 0; i < characters.length; i++) {
@@ -615,13 +661,14 @@ phina.define('PlayerShot', {
             if (characters[i].type === Character.type.ENEMY) {
 
                 // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(this, characters[i])) {
+                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
 
                     // 敵キャラクターの衝突処理を実行する。
                     characters[i].hit(this);
 
                     // 敵キャラクターに接触した場合は自分自身は削除する。
-                    this.remove();
+                    scene.removeCharacter(this);
+                    this.sprite.remove();
                     break;
                 }
             }
@@ -687,7 +734,7 @@ phina.define('Stage', {
      * @param [in] scene シーン
      * @param [in/out] layer ステージ画像を配置するレイヤー
      */
-    init: function(mapName, scene, layer) {
+    init: function(mapName, layer) {
 
         // メンバを初期化する。
         this.speed = 0;
@@ -696,24 +743,22 @@ phina.define('Stage', {
         
         // タイルマップを読み込み、背景画像を配置する。
         this.mapManager = TileMapManager(mapName);
+        this.mapManager.createObjectMap('block', 'collision');
         this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
-
-        // シーンを記憶する。
-        this.scene = scene;
     },
     /**
      * @function update
      * @brief 更新処理
      * ステージの状態を更新する。
      *
-     * @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] scene シーン
      */
-    update: function(characterLayer) {
+    update: function(scene) {
 
         // イベントを実行する。
-        this._execEvent(characterLayer);
+        this._execEvent(scene);
 
         // スピードに応じて移動する。
         this._move();
@@ -724,9 +769,9 @@ phina.define('Stage', {
      * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
      * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
      *
-     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] scene シーン
      */
-    _execEvent: function(characterLayer) {
+    _execEvent: function(scene) {
 
         // 画面外2個先の列まで処理を行う。
         var maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / Stage.TILE_SIZE) + 2;
@@ -753,7 +798,7 @@ phina.define('Stage', {
                     this._createEnemy(objects[i].name,
                                       this.x + objects[i].x + objects[i].width / 2,
                                       objects[i].y + objects[i].height / 2,
-                                      characterLayer);
+                                      scene);
                     break;
                 default:
                     break;
@@ -786,12 +831,12 @@ phina.define('Stage', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
-     @ @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] scene シーン
      */
-    _createEnemy: function(type, x, y, characterLayer) {
+    _createEnemy: function(type, x, y, scene) {
         switch (type) {
         case 'dragonfly':
-            Dragonfly(x, y, this.scene).addChildTo(characterLayer);
+            scene.addCharacter(Dragonfly(x, y, scene));
             break;
         default:
             break;
@@ -850,7 +895,7 @@ phina.define('Stage', {
          "y":0
         }, 
         {
-         "data":[69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 65, 65, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 65, 65, 65, 65, 65, 69, 69, 69, 69, 65, 65, 65, 65, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 70, 69, 69, 70, 0, 0, 0, 0, 70, 69, 70, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 66, 67, 67, 0, 0, 0, 0, 0, 0, 67, 66, 67, 67, 66, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 67, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 67, 66, 66, 67, 67, 66, 66, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 65, 65, 65, 65, 66, 66, 66, 66, 66, 66, 65, 65, 65, 65, 65, 65, 66, 66, 66, 66, 66, 66, 66, 66, 66, 65, 65, 65, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 65, 65, 65, 65, 65, 65, 65, 65, 65, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66, 66],
+         "data":[41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 33, 33, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 33, 33, 33, 33, 33, 41, 41, 41, 41, 33, 33, 33, 33, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 42, 41, 41, 42, 0, 0, 0, 0, 42, 41, 42, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 34, 35, 35, 0, 0, 0, 0, 0, 0, 35, 34, 35, 35, 34, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 35, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 35, 34, 34, 35, 35, 34, 34, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 33, 33, 33, 33, 34, 34, 34, 34, 34, 34, 33, 33, 33, 33, 33, 33, 34, 34, 34, 34, 34, 34, 34, 34, 34, 33, 33, 33, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 33, 33, 33, 33, 33, 33, 33, 33, 33, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
          "height":9,
          "name":"block",
          "opacity":1,
@@ -1475,20 +1520,159 @@ phina.define('Stage', {
          "spacing":0,
          "tilecount":64,
          "tileheight":16,
-         "tilewidth":16,
-         "transparentcolor":"#ff00ff"
-        }, 
-        {
-         "columns":4,
-         "firstgid":65,
-         "image":"images\/block.png",
-         "imageheight":64,
-         "imagewidth":64,
-         "margin":0,
-         "name":"block",
-         "spacing":0,
-         "tilecount":16,
-         "tileheight":16,
+         "tiles":
+            {
+             "32":
+                {
+                 "objectgroup":
+                    {
+                     "draworder":"index",
+                     "name":"",
+                     "objects":[
+                            {
+                             "height":16,
+                             "id":1,
+                             "name":"collision",
+                             "rotation":0,
+                             "type":"collision",
+                             "visible":true,
+                             "width":16,
+                             "x":0,
+                             "y":0
+                            }],
+                     "opacity":1,
+                     "type":"objectgroup",
+                     "visible":true,
+                     "x":0,
+                     "y":0
+                    }
+                },
+             "33":
+                {
+                 "objectgroup":
+                    {
+                     "draworder":"index",
+                     "name":"",
+                     "objects":[
+                            {
+                             "height":16,
+                             "id":1,
+                             "name":"collision",
+                             "rotation":0,
+                             "type":"collision",
+                             "visible":true,
+                             "width":16,
+                             "x":0,
+                             "y":0
+                            }],
+                     "opacity":1,
+                     "type":"objectgroup",
+                     "visible":true,
+                     "x":0,
+                     "y":0
+                    }
+                },
+             "34":
+                {
+                 "objectgroup":
+                    {
+                     "draworder":"index",
+                     "name":"",
+                     "objects":[
+                            {
+                             "height":8,
+                             "id":1,
+                             "name":"collision",
+                             "rotation":0,
+                             "type":"collision",
+                             "visible":true,
+                             "width":16,
+                             "x":0,
+                             "y":8
+                            }],
+                     "opacity":1,
+                     "type":"objectgroup",
+                     "visible":true,
+                     "x":0,
+                     "y":0
+                    }
+                },
+             "40":
+                {
+                 "objectgroup":
+                    {
+                     "draworder":"index",
+                     "name":"",
+                     "objects":[
+                            {
+                             "height":16,
+                             "id":1,
+                             "name":"collision",
+                             "rotation":0,
+                             "type":"collision",
+                             "visible":true,
+                             "width":16,
+                             "x":0,
+                             "y":0
+                            }],
+                     "opacity":1,
+                     "type":"objectgroup",
+                     "visible":true,
+                     "x":0,
+                     "y":0
+                    }
+                },
+             "41":
+                {
+                 "objectgroup":
+                    {
+                     "draworder":"index",
+                     "name":"",
+                     "objects":[
+                            {
+                             "height":8,
+                             "id":1,
+                             "name":"collision",
+                             "rotation":0,
+                             "type":"collision",
+                             "visible":true,
+                             "width":16,
+                             "x":0,
+                             "y":0
+                            }],
+                     "opacity":1,
+                     "type":"objectgroup",
+                     "visible":true,
+                     "x":0,
+                     "y":0
+                    }
+                },
+             "42":
+                {
+                 "objectgroup":
+                    {
+                     "draworder":"index",
+                     "name":"",
+                     "objects":[
+                            {
+                             "height":16,
+                             "id":1,
+                             "name":"collision",
+                             "rotation":0,
+                             "type":"collision",
+                             "visible":true,
+                             "width":16,
+                             "x":0,
+                             "y":0
+                            }],
+                     "opacity":1,
+                     "type":"objectgroup",
+                     "visible":true,
+                     "x":0,
+                     "y":0
+                    }
+                }
+            },
          "tilewidth":16,
          "transparentcolor":"#ff00ff"
         }],
@@ -1524,6 +1708,9 @@ phina.define('TileMapManager', {
 
         // マップ名に対応するマップを取得する。
         this.map = TileMaps[mapName];
+
+        // 空のオブジェクトマップを作成する。
+        this.objectMap = {};
     },
 
     /**
@@ -1572,7 +1759,64 @@ phina.define('TileMapManager', {
         texture.domElement = canvas.domElement;
         return texture;
     },
+    /**
+     * @function createObjectMap
+     * @brief オブジェクトマップ作成処理
+     * タイルセットのオブジェクトの情報を
+     */
+    createObjectMap: function(layerName, type) {
 
+        // 指定された種別のオブジェクトマップを作成する。
+        this.objectMap[type] = new Array(this.map.height);
+        for (var i = 0; i < this.map.height; i++) {
+            this.objectMap[type][i] = new Array(this.map.width);
+        }
+        
+        // レイヤー名に対応するレイヤーを取得する。
+        var layer;
+        for (var i = 0; i < this.map.layers.length; i++) {
+            if (this.map.layers[i].name == layerName) {
+                layer = this.map.layers[i];
+            }
+        }
+
+        // レイヤー内の各タイルを処理する。
+        for (var i = 0; i < layer.data.length; i++) {
+
+            // タイルが配置されている場合
+            var gid = layer.data[i];
+            if (gid > 0) {
+
+                // gidに対応するタイルセットを検索する。
+                for (var j = 0; j < this.map.tilesets.length; j++) {
+
+                    // タイルがあった場合
+                    var tile = this.map.tilesets[j].tiles[gid - 1];
+                    if (tile) {
+
+                        // 指定された種別のオブジェクトを検索する。
+                        for (var k = 0; k < tile.objectgroup.objects.length; k++) {
+
+                            var obj = tile.objectgroup.objects[k];
+                            if (obj.type === type) {
+
+                                // 一次元配列になっているので、x座標とy座標を計算する。
+                                var x = i % layer.width;
+                                var y = Math.floor(i / layer.width);
+
+                                // オブジェクトマップにオブジェクトを格納する。
+                                this.objectMap[type][y][x] = obj;
+
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+    },
     /**
      * @function _drawTile
      * @brief タイル描画処理
@@ -1679,16 +1923,217 @@ phina.define('Util', {
          * @retval false 衝突していない
          */
         isHitCharacter: function(a, b) {
-            if (a.floatX <= b.floatX + b.hitWidth &&
-                a.floatX + a.hitWidth >= b.floatX &&
-                a.floatY <= b.floatY + b.hitHeight &&
-                a.floatY + b.hitWidth >= b.floatY) {
+            if (a.x - a.width / 2 < b.x + b.width / 2 &&
+                a.x + a.width / 2 > b.x - b.width / 2 &&
+                a.y - a.height < b.y + b.height / 2 &&
+                a.y + a.height > b.y - b.height / 2) {
 
                 return true;
             }
             else {
                 return false;
             }
+        },
+        /**
+         * @function checkCollidedBlock
+         * @brief 衝突しているブロックを調べる
+         * キャラクターの周囲にあるマップを探し、衝突しているブロックがあれば
+         * そのブロックの座標とサイズを返す。衝突していなければnullを返す。
+         *
+         * @param [in] character キャラクター
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @return 衝突しているブロック、見つからなければnull。
+         */
+        checkCollidedBlock: function(character, stagePosition, blockMap) {
+
+            // ブロックマップの検索範囲を計算する。
+            var xmin = Math.floor((character.x - character.width / 2 + stagePosition) / Stage.TILE_SIZE);
+            var xmax = Math.ceil((character.x + character.width / 2 + stagePosition) / Stage.TILE_SIZE);
+            var ymin = Math.floor((character.y - character.height / 2) / Stage.TILE_SIZE);
+            var ymax = Math.ceil((character.y + character.height / 2) / Stage.TILE_SIZE);
+
+            // x、yの上下限値をチェックする。
+            if (xmin < 0) { 
+                xmin = 0;
+            }
+            if (xmax >= blockMap[0].length) {
+                xmax = blockMap[0].length - 1;
+            }
+            if (ymin < 0) { 
+                ymin = 0;
+            }
+            if (ymax >= blockMap.length) {
+                ymax = blockMap.length - 1;
+            }
+
+            // 周囲のタイルから衝突しているブロックを探す。
+            for (var y = ymin; y <= ymax; y++) {
+                for (var x = xmin; x <= xmax; x++) {
+
+                    // 衝突しているブロックが見つかった場合
+                    if (blockMap[y][x] &&
+                        character.x - character.width / 2 < x * Stage.TILE_SIZE - stagePosition + blockMap[y][x].x + blockMap[y][x].width &&
+                        character.x + character.width / 2 > x * Stage.TILE_SIZE - stagePosition + blockMap[y][x].x &&
+                        character.y - character.height / 2 < y * Stage.TILE_SIZE + blockMap[y][x].y + blockMap[y][x].height &&
+                        character.y + character.height / 2 > y * Stage.TILE_SIZE + blockMap[y][x].y) {
+
+                        // ブロックの中心座標とサイズを戻り値とする。
+                        // 変数名や値はキャラクターに合わせる。
+                        var ret = {
+                            x: x * Stage.TILE_SIZE - stagePosition + blockMap[y][x].x + blockMap[y][x].width / 2,
+                            y: y * Stage.TILE_SIZE + blockMap[y][x].y + blockMap[y][x].height / 2,
+                            width: blockMap[y][x].width,
+                            height: blockMap[y][x].height,
+                        };
+
+                        return ret;
+                    }
+                }
+            }
+
+            return null;
+        },
+        /**
+         * @function moveByBlock
+         * @brief ブロック衝突による移動
+         * ブロック衝突による移動を行う。
+         * 右方向移動中に衝突した場合はブロックの左端に移動する。他の方向も同様。
+         * 移動前から衝突している場合はその方向には移動しない。このケースは
+         * ブロック移動による押出処理で対応する。
+         * 縦横どちらにも移動する場合には横方向だけ移動して再度衝突をチェックし、
+         * 衝突しなければ横方向だけ移動し、衝突すれば縦方向だけ移動する。
+         *
+         * @param [in] character キャラクター
+         * @param [in] prevX 移動前x座標
+         * @param [in] prevY 移動前y座標
+         * @param [in] block 衝突したブロックの位置とサイズ
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @return 移動後の座標
+         */
+        moveByBlock: function(character, prevX, prevY, block, stagePosition, blockMap) {
+            
+            // 衝突による移動先の座標を現在の座標で初期化する
+            var newPosition = {
+                x: character.x,
+                y: character.y,
+                width: character.width,
+                height: character.height,
+            };
+
+            // 障害物の横方向の端に合わせて移動した場合は
+            // 縦方向の移動は不要になるため、フラグを立てて後で使用する。
+            var isXMoved = false;
+
+            // x方向右に進んでいる時に衝突した場合
+            if (character.x > prevX &&
+                character.x + character.width / 2 > block.x - block.width / 2) {
+
+                // 前回の右端が障害物の前回の左端よりも右側ならば
+                // 障害物内部に入り込んでいるものとみなし、前回値に戻す。
+                // 障害物内部に入り込んでいるものは画面スクロール時のブロックがキャラクターを押し出す処理で
+                // 脱出を試みる。
+                if (prevX + character.width / 2 > block.x - block.width / 2) {
+                    newPosition.x = prevX;
+                }
+                else {
+                    // そうでない場合は右端を障害物の左端に合わせる
+                    newPosition.x = block.x - block.width / 2 - character.width / 2 ;
+
+                    // 横方向移動のフラグを立てる
+                    isXMoved = true;
+                }
+            }
+            // x方向左に進んでいる時に衝突した場合
+            else if (character.x < prevX &&
+                character.x - character.width / 2 < block.x + block.width / 2) {
+
+                // 前回の左端が障害物の前回の右端よりも左側ならば
+                // 障害物内部に入り込んでいるものとみなし、前回値に戻す。
+                // 障害物内部に入り込んでいるものは画面スクロール時のブロックがキャラクターを押し出す処理で
+                // 脱出を試みる。
+                if (prevX - character.width / 2 < block.x + block.width / 2) {
+                    newPosition.x = prevX;
+                }
+                else {
+                    // そうでない場合は左端を障害物の右端に合わせる
+                    newPosition.x = block.x + block.width / 2 + character.width / 2;
+
+                    // 横方向移動のフラグを立てる
+                    isXMoved = true;
+                }
+            }
+            else {
+                // x方向に進んでいない、または衝突していない場合は無処理
+            }
+    
+            // 障害物の縦方向の端に合わせて移動した場合は
+            // 横方向の移動は不要になるため、フラグを立てて後で使用する。
+            var isYMoved = false;
+    
+            // y方向上に進んでいる時に衝突した場合
+            if (character.y < prevY &&
+                character.y - character.height / 2 < block.y + block.height / 2) {
+
+                // 前回の上端が障害物の前回の下端よりも上側ならば
+                // 障害物内部に入り込んでいるものとみなし、前回値に戻す。
+                // 障害物内部に入り込んでいるものは画面スクロール時のブロックがキャラクターを押し出す処理で
+                // 脱出を試みる。
+                if (prevY - character.height / 2 > block.y + block.height / 2) {
+                    newPosition.y = prevY;
+                }
+                else {
+                    // そうでない場合は上端を障害物の下端に合わせる
+                    newPosition.y = block.y + block.height / 2 + character.height / 2;
+
+                    // 縦方向移動のフラグを立てる
+                    isYMoved = true;
+                }
+            }
+            // y方向下に進んでいる時に衝突した場合
+            else if (character.y > prevY &&
+                character.y + character.height / 2 > block.y - block.height / 2) {
+
+                // 前回の下端が障害物の前回の上端よりも下側ならば
+                // 障害物内部に入り込んでいるものとみなし、前回値に戻す。
+                // 障害物内部に入り込んでいるものは画面スクロール時のブロックがキャラクターを押し出す処理で
+                // 脱出を試みる。
+                if (prevY + character.height / 2 > block.y - block.height / 2) {
+                    newPosition.y = prevY;
+                }
+                else {
+                    // そうでない場合は下端を障害物の上端に合わせる
+                    newPosition.y = block.y - block.height / 2 - character.height / 2;
+            
+                    // 縦方向移動のフラグを立てる
+                    isYMoved = true;
+                }
+            }
+            else {
+                // y方向に進んでいない、または衝突していない場合は無処理
+            }
+
+            // xy方向両方へ移動した場合
+            if (isXMoved && isYMoved) {
+
+                // y座標だけ元に戻して衝突するか調べる。
+                var newYPosBackup = newPosition.y;
+                newPosition.y = character.y;
+                if (Util.checkCollidedBlock(newPosition, stagePosition, blockMap) != null) {
+
+                    // x方向の移動で衝突する場合はy方向の移動を採用する。
+                    newPosition.x = character.x;
+                    newPosition.y = newYPosBackup;
+                }
+            }
+
+            console.log('newPosition={%d,%d,%d,%d},block={%d,%d,%d,%d}', 
+                newPosition.x, newPosition.y, newPosition.width, newPosition.height,
+                block.x, block.y, block.width, block.height);
+
+            // 移動後の座標を戻り値として返す。
+            return newPosition;
         },
     },
 });
@@ -16584,7 +17029,6 @@ const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 const ASSETS = {
     image: {
         'back': './images/back.png',
-        'block': './images/block.png',
         'control': './images/control.png',
         'image_8x8': './images/image_8x8.png',
         'image_16x16': './images/image_16x16.png',
@@ -16650,7 +17094,7 @@ phina.define('MainScene', {
         this._createFrame();
 
         // ステージを作成する。
-        this.stage = Stage('stage1', this, this.backgroundLayer);
+        this.stage = Stage('stage1', this.backgroundLayer);
 
         // スコアラベルを作成する。
         this.scoreLabelBase = RectangleShape({
@@ -16671,10 +17115,13 @@ phina.define('MainScene', {
 
         this.score = 0;
 
+        // キャラクター管理配列を作成する。
+        this.characters = [];
+
         // 自機を作成する。
         this.player = Player(Math.round(ScreenSize.STAGE_RECT.width / 4),
-                             Math.round(ScreenSize.STAGE_RECT.height / 2));
-        this.player.addChildTo(this.characterLayer);
+                             Math.round(ScreenSize.STAGE_RECT.height / 2),
+                             this);
 
         // タッチ情報を初期化する。
         this.touch = {id: -1, x:0, y:0};
@@ -16694,16 +17141,16 @@ phina.define('MainScene', {
 
         // カーソルキーの入力によって自機を移動する。
         if (key.getKey('left')) {
-            this.player.moveKeyLeft();
+            this.player.moveKeyLeft(this);
         }
         if (key.getKey('right')) {
-            this.player.moveKeyRight();
+            this.player.moveKeyRight(this);
         }
         if (key.getKey('up')) {
-            this.player.moveKeyUp();
+            this.player.moveKeyUp(this);
         }
         if (key.getKey('down')) {
-            this.player.moveKeyDown();
+            this.player.moveKeyDown(this);
         }
 
         var touches = app.pointers;
@@ -16725,7 +17172,7 @@ phina.define('MainScene', {
 
                 // スライド操作をしている場合はスライド量に応じて自機を移動する。
                 if (this.touch.id == touches[i].id) {
-                    this.player.moveTouch(touches[i].x - this.touch.x, touches[i].y - this.touch.y);
+                    this.player.moveTouch(touches[i].x - this.touch.x, touches[i].y - this.touch.y, this);
                     this.touch.x = touches[i].x;
                     this.touch.y = touches[i].y;
                     sliding = true;
@@ -16745,17 +17192,85 @@ phina.define('MainScene', {
         var stick = this.gamepad.getStickDirection(0);
 
         if (stick.length() > 0.5) {
-            this.player.moveGamepad(stick.x, stick.y);
+            this.player.moveGamepad(stick.x, stick.y, this);
+        }
+
+        // ステージの状態を更新する。
+        this.stage.update(this);
+
+        // プレイヤーの状態を更新する。
+        this.player.update(this);
+
+        // 各キャラクターの状態を更新する。
+        for (var i = 0; i < this.characters.length; i++) {
+            this.characters[i].update(this);
         }
 
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
-
-        // ステージの状態を更新する。
-        this.stage.update(this.characterLayer);
     },
+    /**
+     * @function addCharacter
+     * @brief キャラクター追加
+     * キャラクターを追加する。
+     *
+     * @param [in] character 追加するキャラクター
+     */
+    addCharacter: function(character) {
+        this.characters.push(character);
+    },
+    /**
+     * @function addCharacterSprite
+     * @brief キャラクタースプライトの追加
+     * キャラクターのスプライトを追加する。
+     *
+     * @param [in/out] sprite 追加するスプライト
+     */
+    addCharacterSprite: function(sprite) {
+        sprite.addChildTo(this.characterLayer);
+    },
+    /**
+     * @function removeCharacter
+     * @brief キャラクター削除
+     * キャラクターを削除する。
+     *
+     * @param [in/out] character 追加するキャラクター
+     */
+    removeCharacter: function(character) {
+        var i = this.characters.indexOf(character);
+        if (i >= 0) {
+            this.characters.splice(i, 1);
+        }
+    },
+    /**
+     * @function addScore
+     * @brief スコア追加
+     * スコアを追加する。
+     *
+     * @param [in] score 追加するスコア
+     */
     addScore: function(score) {
         this.score += score;
+    },
+    /**
+     * @function getBlockMap
+     * @brief ブロックマップ取得
+     * ブロックマップを取得する。
+     *
+     * @return ブロックマップ
+     */
+    getBlockMap: function() {
+        return this.stage.mapManager.objectMap.collision;
+    },
+    /**
+     * @function getStagePosition
+     * @brief ステージ位置取得
+     * ステージが左方向に何ドット移動しているかを取得する。
+     *
+     * @return ステージ位置
+     */
+    getStagePosition: function() {
+        return -this.stage.x;
     },
     /**
      * @function _crateFrame

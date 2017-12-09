@@ -19,7 +19,7 @@ phina.define('Stage', {
      * @param [in] scene シーン
      * @param [in/out] layer ステージ画像を配置するレイヤー
      */
-    init: function(mapName, scene, layer) {
+    init: function(mapName, layer) {
 
         // メンバを初期化する。
         this.speed = 0;
@@ -28,24 +28,22 @@ phina.define('Stage', {
         
         // タイルマップを読み込み、背景画像を配置する。
         this.mapManager = TileMapManager(mapName);
+        this.mapManager.createObjectMap('block', 'collision');
         this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
-
-        // シーンを記憶する。
-        this.scene = scene;
     },
     /**
      * @function update
      * @brief 更新処理
      * ステージの状態を更新する。
      *
-     * @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] scene シーン
      */
-    update: function(characterLayer) {
+    update: function(scene) {
 
         // イベントを実行する。
-        this._execEvent(characterLayer);
+        this._execEvent(scene);
 
         // スピードに応じて移動する。
         this._move();
@@ -56,9 +54,9 @@ phina.define('Stage', {
      * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
      * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
      *
-     * @param [in] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] scene シーン
      */
-    _execEvent: function(characterLayer) {
+    _execEvent: function(scene) {
 
         // 画面外2個先の列まで処理を行う。
         var maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / Stage.TILE_SIZE) + 2;
@@ -85,7 +83,7 @@ phina.define('Stage', {
                     this._createEnemy(objects[i].name,
                                       this.x + objects[i].x + objects[i].width / 2,
                                       objects[i].y + objects[i].height / 2,
-                                      characterLayer);
+                                      scene);
                     break;
                 default:
                     break;
@@ -118,12 +116,12 @@ phina.define('Stage', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
-     @ @param [in/out] characterLayer 敵キャラクターを配置するレイヤー
+     * @param [in/out] scene シーン
      */
-    _createEnemy: function(type, x, y, characterLayer) {
+    _createEnemy: function(type, x, y, scene) {
         switch (type) {
         case 'dragonfly':
-            Dragonfly(x, y, this.scene).addChildTo(characterLayer);
+            scene.addCharacter(Dragonfly(x, y, scene));
             break;
         default:
             break;

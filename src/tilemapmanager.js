@@ -19,6 +19,9 @@ phina.define('TileMapManager', {
 
         // マップ名に対応するマップを取得する。
         this.map = TileMaps[mapName];
+
+        // 空のオブジェクトマップを作成する。
+        this.objectMap = {};
     },
 
     /**
@@ -67,7 +70,64 @@ phina.define('TileMapManager', {
         texture.domElement = canvas.domElement;
         return texture;
     },
+    /**
+     * @function createObjectMap
+     * @brief オブジェクトマップ作成処理
+     * タイルセットのオブジェクトの情報を
+     */
+    createObjectMap: function(layerName, type) {
 
+        // 指定された種別のオブジェクトマップを作成する。
+        this.objectMap[type] = new Array(this.map.height);
+        for (var i = 0; i < this.map.height; i++) {
+            this.objectMap[type][i] = new Array(this.map.width);
+        }
+        
+        // レイヤー名に対応するレイヤーを取得する。
+        var layer;
+        for (var i = 0; i < this.map.layers.length; i++) {
+            if (this.map.layers[i].name == layerName) {
+                layer = this.map.layers[i];
+            }
+        }
+
+        // レイヤー内の各タイルを処理する。
+        for (var i = 0; i < layer.data.length; i++) {
+
+            // タイルが配置されている場合
+            var gid = layer.data[i];
+            if (gid > 0) {
+
+                // gidに対応するタイルセットを検索する。
+                for (var j = 0; j < this.map.tilesets.length; j++) {
+
+                    // タイルがあった場合
+                    var tile = this.map.tilesets[j].tiles[gid - 1];
+                    if (tile) {
+
+                        // 指定された種別のオブジェクトを検索する。
+                        for (var k = 0; k < tile.objectgroup.objects.length; k++) {
+
+                            var obj = tile.objectgroup.objects[k];
+                            if (obj.type === type) {
+
+                                // 一次元配列になっているので、x座標とy座標を計算する。
+                                var x = i % layer.width;
+                                var y = Math.floor(i / layer.width);
+
+                                // オブジェクトマップにオブジェクトを格納する。
+                                this.objectMap[type][y][x] = obj;
+
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+    },
     /**
      * @function _drawTile
      * @brief タイル描画処理

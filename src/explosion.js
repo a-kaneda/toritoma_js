@@ -4,7 +4,6 @@
  * 爆発アニメーションを行う。
  */
 phina.define('Explosion', {
-    superClass: 'phina.display.Sprite',
     /**
      * @function init
      * @brief コンストラクタ
@@ -12,21 +11,22 @@ phina.define('Explosion', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
+     * @param [in/out] scene シーン
      */
-    init: function(x, y) {
+    init: function(x, y, scene) {
 
-        // 親クラスのコンストラクタを呼び出す。
-        this.superInit('image_16x16', 16, 16);
+        // スプライトを作成する。
+        this.sprite = Sprite('image_16x16', 16, 16);
+        scene.addCharacterSprite(this.sprite);
 
-        // 座標を設定する。
-        this.x = Math.floor(x);
-        this.y = Math.floor(y);
-
-        // スプライトシートの設定を行う。
+        // アニメーションの設定を行う。
         this.animation = FrameAnimation('image_16x16_ss');
-        this.animation.attachTo(this);
+        this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('explosion');
-        
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(x), Math.floor(y));
+
         // 爆発音を再生する。
         SoundManager.play('bomb_min');
     },
@@ -34,11 +34,15 @@ phina.define('Explosion', {
      * @function update
      * @brief 更新処理
      * アニメーションが終了すると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
      */
-    update: function() {
+    update: function(scene) {
+
         // アニメーションが終了すると自分自身を削除する。
         if (this.animation.finished) {
-            this.remove();
+            scene.removeCharacter(this);
+            this.sprite.remove();
         }
     },
 });
