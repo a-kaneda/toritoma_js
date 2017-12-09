@@ -61,6 +61,14 @@ phina.define('Player', {
      */
     update: function(scene) {
 
+        // ブロックと衝突している場合
+        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+            // ブロックによって押されて移動する。
+            var dest = Util.pushCharacter(this.rect, scene.getStagePosition(), scene.getBlockMap(), false);
+            this.rect.x = dest.x;
+            this.rect.y = dest.y;
+        }
+
         // 自機弾発射間隔が経過した場合は自機弾を発射する。
         this.shotInterval++;
         if (this.shotInterval >= Player.SHOT_INTERVAL) {

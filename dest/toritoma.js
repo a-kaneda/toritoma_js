@@ -408,6 +408,14 @@ phina.define('Player', {
      */
     update: function(scene) {
 
+        // ブロックと衝突している場合
+        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+            // ブロックによって押されて移動する。
+            var dest = Util.pushCharacter(this.rect, scene.getStagePosition(), scene.getBlockMap(), false);
+            this.rect.x = dest.x;
+            this.rect.y = dest.y;
+        }
+
         // 自機弾発射間隔が経過した場合は自機弾を発射する。
         this.shotInterval++;
         if (this.shotInterval >= Player.SHOT_INTERVAL) {
@@ -2128,12 +2136,199 @@ phina.define('Util', {
                 }
             }
 
-            console.log('newPosition={%d,%d,%d,%d},block={%d,%d,%d,%d}', 
-                newPosition.x, newPosition.y, newPosition.width, newPosition.height,
-                block.x, block.y, block.width, block.height);
-
             // 移動後の座標を戻り値として返す。
             return newPosition;
+        },
+        /**
+         * @function dodgeBlockUp
+         * @brief ブロックを避けて上に移動する
+         * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
+         *
+         * @param [in] character キャラクター
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @return 移動後の位置
+         */
+        dodgeBlockUp: function(character, stagePosition, blockMap) {
+
+            // 上方向に移動してブロックを回避する。
+            var dest = Util._dodgeBlock(character,
+                                        stagePosition,
+                                        blockMap,
+                                        function(dest, block) { dest.y = block.y - block.height / 2 - dest.height / 2; });
+
+            // 移動先の座標を返す。
+            return dest;
+        },
+        /**
+         * @function dodgeBlockDown
+         * @brief ブロックを避けて下に移動する
+         * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
+         *
+         * @param [in] character キャラクター
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @return 移動後の位置
+         */
+        dodgeBlockDown: function(character, stagePosition, blockMap) {
+
+            // 下方向に移動してブロックを回避する。
+            var dest = Util._dodgeBlock(character,
+                                        stagePosition,
+                                        blockMap,
+                                        function(dest, block) { dest.y = block.y + block.height / 2 + dest.height / 2; });
+
+            // 移動先の座標を返す。
+            return dest;
+        },
+        /**
+         * @function dodgeBlockLeft
+         * @brief ブロックを避けて左に移動する
+         * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
+         *
+         * @param [in] character キャラクター
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @return 移動後の位置
+         */
+        dodgeBlockLeft: function(character, stagePosition, blockMap) {
+
+            // 左方向に移動してブロックを回避する。
+            var dest = Util._dodgeBlock(character,
+                                        stagePosition,
+                                        blockMap,
+                                        function(dest, block) { dest.x = block.x - block.width / 2 - dest.width / 2; });
+
+            // 移動先の座標を返す。
+            return dest;
+        },
+        /**
+         * @function dodgeBlockRight
+         * @brief ブロックを避けて右に移動する
+         * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
+         *
+         * @param [in] character キャラクター
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @return 移動後の位置
+         */
+        dodgeBlockRight: function(character, stagePosition, blockMap) {
+
+            // 右方向に移動してブロックを回避する。
+            var dest = Util._dodgeBlock(character,
+                                        stagePosition,
+                                        blockMap,
+                                        function(dest, block) { dest.x = block.x + block.width / 2 + dest.width / 2; });
+
+            // 移動先の座標を返す。
+            return dest;
+        },
+        /**
+         * @function _dodgeBlock
+         * @brief ブロックを避けて移動する
+         * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
+         * 衝突していない場合、画面外まで出る場合は移動前の位置を返す。
+         *
+         * @param [in] character キャラクター
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @param [in] move 移動する方法
+         * @return 移動後の位置
+         */
+        _dodgeBlock: function(character, stagePosition, blockMap, move) {
+
+             // 移動先座標の情報を現在位置で初期化する。
+            var dest = {
+                x: character.x,
+                y: character.y,
+                width: character.width,
+                height: character.height,
+            };
+
+            // 衝突するブロックがなくなるまでループする。
+            while (true) {
+
+                // 衝突しているブロックを取得する。
+                var block = Util.checkCollidedBlock(dest, stagePosition, blockMap); 
+                if (block == null) {
+                    break;
+                }
+
+                // 回避するように移動する。
+                move(dest, block);
+            }
+
+            // 移動先の座標を返す。
+            return dest;
+        },
+        /**
+         * @function pushCharacter
+         * @brief ブロックによるキャラクター押出
+         * ブロックとぶつかったキャラクターを押し動かす。
+         *
+         * @param [in] character キャラクター
+         * @param [in] stagePosition ステージ位置
+         * @param [in] blockMap ブロックマップ
+         * @param [in] canMoveOut 画面外へ移動できるかどうか
+         * @return 移動先座標
+         */
+        pushCharacter: function(character, stagePosition, blockMap, canMoveOut) {
+
+            // 各方向への回避した場合の移動先座標を求める。
+            var left = Util.dodgeBlockLeft(character, stagePosition, blockMap);
+            
+            // 画面外への移動を許可する場合は常に左へ移動する。
+            if (canMoveOut) {
+                return left;
+            }
+
+            // 各方向への回避した場合の移動先座標を求める。
+            var right = Util.dodgeBlockRight(character, stagePosition, blockMap);
+            var up = Util.dodgeBlockUp(character, stagePosition, blockMap);
+            var down = Util.dodgeBlockDown(character, stagePosition, blockMap);
+
+            // 移動先候補を設定する。
+            // 移動の優先度は
+            //   1.スクロール方向
+            //   2.スクロールと垂直方向の近い方
+            //   3.スクロールと垂直方向の遠い方
+            //   4.スクロールと反対方向
+            var movePos = new Array(4);
+
+            // 1番目はスクロール方向（左方向）とする。
+            movePos[0] = left;
+
+            // 上への移動量の方が小さい場合
+            if (character.y - up.y < down.y - character.y) {
+                // 2番目を上、3番目を下とする。
+                movePos[1] = up;
+                movePos[2] = down;
+            }
+            else {
+                // 2番目を下、3番目を上とする。
+                movePos[1] = down;
+                movePos[2] = up;
+            }
+
+            // 4番目はスクロールと反対方向（右方向）とする。
+            movePos[3] = right;
+
+            // 4方向へ移動を試みる。
+            for (var i = 0; i < 4; i++) {
+
+                // 画面範囲外に出ているかをチェックする。
+                if (movePos[i].x >= 0 &&
+                    movePos[i].x < ScreenSize.STAGE_RECT.width &&
+                    movePos[i].y >= 0 &&
+                    movePos[i].y < ScreenSize.STAGE_RECT.height) {
+
+                    // 範囲内の場合はそこへ移動する。
+                    return movePos[i];
+                }
+            }
+
+            // どちらにも移動できない場合は移動前の位置を返す。
+            return character;
         },
     },
 });
