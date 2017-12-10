@@ -250,14 +250,15 @@ phina.define('Player', {
         // 各キャラクターとの当たり判定を処理する。
         for (var i = 0; i < characters.length; i++) {
 
-            // 対象が敵キャラクターの場合
-            if (characters[i].type === Character.type.ENEMY) {
+            // 対象が敵キャラクター、敵弾の場合
+            if (characters[i].type === Character.type.ENEMY ||
+                characters[i].type === Character.type.ENEMY_SHOT) {
 
                 // 接触しているかどうかを調べる。
                 if (Util.isHitCharacter(this.rect, characters[i].rect)) {
 
                     // 敵キャラクターの衝突処理を実行する。
-                    characters[i].hit(this);
+                    characters[i].hit(this, scene);
 
                     // 死亡時エフェクトを作成する。
                     scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));

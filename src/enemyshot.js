@@ -86,4 +86,18 @@ phina.define('EnemyShot', {
             return;
         }
     },
+    /**
+     * @function hit
+     * @brief 衝突処理
+     * 他のキャラクターと衝突したときの処理を行う。
+     *
+     * @param [in] character 衝突したキャラクター
+     * @param [in/out] scene シーン
+     */
+    hit: function(character, scene) {
+
+        // 自分自身を削除する。
+        scene.removeCharacter(this);
+        this.sprite.remove();
+    },
 });

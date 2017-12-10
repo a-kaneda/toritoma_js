@@ -293,11 +293,14 @@ phina.define('Dragonfly', {
      * @brief 衝突処理
      * 他のキャラクターと衝突したときの処理を行う。
      *
-     * @param character 衝突したキャラクター
+     * @param [in] character 衝突したキャラクター
+     * @param [in/out] scene シーン
      */
-    hit: function(character) {
-        // 衝突したキャラクターが自機弾の場合
-        if (character.type === Character.type.PLAYER_SHOT) {
+    hit: function(character, scene) {
+        // 衝突したキャラクターが自機または自機弾の場合
+        if (character.type === Character.type.PLAYER ||
+            character.type === Character.type.PLAYER_SHOT) {
+
             // 相手の攻撃力と自分の防御力の差をダメージとしてHPから減らす。
             if (this.defense < character.power) {
                 this.hp -= character.power - this.defense;
@@ -398,6 +401,20 @@ phina.define('EnemyShot', {
             this.sprite.remove();
             return;
         }
+    },
+    /**
+     * @function hit
+     * @brief 衝突処理
+     * 他のキャラクターと衝突したときの処理を行う。
+     *
+     * @param [in] character 衝突したキャラクター
+     * @param [in/out] scene シーン
+     */
+    hit: function(character, scene) {
+
+        // 自分自身を削除する。
+        scene.removeCharacter(this);
+        this.sprite.remove();
     },
 });
 
@@ -713,14 +730,15 @@ phina.define('Player', {
         // 各キャラクターとの当たり判定を処理する。
         for (var i = 0; i < characters.length; i++) {
 
-            // 対象が敵キャラクターの場合
-            if (characters[i].type === Character.type.ENEMY) {
+            // 対象が敵キャラクター、敵弾の場合
+            if (characters[i].type === Character.type.ENEMY ||
+                characters[i].type === Character.type.ENEMY_SHOT) {
 
                 // 接触しているかどうかを調べる。
                 if (Util.isHitCharacter(this.rect, characters[i].rect)) {
 
                     // 敵キャラクターの衝突処理を実行する。
-                    characters[i].hit(this);
+                    characters[i].hit(this, scene);
 
                     // 死亡時エフェクトを作成する。
                     scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
