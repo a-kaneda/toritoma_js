@@ -17,6 +17,7 @@ var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');
 var player = require('./player.js');
 var playerShot = require('./playershot.js');
+var playerDeathEffect = require('./playerdeatheffect.js');
 var explosion = require('./explosion.js');
 var dragonfly = require('./dragonfly.js');
 
@@ -53,6 +54,7 @@ const ASSETS = {
     sound: {
         'stage1': './sound/stage1.mp3',
         'bomb_min': './sound/bomb_min.mp3',
+        'miss': './sound/miss.mp3',
     },
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',

@@ -17,6 +17,15 @@ phina.define('Player', {
         HIT_WIDTH: 8,
         // 当たり判定高さ
         HIT_HEIGHT: 8,
+        // 状態
+        STATUS: {
+            // 通常
+            NORMAL: 1,
+            // 死亡
+            DEATH: 2,
+            // 無敵
+            INVINCIBLE: 3,
+        },
     },
     /**
      * @function init
@@ -51,6 +60,8 @@ phina.define('Player', {
 
         // メンバを初期化する。
         this.shotInterval = 0;
+        this.status = Player.STATUS.NORMAL;
+        this.power = 1;
     },
     /**
      * @function update
@@ -69,11 +80,20 @@ phina.define('Player', {
             this.rect.y = dest.y;
         }
 
-        // 自機弾発射間隔が経過した場合は自機弾を発射する。
-        this.shotInterval++;
-        if (this.shotInterval >= Player.SHOT_INTERVAL) {
-            scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
-            this.shotInterval = 0;
+        if (this.status === Player.STATUS.NORMAL || this.status === Player.STATUS.INVINCIBLE) {
+
+            // 自機弾発射間隔が経過した場合は自機弾を発射する。
+            this.shotInterval++;
+            if (this.shotInterval >= Player.SHOT_INTERVAL) {
+                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
+                this.shotInterval = 0;
+            }
+        }
+
+        if (this.status === Player.STATUS.NORMAL) {
+
+            // 敵キャラとの当たり判定処理を行う。
+            this._checkHitChacater(scene);
         }
 
         // 座標をスプライトに適用する。
@@ -213,6 +233,40 @@ phina.define('Player', {
         // 下側画面範囲外には移動させないようにする。
         if (this.rect.y > ScreenSize.STAGE_RECT.height - 1) {
             this.rect.y = ScreenSize.STAGE_RECT.height - 1;
+        }
+    },
+    /**
+     * @function _checkHitChacater
+     * @breif 当たり判定処理
+     * 他のキャラクターとの当たり判定を処理する。
+     *
+     * @param [in/out] scene シーン
+     */
+    _checkHitChacater: function(scene) {
+
+        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
+        var characters = scene.characters;
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 対象が敵キャラクターの場合
+            if (characters[i].type === Character.type.ENEMY) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
+
+                    // 敵キャラクターの衝突処理を実行する。
+                    characters[i].hit(this);
+
+                    // 死亡時エフェクトを作成する。
+                    scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
+
+                    // 敵キャラクターに接触した場合はステータスを死亡に変更してスプライトを削除する。
+                    this.status = Player.STATUS.DEATH;
+                    this.sprite.remove();
+                }
+            }
         }
     },
 });

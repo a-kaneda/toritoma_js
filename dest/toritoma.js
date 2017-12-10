@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 14);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -300,7 +300,8 @@ phina.define('Explosion', {
     /**
      * @function init
      * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
+     * 座標の設定とアニメーションの設定を行う。
+     * 爆発音を再生する。
      *
      * @param [in] x x座標
      * @param [in] y y座標
@@ -364,6 +365,15 @@ phina.define('Player', {
         HIT_WIDTH: 8,
         // 当たり判定高さ
         HIT_HEIGHT: 8,
+        // 状態
+        STATUS: {
+            // 通常
+            NORMAL: 1,
+            // 死亡
+            DEATH: 2,
+            // 無敵
+            INVINCIBLE: 3,
+        },
     },
     /**
      * @function init
@@ -398,6 +408,8 @@ phina.define('Player', {
 
         // メンバを初期化する。
         this.shotInterval = 0;
+        this.status = Player.STATUS.NORMAL;
+        this.power = 1;
     },
     /**
      * @function update
@@ -416,11 +428,20 @@ phina.define('Player', {
             this.rect.y = dest.y;
         }
 
-        // 自機弾発射間隔が経過した場合は自機弾を発射する。
-        this.shotInterval++;
-        if (this.shotInterval >= Player.SHOT_INTERVAL) {
-            scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
-            this.shotInterval = 0;
+        if (this.status === Player.STATUS.NORMAL || this.status === Player.STATUS.INVINCIBLE) {
+
+            // 自機弾発射間隔が経過した場合は自機弾を発射する。
+            this.shotInterval++;
+            if (this.shotInterval >= Player.SHOT_INTERVAL) {
+                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
+                this.shotInterval = 0;
+            }
+        }
+
+        if (this.status === Player.STATUS.NORMAL) {
+
+            // 敵キャラとの当たり判定処理を行う。
+            this._checkHitChacater(scene);
         }
 
         // 座標をスプライトに適用する。
@@ -562,11 +583,104 @@ phina.define('Player', {
             this.rect.y = ScreenSize.STAGE_RECT.height - 1;
         }
     },
+    /**
+     * @function _checkHitChacater
+     * @breif 当たり判定処理
+     * 他のキャラクターとの当たり判定を処理する。
+     *
+     * @param [in/out] scene シーン
+     */
+    _checkHitChacater: function(scene) {
+
+        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
+        var characters = scene.characters;
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 対象が敵キャラクターの場合
+            if (characters[i].type === Character.type.ENEMY) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
+
+                    // 敵キャラクターの衝突処理を実行する。
+                    characters[i].hit(this);
+
+                    // 死亡時エフェクトを作成する。
+                    scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
+
+                    // 敵キャラクターに接触した場合はステータスを死亡に変更してスプライトを削除する。
+                    this.status = Player.STATUS.DEATH;
+                    this.sprite.remove();
+                }
+            }
+        }
+    },
 });
 
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports) {
+
+/**
+ * @class PlayerDeathEffect
+ * @brief 自機死亡エフェクト
+ * 自機死亡時のエフェクトを表示する。
+ */
+phina.define('PlayerDeathEffect', {
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 座標の設定とアニメーションの設定を行う。
+     * 死亡時SEを再生する。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     * @param [in/out] scene シーン
+     */
+    init: function(x, y, scene) {
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_16x16', 16, 16);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('player_death');
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(x), Math.floor(y));
+
+        // 死亡音を再生する。
+        SoundManager.play('miss');
+    },
+    /**
+     * @function update
+     * @brief 更新処理
+     * 下に落ちる。
+     * アニメーションが終了すると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
+     */
+    update: function(scene) {
+
+        // 下に落ちる。
+        this.sprite.y = Math.floor(this.sprite.y + 1);
+
+        // アニメーションが終了すると自分自身を削除する。
+        if (this.animation.finished) {
+            scene.removeCharacter(this);
+            this.sprite.remove();
+        }
+    },
+});
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports) {
 
 /**
@@ -701,7 +815,7 @@ phina.define('PlayerShot', {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -733,7 +847,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /**
@@ -869,7 +983,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -1704,10 +1818,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)(module)))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 /**
@@ -1925,7 +2039,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /**
@@ -2350,7 +2464,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17134,10 +17248,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17164,7 +17278,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17192,28 +17306,29 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // phina.jsを読み込む
-var phina = __webpack_require__(11);
+var phina = __webpack_require__(12);
 
 // グローバル変数定義用
 phina.define('toritoma', {
 });
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(8);
+var tmx_stage1 = __webpack_require__(9);
 
 // 各クラス定義を読み込む。
-var util = __webpack_require__(10);
-var screenSize = __webpack_require__(6);
+var util = __webpack_require__(11);
+var screenSize = __webpack_require__(7);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(9);
-var stage = __webpack_require__(7);
+var tileMapManager = __webpack_require__(10);
+var stage = __webpack_require__(8);
 var controlSize = __webpack_require__(1);
 var player = __webpack_require__(4);
-var playerShot = __webpack_require__(5);
+var playerShot = __webpack_require__(6);
+var playerDeathEffect = __webpack_require__(5);
 var explosion = __webpack_require__(3);
 var dragonfly = __webpack_require__(2);
 
@@ -17250,6 +17365,7 @@ const ASSETS = {
     sound: {
         'stage1': './sound/stage1.mp3',
         'bomb_min': './sound/bomb_min.mp3',
+        'miss': './sound/miss.mp3',
     },
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',

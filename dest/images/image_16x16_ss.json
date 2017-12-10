@@ -11,6 +11,11 @@
             "next": "player_normal",
             "frequency": 12
         },
+        "player_death": {
+            "frames": [2],
+            "next": "",
+            "frequency": 60
+        },
         "explosion": {
             "frames": [8, 9, 10, 11, 12, 13, 14, 15],
             "next": "",
