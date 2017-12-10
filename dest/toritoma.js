@@ -2173,6 +2173,9 @@ phina.define('Util', {
                 // 脱出を試みる。
                 if (prevX + character.width / 2 > block.x - block.width / 2) {
                     newPosition.x = prevX;
+
+                    // 横方向移動のフラグは立てない。
+                    // 縦方向移動のフラグがたった場合はここでの変更は元に戻すため。
                 }
                 else {
                     // そうでない場合は右端を障害物の左端に合わせる
@@ -2192,6 +2195,9 @@ phina.define('Util', {
                 // 脱出を試みる。
                 if (prevX - character.width / 2 < block.x + block.width / 2) {
                     newPosition.x = prevX;
+
+                    // 横方向移動のフラグは立てない。
+                    // 縦方向移動のフラグがたった場合はここでの変更は元に戻すため。
                 }
                 else {
                     // そうでない場合は左端を障害物の右端に合わせる
@@ -2217,8 +2223,11 @@ phina.define('Util', {
                 // 障害物内部に入り込んでいるものとみなし、前回値に戻す。
                 // 障害物内部に入り込んでいるものは画面スクロール時のブロックがキャラクターを押し出す処理で
                 // 脱出を試みる。
-                if (prevY - character.height / 2 > block.y + block.height / 2) {
+                if (prevY - character.height / 2 < block.y + block.height / 2) {
                     newPosition.y = prevY;
+
+                    // 縦方向移動のフラグは立てない。
+                    // 横方向移動のフラグがたった場合はここでの変更は元に戻すため。
                 }
                 else {
                     // そうでない場合は上端を障害物の下端に合わせる
@@ -2238,6 +2247,9 @@ phina.define('Util', {
                 // 脱出を試みる。
                 if (prevY + character.height / 2 > block.y - block.height / 2) {
                     newPosition.y = prevY;
+
+                    // 縦方向移動のフラグは立てない。
+                    // 横方向移動のフラグがたった場合はここでの変更は元に戻すため。
                 }
                 else {
                     // そうでない場合は下端を障害物の上端に合わせる
@@ -2263,6 +2275,20 @@ phina.define('Util', {
                     newPosition.x = character.x;
                     newPosition.y = newYPosBackup;
                 }
+            }
+            // x方向だけ移動した場合
+            else if (isXMoved) {
+                // y方向は元に戻す。
+                newPosition.y = character.y;
+            }
+            // y方向だけ移動した場合
+            else if (isYMoved) {
+                // x方向は元に戻す。
+                newPosition.x = character.x;
+            }
+            else {
+                // 変更後の値を採用する。
+                // 障害物に入り込んでいる方向については移動前のものに戻される。
             }
 
             // 移動後の座標を戻り値として返す。
