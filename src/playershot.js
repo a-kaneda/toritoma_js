@@ -71,12 +71,24 @@ phina.define('PlayerShot', {
         this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
 
         // 当たり判定処理を行う。
-        this._checkHitChacater(scene);
+        if (this._checkHitChacater(scene)) {
+            // 敵キャラと衝突した場合は処理を終了する。
+            return;
+        }
+        
+        // ブロックとの当たり判定処理を行う。
+        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+            // ブロックと衝突した場合は自分自身を削除する。
+            scene.removeCharacter(this);
+            this.sprite.remove();
+            return;
+        }
 
         // 画面外に出た場合は自分自身を削除する。
         if (this.rect.x > ScreenSize.STAGE_RECT.width + 4) {
             scene.removeCharacter(this);
             this.sprite.remove();
+            return;
         }
     },
     /**
@@ -85,6 +97,7 @@ phina.define('PlayerShot', {
      * 他のキャラクターとの当たり判定を処理する。
      *
      * @param [in/out] scene シーン
+     * @return 敵キャラと衝突した場合trueを返す
      */
     _checkHitChacater: function(scene) {
 
@@ -106,9 +119,11 @@ phina.define('PlayerShot', {
                     // 敵キャラクターに接触した場合は自分自身は削除する。
                     scene.removeCharacter(this);
                     this.sprite.remove();
-                    break;
+                    return true;
                 }
             }
         }
+
+        return false;
     },
 });
