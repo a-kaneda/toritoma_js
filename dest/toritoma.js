@@ -17636,7 +17636,7 @@ phina.main(function() {
 
     // 画面サイズの補正の有効無効を切り替える。
     var isFit = true;
-    if (localStorage.disableFit) {
+    if (localStorage.disableFit == 'true') {
         isFit = false;
     }
 
