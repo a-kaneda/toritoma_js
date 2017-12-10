@@ -19,6 +19,7 @@ var player = require('./player.js');
 var playerShot = require('./playershot.js');
 var playerDeathEffect = require('./playerdeatheffect.js');
 var explosion = require('./explosion.js');
+var enemyShot = require('./enemyshot.js');
 var dragonfly = require('./dragonfly.js');
 
 // マウスが接続されているかどうか

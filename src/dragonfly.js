@@ -5,6 +5,14 @@
  * 左方向に直進する弾を発射する。
  */
 phina.define('Dragonfly', {
+    _static: {
+        // 移動スピード
+        MOVE_SPEED: -0.5,
+        // 弾のスピード
+        SHOT_SPEED: 0.75,
+        // 弾発射間隔（1周目）
+        SHOT_INTERVAL: 120,
+    },
     /**
      * @function init
      * @brief コンストラクタ
@@ -36,6 +44,9 @@ phina.define('Dragonfly', {
 
         // パラメータを設定する。
         Character.setEnemyParam('dragonfly', this);
+
+        // メンバを初期化する。
+        this.shotInterval = 0;
     },
     /**
      * @function update
@@ -49,7 +60,7 @@ phina.define('Dragonfly', {
     update: function(scene) {
 
         // 左へ移動する。
-        this.rect.x -= 1;
+        this.rect.x += Dragonfly.MOVE_SPEED;
 
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
@@ -66,10 +77,19 @@ phina.define('Dragonfly', {
             // 自分自身を削除する。
             scene.removeCharacter(this);
             this.sprite.remove();
+
+            return;
+        }
+
+        // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
+        this.shotInterval++;
+        if (this.shotInterval >= Dragonfly.SHOT_INTERVAL) {
+            scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+            this.shotInterval = 0;
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX < -32) {
+        if (this.floatX < -this.rect.width * 2) {
             scene.removeCharacter(this);
             this.sprite.remove();
         }

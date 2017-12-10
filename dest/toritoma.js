@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -199,6 +199,14 @@ phina.define('ControlSize', {
  * 左方向に直進する弾を発射する。
  */
 phina.define('Dragonfly', {
+    _static: {
+        // 移動スピード
+        MOVE_SPEED: -0.5,
+        // 弾のスピード
+        SHOT_SPEED: 0.75,
+        // 弾発射間隔（1周目）
+        SHOT_INTERVAL: 120,
+    },
     /**
      * @function init
      * @brief コンストラクタ
@@ -230,6 +238,9 @@ phina.define('Dragonfly', {
 
         // パラメータを設定する。
         Character.setEnemyParam('dragonfly', this);
+
+        // メンバを初期化する。
+        this.shotInterval = 0;
     },
     /**
      * @function update
@@ -243,7 +254,7 @@ phina.define('Dragonfly', {
     update: function(scene) {
 
         // 左へ移動する。
-        this.rect.x -= 1;
+        this.rect.x += Dragonfly.MOVE_SPEED;
 
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
@@ -260,10 +271,19 @@ phina.define('Dragonfly', {
             // 自分自身を削除する。
             scene.removeCharacter(this);
             this.sprite.remove();
+
+            return;
+        }
+
+        // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
+        this.shotInterval++;
+        if (this.shotInterval >= Dragonfly.SHOT_INTERVAL) {
+            scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+            this.shotInterval = 0;
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX < -32) {
+        if (this.floatX < -this.rect.width * 2) {
             scene.removeCharacter(this);
             this.sprite.remove();
         }
@@ -289,6 +309,101 @@ phina.define('Dragonfly', {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+/**
+ * @class EnemyShot
+ * @brief 敵弾
+ * 敵が発射する弾。
+ */
+phina.define('EnemyShot', {
+    _static: {
+        // 当たり判定幅
+        HIT_WIDTH: 6,
+        // 当たり判定高さ
+        HIT_HEIGHT: 6,
+    },
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 座標の設定とスプライトシートの設定を行う。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     * @param [in] angle 進行方向
+     * @param [in] speed スピード
+     * @param [in/out] scene シーン
+     */
+    init: function(x, y, angle, speed, scene) {
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_8x8', 8, 8);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_8x8_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('enemy_shot');
+
+        // キャラクタータイプを設定する。
+        this.type = Character.type.ENEMY_SHOT;
+
+        // 座標、サイズを設定する。
+        this.rect = {
+            x: x,
+            y: y,
+            width: EnemyShot.HIT_WIDTH,
+            height: EnemyShot.HIT_HEIGHT,
+        };
+
+        // x方向のスピードを計算する。
+        this.speedX = Math.cos(angle) * speed;
+        
+        // y方向のスピードを計算する。
+        // phina.jsの座標系は下方向が正なので逆向きにする。
+        this.speedY = Math.sin(angle) * speed * -1;
+    },
+    /**
+     * @function update
+     * @brief 更新処理
+     * スピードに応じて移動する。
+     * 画面外に出ると自分自身を削除する。
+     *
+     * @param [in/out] scene シーン
+     */
+    update: function(scene) {
+
+        // スピードに応じて移動する。
+        this.rect.x += this.speedX;
+        this.rect.y += this.speedY;
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+
+        // ブロックとの当たり判定処理を行う。
+        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+            // ブロックと衝突した場合は自分自身を削除する。
+            scene.removeCharacter(this);
+            this.sprite.remove();
+            return;
+        }
+
+        // 画面外に出た場合は自分自身を削除する。
+        if (this.rect.x < -this.rect.width * 2 ||
+            this.rect.x > ScreenSize.STAGE_RECT.width + this.rect.width * 2 ||
+            this.rect.y < -this.rect.height * 2 ||
+            this.rect.y > ScreenSize.STAGE_RECT.height + this.rect.height * 2) {
+
+            scene.removeCharacter(this);
+            this.sprite.remove();
+            return;
+        }
+    },
+});
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports) {
 
 /**
@@ -343,7 +458,7 @@ phina.define('Explosion', {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 /**
@@ -621,7 +736,7 @@ phina.define('Player', {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 /**
@@ -680,7 +795,7 @@ phina.define('PlayerDeathEffect', {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /**
@@ -815,7 +930,7 @@ phina.define('PlayerShot', {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -847,7 +962,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /**
@@ -983,7 +1098,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -1818,10 +1933,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)(module)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /**
@@ -2039,7 +2154,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /**
@@ -2490,7 +2605,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17274,10 +17389,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17304,7 +17419,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17332,30 +17447,31 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // phina.jsを読み込む
-var phina = __webpack_require__(12);
+var phina = __webpack_require__(13);
 
 // グローバル変数定義用
 phina.define('toritoma', {
 });
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(9);
+var tmx_stage1 = __webpack_require__(10);
 
 // 各クラス定義を読み込む。
-var util = __webpack_require__(11);
-var screenSize = __webpack_require__(7);
+var util = __webpack_require__(12);
+var screenSize = __webpack_require__(8);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(10);
-var stage = __webpack_require__(8);
+var tileMapManager = __webpack_require__(11);
+var stage = __webpack_require__(9);
 var controlSize = __webpack_require__(1);
-var player = __webpack_require__(4);
-var playerShot = __webpack_require__(6);
-var playerDeathEffect = __webpack_require__(5);
-var explosion = __webpack_require__(3);
+var player = __webpack_require__(5);
+var playerShot = __webpack_require__(7);
+var playerDeathEffect = __webpack_require__(6);
+var explosion = __webpack_require__(4);
+var enemyShot = __webpack_require__(3);
 var dragonfly = __webpack_require__(2);
 
 // マウスが接続されているかどうか
