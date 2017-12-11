@@ -9,12 +9,14 @@ phina.define('toritoma', {
 var tmx_stage1 = require('./stage1.js');
 
 // 各クラス定義を読み込む。
+var myColor = require('./mycolor.js');
 var util = require('./util.js');
 var screenSize = require('./screensize.js');
 var character = require('./character.js');
 var tileMapManager = require('./tilemapmanager.js');
 var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');
+var life = require('./life.js');
 var player = require('./player.js');
 var playerShot = require('./playershot.js');
 var playerDeathEffect = require('./playerdeatheffect.js');
@@ -36,9 +38,6 @@ document.addEventListener('mousemove', detectDeviceType);
 
 // phina.js をグローバル領域に展開
 phina.globalize();
-
-// モノクロの各色の定義
-const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 
 // アセット
 const ASSETS = {
@@ -64,6 +63,16 @@ const ASSETS = {
 
 // MainScene クラスを定義
 phina.define('MainScene', {
+    _static: {
+        // 初期残機
+        INITIAL_LIFE: 2,
+        // 残機位置x座標
+        LIFE_POS_X: 32,
+        // 残機位置y座標
+        LIFE_POS_Y: 12,
+        // スコアラベル位置
+        SCORE_POS_Y: 12,
+    },
     superClass: 'DisplayScene',
     init: function() {
         this.superInit({
@@ -82,7 +91,7 @@ phina.define('MainScene', {
         this.gamepad = this.gamepadManager.get(0);
 
         // 背景色を指定する。
-        this.backgroundColor = COLOR[0];
+        this.backgroundColor = MyColor.BACK_COLOR;
 
         // 背景レイヤーを作成する。
         this.backgroundLayer = DisplayElement().addChildTo(this);
@@ -116,20 +125,30 @@ phina.define('MainScene', {
         this.scoreLabelBase = RectangleShape({
             height: 22,
             width: 148,
-            fill: COLOR[0],
+            fill: MyColor.BACK_COLOR,
             strokeWidth: 0,
             x: Math.round(this.gridX.center()),
-            y: 14,
+            y: MainScene.SCORE_POS_Y,
         }).addChildTo(this.infoLayer);
 
         this.scoreLabel = Label({
             text: 'SCORE: 000000',
             fontSize: 20,
-            fill: COLOR[3],
+            fill: MyColor.FORE_COLOR,
             fontFamily: 'noto',
         }).addChildTo(this.scoreLabelBase);
 
         this.score = 0;
+
+        // 残機表示を作成する。
+        this.lifeLabel = Life();
+        this.lifeLabel.getSprite().addChildTo(this.infoLayer);
+        this.lifeLabel.getSprite().x = ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO + MainScene.LIFE_POS_X;
+        this.lifeLabel.getSprite().y = MainScene.LIFE_POS_Y;
+
+        // 残機を初期化する。
+        this.life = MainScene.INITIAL_LIFE;
+        this.lifeLabel.setLife(this.life);
 
         // キャラクター管理配列を作成する。
         this.characters = [];

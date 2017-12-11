@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 16);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -183,6 +183,12 @@ phina.define('ControlSize', {
             y: 8,
             w: 4,
             h: 4,
+        },
+        life: {
+            x: 0,
+            y: 16,
+            w: 8,
+            h: 8,
         },
     },
 });
@@ -479,6 +485,112 @@ phina.define('Explosion', {
 /***/ (function(module, exports) {
 
 /**
+ * @class Life
+ * @brief 残機表示
+ * 残機を表示する。
+ */
+phina.define('Life', {
+    _static: {
+        // 残機最大値
+        MAX_LIFE: 99,
+        // 画像位置
+        IMAGE_POS_X: -16,
+        // ラベル位置
+        LABEL_POS_X: 8,
+    },
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 画像と数値のラベルをくっつけたコントールを作成する。
+     */
+    init: function() {
+
+        // ベース部分を作成する。
+        this.base = RectangleShape({
+            height: 22,
+            width: 52,
+            fill: MyColor.BACK_COLOR,
+            strokeWidth: 0,
+        });
+
+        // 画像を読み込む
+        this.image = Sprite('control', ControlSize.life.w, ControlSize.life.h);
+        this.image.srcRect.set(ControlSize.life.x, ControlSize.life.y, ControlSize.life.w, ControlSize.life.h);
+        this.image.scaleX = ScreenSize.ZOOM_RATIO;
+        this.image.scaleY = ScreenSize.ZOOM_RATIO;
+        this.image.x = Life.IMAGE_POS_X;
+        this.image.addChildTo(this.base);
+
+        // ラベルを作成する。
+        this.label = Label({
+            text: ':00',
+            fontSize: 20,
+            fill: MyColor.FORE_COLOR,
+            fontFamily: 'noto',
+        });
+        this.label.x = Life.LABEL_POS_X;
+        this.label.addChildTo(this.base);
+
+        // 残機の初期値は0とする。
+        this.life = 0;
+    },
+    /**
+     * @function getSprite
+     * @brief スプライト取得
+     * 残機画像、ラベルを合わせたスプライトを取得する。
+     *
+     * @return スプライト
+     */
+    getSprite: function() {
+        return this.base;
+    },
+    /**
+     * @function setLife
+     * @brief 残機設定
+     * 残機を設定し、
+     */
+    setLife: function(life) {
+
+        // 残機を変更する。
+        this.life = life;
+
+        // 最大値を超えている場合は最大値に補正する。
+        if (this.life > Life.MAX_LIFE) {
+            this.life = Life.MAX_LIFE;
+        }
+
+        // ラベルの表示文字列を変更する。
+        this.label.text = ':' + ('00' + this.life).slice(-2);
+    },
+});
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+/**
+ * @class MyColor
+ * @brief 色定義
+ * ゲーム内で使用する色を定義する。
+ */
+phina.define('MyColor', {
+    _static: {
+        // 使用する色、0:薄い、3:濃い
+        COLORS: ['#9cb389', '#6e8464', '#40553f', '#12241A'],
+        // 背景色
+        BACK_COLOR: '#9cb389',
+        // 前景色
+        FORE_COLOR: '#12241A',
+    },
+});
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+/**
  * @class Player
  * @brief 自機
  * ユーザー捜査に応じて移動する。
@@ -754,7 +866,7 @@ phina.define('Player', {
 
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /**
@@ -813,7 +925,7 @@ phina.define('PlayerDeathEffect', {
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /**
@@ -948,7 +1060,7 @@ phina.define('PlayerShot', {
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -980,7 +1092,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /**
@@ -1116,7 +1228,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -1951,10 +2063,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)(module)))
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports) {
 
 /**
@@ -2172,7 +2284,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports) {
 
 /**
@@ -2623,7 +2735,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17407,10 +17519,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17437,7 +17549,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17465,29 +17577,31 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // phina.jsを読み込む
-var phina = __webpack_require__(13);
+var phina = __webpack_require__(15);
 
 // グローバル変数定義用
 phina.define('toritoma', {
 });
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(10);
+var tmx_stage1 = __webpack_require__(12);
 
 // 各クラス定義を読み込む。
-var util = __webpack_require__(12);
-var screenSize = __webpack_require__(8);
+var myColor = __webpack_require__(6);
+var util = __webpack_require__(14);
+var screenSize = __webpack_require__(10);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(11);
-var stage = __webpack_require__(9);
+var tileMapManager = __webpack_require__(13);
+var stage = __webpack_require__(11);
 var controlSize = __webpack_require__(1);
-var player = __webpack_require__(5);
-var playerShot = __webpack_require__(7);
-var playerDeathEffect = __webpack_require__(6);
+var life = __webpack_require__(5);
+var player = __webpack_require__(7);
+var playerShot = __webpack_require__(9);
+var playerDeathEffect = __webpack_require__(8);
 var explosion = __webpack_require__(4);
 var enemyShot = __webpack_require__(3);
 var dragonfly = __webpack_require__(2);
@@ -17506,9 +17620,6 @@ document.addEventListener('mousemove', detectDeviceType);
 
 // phina.js をグローバル領域に展開
 phina.globalize();
-
-// モノクロの各色の定義
-const COLOR = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 
 // アセット
 const ASSETS = {
@@ -17534,6 +17645,16 @@ const ASSETS = {
 
 // MainScene クラスを定義
 phina.define('MainScene', {
+    _static: {
+        // 初期残機
+        INITIAL_LIFE: 2,
+        // 残機位置x座標
+        LIFE_POS_X: 32,
+        // 残機位置y座標
+        LIFE_POS_Y: 12,
+        // スコアラベル位置
+        SCORE_POS_Y: 12,
+    },
     superClass: 'DisplayScene',
     init: function() {
         this.superInit({
@@ -17552,7 +17673,7 @@ phina.define('MainScene', {
         this.gamepad = this.gamepadManager.get(0);
 
         // 背景色を指定する。
-        this.backgroundColor = COLOR[0];
+        this.backgroundColor = MyColor.BACK_COLOR;
 
         // 背景レイヤーを作成する。
         this.backgroundLayer = DisplayElement().addChildTo(this);
@@ -17586,20 +17707,30 @@ phina.define('MainScene', {
         this.scoreLabelBase = RectangleShape({
             height: 22,
             width: 148,
-            fill: COLOR[0],
+            fill: MyColor.BACK_COLOR,
             strokeWidth: 0,
             x: Math.round(this.gridX.center()),
-            y: 14,
+            y: MainScene.SCORE_POS_Y,
         }).addChildTo(this.infoLayer);
 
         this.scoreLabel = Label({
             text: 'SCORE: 000000',
             fontSize: 20,
-            fill: COLOR[3],
+            fill: MyColor.FORE_COLOR,
             fontFamily: 'noto',
         }).addChildTo(this.scoreLabelBase);
 
         this.score = 0;
+
+        // 残機表示を作成する。
+        this.lifeLabel = Life();
+        this.lifeLabel.getSprite().addChildTo(this.infoLayer);
+        this.lifeLabel.getSprite().x = ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO + MainScene.LIFE_POS_X;
+        this.lifeLabel.getSprite().y = MainScene.LIFE_POS_Y;
+
+        // 残機を初期化する。
+        this.life = MainScene.INITIAL_LIFE;
+        this.lifeLabel.setLife(this.life);
 
         // キャラクター管理配列を作成する。
         this.characters = [];

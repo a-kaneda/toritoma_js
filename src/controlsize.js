@@ -60,5 +60,11 @@ phina.define('ControlSize', {
             w: 4,
             h: 4,
         },
+        life: {
+            x: 0,
+            y: 16,
+            w: 8,
+            h: 8,
+        },
     },
 });
