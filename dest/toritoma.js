@@ -289,7 +289,7 @@ phina.define('Dragonfly', {
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.floatX < -this.rect.width * 2) {
+        if (this.rect.x < -this.rect.width * 2) {
             scene.removeCharacter(this);
             this.sprite.remove();
         }
