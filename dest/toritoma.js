@@ -609,6 +609,8 @@ phina.define('Player', {
         HIT_WIDTH: 8,
         // 当たり判定高さ
         HIT_HEIGHT: 8,
+        // 復活後無敵フレーム数
+        INVINCIBLE_FRAME: 120,
         // 状態
         STATUS: {
             // 通常
@@ -654,11 +656,14 @@ phina.define('Player', {
         this.shotInterval = 0;
         this.status = Player.STATUS.NORMAL;
         this.power = 1;
+        this.invincibleFrame = 0;
     },
     /**
      * @function update
      * @brief 更新処理
      * 座標をスプライトに適用する。
+     * ブロックやキャラクターとの当たり判定処理を行う。
+     * 自機弾を発射する。
      *
      * @param [in/out] scene シーン
      */
@@ -671,6 +676,14 @@ phina.define('Player', {
             this.rect.x = dest.x;
             this.rect.y = dest.y;
         }
+
+        if (this.status === Player.STATUS.INVINCIBLE) {
+            // 無敵状態フレーム数を経過した場合は通常状態に戻す。
+            this.invincibleFrame--;
+            if (this.invincibleFrame <= 0) {
+                this.status = Player.STATUS.NORMAL;
+            }
+        } 
 
         if (this.status === Player.STATUS.NORMAL || this.status === Player.STATUS.INVINCIBLE) {
 
@@ -768,6 +781,25 @@ phina.define('Player', {
                    scene);
     },
     /**
+     * @function rebirth
+     * @brief 復活処理
+     * 死亡後の復活処理を行う。
+     * 一定時間無敵状態とし、再度スプライトを配置する。
+     *
+     * @param [in/out] scene シーン
+     */
+    rebirth: function(scene) {
+
+        // ステータスを無敵状態にする。
+        this.status = Player.STATUS.INVINCIBLE;
+
+        // 無敵状態フレーム数を設定する。
+        this.invincibleFrame = Player.INVINCIBLE_FRAME;
+
+        // スプライトを配置する。
+        scene.addCharacterSprite(this.sprite);
+    },
+    /**
      * @function _move
      * @brief 移動処理
      * 座標を変更し、各種当たり判定処理を行う。
@@ -782,9 +814,12 @@ phina.define('Player', {
         var prevX = this.rect.x;
         var prevY = this.rect.y;
 
-        // 現在の座標を変更する。
-        this.rect.x = x;
-        this.rect.y = y;
+        // 死亡中でない場合のみ移動を行う。
+        if (this.status != Player.STATUS.DEATH) {
+            // 現在の座標を変更する。
+            this.rect.x = x;
+            this.rect.y = y;
+        }
 
         // 衝突しているブロックがないか調べる。
         var block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
@@ -858,6 +893,9 @@ phina.define('Player', {
                     // 敵キャラクターに接触した場合はステータスを死亡に変更してスプライトを削除する。
                     this.status = Player.STATUS.DEATH;
                     this.sprite.remove();
+
+                    // シーンの死亡時処理を実行する。
+                    scene.miss();
                 }
             }
         }
@@ -17644,6 +17682,11 @@ const ASSETS = {
 };
 
 // MainScene クラスを定義
+/**
+ * @class MainScene
+ * @brief メインシーン
+ * ゲームの各ステージをプレイするメインのシーン。
+ */
 phina.define('MainScene', {
     _static: {
         // 初期残機
@@ -17654,8 +17697,15 @@ phina.define('MainScene', {
         LIFE_POS_Y: 12,
         // スコアラベル位置
         SCORE_POS_Y: 12,
+        // 復活待機フレーム数
+        REBIRTH_WAIT: 60,
     },
     superClass: 'DisplayScene',
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 各種データの初期化と生成を行う。
+     */
     init: function() {
         this.superInit({
             width: ScreenSize.SCREEN_WIDTH,
@@ -17729,8 +17779,10 @@ phina.define('MainScene', {
         this.lifeLabel.getSprite().y = MainScene.LIFE_POS_Y;
 
         // 残機を初期化する。
-        this.life = MainScene.INITIAL_LIFE;
-        this.lifeLabel.setLife(this.life);
+        this._setLife(MainScene.INITIAL_LIFE);
+
+        // 復活待機フレーム数を初期化する。
+        this.rebirthWait = 0;
 
         // キャラクター管理配列を作成する。
         this.characters = [];
@@ -17749,68 +17801,24 @@ phina.define('MainScene', {
         // BGMを再生する。
         SoundManager.playMusic('stage1');
     },
+    /**
+     * @function update
+     * @brief 更新処理
+     * キー入力処理を行う。
+     * ステージ、キャラクターの更新処理を行う。
+     *
+     * @param [in] app アプリケーション
+     */
     update: function(app) {
 
-        // ゲームパッドの状態を更新する。
-        this.gamepadManager.update();
+        // キーボード入力を行う。
+        this._inputKeyboard(app);
 
-        var key = app.keyboard;
+        // タッチ入力を行う。
+        this._inputTouch(app);
 
-        // カーソルキーの入力によって自機を移動する。
-        if (key.getKey('left')) {
-            this.player.moveKeyLeft(this);
-        }
-        if (key.getKey('right')) {
-            this.player.moveKeyRight(this);
-        }
-        if (key.getKey('up')) {
-            this.player.moveKeyUp(this);
-        }
-        if (key.getKey('down')) {
-            this.player.moveKeyDown(this);
-        }
-
-        var touches = app.pointers;
-        var sliding = false;
-
-        for (var i = 0; i < touches.length; i++) {
-
-            // マウスが接続されていない場合はスライドの処理を行う。
-            if (!toritoma.isMouseUsed) {
-
-                // スライド操作をしていない状態だった場合、最初のタッチ位置を記憶する。
-                if (this.touch.id < 0) {
-                    this.touch.id = touches[i].id;
-                    this.touch.x = touches[i].x;
-                    this.touch.y = touches[i].y;
-                    sliding = true;
-                    continue;
-                }
-
-                // スライド操作をしている場合はスライド量に応じて自機を移動する。
-                if (this.touch.id == touches[i].id) {
-                    this.player.moveTouch(touches[i].x - this.touch.x, touches[i].y - this.touch.y, this);
-                    this.touch.x = touches[i].x;
-                    this.touch.y = touches[i].y;
-                    sliding = true;
-                    continue;
-                }
-            }
-        }
-
-        // スライドしていない場合はタッチ情報を初期化する。
-        if (!sliding) {
-            this.touch.id = -1;
-            this.touch.x = 0;
-            this.touch.y = 0;
-        }
-
-        // アナログスティックの入力を取得する。
-        var stick = this.gamepad.getStickDirection(0);
-
-        if (stick.length() > 0.5) {
-            this.player.moveGamepad(stick.x, stick.y, this);
-        }
+        // ゲームパッド入力を行う。
+        this._inputGamepad();
 
         // ステージの状態を更新する。
         this.stage.update(this);
@@ -17822,6 +17830,9 @@ phina.define('MainScene', {
         for (var i = 0; i < this.characters.length; i++) {
             this.characters[i].update(this);
         }
+
+        // 自機復活処理を行う。
+        this._rebirthPlayer();
 
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
@@ -17851,7 +17862,7 @@ phina.define('MainScene', {
      * @brief キャラクター削除
      * キャラクターを削除する。
      *
-     * @param [in/out] character 追加するキャラクター
+     * @param [in/out] character 削除するキャラクター
      */
     removeCharacter: function(character) {
         var i = this.characters.indexOf(character);
@@ -17888,6 +17899,117 @@ phina.define('MainScene', {
      */
     getStagePosition: function() {
         return -this.stage.x;
+    },
+    /**
+     * @function miss
+     * @brief 自機死亡時処理
+     * 自機が死亡したときの処理を行う。
+     * 残機が残っていれば、残機を一つ減らし、自機を復活する。
+     * 残機が残っていなければゲームオーバー処理を行う。
+     */
+    miss: function() {
+
+        // 残機が残っている場合
+        if (this.life > 0) {
+
+            // 残機を一つ減らす。
+            this._setLife(this.life - 1);
+
+            // 復活待機フレーム数を設定する。
+            // この時間が経過したときに自機を復活する。
+            this.rebirthWait = MainScene.REBIRTH_WAIT;
+        }
+        // 残機が残っていない場合
+        else {
+        }
+    },
+    /**
+     * @function _inputKeyboard
+     * @brief キーボード入力処理
+     * キーボードの入力処理を行う。
+     *
+     * @param [in] app アプリケーション
+     */
+    _inputKeyboard: function(app) {
+
+        // キーボードを取得する。
+        var key = app.keyboard;
+
+        // カーソルキーの入力によって自機を移動する。
+        if (key.getKey('left')) {
+            this.player.moveKeyLeft(this);
+        }
+        if (key.getKey('right')) {
+            this.player.moveKeyRight(this);
+        }
+        if (key.getKey('up')) {
+            this.player.moveKeyUp(this);
+        }
+        if (key.getKey('down')) {
+            this.player.moveKeyDown(this);
+        }
+
+    },
+    /**
+     * @function _inputTouch
+     * @brief タッチ入力処理
+     * タッチの入力処理を行う。
+     *
+     * @param [in] app アプリケーション
+     */
+    _inputTouch: function(app) {
+
+        var touches = app.pointers;
+        var sliding = false;
+
+        for (var i = 0; i < touches.length; i++) {
+
+            // マウスが接続されていない場合はスライドの処理を行う。
+            if (!toritoma.isMouseUsed) {
+
+                // スライド操作をしていない状態だった場合、最初のタッチ位置を記憶する。
+                if (this.touch.id < 0) {
+                    this.touch.id = touches[i].id;
+                    this.touch.x = touches[i].x;
+                    this.touch.y = touches[i].y;
+                    sliding = true;
+                    continue;
+                }
+
+                // スライド操作をしている場合はスライド量に応じて自機を移動する。
+                if (this.touch.id == touches[i].id) {
+                    this.player.moveTouch(touches[i].x - this.touch.x, touches[i].y - this.touch.y, this);
+                    this.touch.x = touches[i].x;
+                    this.touch.y = touches[i].y;
+                    sliding = true;
+                    continue;
+                }
+            }
+        }
+
+        // スライドしていない場合はタッチ情報を初期化する。
+        if (!sliding) {
+            this.touch.id = -1;
+            this.touch.x = 0;
+            this.touch.y = 0;
+        }
+    },
+    /**
+     * @function _inputGamepad
+     * @brief ゲームパッド入力処理
+     * ゲームパッドの入力処理を行う。
+     */
+    _inputGamepad: function() {
+
+        // ゲームパッドの状態を更新する。
+        this.gamepadManager.update();
+
+        // アナログスティックの入力を取得する。
+        var stick = this.gamepad.getStickDirection(0);
+
+        if (stick.length() > 0.5) {
+            this.player.moveGamepad(stick.x, stick.y, this);
+        }
     },
     /**
      * @function _crateFrame
@@ -18050,6 +18172,36 @@ phina.define('MainScene', {
         bar.setOrigin(0, 0);
         bar.setPosition(x, y);
         bar.addChildTo(this.frameLayer);
+    },
+    /**
+     * @function _setLife
+     * @brief 残機設定
+     * 残機を変更し、残機ラベルを更新する。
+     */
+    _setLife: function(life) {
+        this.life = life;
+        this.lifeLabel.setLife(this.life);
+    },
+    /**
+     * @function _rebirthPlayer
+     * @brief 自機復活処理
+     * 復活待機フレーム数をカウントし、
+     * 待機フレーム数を経過したタイミングで自機を復活する。
+     */
+    _rebirthPlayer: function() {
+
+        // 復活待機フレーム数が設定されている場合はフレーム数をカウントする
+        if (this.rebirthWait > 0) {
+        
+            this.rebirthWait--;
+        
+            // 復活までのフレーム数が経過している場合は自機を復活する
+            if (this.rebirthWait <= 0) {
+
+                // 自機を復活させる
+                this.player.rebirth(this);
+            }
+        }
     },
 });
 

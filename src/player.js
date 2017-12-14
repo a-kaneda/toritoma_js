@@ -17,6 +17,8 @@ phina.define('Player', {
         HIT_WIDTH: 8,
         // 当たり判定高さ
         HIT_HEIGHT: 8,
+        // 復活後無敵フレーム数
+        INVINCIBLE_FRAME: 120,
         // 状態
         STATUS: {
             // 通常
@@ -62,11 +64,14 @@ phina.define('Player', {
         this.shotInterval = 0;
         this.status = Player.STATUS.NORMAL;
         this.power = 1;
+        this.invincibleFrame = 0;
     },
     /**
      * @function update
      * @brief 更新処理
      * 座標をスプライトに適用する。
+     * ブロックやキャラクターとの当たり判定処理を行う。
+     * 自機弾を発射する。
      *
      * @param [in/out] scene シーン
      */
@@ -79,6 +84,14 @@ phina.define('Player', {
             this.rect.x = dest.x;
             this.rect.y = dest.y;
         }
+
+        if (this.status === Player.STATUS.INVINCIBLE) {
+            // 無敵状態フレーム数を経過した場合は通常状態に戻す。
+            this.invincibleFrame--;
+            if (this.invincibleFrame <= 0) {
+                this.status = Player.STATUS.NORMAL;
+            }
+        } 
 
         if (this.status === Player.STATUS.NORMAL || this.status === Player.STATUS.INVINCIBLE) {
 
@@ -176,6 +189,25 @@ phina.define('Player', {
                    scene);
     },
     /**
+     * @function rebirth
+     * @brief 復活処理
+     * 死亡後の復活処理を行う。
+     * 一定時間無敵状態とし、再度スプライトを配置する。
+     *
+     * @param [in/out] scene シーン
+     */
+    rebirth: function(scene) {
+
+        // ステータスを無敵状態にする。
+        this.status = Player.STATUS.INVINCIBLE;
+
+        // 無敵状態フレーム数を設定する。
+        this.invincibleFrame = Player.INVINCIBLE_FRAME;
+
+        // スプライトを配置する。
+        scene.addCharacterSprite(this.sprite);
+    },
+    /**
      * @function _move
      * @brief 移動処理
      * 座標を変更し、各種当たり判定処理を行う。
@@ -190,9 +222,12 @@ phina.define('Player', {
         var prevX = this.rect.x;
         var prevY = this.rect.y;
 
-        // 現在の座標を変更する。
-        this.rect.x = x;
-        this.rect.y = y;
+        // 死亡中でない場合のみ移動を行う。
+        if (this.status != Player.STATUS.DEATH) {
+            // 現在の座標を変更する。
+            this.rect.x = x;
+            this.rect.y = y;
+        }
 
         // 衝突しているブロックがないか調べる。
         var block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
@@ -266,6 +301,9 @@ phina.define('Player', {
                     // 敵キャラクターに接触した場合はステータスを死亡に変更してスプライトを削除する。
                     this.status = Player.STATUS.DEATH;
                     this.sprite.remove();
+
+                    // シーンの死亡時処理を実行する。
+                    scene.miss();
                 }
             }
         }
