@@ -1184,9 +1184,9 @@ phina.define('PlayerShot', {
         // オプションの攻撃力
         OPTION_POWER: 2,
         // 当たり判定幅
-        HIT_WIDTH: 6,
+        HIT_WIDTH: 3,
         // 当たり判定高さ
-        HIT_HEIGHT: 6,
+        HIT_HEIGHT: 3,
     },
     /**
      * @function init
