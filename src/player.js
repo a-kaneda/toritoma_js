@@ -86,10 +86,22 @@ phina.define('Player', {
         }
 
         if (this.status === Player.STATUS.INVINCIBLE) {
-            // 無敵状態フレーム数を経過した場合は通常状態に戻す。
+
+            // 無敵状態フレーム数をカウントする。
             this.invincibleFrame--;
+
+            // 無敵状態フレーム数を経過した場合
             if (this.invincibleFrame <= 0) {
+
+                // ステータスを通常状態に戻す。
                 this.status = Player.STATUS.NORMAL;
+
+                // 点滅アニメーションを停止する。
+                this.sprite.tweener.clear();
+
+                // アニメーションが非表示で終了している可能性があるので、
+                // 表示状態にする。
+                this.sprite.alpha = 1;
             }
         } 
 
@@ -192,7 +204,7 @@ phina.define('Player', {
      * @function rebirth
      * @brief 復活処理
      * 死亡後の復活処理を行う。
-     * 一定時間無敵状態とし、再度スプライトを配置する。
+     * 一定時間無敵状態とし、画像を点滅表示する。
      *
      * @param [in/out] scene シーン
      */
@@ -204,8 +216,18 @@ phina.define('Player', {
         // 無敵状態フレーム数を設定する。
         this.invincibleFrame = Player.INVINCIBLE_FRAME;
 
-        // スプライトを配置する。
-        scene.addCharacterSprite(this.sprite);
+        // 画像を表示する。
+        this.sprite.alpha = 1;
+
+        // 点滅アニメーションを実行する。
+        // 100ms周期で表示、非表示を切り替える。
+        this.sprite.tweener
+            .wait(100)
+            .set({ alpha: 0 })
+            .wait(100)
+            .set({ alpha: 1 })
+            .setLoop(true)
+            .play();
     },
     /**
      * @function _move
@@ -295,12 +317,16 @@ phina.define('Player', {
                     // 敵キャラクターの衝突処理を実行する。
                     characters[i].hit(this, scene);
 
+                    // 敵キャラクターに接触した場合は死亡処理を行う。
+
                     // 死亡時エフェクトを作成する。
                     scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
 
-                    // 敵キャラクターに接触した場合はステータスを死亡に変更してスプライトを削除する。
+                    // ステータスを死亡に変更する。
                     this.status = Player.STATUS.DEATH;
-                    this.sprite.remove();
+
+                    // 画像を非表示にする。
+                    this.sprite.alpha = 0;
 
                     // シーンの死亡時処理を実行する。
                     scene.miss();
