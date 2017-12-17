@@ -227,9 +227,15 @@ phina.define('Util', {
                 newPosition.y = character.y;
                 if (Util.checkCollidedBlock(newPosition, stagePosition, blockMap) != null) {
 
-                    // x方向の移動で衝突する場合はy方向の移動を採用する。
+                    // x座標だけ元に戻して衝突するか調べる。
+                    var newXPosBackupt = newPosition.x;
                     newPosition.x = character.x;
                     newPosition.y = newYPosBackup;
+                    if (Util.checkCollidedBlock(newPosition, stagePosition, blockMap) != null) {
+
+                        // 片方だけでは衝突する場合は両方の値を採用する。
+                        newPosition.x = newXPosBackupt;
+                    }
                 }
             }
             // x方向だけ移動した場合

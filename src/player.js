@@ -84,6 +84,7 @@ phina.define('Player', {
 
         // ブロックと衝突している場合
         if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+
             // ブロックによって押されて移動する。
             var dest = Util.pushCharacter(this.rect, scene.getStagePosition(), scene.getBlockMap(), false);
             this.rect.x = dest.x;
@@ -115,7 +116,7 @@ phina.define('Player', {
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
             this.shotInterval++;
             if (this.shotInterval >= Player.SHOT_INTERVAL) {
-                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
+                //scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
                 this.shotInterval = 0;
             }
 
@@ -276,10 +277,22 @@ phina.define('Player', {
         var block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
 
         // 衝突しているブロックがある場合は移動する。
-        if (block != null) {
+        while (block != null) {
+
+            // 移動位置を計算する。
             var newPosition = Util.moveByBlock(this.rect, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
+
+            // 移動できない場合はループを抜ける。
+            if (this.rect.x == newPosition.x && this.rect.y == newPosition.y) {
+                break;
+            }
+            
+            // 移動後の座標を反映する。
             this.rect.x = newPosition.x;
             this.rect.y = newPosition.y;
+
+            // 移動後に再度衝突していないかチェックする。
+            block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
         }
 
         // 画面外に出ていないかチェックする。
