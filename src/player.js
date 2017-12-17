@@ -116,7 +116,7 @@ phina.define('Player', {
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
             this.shotInterval++;
             if (this.shotInterval >= Player.SHOT_INTERVAL) {
-                //scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
+                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
                 this.shotInterval = 0;
             }
 

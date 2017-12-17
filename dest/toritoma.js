@@ -783,12 +783,10 @@ phina.define('Player', {
         // ブロックと衝突している場合
         if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
 
-            console.log('update,ブロックと衝突,x=%d,y=%d,width=%d,height=%d', this.rect.x, this.rect.y, this.rect.width, this.rect.height);
             // ブロックによって押されて移動する。
             var dest = Util.pushCharacter(this.rect, scene.getStagePosition(), scene.getBlockMap(), false);
             this.rect.x = dest.x;
             this.rect.y = dest.y;
-            console.log('update,ブロック衝突による移動,x=%d,y=%d,width=%d,height=%d', this.rect.x, this.rect.y, this.rect.width, this.rect.height);
         }
 
         if (this.status === Player.STATUS.INVINCIBLE) {
@@ -816,7 +814,7 @@ phina.define('Player', {
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
             this.shotInterval++;
             if (this.shotInterval >= Player.SHOT_INTERVAL) {
-                //scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
+                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
                 this.shotInterval = 0;
             }
 
@@ -962,8 +960,6 @@ phina.define('Player', {
      */
     _move: function(x, y, scene) {
 
-        console.log('_move,移動先,x=%f,y=%f', x, y);
-
         // 前回値を保存する。
         var prevX = this.rect.x;
         var prevY = this.rect.y;
@@ -999,8 +995,6 @@ phina.define('Player', {
 
         // 画面外に出ていないかチェックする。
         this._checkScreenArea();
-
-        console.log('_move,x=%f,y=%f,width=%d,height=%d', this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     },
     /**
      * @function _checkScreenArea
@@ -2610,9 +2604,6 @@ phina.define('Util', {
                         character.y - character.height / 2 < y * Stage.TILE_SIZE + blockMap[y][x].y + blockMap[y][x].height &&
                         character.y + character.height / 2 > y * Stage.TILE_SIZE + blockMap[y][x].y) {
 
-                        console.log('checkCollidedBlock,character.y + character.height / 2 = %f', character.y + character.height / 2);
-                        console.log('checkCollidedBlock,y * Stage.TILE_SIZE + blockMap[' + y + '][' + x + '].y = %f', y * Stage.TILE_SIZE + blockMap[y][x].y);
-
                         // ブロックの中心座標とサイズを戻り値とする。
                         // 変数名や値はキャラクターに合わせる。
                         var ret = {
@@ -2621,9 +2612,6 @@ phina.define('Util', {
                             width: blockMap[y][x].width,
                             height: blockMap[y][x].height,
                         };
-
-                        console.log('checkCollidedBlock,character,x=%f,y=%f,width=%d,height=%d', character.x, character.y, character.width, character.height);
-                        console.log('checkCollidedBlock,ret,x=%f,y=%f,width=%d,height=%d', ret.x, ret.y, ret.width, ret.height);
 
                         return ret;
                     }
@@ -2855,14 +2843,12 @@ phina.define('Util', {
          */
         dodgeBlockLeft: function(character, stagePosition, blockMap) {
 
-            console.log('dodgeBlockLeft,begin');
             // 左方向に移動してブロックを回避する。
             var dest = Util._dodgeBlock(character,
                                         stagePosition,
                                         blockMap,
                                         function(dest, block) { dest.x = block.x - block.width / 2 - dest.width / 2; });
 
-            console.log('dodgeBlockLeft,end');
             // 移動先の座標を返す。
             return dest;
         },
@@ -2979,8 +2965,6 @@ phina.define('Util', {
 
             // 4方向へ移動を試みる。
             for (var i = 0; i < 4; i++) {
-
-                console.log('movePos[' + i + ']=[%d,%d]', movePos[i].x, movePos[i].y);
 
                 // 画面範囲外に出ているかをチェックする。
                 if (movePos[i].x >= 0 &&
