@@ -708,7 +708,7 @@ phina.define('Player', {
         // タッチ操作による移動スピード
         SPEED_BY_TOUCH: 1.8 / ScreenSize.ZOOM_RATIO,
         // ゲームパッドによる移動スピード
-        SPEED_BY_GAMEPAD: 4,
+        SPEED_BY_GAMEPAD: 3,
         // 自機弾発射間隔
         SHOT_INTERVAL: 12,
         // 当たり判定幅
