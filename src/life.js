@@ -27,9 +27,9 @@ phina.define('Life', {
             strokeWidth: 0,
         });
 
-        // 画像を読み込む
-        this.image = Sprite('control', ControlSize.life.w, ControlSize.life.h);
-        this.image.srcRect.set(ControlSize.life.x, ControlSize.life.y, ControlSize.life.w, ControlSize.life.h);
+        // 画像を読み込む。
+        this.image = Sprite('control', ControlSize.life.width, ControlSize.life.height);
+        this.image.srcRect.set(ControlSize.life.x, ControlSize.life.y, ControlSize.life.width, ControlSize.life.height);
         this.image.scaleX = ScreenSize.ZOOM_RATIO;
         this.image.scaleY = ScreenSize.ZOOM_RATIO;
         this.image.x = Life.IMAGE_POS_X;

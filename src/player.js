@@ -14,9 +14,13 @@ phina.define('Player', {
         // 自機弾発射間隔
         SHOT_INTERVAL: 12,
         // 当たり判定幅
-        HIT_WIDTH: 8,
+        HIT_WIDTH: 4,
         // 当たり判定高さ
-        HIT_HEIGHT: 8,
+        HIT_HEIGHT: 4,
+        // かすり当たり判定幅
+        GRAZE_WIDTH: 16,
+        // かすり当たり判定高さ
+        GRAZE_HEIGHT: 16,
         // 復活後無敵フレーム数
         INVINCIBLE_FRAME: 120,
         // 状態
@@ -65,6 +69,7 @@ phina.define('Player', {
         this.status = Player.STATUS.NORMAL;
         this.power = 1;
         this.invincibleFrame = 0;
+        this.chickenGauge = 0;
     },
     /**
      * @function update
@@ -113,6 +118,9 @@ phina.define('Player', {
                 scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
                 this.shotInterval = 0;
             }
+
+            // 敵弾とのかすり判定を行う。
+            this._checkGraze(scene);
         }
 
         if (this.status === Player.STATUS.NORMAL) {
@@ -213,6 +221,9 @@ phina.define('Player', {
         // ステータスを無敵状態にする。
         this.status = Player.STATUS.INVINCIBLE;
 
+        // チキンゲージを初期化する。
+        this.chickenGauge = 0;
+
         // 無敵状態フレーム数を設定する。
         this.invincibleFrame = Player.INVINCIBLE_FRAME;
 
@@ -228,6 +239,16 @@ phina.define('Player', {
             .set({ alpha: 1 })
             .setLoop(true)
             .play();
+    },
+    /**
+     * @function getChickenGauge
+     * @brief チキンゲージ取得
+     * チキンゲージの溜まっている比率を0～1の範囲で取得する。
+     *
+     * @return チキンゲージ
+     */
+    getChickenGauge: function() {
+        return this.chickenGauge;
     },
     /**
      * @function _move
@@ -330,6 +351,46 @@ phina.define('Player', {
 
                     // シーンの死亡時処理を実行する。
                     scene.miss();
+                }
+            }
+        }
+    },
+    /**
+     * @function _checkGraze
+     * @breif かすり判定処理
+     * 敵弾とのかすり判定を処理する。
+     *
+     * @param [in/out] scene シーン
+     */
+    _checkGraze: function(scene) {
+
+        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
+        var characters = scene.characters;
+
+        // かすり当たり判定を設定する。
+        var rect = {
+            x: this.rect.x,
+            y: this.rect.y,
+            width: Player.GRAZE_WIDTH,
+            height: Player.GRAZE_HEIGHT,
+        };
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 対象が敵キャラクター、敵弾の場合
+            if (characters[i].type === Character.type.ENEMY_SHOT) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(rect, characters[i].rect)) {
+
+                    // チキンゲージを増加させる。
+                    this.chickenGauge += characters[i].graze();
+
+                    // 上限値を超えた場合は上限値に補正する。
+                    if (this.chickenGauge > 1) {
+                        this.chickenGauge = 1;
+                    }
                 }
             }
         }

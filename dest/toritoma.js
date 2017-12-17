@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -123,6 +123,80 @@ phina.define('Character', {
 /***/ (function(module, exports) {
 
 /**
+ * @class ChickenGauge
+ * @brief チキンゲージ
+ * チキンゲージの画像を表示する。
+ */
+phina.define('ChickenGauge', {
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 画像の読み込みを行う。
+     */
+    init: function() {
+
+        // ベース部分を作成する。
+        this.base = DisplayElement();
+
+        // 空ゲージの画像を読み込む。
+        this.emptyImage = Sprite('control', ControlSize.chickenGaugeEmpty.width, ControlSize.chickenGaugeEmpty.height);
+        this.emptyImage.srcRect.set(ControlSize.chickenGaugeEmpty.x,
+                                    ControlSize.chickenGaugeEmpty.y,
+                                    ControlSize.chickenGaugeEmpty.width,
+                                    ControlSize.chickenGaugeEmpty.height);
+        this.emptyImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.emptyImage.scaleY = ScreenSize.ZOOM_RATIO;
+        this.emptyImage.addChildTo(this.base);
+
+        // 満ゲージの画像を読み込む。
+        this.fullImage = Sprite('control', ControlSize.chickenGaugeFull.width, ControlSize.chickenGaugeFull.height);
+        this.fullImage.srcRect.set(ControlSize.chickenGaugeFull.x,
+                                   ControlSize.chickenGaugeFull.y,
+                                   ControlSize.chickenGaugeFull.width,
+                                   ControlSize.chickenGaugeFull.height);
+        this.fullImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.fullImage.scaleY = ScreenSize.ZOOM_RATIO;
+        this.fullImage.addChildTo(this.base);
+
+        // 左端を基準にゲージを増減させるため、原点位置を左端に変更する。
+        this.fullImage.setOrigin(0, 0.5);
+        this.fullImage.x = -ControlSize.chickenGaugeFull.width;
+
+        // ゲージの初期値は0とする。
+        this.fullImage.width = 0;
+        this.fullImage.srcRect.width = 0;
+    },
+    /**
+     * @function getSprite
+     * @brief スプライト取得
+     * ゲージのたまっている比率に応じたスプライトを取得する。
+     *
+     * @return スプライト
+     */
+    getSprite: function() {
+        return this.base;
+    },
+    /**
+     * @function setRate
+     * @brief ゲージ比率設定
+     * ゲージが溜まっている比率を設定する。
+     *
+     * @param [in] rate ゲージが溜まっている比率(0～1)
+     */
+    setRate: function(rate) {
+
+        // 画像の幅を指定された比率に設定する。
+        this.fullImage.width = Math.round(ControlSize.chickenGaugeFull.width * rate);
+        this.fullImage.srcRect.width = Math.round(ControlSize.chickenGaugeFull.width * rate);
+    },
+});
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+/**
  * @class ControlSize
  * @brief コントロールサイズ
  *
@@ -133,69 +207,81 @@ phina.define('ControlSize', {
         frameBack: {
             x: 0,
             y: 0,
-            w: 16,
-            h: 16,
+            width: 16,
+            height: 16,
         },
         frameLeftTop: {
             x: 16,
             y: 0,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         frameTop: {
             x: 20,
             y: 0,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         frameRightTop: {
             x: 24,
             y: 0,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         frameLeft: {
             x: 16,
             y: 4,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         frameRight: {
             x: 24,
             y: 4,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         frameBottomLeft: {
             x: 16,
             y: 8,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         frameBottom: {
             x: 20,
             y: 8,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         frameBottomRight: {
             x: 24,
             y: 8,
-            w: 4,
-            h: 4,
+            width: 4,
+            height: 4,
         },
         life: {
             x: 0,
             y: 16,
-            w: 8,
-            h: 8,
+            width: 8,
+            height: 8,
+        },
+        chickenGaugeEmpty: {
+            x: 0,
+            y: 24,
+            width: 128,
+            height: 8,
+        },
+        chickenGaugeFull: {
+            x: 0,
+            y: 32,
+            width: 128,
+            height: 8,
         },
     },
 });
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
 /**
@@ -320,7 +406,7 @@ phina.define('Dragonfly', {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /**
@@ -331,9 +417,11 @@ phina.define('Dragonfly', {
 phina.define('EnemyShot', {
     _static: {
         // 当たり判定幅
-        HIT_WIDTH: 6,
+        HIT_WIDTH: 3,
         // 当たり判定高さ
-        HIT_HEIGHT: 6,
+        HIT_HEIGHT: 3,
+        // かすりゲージ増加率
+        GRAZE_RATE: 0.02,
     },
     /**
      * @function init
@@ -374,6 +462,9 @@ phina.define('EnemyShot', {
         // y方向のスピードを計算する。
         // phina.jsの座標系は下方向が正なので逆向きにする。
         this.speedY = Math.sin(angle) * speed * -1;
+
+        // かすり時のゲージ増加率を設定する。
+        this.grazeRate = EnemyShot.GRAZE_RATE;
     },
     /**
      * @function update
@@ -425,11 +516,23 @@ phina.define('EnemyShot', {
         scene.removeCharacter(this);
         this.sprite.remove();
     },
+    /**
+     * @function graze
+     * @brief かすり処理
+     * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
+     *
+     * @return ゲージ増加比率
+     */
+    graze: function() {
+        var ret = this.grazeRate;
+        this.grazeRate = 0;
+        return ret;
+    },
 });
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 /**
@@ -484,7 +587,7 @@ phina.define('Explosion', {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 /**
@@ -516,9 +619,9 @@ phina.define('Life', {
             strokeWidth: 0,
         });
 
-        // 画像を読み込む
-        this.image = Sprite('control', ControlSize.life.w, ControlSize.life.h);
-        this.image.srcRect.set(ControlSize.life.x, ControlSize.life.y, ControlSize.life.w, ControlSize.life.h);
+        // 画像を読み込む。
+        this.image = Sprite('control', ControlSize.life.width, ControlSize.life.height);
+        this.image.srcRect.set(ControlSize.life.x, ControlSize.life.y, ControlSize.life.width, ControlSize.life.height);
         this.image.scaleX = ScreenSize.ZOOM_RATIO;
         this.image.scaleY = ScreenSize.ZOOM_RATIO;
         this.image.x = Life.IMAGE_POS_X;
@@ -569,7 +672,7 @@ phina.define('Life', {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /**
@@ -590,7 +693,7 @@ phina.define('MyColor', {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /**
@@ -609,9 +712,13 @@ phina.define('Player', {
         // 自機弾発射間隔
         SHOT_INTERVAL: 12,
         // 当たり判定幅
-        HIT_WIDTH: 8,
+        HIT_WIDTH: 4,
         // 当たり判定高さ
-        HIT_HEIGHT: 8,
+        HIT_HEIGHT: 4,
+        // かすり当たり判定幅
+        GRAZE_WIDTH: 16,
+        // かすり当たり判定高さ
+        GRAZE_HEIGHT: 16,
         // 復活後無敵フレーム数
         INVINCIBLE_FRAME: 120,
         // 状態
@@ -660,6 +767,7 @@ phina.define('Player', {
         this.status = Player.STATUS.NORMAL;
         this.power = 1;
         this.invincibleFrame = 0;
+        this.chickenGauge = 0;
     },
     /**
      * @function update
@@ -708,6 +816,9 @@ phina.define('Player', {
                 scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
                 this.shotInterval = 0;
             }
+
+            // 敵弾とのかすり判定を行う。
+            this._checkGraze(scene);
         }
 
         if (this.status === Player.STATUS.NORMAL) {
@@ -808,6 +919,9 @@ phina.define('Player', {
         // ステータスを無敵状態にする。
         this.status = Player.STATUS.INVINCIBLE;
 
+        // チキンゲージを初期化する。
+        this.chickenGauge = 0;
+
         // 無敵状態フレーム数を設定する。
         this.invincibleFrame = Player.INVINCIBLE_FRAME;
 
@@ -823,6 +937,16 @@ phina.define('Player', {
             .set({ alpha: 1 })
             .setLoop(true)
             .play();
+    },
+    /**
+     * @function getChickenGauge
+     * @brief チキンゲージ取得
+     * チキンゲージの溜まっている比率を0～1の範囲で取得する。
+     *
+     * @return チキンゲージ
+     */
+    getChickenGauge: function() {
+        return this.chickenGauge;
     },
     /**
      * @function _move
@@ -929,11 +1053,51 @@ phina.define('Player', {
             }
         }
     },
+    /**
+     * @function _checkGraze
+     * @breif かすり判定処理
+     * 敵弾とのかすり判定を処理する。
+     *
+     * @param [in/out] scene シーン
+     */
+    _checkGraze: function(scene) {
+
+        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
+        var characters = scene.characters;
+
+        // かすり当たり判定を設定する。
+        var rect = {
+            x: this.rect.x,
+            y: this.rect.y,
+            width: Player.GRAZE_WIDTH,
+            height: Player.GRAZE_HEIGHT,
+        };
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 対象が敵キャラクター、敵弾の場合
+            if (characters[i].type === Character.type.ENEMY_SHOT) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(rect, characters[i].rect)) {
+
+                    // チキンゲージを増加させる。
+                    this.chickenGauge += characters[i].graze();
+
+                    // 上限値を超えた場合は上限値に補正する。
+                    if (this.chickenGauge > 1) {
+                        this.chickenGauge = 1;
+                    }
+                }
+            }
+        }
+    },
 });
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /**
@@ -992,7 +1156,7 @@ phina.define('PlayerDeathEffect', {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 /**
@@ -1127,7 +1291,7 @@ phina.define('PlayerShot', {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -1159,7 +1323,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /**
@@ -1295,7 +1459,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -2130,10 +2294,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)(module)))
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 /**
@@ -2309,16 +2473,16 @@ phina.define('TileMapManager', {
      * @function getObjects
      * @brief オブジェクト検索処理
      * 
-     * layerNameで指定されたレイヤーの座標x, yから幅w、高さhの範囲内にあるオブジェクトを取得する。
+     * layerNameで指定されたレイヤーの座標x, yから幅width、高さheightの範囲内にあるオブジェクトを取得する。
      *
      * @param [in] layerName レイヤー名
      * @param [in] x 検索範囲左上のx座標
      * @param [in] y 検索範囲左上のy座標
-     * @apram [in] w 検索範囲幅
-     * @param [in] h 検索範囲高さ
+     * @apram [in] width 検索範囲幅
+     * @param [in] height 検索範囲高さ
      * @return 検索結果のオブジェクトの配列
      */
-    getObjects: function(layerName, x, y, w, h) {
+    getObjects: function(layerName, x, y, width, height) {
         var objects = [];
 
          // レイヤー名に対応するレイヤーを取得する。
@@ -2334,9 +2498,9 @@ phina.define('TileMapManager', {
             var object = layer.objects[i];
 
             // 指定した範囲内に存在するオブジェクトを戻り値に格納する。
-            if (object.x < x + w &&
+            if (object.x < x + width &&
                 object.x + object.width - 1 >= x &&
-                object.y < y + h &&
+                object.y < y + height &&
                 object.y + object.height - 1>= y) {
 
                 objects.push(object);
@@ -2351,7 +2515,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /**
@@ -2802,7 +2966,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17586,10 +17750,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)))
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17616,7 +17780,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17644,34 +17808,35 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // phina.jsを読み込む
-var phina = __webpack_require__(15);
+var phina = __webpack_require__(16);
 
 // グローバル変数定義用
 phina.define('toritoma', {
 });
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(12);
+var tmx_stage1 = __webpack_require__(13);
 
 // 各クラス定義を読み込む。
-var myColor = __webpack_require__(6);
-var util = __webpack_require__(14);
-var screenSize = __webpack_require__(10);
+var myColor = __webpack_require__(7);
+var util = __webpack_require__(15);
+var screenSize = __webpack_require__(11);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(13);
-var stage = __webpack_require__(11);
-var controlSize = __webpack_require__(1);
-var life = __webpack_require__(5);
-var player = __webpack_require__(7);
-var playerShot = __webpack_require__(9);
-var playerDeathEffect = __webpack_require__(8);
-var explosion = __webpack_require__(4);
-var enemyShot = __webpack_require__(3);
-var dragonfly = __webpack_require__(2);
+var tileMapManager = __webpack_require__(14);
+var stage = __webpack_require__(12);
+var controlSize = __webpack_require__(2);
+var life = __webpack_require__(6);
+var chickenGauge = __webpack_require__(1);
+var player = __webpack_require__(8);
+var playerShot = __webpack_require__(10);
+var playerDeathEffect = __webpack_require__(9);
+var explosion = __webpack_require__(5);
+var enemyShot = __webpack_require__(4);
+var dragonfly = __webpack_require__(3);
 
 // マウスが接続されているかどうか
 toritoma.isMouseUsed = false;
@@ -17720,14 +17885,16 @@ phina.define('MainScene', {
     _static: {
         // 初期残機
         INITIAL_LIFE: 2,
-        // 残機位置x座標
+        // 残機位置x座標(ステージ左端からの位置)
         LIFE_POS_X: 32,
-        // 残機位置y座標
+        // 残機位置y座標(画面上からの位置)
         LIFE_POS_Y: 12,
-        // スコアラベル位置
+        // スコアラベル位置(画面上からの位置)
         SCORE_POS_Y: 12,
         // 復活待機フレーム数
         REBIRTH_WAIT: 60,
+        // チキンゲージ位置(画面下からの位置)
+        CHICKEN_GAUGE_POS_Y: 12,
     },
     superClass: 'DisplayScene',
     /**
@@ -17810,6 +17977,12 @@ phina.define('MainScene', {
         // 残機を初期化する。
         this._setLife(MainScene.INITIAL_LIFE);
 
+        // チキンゲージを作成する。
+        this.chickenGauge = ChickenGauge();
+        this.chickenGauge.getSprite().addChildTo(this.infoLayer);
+        this.chickenGauge.getSprite().x = Math.round(this.gridX.center());
+        this.chickenGauge.getSprite().y = ScreenSize.SCREEN_HEIGHT - MainScene.CHICKEN_GAUGE_POS_Y;
+
         // 復活待機フレーム数を初期化する。
         this.rebirthWait = 0;
 
@@ -17862,6 +18035,9 @@ phina.define('MainScene', {
 
         // 自機復活処理を行う。
         this._rebirthPlayer();
+
+        // チキンゲージ表示を更新する。
+        this.chickenGauge.setRate(this.player.getChickenGauge());
 
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
@@ -18086,28 +18262,28 @@ phina.define('MainScene', {
         // 左側の枠の座標を計算する。
         var x = 0;
         var y = 0;
-        var w = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
-        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
+        var width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
         // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
-        if (w % ControlSize.frameBack.w > 0) {
-            x -= ControlSize.frameBack.w - w % ControlSize.frameBack.w;
-            w += ControlSize.frameBack.w - w % ControlSize.frameBack.w;
+        if (width % ControlSize.frameBack.width > 0) {
+            x -= ControlSize.frameBack.width - width % ControlSize.frameBack.width;
+            width += ControlSize.frameBack.width - width % ControlSize.frameBack.width;
         }
 
         // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h > 0) {
-            y -= ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
-            h += ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
+        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height > 0) {
+            y -= ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
+            height += ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
         }
 
         // 背景を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
-            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
-                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
+        for (var i = 0; i < width; i += ControlSize.frameBack.width) {
+            for (var j = 0; j < height; j += ControlSize.frameBack.height) {
+                var back = Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.setOrigin(0, 0);
                 back.setPosition(x + i, y + j);
-                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.addChildTo(this.frameLayer);
             }
         }
@@ -18115,22 +18291,22 @@ phina.define('MainScene', {
         // 右側の枠の座標を計算する。
         var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
         var y = 0;
-        var w = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
-        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
+        var width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
         // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h > 0) {
-            y -= ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
-            h += ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
+        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height > 0) {
+            y -= ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
+            height += ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
         }
 
         // 背景を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
-            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
-                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
+        for (var i = 0; i < width; i += ControlSize.frameBack.width) {
+            for (var j = 0; j < height; j += ControlSize.frameBack.height) {
+                var back = Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.setOrigin(0, 0);
                 back.setPosition(x + i, y + j);
-                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.addChildTo(this.frameLayer);
             }
         }
@@ -18138,15 +18314,15 @@ phina.define('MainScene', {
         // 下側の枠の座標を計算する。
         var x = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
         var y = ScreenSize.STAGE_RECT.height;
-        var w = ScreenSize.STAGE_RECT.width;
-        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
+        var width = ScreenSize.STAGE_RECT.width;
+        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
 
 
         // 背景を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
-            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
-                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
-                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+        for (var i = 0; i < width; i += ControlSize.frameBack.width) {
+            for (var j = 0; j < height; j += ControlSize.frameBack.height) {
+                var back = Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.setOrigin(0, 0);
                 back.setPosition(x + i, y + j);
                 back.addChildTo(this.frameLayer);
@@ -18162,13 +18338,13 @@ phina.define('MainScene', {
     _createFrameBar: function() {
 
         // 左側の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameLeft.w;
-        var h = ScreenSize.STAGE_RECT.height;
+        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameLeft.width;
+        var height = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        for (var i = 0; i < h; i += ControlSize.frameLeft.h) {
-            var bar = Sprite('control', ControlSize.frameLeft.w, ControlSize.frameLeft.h);
-            bar.srcRect.set(ControlSize.frameLeft.x, ControlSize.frameLeft.y, ControlSize.frameLeft.w, ControlSize.frameLeft.h);
+        for (var i = 0; i < height; i += ControlSize.frameLeft.height) {
+            var bar = Sprite('control', ControlSize.frameLeft.width, ControlSize.frameLeft.height);
+            bar.srcRect.set(ControlSize.frameLeft.x, ControlSize.frameLeft.y, ControlSize.frameLeft.width, ControlSize.frameLeft.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, i);
             bar.addChildTo(this.frameLayer);
@@ -18176,12 +18352,12 @@ phina.define('MainScene', {
 
         // 右側の枠の位置を計算する。
         var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
-        var h = ScreenSize.STAGE_RECT.height;
+        var height = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        for (var i = 0; i < h; i += ControlSize.frameRight.h) {
-            var bar = Sprite('control', ControlSize.frameRight.w, ControlSize.frameRight.h);
-            bar.srcRect.set(ControlSize.frameRight.x, ControlSize.frameRight.y, ControlSize.frameRight.w, ControlSize.frameRight.h);
+        for (var i = 0; i < height; i += ControlSize.frameRight.height) {
+            var bar = Sprite('control', ControlSize.frameRight.width, ControlSize.frameRight.height);
+            bar.srcRect.set(ControlSize.frameRight.x, ControlSize.frameRight.y, ControlSize.frameRight.width, ControlSize.frameRight.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, i);
             bar.addChildTo(this.frameLayer);
@@ -18190,24 +18366,24 @@ phina.define('MainScene', {
         // 下側の枠の位置を計算する。
         var x = ScreenSize.STAGE_RECT.x;
         var y = ScreenSize.STAGE_RECT.height;
-        var w = ScreenSize.STAGE_RECT.width;
+        var width = ScreenSize.STAGE_RECT.width;
 
         // 枠を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBottom.w) {
-            var bar = Sprite('control', ControlSize.frameBottom.w, ControlSize.frameBottom.h);
-            bar.srcRect.set(ControlSize.frameBottom.x, ControlSize.frameBottom.y, ControlSize.frameBottom.w, ControlSize.frameBottom.h);
+        for (var i = 0; i < width; i += ControlSize.frameBottom.width) {
+            var bar = Sprite('control', ControlSize.frameBottom.width, ControlSize.frameBottom.height);
+            bar.srcRect.set(ControlSize.frameBottom.x, ControlSize.frameBottom.y, ControlSize.frameBottom.width, ControlSize.frameBottom.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x + i, y);
             bar.addChildTo(this.frameLayer);
         }
 
         // 左下の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameBottomLeft.w;
+        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameBottomLeft.width;
         var y = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        var bar = Sprite('control', ControlSize.frameBottomLeft.w, ControlSize.frameBottomLeft.h);
-        bar.srcRect.set(ControlSize.frameBottomLeft.x, ControlSize.frameBottomLeft.y, ControlSize.frameBottomLeft.w, ControlSize.frameBottomLeft.h);
+        var bar = Sprite('control', ControlSize.frameBottomLeft.width, ControlSize.frameBottomLeft.height);
+        bar.srcRect.set(ControlSize.frameBottomLeft.x, ControlSize.frameBottomLeft.y, ControlSize.frameBottomLeft.width, ControlSize.frameBottomLeft.height);
         bar.setOrigin(0, 0);
         bar.setPosition(x, y);
         bar.addChildTo(this.frameLayer);
@@ -18217,8 +18393,8 @@ phina.define('MainScene', {
         var y = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        var bar = Sprite('control', ControlSize.frameBottomRight.w, ControlSize.frameBottomRight.h);
-        bar.srcRect.set(ControlSize.frameBottomRight.x, ControlSize.frameBottomRight.y, ControlSize.frameBottomRight.w, ControlSize.frameBottomRight.h);
+        var bar = Sprite('control', ControlSize.frameBottomRight.width, ControlSize.frameBottomRight.height);
+        bar.srcRect.set(ControlSize.frameBottomRight.x, ControlSize.frameBottomRight.y, ControlSize.frameBottomRight.width, ControlSize.frameBottomRight.height);
         bar.setOrigin(0, 0);
         bar.setPosition(x, y);
         bar.addChildTo(this.frameLayer);

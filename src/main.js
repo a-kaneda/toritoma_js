@@ -17,6 +17,7 @@ var tileMapManager = require('./tilemapmanager.js');
 var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');
 var life = require('./life.js');
+var chickenGauge = require('./chickengauge.js');
 var player = require('./player.js');
 var playerShot = require('./playershot.js');
 var playerDeathEffect = require('./playerdeatheffect.js');
@@ -71,14 +72,16 @@ phina.define('MainScene', {
     _static: {
         // 初期残機
         INITIAL_LIFE: 2,
-        // 残機位置x座標
+        // 残機位置x座標(ステージ左端からの位置)
         LIFE_POS_X: 32,
-        // 残機位置y座標
+        // 残機位置y座標(画面上からの位置)
         LIFE_POS_Y: 12,
-        // スコアラベル位置
+        // スコアラベル位置(画面上からの位置)
         SCORE_POS_Y: 12,
         // 復活待機フレーム数
         REBIRTH_WAIT: 60,
+        // チキンゲージ位置(画面下からの位置)
+        CHICKEN_GAUGE_POS_Y: 12,
     },
     superClass: 'DisplayScene',
     /**
@@ -161,6 +164,12 @@ phina.define('MainScene', {
         // 残機を初期化する。
         this._setLife(MainScene.INITIAL_LIFE);
 
+        // チキンゲージを作成する。
+        this.chickenGauge = ChickenGauge();
+        this.chickenGauge.getSprite().addChildTo(this.infoLayer);
+        this.chickenGauge.getSprite().x = Math.round(this.gridX.center());
+        this.chickenGauge.getSprite().y = ScreenSize.SCREEN_HEIGHT - MainScene.CHICKEN_GAUGE_POS_Y;
+
         // 復活待機フレーム数を初期化する。
         this.rebirthWait = 0;
 
@@ -213,6 +222,9 @@ phina.define('MainScene', {
 
         // 自機復活処理を行う。
         this._rebirthPlayer();
+
+        // チキンゲージ表示を更新する。
+        this.chickenGauge.setRate(this.player.getChickenGauge());
 
         // スコア表示を更新する。
         this.scoreLabel.text = 'SCORE: ' + ('000000' + this.score).slice(-6);
@@ -437,28 +449,28 @@ phina.define('MainScene', {
         // 左側の枠の座標を計算する。
         var x = 0;
         var y = 0;
-        var w = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
-        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
+        var width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
         // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
-        if (w % ControlSize.frameBack.w > 0) {
-            x -= ControlSize.frameBack.w - w % ControlSize.frameBack.w;
-            w += ControlSize.frameBack.w - w % ControlSize.frameBack.w;
+        if (width % ControlSize.frameBack.width > 0) {
+            x -= ControlSize.frameBack.width - width % ControlSize.frameBack.width;
+            width += ControlSize.frameBack.width - width % ControlSize.frameBack.width;
         }
 
         // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h > 0) {
-            y -= ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
-            h += ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
+        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height > 0) {
+            y -= ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
+            height += ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
         }
 
         // 背景を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
-            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
-                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
+        for (var i = 0; i < width; i += ControlSize.frameBack.width) {
+            for (var j = 0; j < height; j += ControlSize.frameBack.height) {
+                var back = Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.setOrigin(0, 0);
                 back.setPosition(x + i, y + j);
-                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.addChildTo(this.frameLayer);
             }
         }
@@ -466,22 +478,22 @@ phina.define('MainScene', {
         // 右側の枠の座標を計算する。
         var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
         var y = 0;
-        var w = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
-        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
+        var width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
         // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h > 0) {
-            y -= ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
-            h += ControlSize.frameBack.h - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.h;
+        if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height > 0) {
+            y -= ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
+            height += ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
         }
 
         // 背景を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
-            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
-                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
+        for (var i = 0; i < width; i += ControlSize.frameBack.width) {
+            for (var j = 0; j < height; j += ControlSize.frameBack.height) {
+                var back = Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.setOrigin(0, 0);
                 back.setPosition(x + i, y + j);
-                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.addChildTo(this.frameLayer);
             }
         }
@@ -489,15 +501,15 @@ phina.define('MainScene', {
         // 下側の枠の座標を計算する。
         var x = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
         var y = ScreenSize.STAGE_RECT.height;
-        var w = ScreenSize.STAGE_RECT.width;
-        var h = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
+        var width = ScreenSize.STAGE_RECT.width;
+        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
 
 
         // 背景を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBack.w) {
-            for (var j = 0; j < h; j += ControlSize.frameBack.h) {
-                var back = Sprite('control', ControlSize.frameBack.w, ControlSize.frameBack.h);
-                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.w, ControlSize.frameBack.h);
+        for (var i = 0; i < width; i += ControlSize.frameBack.width) {
+            for (var j = 0; j < height; j += ControlSize.frameBack.height) {
+                var back = Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
+                back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
                 back.setOrigin(0, 0);
                 back.setPosition(x + i, y + j);
                 back.addChildTo(this.frameLayer);
@@ -513,13 +525,13 @@ phina.define('MainScene', {
     _createFrameBar: function() {
 
         // 左側の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameLeft.w;
-        var h = ScreenSize.STAGE_RECT.height;
+        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameLeft.width;
+        var height = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        for (var i = 0; i < h; i += ControlSize.frameLeft.h) {
-            var bar = Sprite('control', ControlSize.frameLeft.w, ControlSize.frameLeft.h);
-            bar.srcRect.set(ControlSize.frameLeft.x, ControlSize.frameLeft.y, ControlSize.frameLeft.w, ControlSize.frameLeft.h);
+        for (var i = 0; i < height; i += ControlSize.frameLeft.height) {
+            var bar = Sprite('control', ControlSize.frameLeft.width, ControlSize.frameLeft.height);
+            bar.srcRect.set(ControlSize.frameLeft.x, ControlSize.frameLeft.y, ControlSize.frameLeft.width, ControlSize.frameLeft.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, i);
             bar.addChildTo(this.frameLayer);
@@ -527,12 +539,12 @@ phina.define('MainScene', {
 
         // 右側の枠の位置を計算する。
         var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
-        var h = ScreenSize.STAGE_RECT.height;
+        var height = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        for (var i = 0; i < h; i += ControlSize.frameRight.h) {
-            var bar = Sprite('control', ControlSize.frameRight.w, ControlSize.frameRight.h);
-            bar.srcRect.set(ControlSize.frameRight.x, ControlSize.frameRight.y, ControlSize.frameRight.w, ControlSize.frameRight.h);
+        for (var i = 0; i < height; i += ControlSize.frameRight.height) {
+            var bar = Sprite('control', ControlSize.frameRight.width, ControlSize.frameRight.height);
+            bar.srcRect.set(ControlSize.frameRight.x, ControlSize.frameRight.y, ControlSize.frameRight.width, ControlSize.frameRight.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, i);
             bar.addChildTo(this.frameLayer);
@@ -541,24 +553,24 @@ phina.define('MainScene', {
         // 下側の枠の位置を計算する。
         var x = ScreenSize.STAGE_RECT.x;
         var y = ScreenSize.STAGE_RECT.height;
-        var w = ScreenSize.STAGE_RECT.width;
+        var width = ScreenSize.STAGE_RECT.width;
 
         // 枠を並べる。
-        for (var i = 0; i < w; i += ControlSize.frameBottom.w) {
-            var bar = Sprite('control', ControlSize.frameBottom.w, ControlSize.frameBottom.h);
-            bar.srcRect.set(ControlSize.frameBottom.x, ControlSize.frameBottom.y, ControlSize.frameBottom.w, ControlSize.frameBottom.h);
+        for (var i = 0; i < width; i += ControlSize.frameBottom.width) {
+            var bar = Sprite('control', ControlSize.frameBottom.width, ControlSize.frameBottom.height);
+            bar.srcRect.set(ControlSize.frameBottom.x, ControlSize.frameBottom.y, ControlSize.frameBottom.width, ControlSize.frameBottom.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x + i, y);
             bar.addChildTo(this.frameLayer);
         }
 
         // 左下の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameBottomLeft.w;
+        var x = ScreenSize.STAGE_RECT.x - ControlSize.frameBottomLeft.width;
         var y = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        var bar = Sprite('control', ControlSize.frameBottomLeft.w, ControlSize.frameBottomLeft.h);
-        bar.srcRect.set(ControlSize.frameBottomLeft.x, ControlSize.frameBottomLeft.y, ControlSize.frameBottomLeft.w, ControlSize.frameBottomLeft.h);
+        var bar = Sprite('control', ControlSize.frameBottomLeft.width, ControlSize.frameBottomLeft.height);
+        bar.srcRect.set(ControlSize.frameBottomLeft.x, ControlSize.frameBottomLeft.y, ControlSize.frameBottomLeft.width, ControlSize.frameBottomLeft.height);
         bar.setOrigin(0, 0);
         bar.setPosition(x, y);
         bar.addChildTo(this.frameLayer);
@@ -568,8 +580,8 @@ phina.define('MainScene', {
         var y = ScreenSize.STAGE_RECT.height;
 
         // 枠を並べる。
-        var bar = Sprite('control', ControlSize.frameBottomRight.w, ControlSize.frameBottomRight.h);
-        bar.srcRect.set(ControlSize.frameBottomRight.x, ControlSize.frameBottomRight.y, ControlSize.frameBottomRight.w, ControlSize.frameBottomRight.h);
+        var bar = Sprite('control', ControlSize.frameBottomRight.width, ControlSize.frameBottomRight.height);
+        bar.srcRect.set(ControlSize.frameBottomRight.x, ControlSize.frameBottomRight.y, ControlSize.frameBottomRight.width, ControlSize.frameBottomRight.height);
         bar.setOrigin(0, 0);
         bar.setPosition(x, y);
         bar.addChildTo(this.frameLayer);

@@ -6,9 +6,11 @@
 phina.define('EnemyShot', {
     _static: {
         // 当たり判定幅
-        HIT_WIDTH: 6,
+        HIT_WIDTH: 3,
         // 当たり判定高さ
-        HIT_HEIGHT: 6,
+        HIT_HEIGHT: 3,
+        // かすりゲージ増加率
+        GRAZE_RATE: 0.02,
     },
     /**
      * @function init
@@ -49,6 +51,9 @@ phina.define('EnemyShot', {
         // y方向のスピードを計算する。
         // phina.jsの座標系は下方向が正なので逆向きにする。
         this.speedY = Math.sin(angle) * speed * -1;
+
+        // かすり時のゲージ増加率を設定する。
+        this.grazeRate = EnemyShot.GRAZE_RATE;
     },
     /**
      * @function update
@@ -99,5 +104,17 @@ phina.define('EnemyShot', {
         // 自分自身を削除する。
         scene.removeCharacter(this);
         this.sprite.remove();
+    },
+    /**
+     * @function graze
+     * @brief かすり処理
+     * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
+     *
+     * @return ゲージ増加比率
+     */
+    graze: function() {
+        var ret = this.grazeRate;
+        this.grazeRate = 0;
+        return ret;
     },
 });

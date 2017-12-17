@@ -171,16 +171,16 @@ phina.define('TileMapManager', {
      * @function getObjects
      * @brief オブジェクト検索処理
      * 
-     * layerNameで指定されたレイヤーの座標x, yから幅w、高さhの範囲内にあるオブジェクトを取得する。
+     * layerNameで指定されたレイヤーの座標x, yから幅width、高さheightの範囲内にあるオブジェクトを取得する。
      *
      * @param [in] layerName レイヤー名
      * @param [in] x 検索範囲左上のx座標
      * @param [in] y 検索範囲左上のy座標
-     * @apram [in] w 検索範囲幅
-     * @param [in] h 検索範囲高さ
+     * @apram [in] width 検索範囲幅
+     * @param [in] height 検索範囲高さ
      * @return 検索結果のオブジェクトの配列
      */
-    getObjects: function(layerName, x, y, w, h) {
+    getObjects: function(layerName, x, y, width, height) {
         var objects = [];
 
          // レイヤー名に対応するレイヤーを取得する。
@@ -196,9 +196,9 @@ phina.define('TileMapManager', {
             var object = layer.objects[i];
 
             // 指定した範囲内に存在するオブジェクトを戻り値に格納する。
-            if (object.x < x + w &&
+            if (object.x < x + width &&
                 object.x + object.width - 1 >= x &&
-                object.y < y + h &&
+                object.y < y + height &&
                 object.y + object.height - 1>= y) {
 
                 objects.push(object);
