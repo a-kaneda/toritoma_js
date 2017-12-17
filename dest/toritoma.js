@@ -284,7 +284,10 @@ phina.define('Dragonfly', {
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this.shotInterval++;
         if (this.shotInterval >= Dragonfly.SHOT_INTERVAL) {
-            scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+            // 敵弾が無効化されていない場合は敵弾を生成する。
+            if (!scene.isDisableEnemyShot()) {
+                scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+            }
             this.shotInterval = 0;
         }
 
@@ -17944,9 +17947,30 @@ phina.define('MainScene', {
             // 復活待機フレーム数を設定する。
             // この時間が経過したときに自機を復活する。
             this.rebirthWait = MainScene.REBIRTH_WAIT;
+
+            // 敵弾を削除する。
+            this._removeEnemyShot();
         }
         // 残機が残っていない場合
         else {
+        }
+    },
+    /**
+     * @function isDisableEnemyShot
+     * @brief 敵弾が無効化されているかどうか
+     * 敵弾が無効化されているかどうかを取得する。
+     * 自機が死亡して復活するまでの間は敵弾は発生させない。
+     *
+     * @return 敵弾が無効化されているかどうか
+     */
+    isDisableEnemyShot: function() {
+
+        // 復活待機フレームが設定されている場合は敵弾は無効とする。
+        if (this.rebirthWait > 0) {
+            return true;
+        }
+        else {
+            return false;
         }
     },
     /**
@@ -18228,6 +18252,23 @@ phina.define('MainScene', {
                 this.player.rebirth(this);
             }
         }
+    },
+    /**
+     * @function _removeEnemyShot
+     * @brief 敵弾削除
+     * 敵弾をすべて削除する。
+     */
+    _removeEnemyShot: function() {
+
+        // キャラクターの中から敵弾を検索し、削除する。
+        // 配列から要素を削除するとインデックスがずれるので後ろからループする。
+        for (var i = this.characters.length - 1; i >= 0; i--) {
+            if (this.characters[i].type == Character.type.ENEMY_SHOT) {
+                this.characters[i].sprite.remove();
+                this.characters.splice(i, 1);
+            }
+        }
+
     },
 });
 

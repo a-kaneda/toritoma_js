@@ -84,7 +84,10 @@ phina.define('Dragonfly', {
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this.shotInterval++;
         if (this.shotInterval >= Dragonfly.SHOT_INTERVAL) {
-            scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+            // 敵弾が無効化されていない場合は敵弾を生成する。
+            if (!scene.isDisableEnemyShot()) {
+                scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+            }
             this.shotInterval = 0;
         }
 
