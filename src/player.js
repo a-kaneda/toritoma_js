@@ -1,7 +1,7 @@
 /**
  * @class Player
  * @brief 自機
- * ユーザー捜査に応じて移動する。
+ * ユーザー操作に応じて移動する。
  */
 phina.define('Player', {
     _static: {
@@ -32,6 +32,8 @@ phina.define('Player', {
             // 無敵
             INVINCIBLE: 3,
         },
+        // オプション最大数
+        MAX_OPTION_COUNT: 3,
     },
     /**
      * @function init
@@ -70,6 +72,7 @@ phina.define('Player', {
         this.power = 1;
         this.invincibleFrame = 0;
         this.chickenGauge = 0;
+        this.option = null;
     },
     /**
      * @function update
@@ -129,6 +132,9 @@ phina.define('Player', {
             // 敵キャラとの当たり判定処理を行う。
             this._checkHitChacater(scene);
         }
+
+        // オプション個数を更新する。
+        this._updateOptionCount(scene);
 
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
@@ -297,6 +303,11 @@ phina.define('Player', {
 
         // 画面外に出ていないかチェックする。
         this._checkScreenArea();
+
+        // オプションがある場合はオプションを移動前の座標へ移動する。
+        if (this.option !== null) {
+            this.option.move(prevX, prevY);
+        }
     },
     /**
      * @function _checkScreenArea
@@ -405,6 +416,44 @@ phina.define('Player', {
                         this.chickenGauge = 1;
                     }
                 }
+            }
+        }
+    },
+    /**
+     * @function _updateOptionCount
+     * @brief オプション個数更新
+     * チキンゲージに応じてオプション個数を更新する。
+     * 
+     * @param [in/out] scene シーン
+     */
+    _updateOptionCount: function(scene) {
+
+        // チキンゲージからオプション個数を計算する
+        var count = Math.floor(this.chickenGauge / (1 / (Player.MAX_OPTION_COUNT + 1)));
+
+        // オプション個数がある場合
+        if (count > 0) {
+
+            // オプションが作成されていなければ作成する。
+            if (this.option === null) {
+                this.option = PlayerOption(this.rect.x, this.rect.y, scene);
+                scene.addCharacter(this.option);
+            }
+
+            // オプションにオプション個数を設定する。
+            this.option.setCount(count, scene);
+        }
+        // オプション個数がない場合
+        else {
+
+            // オプションが作成されていれば削除する。
+            if (this.option !== null) {
+
+                // オプションにオプション個数を設定し、削除処理を行う。
+                this.option.setCount(count, scene);
+
+                // メンバ変数をクリアする。
+                this.option = null;
             }
         }
     },

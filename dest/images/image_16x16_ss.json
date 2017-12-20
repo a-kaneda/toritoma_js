@@ -16,6 +16,16 @@
             "next": "",
             "frequency": 60
         },
+        "player_option_normal": {
+            "frames": [3, 4],
+            "next": "player_option_normal",
+            "frequency": 12
+        },
+        "player_option_shield": {
+            "frames": [5],
+            "next": "player_option_shield",
+            "frequency": 12
+        },
         "explosion": {
             "frames": [8, 9, 10, 11, 12, 13, 14, 15],
             "next": "",

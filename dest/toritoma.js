@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -81,12 +81,14 @@ phina.define('Character', {
         type: {
             // 自機
             PLAYER: 1,
+            // 自機オプション
+            PLAYER_OPTION: 2,
             // 自機弾
-            PLAYER_SHOT: 2,
+            PLAYER_SHOT: 3,
             // 敵
-            ENEMY: 3,
+            ENEMY: 4,
             // 敵弾
-            ENEMY_SHOT: 4,
+            ENEMY_SHOT: 5,
         },
         // 敵キャラパラメータ
         enemy: {
@@ -699,7 +701,7 @@ phina.define('MyColor', {
 /**
  * @class Player
  * @brief 自機
- * ユーザー捜査に応じて移動する。
+ * ユーザー操作に応じて移動する。
  */
 phina.define('Player', {
     _static: {
@@ -730,6 +732,8 @@ phina.define('Player', {
             // 無敵
             INVINCIBLE: 3,
         },
+        // オプション最大数
+        MAX_OPTION_COUNT: 3,
     },
     /**
      * @function init
@@ -768,6 +772,7 @@ phina.define('Player', {
         this.power = 1;
         this.invincibleFrame = 0;
         this.chickenGauge = 0;
+        this.option = null;
     },
     /**
      * @function update
@@ -827,6 +832,9 @@ phina.define('Player', {
             // 敵キャラとの当たり判定処理を行う。
             this._checkHitChacater(scene);
         }
+
+        // オプション個数を更新する。
+        this._updateOptionCount(scene);
 
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
@@ -995,6 +1003,11 @@ phina.define('Player', {
 
         // 画面外に出ていないかチェックする。
         this._checkScreenArea();
+
+        // オプションがある場合はオプションを移動前の座標へ移動する。
+        if (this.option !== null) {
+            this.option.move(prevX, prevY);
+        }
     },
     /**
      * @function _checkScreenArea
@@ -1106,6 +1119,44 @@ phina.define('Player', {
             }
         }
     },
+    /**
+     * @function _updateOptionCount
+     * @brief オプション個数更新
+     * チキンゲージに応じてオプション個数を更新する。
+     * 
+     * @param [in/out] scene シーン
+     */
+    _updateOptionCount: function(scene) {
+
+        // チキンゲージからオプション個数を計算する
+        var count = Math.floor(this.chickenGauge / (1 / (Player.MAX_OPTION_COUNT + 1)));
+
+        // オプション個数がある場合
+        if (count > 0) {
+
+            // オプションが作成されていなければ作成する。
+            if (this.option === null) {
+                this.option = PlayerOption(this.rect.x, this.rect.y, scene);
+                scene.addCharacter(this.option);
+            }
+
+            // オプションにオプション個数を設定する。
+            this.option.setCount(count, scene);
+        }
+        // オプション個数がない場合
+        else {
+
+            // オプションが作成されていれば削除する。
+            if (this.option !== null) {
+
+                // オプションにオプション個数を設定し、削除処理を行う。
+                this.option.setCount(count, scene);
+
+                // メンバ変数をクリアする。
+                this.option = null;
+            }
+        }
+    },
 });
 
 
@@ -1170,6 +1221,164 @@ phina.define('PlayerDeathEffect', {
 
 /***/ }),
 /* 10 */
+/***/ (function(module, exports) {
+
+/**
+ * @class PlayerOption
+ * @brief 自機オプション
+ * 自機の後ろについて移動する。
+ * チキンゲージの比率に応じて増える。
+ */
+phina.define('PlayerOption', {
+    _static: {
+        // 自機弾発射間隔
+        SHOT_INTERVAL: 12,
+        // 当たり判定幅(シールド反射時のみ使用する)
+        HIT_WIDTH: 16,
+        // 当たり判定高さ(シールド反射時のみ使用する)
+        HIT_HEIGHT: 16,
+        // オプション間の間隔(何フレーム分遅れて移動するか)
+        OPTION_SPACE: 20,
+    },
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 座標の設定とスプライトシートの設定を行う。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     * @param [in/out] scene シーン
+     */
+     init: function(x, y, scene) {
+
+        // スプライトを作成する。
+        this.sprite = Sprite('image_16x16', 16, 16);
+        scene.addCharacterSprite(this.sprite);
+
+        // アニメーションの設定を行う。
+        this.animation = FrameAnimation('image_16x16_ss');
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('player_option_normal');
+
+        // キャラクタータイプを設定する。
+        this.type = Character.type.PLAYER_OPTION;
+
+        // 座標、サイズを設定する。
+        this.rect = {
+            x: x,
+            y: y,
+            width: PlayerOption.HIT_WIDTH,
+            height: PlayerOption.HIT_HEIGHT,
+        };
+
+        // メンバを初期化する。
+        this.movePosition = [];
+        this.nextOption = null;
+        this.shotInterval = 0;
+     },
+    /**
+     * @function update
+     * @brief 更新処理
+     * 座標をスプライトに適用する。
+     * シールド使用時は敵弾との当たり判定処理を行う。
+     * 自機弾を発射する。
+     *
+     * @param [in/out] scene シーン
+     */
+    update: function(scene) {
+
+        // 弾発射間隔経過しているときは自機弾を発射する
+        this.shotInterval++;
+        if (this.shotInterval >= PlayerOption.SHOT_INTERVAL) {
+            // 敵弾が無効化されていない場合は自機弾を生成する。
+            if (!scene.isDisableEnemyShot()) {
+                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, true, scene));
+                this.shotInterval = 0;
+            }
+        }
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+    },
+    /**
+     * @function move
+     * @brief 移動処理
+     * 指定された座標へ移動する。
+     * ただし、すぐに移動するのではなく、OPTION_SPACEの間隔分遅れて移動する。
+     * オプションが他に存在する場合は、移動前の座標に対して移動を指示する。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     */
+    move: function(x, y) {
+
+        // 次のオプションが存在する場合は自分の移動前の座標に移動するように指示する。
+        if (this.nextOption !== null) {
+            this.nextOption.move(this.rect.x, this.rect.y);
+        }
+    
+        // 移動先座標が間隔分溜まっている場合は先頭の座標に移動する
+        if (this.movePosition.length >= PlayerOption.OPTION_SPACE) {
+
+            // 先頭の要素を取り出す。
+            var pos = this.movePosition.shift();
+
+            // 移動する。
+            this.rect.x = pos.x;
+            this.rect.y = pos.y;
+        }
+
+        // 移動先座標の配列の末尾に追加する
+        this.movePosition.push({x: x, y: y});
+    },
+    /**
+     * @function setCount
+     * @brief オプション個数設定
+     * オプションの個数を設定する。
+     * 0以下が指定されると自分自身を削除する。
+     * 2個以上が指定されると再帰的に次のオプションを作成する。
+     *
+     * @param [in] count オプション個数
+     * @param [in/out] scene シーン
+     */
+    setCount: function(count, scene) {
+
+        // 個数が2個以上の場合はオプションを作成する。
+        if (count >= 2) {
+
+            // 次のオプションが作成されていなければ作成する。
+            if (this.nextOption === null) {
+                this.nextOption = PlayerOption(this.rect.x, this.rect.y, scene);
+                scene.addCharacter(this.nextOption);
+            }
+
+            // 次のオプションに自分の分を減らした個数を設定する。
+            this.nextOption.setCount(count - 1, scene);
+        }
+        else {
+
+            // 次のオプションが作成されていれば削除する。
+            if (this.nextOption !== null) {
+
+                // 次のオプションに自分の分を減らした個数を設定し、削除処理を行う。
+                this.nextOption.setCount(count - 1, scene);
+
+                // メンバ変数をクリアする。
+                this.nextOption = null;
+            }
+
+            // 0以下が指定された場合は自分自身も削除する。
+            if (count <= 0) {
+                scene.removeCharacter(this);
+                this.sprite.remove();
+            }
+        }
+    },
+});
+
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports) {
 
 /**
@@ -1304,7 +1513,7 @@ phina.define('PlayerShot', {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -1336,7 +1545,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 /**
@@ -1472,7 +1681,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -2307,10 +2516,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)(module)))
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /**
@@ -2528,7 +2737,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /**
@@ -2985,7 +3194,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17769,10 +17978,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17799,7 +18008,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17827,31 +18036,32 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // phina.jsを読み込む
-var phina = __webpack_require__(16);
+var phina = __webpack_require__(17);
 
 // グローバル変数定義用
 phina.define('toritoma', {
 });
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(13);
+var tmx_stage1 = __webpack_require__(14);
 
 // 各クラス定義を読み込む。
 var myColor = __webpack_require__(7);
-var util = __webpack_require__(15);
-var screenSize = __webpack_require__(11);
+var util = __webpack_require__(16);
+var screenSize = __webpack_require__(12);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(14);
-var stage = __webpack_require__(12);
+var tileMapManager = __webpack_require__(15);
+var stage = __webpack_require__(13);
 var controlSize = __webpack_require__(2);
 var life = __webpack_require__(6);
 var chickenGauge = __webpack_require__(1);
 var player = __webpack_require__(8);
-var playerShot = __webpack_require__(10);
+var playerShot = __webpack_require__(11);
+var playerOption = __webpack_require__(10);
 var playerDeathEffect = __webpack_require__(9);
 var explosion = __webpack_require__(5);
 var enemyShot = __webpack_require__(4);

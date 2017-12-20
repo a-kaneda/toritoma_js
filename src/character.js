@@ -9,12 +9,14 @@ phina.define('Character', {
         type: {
             // 自機
             PLAYER: 1,
+            // 自機オプション
+            PLAYER_OPTION: 2,
             // 自機弾
-            PLAYER_SHOT: 2,
+            PLAYER_SHOT: 3,
             // 敵
-            ENEMY: 3,
+            ENEMY: 4,
             // 敵弾
-            ENEMY_SHOT: 4,
+            ENEMY_SHOT: 5,
         },
         // 敵キャラパラメータ
         enemy: {

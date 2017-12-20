@@ -20,6 +20,7 @@ var life = require('./life.js');
 var chickenGauge = require('./chickengauge.js');
 var player = require('./player.js');
 var playerShot = require('./playershot.js');
+var playerOption = require('./playeroption.js');
 var playerDeathEffect = require('./playerdeatheffect.js');
 var explosion = require('./explosion.js');
 var enemyShot = require('./enemyshot.js');
