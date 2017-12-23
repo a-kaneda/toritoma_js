@@ -746,6 +746,8 @@ phina.define('Player', {
         },
         // オプション最大数
         MAX_OPTION_COUNT: 3,
+        // シールド使用時のゲージ使用量
+        CONSUMPTION_GAUGE: 0.005,
     },
     /**
      * @function init
@@ -815,6 +817,7 @@ phina.define('Player', {
             this.rect.y = dest.y;
         }
 
+        // 無敵状態の場合
         if (this.status === Player.STATUS.INVINCIBLE) {
 
             // 無敵状態フレーム数をカウントする。
@@ -835,6 +838,7 @@ phina.define('Player', {
             }
         } 
 
+        // 通常状態、無敵状態の場合
         if (this.status === Player.STATUS.NORMAL || this.status === Player.STATUS.INVINCIBLE) {
 
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
@@ -846,8 +850,17 @@ phina.define('Player', {
 
             // 敵弾とのかすり判定を行う。
             this._checkGraze(scene);
+
+            // シールド使用時はチキンゲージを消費する。
+            if (this.shield) {
+                this.chickenGauge -= Player.CONSUMPTION_GAUGE;
+                if (this.chickenGauge < 0) {
+                    this.chickenGauge = 0;
+                }
+            }
         }
 
+        // 通常状態の場合
         if (this.status === Player.STATUS.NORMAL) {
 
             // 敵キャラとの当たり判定処理を行う。
@@ -1679,7 +1692,6 @@ phina.define('ShieldButton', {
 
         // タッチ開始イベントのハンドラを作成する。
         this.button.onpointstart = function() {
-            console.log('onpointstart');
             self.touch = true;
             self.offImage.alpha = 0;
             self.onImage.alpha = 1;
@@ -1687,7 +1699,6 @@ phina.define('ShieldButton', {
 
         // タッチ終了イベントのハンドラを作成する。
         this.button.onpointend = function() {
-            console.log('onpointend');
             self.touch = false;
             self.offImage.alpha = 1;
             self.onImage.alpha = 0;

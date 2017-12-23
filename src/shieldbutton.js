@@ -46,7 +46,6 @@ phina.define('ShieldButton', {
 
         // タッチ開始イベントのハンドラを作成する。
         this.button.onpointstart = function() {
-            console.log('onpointstart');
             self.touch = true;
             self.offImage.alpha = 0;
             self.onImage.alpha = 1;
@@ -54,7 +53,6 @@ phina.define('ShieldButton', {
 
         // タッチ終了イベントのハンドラを作成する。
         this.button.onpointend = function() {
-            console.log('onpointend');
             self.touch = false;
             self.offImage.alpha = 1;
             self.onImage.alpha = 0;
