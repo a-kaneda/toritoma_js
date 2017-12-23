@@ -22,18 +22,29 @@ phina.define('PlayerOption', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
+     * @param [in] shield シールド使用不使用
      * @param [in/out] scene シーン
      */
-     init: function(x, y, scene) {
+     init: function(x, y, shield , scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_16x16', 16, 16);
         scene.addCharacterSprite(this.sprite);
 
+        // シールド使用不使用を設定する。
+        this.shield = shield;
+
         // アニメーションの設定を行う。
         this.animation = FrameAnimation('image_16x16_ss');
         this.animation.attachTo(this.sprite);
-        this.animation.gotoAndPlay('player_option_normal');
+
+        // シールド使用不使用によって画像を変更する。
+        if (this.shield) {
+            this.animation.gotoAndPlay('player_option_shield');
+        }
+        else {
+            this.animation.gotoAndPlay('player_option_normal');
+        }
 
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER_OPTION;
@@ -123,7 +134,7 @@ phina.define('PlayerOption', {
 
             // 次のオプションが作成されていなければ作成する。
             if (this.nextOption === null) {
-                this.nextOption = PlayerOption(this.rect.x, this.rect.y, scene);
+                this.nextOption = PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
                 scene.addCharacter(this.nextOption);
             }
 
@@ -147,6 +158,37 @@ phina.define('PlayerOption', {
                 scene.removeCharacter(this);
                 this.sprite.remove();
             }
+        }
+    },
+    /**
+     * @function setShield
+     * @brief シールド使用不使用設定
+     * シールド使用不使用を設定する。
+     * 次のオプションがあればオプションの設定も変更する。
+     *
+     * @param [in] shield シールド使用不使用
+     */
+    setShield: function(shield) {
+
+        // シールド使用不使用が変化した場合はアニメーションを変更する。
+        if (!this.shield && shield) {
+            this.animation.gotoAndPlay('player_option_shield');
+        }
+        else if (this.shield && !shield) {
+            this.animation.gotoAndPlay('player_option_normal');
+        }
+        else {
+            // 変化がない場合はアニメーションを継続する。
+            // 毎回アニメーションを変更すると、都度最初のフレームに戻り、
+            // アニメーションが行われなくなるため。
+        }
+
+        // シールド使用不使用を設定する。
+        this.shield = shield;
+
+        // 次のオプションがある場合は次のオプションのシールド使用不使用を設定する。
+        if (this.nextOption !== null) {
+            this.nextOption.setShield(this.shield);
         }
     },
 });

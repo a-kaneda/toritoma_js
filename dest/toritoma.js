@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ 	return __webpack_require__(__webpack_require__.s = 21);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -277,6 +277,18 @@ phina.define('ControlSize', {
             y: 32,
             width: 128,
             height: 8,
+        },
+        shieldButtonOff: {
+            x: 0,
+            y: 48,
+            width: 32,
+            height: 32,
+        },
+        shieldButtonOn: {
+            x: 32,
+            y: 48,
+            width: 32,
+            height: 32,
         },
     },
 });
@@ -773,6 +785,15 @@ phina.define('Player', {
         this.invincibleFrame = 0;
         this.chickenGauge = 0;
         this.option = null;
+        this.shield = false;
+
+        // デバッグ用
+        if (localStorage.noDeath === 'true') {
+            this.noDeath = true;
+        }
+        else {
+            this.noDeath = false;
+        }
     },
     /**
      * @function update
@@ -958,6 +979,24 @@ phina.define('Player', {
         return this.chickenGauge;
     },
     /**
+     * @function setShield
+     * @brief シールド使用不使用設定
+     * シールド使用不使用を設定する。
+     * オプションがあればオプションの設定も変更する。
+     *
+     * @param [in] shield シールド使用不使用
+     */
+    setShield: function(shield) {
+
+        // シールド使用不使用を設定する。
+        this.shield = shield;
+
+        // オプションがある場合はオプションのシールド使用不使用を設定する。
+        if (this.option !== null) {
+            this.option.setShield(shield);
+        }
+    },
+    /**
      * @function _move
      * @brief 移動処理
      * 座標を変更し、各種当たり判定処理を行う。
@@ -1063,18 +1102,20 @@ phina.define('Player', {
                     characters[i].hit(this, scene);
 
                     // 敵キャラクターに接触した場合は死亡処理を行う。
+                    if (!this.noDeath) {
 
-                    // 死亡時エフェクトを作成する。
-                    scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
+                        // 死亡時エフェクトを作成する。
+                        scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
 
-                    // ステータスを死亡に変更する。
-                    this.status = Player.STATUS.DEATH;
+                        // ステータスを死亡に変更する。
+                        this.status = Player.STATUS.DEATH;
 
-                    // 画像を非表示にする。
-                    this.sprite.alpha = 0;
+                        // 画像を非表示にする。
+                        this.sprite.alpha = 0;
 
-                    // シーンの死亡時処理を実行する。
-                    scene.miss();
+                        // シーンの死亡時処理を実行する。
+                        scene.miss();
+                    }
                 }
             }
         }
@@ -1136,7 +1177,7 @@ phina.define('Player', {
 
             // オプションが作成されていなければ作成する。
             if (this.option === null) {
-                this.option = PlayerOption(this.rect.x, this.rect.y, scene);
+                this.option = PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
                 scene.addCharacter(this.option);
             }
 
@@ -1247,18 +1288,29 @@ phina.define('PlayerOption', {
      *
      * @param [in] x x座標
      * @param [in] y y座標
+     * @param [in] shield シールド使用不使用
      * @param [in/out] scene シーン
      */
-     init: function(x, y, scene) {
+     init: function(x, y, shield , scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_16x16', 16, 16);
         scene.addCharacterSprite(this.sprite);
 
+        // シールド使用不使用を設定する。
+        this.shield = shield;
+
         // アニメーションの設定を行う。
         this.animation = FrameAnimation('image_16x16_ss');
         this.animation.attachTo(this.sprite);
-        this.animation.gotoAndPlay('player_option_normal');
+
+        // シールド使用不使用によって画像を変更する。
+        if (this.shield) {
+            this.animation.gotoAndPlay('player_option_shield');
+        }
+        else {
+            this.animation.gotoAndPlay('player_option_normal');
+        }
 
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER_OPTION;
@@ -1348,7 +1400,7 @@ phina.define('PlayerOption', {
 
             // 次のオプションが作成されていなければ作成する。
             if (this.nextOption === null) {
-                this.nextOption = PlayerOption(this.rect.x, this.rect.y, scene);
+                this.nextOption = PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
                 scene.addCharacter(this.nextOption);
             }
 
@@ -1372,6 +1424,37 @@ phina.define('PlayerOption', {
                 scene.removeCharacter(this);
                 this.sprite.remove();
             }
+        }
+    },
+    /**
+     * @function setShield
+     * @brief シールド使用不使用設定
+     * シールド使用不使用を設定する。
+     * 次のオプションがあればオプションの設定も変更する。
+     *
+     * @param [in] shield シールド使用不使用
+     */
+    setShield: function(shield) {
+
+        // シールド使用不使用が変化した場合はアニメーションを変更する。
+        if (!this.shield && shield) {
+            this.animation.gotoAndPlay('player_option_shield');
+        }
+        else if (this.shield && !shield) {
+            this.animation.gotoAndPlay('player_option_normal');
+        }
+        else {
+            // 変化がない場合はアニメーションを継続する。
+            // 毎回アニメーションを変更すると、都度最初のフレームに戻り、
+            // アニメーションが行われなくなるため。
+        }
+
+        // シールド使用不使用を設定する。
+        this.shield = shield;
+
+        // 次のオプションがある場合は次のオプションのシールド使用不使用を設定する。
+        if (this.nextOption !== null) {
+            this.nextOption.setShield(this.shield);
         }
     },
 });
@@ -1549,6 +1632,100 @@ phina.define('ScreenSize', {
 /***/ (function(module, exports) {
 
 /**
+ * @class ShieldButton
+ * @brief シールドボタン
+ * シールドボタンの画像表示とタッチ処理を行う。
+ */
+phina.define('ShieldButton', {
+    _static: {
+        // ボタンサイズ
+        BUTTON_SIZE: 128,
+    },
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 画像の読み込みとボタン部分を作成する。
+     */
+    init: function() {
+
+        // ベース部分を作成する。
+        this.base = DisplayElement();
+
+        // タッチしていない状態の画像を読み込む。
+        this.offImage = Sprite('control', ControlSize.shieldButtonOff.width, ControlSize.shieldButtonOff.height);
+        this.offImage.srcRect.set(ControlSize.shieldButtonOff.x, ControlSize.shieldButtonOff.y, ControlSize.shieldButtonOff.width, ControlSize.shieldButtonOff.height);
+        this.offImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.offImage.scaleY = ScreenSize.ZOOM_RATIO;
+        this.offImage.addChildTo(this.base);
+
+        // タッチしている状態の画像を読み込む。
+        this.onImage = Sprite('control', ControlSize.shieldButtonOn.width, ControlSize.shieldButtonOn.height);
+        this.onImage.srcRect.set(ControlSize.shieldButtonOn.x, ControlSize.shieldButtonOn.y, ControlSize.shieldButtonOn.width, ControlSize.shieldButtonOn.height);
+        this.onImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.onImage.scaleY = ScreenSize.ZOOM_RATIO;
+        this.onImage.addChildTo(this.base);
+
+        // ボタン部分を作成する。
+        // タップをやりやすくするため、画像より大きめにサイズを取る。
+        this.button = RectangleShape({
+            height: ShieldButton.BUTTON_SIZE,
+            width: ShieldButton.BUTTON_SIZE,
+        });
+        this.button.alpha = 0;
+        this.button.setInteractive(true);
+        this.button.addChildTo(this.base);
+
+        var self = this;
+
+        // タッチ開始イベントのハンドラを作成する。
+        this.button.onpointstart = function() {
+            console.log('onpointstart');
+            self.touch = true;
+            self.offImage.alpha = 0;
+            self.onImage.alpha = 1;
+        };
+
+        // タッチ終了イベントのハンドラを作成する。
+        this.button.onpointend = function() {
+            console.log('onpointend');
+            self.touch = false;
+            self.offImage.alpha = 1;
+            self.onImage.alpha = 0;
+        };
+
+        // 初期状態はタッチしていない状態とする。
+        this.touch = false;
+        this.offImage.alpha = 1;
+        this.onImage.alpha = 0;
+    },
+    /**
+     * @function getSprite
+     * @brief スプライト取得
+     * 画像、ボタンを合わせたスプライトを取得する。
+     *
+     * @return スプライト
+     */
+    getSprite: function() {
+        return this.base;
+    },
+    /**
+     * @function isTouch
+     * @brief タッチ状態取得
+     * タッチされているかどうかを取得する。
+     *
+     * @return タッチされているかどうか
+     */
+    isTouch: function() {
+        return this.touch;
+    },
+});
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
+
+/**
  * @class Stage
  * @brief ステージ管理クラス
  * 
@@ -1681,7 +1858,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -2516,10 +2693,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20)(module)))
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /**
@@ -2737,7 +2914,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 /**
@@ -3194,7 +3371,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17978,10 +18155,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 var g;
@@ -18008,7 +18185,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -18036,29 +18213,30 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // phina.jsを読み込む
-var phina = __webpack_require__(17);
+var phina = __webpack_require__(18);
 
 // グローバル変数定義用
 phina.define('toritoma', {
 });
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(14);
+var tmx_stage1 = __webpack_require__(15);
 
 // 各クラス定義を読み込む。
 var myColor = __webpack_require__(7);
-var util = __webpack_require__(16);
+var util = __webpack_require__(17);
 var screenSize = __webpack_require__(12);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(15);
-var stage = __webpack_require__(13);
+var tileMapManager = __webpack_require__(16);
+var stage = __webpack_require__(14);
 var controlSize = __webpack_require__(2);
 var life = __webpack_require__(6);
 var chickenGauge = __webpack_require__(1);
+var shieldButton = __webpack_require__(13);
 var player = __webpack_require__(8);
 var playerShot = __webpack_require__(11);
 var playerOption = __webpack_require__(10);
@@ -18124,6 +18302,10 @@ phina.define('MainScene', {
         REBIRTH_WAIT: 60,
         // チキンゲージ位置(画面下からの位置)
         CHICKEN_GAUGE_POS_Y: 12,
+        // シールドボタン位置x座標(画面右からの位置)
+        SHIELD_BUTTON_POS_X: 50,
+        // シールドボタン位置y座標(画面下からの位置)
+        SHIELD_BUTTON_POS_Y: 50,
     },
     superClass: 'DisplayScene',
     /**
@@ -18206,6 +18388,12 @@ phina.define('MainScene', {
         // 残機を初期化する。
         this._setLife(MainScene.INITIAL_LIFE);
 
+        // シールドボタンを作成する。
+        this.shieldButton = ShieldButton();
+        this.shieldButton.getSprite().addChildTo(this.infoLayer);
+        this.shieldButton.getSprite().x = ScreenSize.SCREEN_WIDTH - MainScene.SHIELD_BUTTON_POS_X; 
+        this.shieldButton.getSprite().y = ScreenSize.SCREEN_HEIGHT - MainScene.SHIELD_BUTTON_POS_Y; 
+
         // チキンゲージを作成する。
         this.chickenGauge = ChickenGauge();
         this.chickenGauge.getSprite().addChildTo(this.infoLayer);
@@ -18242,6 +18430,9 @@ phina.define('MainScene', {
      */
     update: function(app) {
 
+        // ボタン入力状態を初期化する。
+        this.inputShieldButton = false;
+
         // キーボード入力を行う。
         this._inputKeyboard(app);
 
@@ -18250,6 +18441,14 @@ phina.define('MainScene', {
 
         // ゲームパッド入力を行う。
         this._inputGamepad();
+
+        // シールドボタン入力状態に応じて自機の状態を変化させる。
+        if (this.inputShieldButton) {
+            this.player.setShield(true);
+        }
+        else {
+            this.player.setShield(false);
+        }
 
         // ステージの状態を更新する。
         this.stage.update(this);
@@ -18404,6 +18603,10 @@ phina.define('MainScene', {
             this.player.moveKeyDown(this);
         }
 
+        // zキーでシールドを使用する。
+        if (key.getKey('z')) {
+            this.inputShieldButton = true;
+        }
     },
     /**
      * @function _inputTouch
@@ -18448,6 +18651,11 @@ phina.define('MainScene', {
             this.touch.x = 0;
             this.touch.y = 0;
         }
+
+        // シールドボタンがタッチされている場合はシールドを使用する。
+        if (this.shieldButton.isTouch()) {
+            this.inputShieldButton = true;
+        }
     },
     /**
      * @function _inputGamepad
@@ -18459,11 +18667,19 @@ phina.define('MainScene', {
         // ゲームパッドの状態を更新する。
         this.gamepadManager.update();
 
+        // ゲームパッドを取得する。
+        var gamepad = this.gamepadManager.get();
+
         // アナログスティックの入力を取得する。
         var stick = this.gamepad.getStickDirection(0);
 
         if (stick.length() > 0.5) {
             this.player.moveGamepad(stick.x, stick.y, this);
+        }
+
+        // Aボタンでシールドを使用する。
+        if (gamepad.getKey('a')) {
+            this.inputShieldButton = true;
         }
     },
     /**

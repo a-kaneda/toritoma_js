@@ -78,5 +78,17 @@ phina.define('ControlSize', {
             width: 128,
             height: 8,
         },
+        shieldButtonOff: {
+            x: 0,
+            y: 48,
+            width: 32,
+            height: 32,
+        },
+        shieldButtonOn: {
+            x: 32,
+            y: 48,
+            width: 32,
+            height: 32,
+        },
     },
 });

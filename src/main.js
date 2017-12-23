@@ -18,6 +18,7 @@ var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');
 var life = require('./life.js');
 var chickenGauge = require('./chickengauge.js');
+var shieldButton = require('./shieldbutton.js');
 var player = require('./player.js');
 var playerShot = require('./playershot.js');
 var playerOption = require('./playeroption.js');
@@ -83,6 +84,10 @@ phina.define('MainScene', {
         REBIRTH_WAIT: 60,
         // チキンゲージ位置(画面下からの位置)
         CHICKEN_GAUGE_POS_Y: 12,
+        // シールドボタン位置x座標(画面右からの位置)
+        SHIELD_BUTTON_POS_X: 50,
+        // シールドボタン位置y座標(画面下からの位置)
+        SHIELD_BUTTON_POS_Y: 50,
     },
     superClass: 'DisplayScene',
     /**
@@ -165,6 +170,12 @@ phina.define('MainScene', {
         // 残機を初期化する。
         this._setLife(MainScene.INITIAL_LIFE);
 
+        // シールドボタンを作成する。
+        this.shieldButton = ShieldButton();
+        this.shieldButton.getSprite().addChildTo(this.infoLayer);
+        this.shieldButton.getSprite().x = ScreenSize.SCREEN_WIDTH - MainScene.SHIELD_BUTTON_POS_X; 
+        this.shieldButton.getSprite().y = ScreenSize.SCREEN_HEIGHT - MainScene.SHIELD_BUTTON_POS_Y; 
+
         // チキンゲージを作成する。
         this.chickenGauge = ChickenGauge();
         this.chickenGauge.getSprite().addChildTo(this.infoLayer);
@@ -201,6 +212,9 @@ phina.define('MainScene', {
      */
     update: function(app) {
 
+        // ボタン入力状態を初期化する。
+        this.inputShieldButton = false;
+
         // キーボード入力を行う。
         this._inputKeyboard(app);
 
@@ -209,6 +223,14 @@ phina.define('MainScene', {
 
         // ゲームパッド入力を行う。
         this._inputGamepad();
+
+        // シールドボタン入力状態に応じて自機の状態を変化させる。
+        if (this.inputShieldButton) {
+            this.player.setShield(true);
+        }
+        else {
+            this.player.setShield(false);
+        }
 
         // ステージの状態を更新する。
         this.stage.update(this);
@@ -363,6 +385,10 @@ phina.define('MainScene', {
             this.player.moveKeyDown(this);
         }
 
+        // zキーでシールドを使用する。
+        if (key.getKey('z')) {
+            this.inputShieldButton = true;
+        }
     },
     /**
      * @function _inputTouch
@@ -407,6 +433,11 @@ phina.define('MainScene', {
             this.touch.x = 0;
             this.touch.y = 0;
         }
+
+        // シールドボタンがタッチされている場合はシールドを使用する。
+        if (this.shieldButton.isTouch()) {
+            this.inputShieldButton = true;
+        }
     },
     /**
      * @function _inputGamepad
@@ -418,11 +449,19 @@ phina.define('MainScene', {
         // ゲームパッドの状態を更新する。
         this.gamepadManager.update();
 
+        // ゲームパッドを取得する。
+        var gamepad = this.gamepadManager.get();
+
         // アナログスティックの入力を取得する。
         var stick = this.gamepad.getStickDirection(0);
 
         if (stick.length() > 0.5) {
             this.player.moveGamepad(stick.x, stick.y, this);
+        }
+
+        // Aボタンでシールドを使用する。
+        if (gamepad.getKey('a')) {
+            this.inputShieldButton = true;
         }
     },
     /**

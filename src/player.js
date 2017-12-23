@@ -73,6 +73,15 @@ phina.define('Player', {
         this.invincibleFrame = 0;
         this.chickenGauge = 0;
         this.option = null;
+        this.shield = false;
+
+        // デバッグ用
+        if (localStorage.noDeath === 'true') {
+            this.noDeath = true;
+        }
+        else {
+            this.noDeath = false;
+        }
     },
     /**
      * @function update
@@ -258,6 +267,24 @@ phina.define('Player', {
         return this.chickenGauge;
     },
     /**
+     * @function setShield
+     * @brief シールド使用不使用設定
+     * シールド使用不使用を設定する。
+     * オプションがあればオプションの設定も変更する。
+     *
+     * @param [in] shield シールド使用不使用
+     */
+    setShield: function(shield) {
+
+        // シールド使用不使用を設定する。
+        this.shield = shield;
+
+        // オプションがある場合はオプションのシールド使用不使用を設定する。
+        if (this.option !== null) {
+            this.option.setShield(shield);
+        }
+    },
+    /**
      * @function _move
      * @brief 移動処理
      * 座標を変更し、各種当たり判定処理を行う。
@@ -363,18 +390,20 @@ phina.define('Player', {
                     characters[i].hit(this, scene);
 
                     // 敵キャラクターに接触した場合は死亡処理を行う。
+                    if (!this.noDeath) {
 
-                    // 死亡時エフェクトを作成する。
-                    scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
+                        // 死亡時エフェクトを作成する。
+                        scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
 
-                    // ステータスを死亡に変更する。
-                    this.status = Player.STATUS.DEATH;
+                        // ステータスを死亡に変更する。
+                        this.status = Player.STATUS.DEATH;
 
-                    // 画像を非表示にする。
-                    this.sprite.alpha = 0;
+                        // 画像を非表示にする。
+                        this.sprite.alpha = 0;
 
-                    // シーンの死亡時処理を実行する。
-                    scene.miss();
+                        // シーンの死亡時処理を実行する。
+                        scene.miss();
+                    }
                 }
             }
         }
@@ -436,7 +465,7 @@ phina.define('Player', {
 
             // オプションが作成されていなければ作成する。
             if (this.option === null) {
-                this.option = PlayerOption(this.rect.x, this.rect.y, scene);
+                this.option = PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
                 scene.addCharacter(this.option);
             }
 
