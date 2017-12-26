@@ -11,6 +11,8 @@ phina.define('EnemyShot', {
         HIT_HEIGHT: 3,
         // かすりゲージ増加率
         GRAZE_RATE: 0.02,
+        // 反射弾の攻撃力
+        REFLECTION_POWER: 5,
     },
     /**
      * @function init
@@ -37,13 +39,8 @@ phina.define('EnemyShot', {
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY_SHOT;
 
-        // 座標、サイズを設定する。
-        this.rect = {
-            x: x,
-            y: y,
-            width: EnemyShot.HIT_WIDTH,
-            height: EnemyShot.HIT_HEIGHT,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, EnemyShot.HIT_WIDTH, EnemyShot.HIT_HEIGHT);
 
         // x方向のスピードを計算する。
         this.speedX = Math.cos(angle) * speed;
@@ -66,14 +63,14 @@ phina.define('EnemyShot', {
     update: function(scene) {
 
         // スピードに応じて移動する。
-        this.rect.x += this.speedX;
-        this.rect.y += this.speedY;
+        this.hitArea.x += this.speedX;
+        this.hitArea.y += this.speedY;
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
         // ブロックとの当たり判定処理を行う。
-        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+        if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
             this.sprite.remove();
@@ -81,10 +78,10 @@ phina.define('EnemyShot', {
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.rect.x < -this.rect.width * 2 ||
-            this.rect.x > ScreenSize.STAGE_RECT.width + this.rect.width * 2 ||
-            this.rect.y < -this.rect.height * 2 ||
-            this.rect.y > ScreenSize.STAGE_RECT.height + this.rect.height * 2) {
+        if (this.hitArea.x < -this.hitArea.width * 2 ||
+            this.hitArea.x > ScreenSize.STAGE_RECT.width + this.hitArea.width * 2 ||
+            this.hitArea.y < -this.hitArea.height * 2 ||
+            this.hitArea.y > ScreenSize.STAGE_RECT.height + this.hitArea.height * 2) {
 
             scene.removeCharacter(this);
             this.sprite.remove();
@@ -116,5 +113,19 @@ phina.define('EnemyShot', {
         var ret = this.grazeRate;
         this.grazeRate = 0;
         return ret;
+    },
+    /**
+     * @function reflect
+     * @brief 反射処理
+     * 移動方向を180度反転させ、自機弾として扱うようにする。
+     */
+    reflect: function() {
+
+        // キャラクタータイプを自機弾に変更する。
+        this.type = Character.type.PLAYER_SHOT;
+
+        // 攻撃力を設定する。
+        this.power = EnemyShot.REFLECTION_POWER;
+
     },
 });

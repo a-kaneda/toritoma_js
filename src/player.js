@@ -60,13 +60,11 @@ phina.define('Player', {
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER;
 
-        // 座標、サイズを設定する。
-        this.rect = {
-            x: x,
-            y: y,
-            width: Player.HIT_WIDTH,
-            height: Player.HIT_HEIGHT,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, Player.HIT_WIDTH, Player.HIT_HEIGHT);
+
+        // かすり当たり判定を作成する。
+        this.grazeArea = Collider(x, y, Player.GRAZE_WIDTH, Player.GRAZE_HEIGHT);
 
         // メンバを初期化する。
         this.shotInterval = 0;
@@ -97,12 +95,12 @@ phina.define('Player', {
     update: function(scene) {
 
         // ブロックと衝突している場合
-        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+        if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
 
             // ブロックによって押されて移動する。
-            var dest = Util.pushCharacter(this.rect, scene.getStagePosition(), scene.getBlockMap(), false);
-            this.rect.x = dest.x;
-            this.rect.y = dest.y;
+            var dest = Util.pushCharacter(this.hitArea, scene.getStagePosition(), scene.getBlockMap(), false);
+            this.hitArea.x = dest.x;
+            this.hitArea.y = dest.y;
         }
 
         // 無敵状態の場合
@@ -132,7 +130,7 @@ phina.define('Player', {
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
             this.shotInterval++;
             if (this.shotInterval >= Player.SHOT_INTERVAL) {
-                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
+                scene.addCharacter(PlayerShot(this.hitArea.x, this.hitArea.y, false, scene));
                 this.shotInterval = 0;
             }
 
@@ -159,7 +157,7 @@ phina.define('Player', {
         this._updateOptionCount(scene);
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
     },
     /**
      * @function moveKeyLeft
@@ -169,8 +167,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyLeft: function(scene) {
-        this._move(this.rect.x - Player.SPEED_BY_KEY,
-                   this.rect.y,
+        this._move(this.hitArea.x - Player.SPEED_BY_KEY,
+                   this.hitArea.y,
                    scene);
     },
     /**
@@ -181,8 +179,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyRight: function(scene) {
-        this._move(this.rect.x + Player.SPEED_BY_KEY,
-                   this.rect.y,
+        this._move(this.hitArea.x + Player.SPEED_BY_KEY,
+                   this.hitArea.y,
                    scene);
     },
     /**
@@ -193,8 +191,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyUp: function(scene) {
-        this._move(this.rect.x,
-                   this.rect.y - Player.SPEED_BY_KEY,
+        this._move(this.hitArea.x,
+                   this.hitArea.y - Player.SPEED_BY_KEY,
                    scene);
     },
     /**
@@ -205,8 +203,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyDown: function(scene) {
-        this._move(this.rect.x,
-                   this.rect.y + Player.SPEED_BY_KEY,
+        this._move(this.hitArea.x,
+                   this.hitArea.y + Player.SPEED_BY_KEY,
                    scene);
     },
     /**
@@ -219,8 +217,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveTouch: function(x, y, scene) {
-        this._move(this.rect.x + x * Player.SPEED_BY_TOUCH,
-                   this.rect.y + y * Player.SPEED_BY_TOUCH,
+        this._move(this.hitArea.x + x * Player.SPEED_BY_TOUCH,
+                   this.hitArea.y + y * Player.SPEED_BY_TOUCH,
                    scene);
     },
     /**
@@ -233,8 +231,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveGamepad: function(x, y, scene) {
-        this._move(this.rect.x + x * Player.SPEED_BY_GAMEPAD,
-                   this.rect.y + y * Player.SPEED_BY_GAMEPAD,
+        this._move(this.hitArea.x + x * Player.SPEED_BY_GAMEPAD,
+                   this.hitArea.y + y * Player.SPEED_BY_GAMEPAD,
                    scene);
     },
     /**
@@ -309,36 +307,36 @@ phina.define('Player', {
     _move: function(x, y, scene) {
 
         // 前回値を保存する。
-        var prevX = this.rect.x;
-        var prevY = this.rect.y;
+        var prevX = this.hitArea.x;
+        var prevY = this.hitArea.y;
 
         // 死亡中でない場合のみ移動を行う。
         if (this.status != Player.STATUS.DEATH) {
             // 現在の座標を変更する。
-            this.rect.x = x;
-            this.rect.y = y;
+            this.hitArea.x = x;
+            this.hitArea.y = y;
         }
 
         // 衝突しているブロックがないか調べる。
-        var block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
+        var block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
 
         // 衝突しているブロックがある場合は移動する。
         while (block != null) {
 
             // 移動位置を計算する。
-            var newPosition = Util.moveByBlock(this.rect, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
+            var newPosition = Util.moveByBlock(this.hitArea, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
 
             // 移動できない場合はループを抜ける。
-            if (this.rect.x == newPosition.x && this.rect.y == newPosition.y) {
+            if (this.hitArea.x == newPosition.x && this.hitArea.y == newPosition.y) {
                 break;
             }
             
             // 移動後の座標を反映する。
-            this.rect.x = newPosition.x;
-            this.rect.y = newPosition.y;
+            this.hitArea.x = newPosition.x;
+            this.hitArea.y = newPosition.y;
 
             // 移動後に再度衝突していないかチェックする。
-            block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
+            block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
         }
 
         // 画面外に出ていないかチェックする。
@@ -358,23 +356,23 @@ phina.define('Player', {
     _checkScreenArea: function() {
 
         // 左側画面範囲外には移動させないようにする。
-        if (this.rect.x < 0) {
-            this.rect.x = 0;
+        if (this.hitArea.x < 0) {
+            this.hitArea.x = 0;
         }
 
         // 右側画面範囲外には移動させないようにする。
-        if (this.rect.x > ScreenSize.STAGE_RECT.width - 1) {
-            this.rect.x = ScreenSize.STAGE_RECT.width - 1;
+        if (this.hitArea.x > ScreenSize.STAGE_RECT.width - 1) {
+            this.hitArea.x = ScreenSize.STAGE_RECT.width - 1;
         }
 
         // 上側画面範囲外には移動させないようにする。
-        if (this.rect.y < 0) {
-            this.rect.y = 0;
+        if (this.hitArea.y < 0) {
+            this.hitArea.y = 0;
         }
 
         // 下側画面範囲外には移動させないようにする。
-        if (this.rect.y > ScreenSize.STAGE_RECT.height - 1) {
-            this.rect.y = ScreenSize.STAGE_RECT.height - 1;
+        if (this.hitArea.y > ScreenSize.STAGE_RECT.height - 1) {
+            this.hitArea.y = ScreenSize.STAGE_RECT.height - 1;
         }
     },
     /**
@@ -386,38 +384,29 @@ phina.define('Player', {
      */
     _checkHitChacater: function(scene) {
 
-        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = scene.characters;
+        // 衝突している敵キャラクターを検索する。
+        var hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY, Character.type.ENEMY_SHOT]);
 
-        // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
+        // 衝突している敵キャラクターがいる場合。
+        if (hitCharacters.length > 0) {
 
-            // 対象が敵キャラクター、敵弾の場合
-            if (characters[i].type === Character.type.ENEMY ||
-                characters[i].type === Character.type.ENEMY_SHOT) {
+            // 敵キャラクターの衝突処理を実行する。
+            hitCharacters[0].hit(this, scene);
 
-                // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
+            // 敵キャラクターに接触した場合は死亡処理を行う。
+            if (!this.noDeath) {
 
-                    // 敵キャラクターの衝突処理を実行する。
-                    characters[i].hit(this, scene);
+                // 死亡時エフェクトを作成する。
+                scene.addCharacter(PlayerDeathEffect(this.hitArea.x, this.hitArea.y, scene));
 
-                    // 敵キャラクターに接触した場合は死亡処理を行う。
-                    if (!this.noDeath) {
+                // ステータスを死亡に変更する。
+                this.status = Player.STATUS.DEATH;
 
-                        // 死亡時エフェクトを作成する。
-                        scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
+                // 画像を非表示にする。
+                this.sprite.alpha = 0;
 
-                        // ステータスを死亡に変更する。
-                        this.status = Player.STATUS.DEATH;
-
-                        // 画像を非表示にする。
-                        this.sprite.alpha = 0;
-
-                        // シーンの死亡時処理を実行する。
-                        scene.miss();
-                    }
-                }
+                // シーンの死亡時処理を実行する。
+                scene.miss();
             }
         }
     },
@@ -430,34 +419,22 @@ phina.define('Player', {
      */
     _checkGraze: function(scene) {
 
-        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = scene.characters;
+        // かすり当たり判定位置を更新する。
+        this.grazeArea.x = this.hitArea.x;
+        this.grazeArea.y = this.hitArea.y;
 
-        // かすり当たり判定を設定する。
-        var rect = {
-            x: this.rect.x,
-            y: this.rect.y,
-            width: Player.GRAZE_WIDTH,
-            height: Player.GRAZE_HEIGHT,
-        };
+        // かすっている敵弾を検索する。
+        var hitCharacters = this.grazeArea.getHitCharacter(scene.characters, [Character.type.ENEMY_SHOT]);
 
-        // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
+        // かすっている敵弾とかすり処理を行う。
+        for (var i = 0; i < hitCharacters.length; i++) {
 
-            // 対象が敵キャラクター、敵弾の場合
-            if (characters[i].type === Character.type.ENEMY_SHOT) {
+            // チキンゲージを増加させる。
+            this.chickenGauge += hitCharacters[i].graze();
 
-                // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(rect, characters[i].rect)) {
-
-                    // チキンゲージを増加させる。
-                    this.chickenGauge += characters[i].graze();
-
-                    // 上限値を超えた場合は上限値に補正する。
-                    if (this.chickenGauge > 1) {
-                        this.chickenGauge = 1;
-                    }
-                }
+            // 上限値を超えた場合は上限値に補正する。
+            if (this.chickenGauge > 1) {
+                this.chickenGauge = 1;
             }
         }
     },
@@ -478,7 +455,7 @@ phina.define('Player', {
 
             // オプションが作成されていなければ作成する。
             if (this.option === null) {
-                this.option = PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
+                this.option = PlayerOption(this.hitArea.x, this.hitArea.y, this.shield, scene);
                 scene.addCharacter(this.option);
             }
 

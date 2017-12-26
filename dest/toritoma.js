@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 21);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -100,21 +100,6 @@ phina.define('Character', {
                 defense: 0,
                 score: 100,
             },
-        },
-        /**
-         * @function setEnemyParam
-         * @brief 敵キャラパラメータの設定
-         * 敵キャラの当たり判定、HP、防御力、スコアを設定する。
-         *
-         * @param enemyType 敵キャラの種類
-         * @param instance 敵キャラオブジェクト
-         */ 
-        setEnemyParam: function(enemyType, instance) {
-            instance.rect.width = Character.enemy[enemyType].width;
-            instance.rect.height = Character.enemy[enemyType].height;
-            instance.hp = Character.enemy[enemyType].hp;
-            instance.defense = Character.enemy[enemyType].defense;
-            instance.score = Character.enemy[enemyType].score;
         },
     },
 });
@@ -196,6 +181,67 @@ phina.define('ChickenGauge', {
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+/**
+ * @class Collider
+ * @brief 当たり判定
+ * 当たり判定処理を行う。
+ */
+phina.define('Collider', {
+    /**
+     * @function init
+     * @brief コンストラクタ
+     * 当たり判定の範囲を設定する。
+     *
+     * @param [in] x x座標
+     * @param [in] y y座標
+     * @param [in] width 幅
+     * @param [in] height 高さ
+     */
+    init: function(x, y, width, height) {
+
+        // メンバ変数に格納する。
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    },
+    /**
+     * @function getHitCharacter
+     * @brief 衝突キャラクター検索
+     * 衝突しているキャラクターを検索する。
+     *
+     * @param [in] characters キャラクター配列
+     * @param [in] types 検索対象のキャラクター種別
+     * @return 衝突しているキャラクター配列
+     */
+    getHitCharacter: function(characters, types) {
+
+        var ret = [];
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 検索対象のキャラクター種別か調べる。
+            if (types.indexOf(characters[i].type) >= 0) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(this, characters[i].hitArea)) {
+
+                    // 見つかったキャラクターを戻り値に追加する。
+                    ret.push(characters[i]);
+                }
+            }
+        }
+
+        return ret;
+    },
+});
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports) {
 
 /**
@@ -295,7 +341,7 @@ phina.define('ControlSize', {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /**
@@ -336,14 +382,17 @@ phina.define('Dragonfly', {
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY;
 
-        // 座標を設定する。
-        this.rect = {
-            x: x,
-            y: y,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, Character.enemy['dragonfly'].width, Character.enemy['dragonfly'].height); 
 
-        // パラメータを設定する。
-        Character.setEnemyParam('dragonfly', this);
+        // HPを設定する。
+        this.hp = Character.enemy['dragonfly'].hp;
+
+        // 防御力を設定する。
+        this.defense = Character.enemy['dragonfly'].defense;
+
+        // スコアを設定する。
+        this.score = Character.enemy['dragonfly'].score;
 
         // メンバを初期化する。
         this.shotInterval = 0;
@@ -360,16 +409,16 @@ phina.define('Dragonfly', {
     update: function(scene) {
 
         // 左へ移動する。
-        this.rect.x += Dragonfly.MOVE_SPEED;
+        this.hitArea.x += Dragonfly.MOVE_SPEED;
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this.hp <= 0) {
 
             // 爆発アニメーションを作成する。
-            scene.addCharacter(Explosion(this.rect.x, this.rect.y, scene));
+            scene.addCharacter(Explosion(this.hitArea.x, this.hitArea.y, scene));
 
             // スコアを加算する。
             scene.addScore(this.score);
@@ -386,13 +435,13 @@ phina.define('Dragonfly', {
         if (this.shotInterval >= Dragonfly.SHOT_INTERVAL) {
             // 敵弾が無効化されていない場合は敵弾を生成する。
             if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+                scene.addCharacter(EnemyShot(this.hitArea.x, this.hitArea.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
             }
             this.shotInterval = 0;
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.rect.x < -this.rect.width * 2) {
+        if (this.hitArea.x < -this.hitArea.width * 2) {
             scene.removeCharacter(this);
             this.sprite.remove();
         }
@@ -420,7 +469,7 @@ phina.define('Dragonfly', {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 /**
@@ -436,6 +485,8 @@ phina.define('EnemyShot', {
         HIT_HEIGHT: 3,
         // かすりゲージ増加率
         GRAZE_RATE: 0.02,
+        // 反射弾の攻撃力
+        REFLECTION_POWER: 5,
     },
     /**
      * @function init
@@ -462,13 +513,8 @@ phina.define('EnemyShot', {
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY_SHOT;
 
-        // 座標、サイズを設定する。
-        this.rect = {
-            x: x,
-            y: y,
-            width: EnemyShot.HIT_WIDTH,
-            height: EnemyShot.HIT_HEIGHT,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, EnemyShot.HIT_WIDTH, EnemyShot.HIT_HEIGHT);
 
         // x方向のスピードを計算する。
         this.speedX = Math.cos(angle) * speed;
@@ -491,14 +537,14 @@ phina.define('EnemyShot', {
     update: function(scene) {
 
         // スピードに応じて移動する。
-        this.rect.x += this.speedX;
-        this.rect.y += this.speedY;
+        this.hitArea.x += this.speedX;
+        this.hitArea.y += this.speedY;
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
         // ブロックとの当たり判定処理を行う。
-        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+        if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
             this.sprite.remove();
@@ -506,10 +552,10 @@ phina.define('EnemyShot', {
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.rect.x < -this.rect.width * 2 ||
-            this.rect.x > ScreenSize.STAGE_RECT.width + this.rect.width * 2 ||
-            this.rect.y < -this.rect.height * 2 ||
-            this.rect.y > ScreenSize.STAGE_RECT.height + this.rect.height * 2) {
+        if (this.hitArea.x < -this.hitArea.width * 2 ||
+            this.hitArea.x > ScreenSize.STAGE_RECT.width + this.hitArea.width * 2 ||
+            this.hitArea.y < -this.hitArea.height * 2 ||
+            this.hitArea.y > ScreenSize.STAGE_RECT.height + this.hitArea.height * 2) {
 
             scene.removeCharacter(this);
             this.sprite.remove();
@@ -542,11 +588,25 @@ phina.define('EnemyShot', {
         this.grazeRate = 0;
         return ret;
     },
+    /**
+     * @function reflect
+     * @brief 反射処理
+     * 移動方向を180度反転させ、自機弾として扱うようにする。
+     */
+    reflect: function() {
+
+        // キャラクタータイプを自機弾に変更する。
+        this.type = Character.type.PLAYER_SHOT;
+
+        // 攻撃力を設定する。
+        this.power = EnemyShot.REFLECTION_POWER;
+
+    },
 });
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 /**
@@ -601,7 +661,7 @@ phina.define('Explosion', {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /**
@@ -686,7 +746,7 @@ phina.define('Life', {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 /**
@@ -707,7 +767,7 @@ phina.define('MyColor', {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /**
@@ -772,13 +832,11 @@ phina.define('Player', {
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER;
 
-        // 座標、サイズを設定する。
-        this.rect = {
-            x: x,
-            y: y,
-            width: Player.HIT_WIDTH,
-            height: Player.HIT_HEIGHT,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, Player.HIT_WIDTH, Player.HIT_HEIGHT);
+
+        // かすり当たり判定を作成する。
+        this.grazeArea = Collider(x, y, Player.GRAZE_WIDTH, Player.GRAZE_HEIGHT);
 
         // メンバを初期化する。
         this.shotInterval = 0;
@@ -809,12 +867,12 @@ phina.define('Player', {
     update: function(scene) {
 
         // ブロックと衝突している場合
-        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+        if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
 
             // ブロックによって押されて移動する。
-            var dest = Util.pushCharacter(this.rect, scene.getStagePosition(), scene.getBlockMap(), false);
-            this.rect.x = dest.x;
-            this.rect.y = dest.y;
+            var dest = Util.pushCharacter(this.hitArea, scene.getStagePosition(), scene.getBlockMap(), false);
+            this.hitArea.x = dest.x;
+            this.hitArea.y = dest.y;
         }
 
         // 無敵状態の場合
@@ -844,7 +902,7 @@ phina.define('Player', {
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
             this.shotInterval++;
             if (this.shotInterval >= Player.SHOT_INTERVAL) {
-                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, false, scene));
+                scene.addCharacter(PlayerShot(this.hitArea.x, this.hitArea.y, false, scene));
                 this.shotInterval = 0;
             }
 
@@ -871,7 +929,7 @@ phina.define('Player', {
         this._updateOptionCount(scene);
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
     },
     /**
      * @function moveKeyLeft
@@ -881,8 +939,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyLeft: function(scene) {
-        this._move(this.rect.x - Player.SPEED_BY_KEY,
-                   this.rect.y,
+        this._move(this.hitArea.x - Player.SPEED_BY_KEY,
+                   this.hitArea.y,
                    scene);
     },
     /**
@@ -893,8 +951,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyRight: function(scene) {
-        this._move(this.rect.x + Player.SPEED_BY_KEY,
-                   this.rect.y,
+        this._move(this.hitArea.x + Player.SPEED_BY_KEY,
+                   this.hitArea.y,
                    scene);
     },
     /**
@@ -905,8 +963,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyUp: function(scene) {
-        this._move(this.rect.x,
-                   this.rect.y - Player.SPEED_BY_KEY,
+        this._move(this.hitArea.x,
+                   this.hitArea.y - Player.SPEED_BY_KEY,
                    scene);
     },
     /**
@@ -917,8 +975,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveKeyDown: function(scene) {
-        this._move(this.rect.x,
-                   this.rect.y + Player.SPEED_BY_KEY,
+        this._move(this.hitArea.x,
+                   this.hitArea.y + Player.SPEED_BY_KEY,
                    scene);
     },
     /**
@@ -931,8 +989,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveTouch: function(x, y, scene) {
-        this._move(this.rect.x + x * Player.SPEED_BY_TOUCH,
-                   this.rect.y + y * Player.SPEED_BY_TOUCH,
+        this._move(this.hitArea.x + x * Player.SPEED_BY_TOUCH,
+                   this.hitArea.y + y * Player.SPEED_BY_TOUCH,
                    scene);
     },
     /**
@@ -945,8 +1003,8 @@ phina.define('Player', {
      * @param [in/out] scene シーン
      */
     moveGamepad: function(x, y, scene) {
-        this._move(this.rect.x + x * Player.SPEED_BY_GAMEPAD,
-                   this.rect.y + y * Player.SPEED_BY_GAMEPAD,
+        this._move(this.hitArea.x + x * Player.SPEED_BY_GAMEPAD,
+                   this.hitArea.y + y * Player.SPEED_BY_GAMEPAD,
                    scene);
     },
     /**
@@ -1021,36 +1079,36 @@ phina.define('Player', {
     _move: function(x, y, scene) {
 
         // 前回値を保存する。
-        var prevX = this.rect.x;
-        var prevY = this.rect.y;
+        var prevX = this.hitArea.x;
+        var prevY = this.hitArea.y;
 
         // 死亡中でない場合のみ移動を行う。
         if (this.status != Player.STATUS.DEATH) {
             // 現在の座標を変更する。
-            this.rect.x = x;
-            this.rect.y = y;
+            this.hitArea.x = x;
+            this.hitArea.y = y;
         }
 
         // 衝突しているブロックがないか調べる。
-        var block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
+        var block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
 
         // 衝突しているブロックがある場合は移動する。
         while (block != null) {
 
             // 移動位置を計算する。
-            var newPosition = Util.moveByBlock(this.rect, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
+            var newPosition = Util.moveByBlock(this.hitArea, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
 
             // 移動できない場合はループを抜ける。
-            if (this.rect.x == newPosition.x && this.rect.y == newPosition.y) {
+            if (this.hitArea.x == newPosition.x && this.hitArea.y == newPosition.y) {
                 break;
             }
             
             // 移動後の座標を反映する。
-            this.rect.x = newPosition.x;
-            this.rect.y = newPosition.y;
+            this.hitArea.x = newPosition.x;
+            this.hitArea.y = newPosition.y;
 
             // 移動後に再度衝突していないかチェックする。
-            block = Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap());
+            block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
         }
 
         // 画面外に出ていないかチェックする。
@@ -1070,23 +1128,23 @@ phina.define('Player', {
     _checkScreenArea: function() {
 
         // 左側画面範囲外には移動させないようにする。
-        if (this.rect.x < 0) {
-            this.rect.x = 0;
+        if (this.hitArea.x < 0) {
+            this.hitArea.x = 0;
         }
 
         // 右側画面範囲外には移動させないようにする。
-        if (this.rect.x > ScreenSize.STAGE_RECT.width - 1) {
-            this.rect.x = ScreenSize.STAGE_RECT.width - 1;
+        if (this.hitArea.x > ScreenSize.STAGE_RECT.width - 1) {
+            this.hitArea.x = ScreenSize.STAGE_RECT.width - 1;
         }
 
         // 上側画面範囲外には移動させないようにする。
-        if (this.rect.y < 0) {
-            this.rect.y = 0;
+        if (this.hitArea.y < 0) {
+            this.hitArea.y = 0;
         }
 
         // 下側画面範囲外には移動させないようにする。
-        if (this.rect.y > ScreenSize.STAGE_RECT.height - 1) {
-            this.rect.y = ScreenSize.STAGE_RECT.height - 1;
+        if (this.hitArea.y > ScreenSize.STAGE_RECT.height - 1) {
+            this.hitArea.y = ScreenSize.STAGE_RECT.height - 1;
         }
     },
     /**
@@ -1098,38 +1156,29 @@ phina.define('Player', {
      */
     _checkHitChacater: function(scene) {
 
-        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = scene.characters;
+        // 衝突している敵キャラクターを検索する。
+        var hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY, Character.type.ENEMY_SHOT]);
 
-        // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
+        // 衝突している敵キャラクターがいる場合。
+        if (hitCharacters.length > 0) {
 
-            // 対象が敵キャラクター、敵弾の場合
-            if (characters[i].type === Character.type.ENEMY ||
-                characters[i].type === Character.type.ENEMY_SHOT) {
+            // 敵キャラクターの衝突処理を実行する。
+            hitCharacters[0].hit(this, scene);
 
-                // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
+            // 敵キャラクターに接触した場合は死亡処理を行う。
+            if (!this.noDeath) {
 
-                    // 敵キャラクターの衝突処理を実行する。
-                    characters[i].hit(this, scene);
+                // 死亡時エフェクトを作成する。
+                scene.addCharacter(PlayerDeathEffect(this.hitArea.x, this.hitArea.y, scene));
 
-                    // 敵キャラクターに接触した場合は死亡処理を行う。
-                    if (!this.noDeath) {
+                // ステータスを死亡に変更する。
+                this.status = Player.STATUS.DEATH;
 
-                        // 死亡時エフェクトを作成する。
-                        scene.addCharacter(PlayerDeathEffect(this.rect.x, this.rect.y, scene));
+                // 画像を非表示にする。
+                this.sprite.alpha = 0;
 
-                        // ステータスを死亡に変更する。
-                        this.status = Player.STATUS.DEATH;
-
-                        // 画像を非表示にする。
-                        this.sprite.alpha = 0;
-
-                        // シーンの死亡時処理を実行する。
-                        scene.miss();
-                    }
-                }
+                // シーンの死亡時処理を実行する。
+                scene.miss();
             }
         }
     },
@@ -1142,34 +1191,22 @@ phina.define('Player', {
      */
     _checkGraze: function(scene) {
 
-        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = scene.characters;
+        // かすり当たり判定位置を更新する。
+        this.grazeArea.x = this.hitArea.x;
+        this.grazeArea.y = this.hitArea.y;
 
-        // かすり当たり判定を設定する。
-        var rect = {
-            x: this.rect.x,
-            y: this.rect.y,
-            width: Player.GRAZE_WIDTH,
-            height: Player.GRAZE_HEIGHT,
-        };
+        // かすっている敵弾を検索する。
+        var hitCharacters = this.grazeArea.getHitCharacter(scene.characters, [Character.type.ENEMY_SHOT]);
 
-        // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
+        // かすっている敵弾とかすり処理を行う。
+        for (var i = 0; i < hitCharacters.length; i++) {
 
-            // 対象が敵キャラクター、敵弾の場合
-            if (characters[i].type === Character.type.ENEMY_SHOT) {
+            // チキンゲージを増加させる。
+            this.chickenGauge += hitCharacters[i].graze();
 
-                // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(rect, characters[i].rect)) {
-
-                    // チキンゲージを増加させる。
-                    this.chickenGauge += characters[i].graze();
-
-                    // 上限値を超えた場合は上限値に補正する。
-                    if (this.chickenGauge > 1) {
-                        this.chickenGauge = 1;
-                    }
-                }
+            // 上限値を超えた場合は上限値に補正する。
+            if (this.chickenGauge > 1) {
+                this.chickenGauge = 1;
             }
         }
     },
@@ -1190,7 +1227,7 @@ phina.define('Player', {
 
             // オプションが作成されていなければ作成する。
             if (this.option === null) {
-                this.option = PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
+                this.option = PlayerOption(this.hitArea.x, this.hitArea.y, this.shield, scene);
                 scene.addCharacter(this.option);
             }
 
@@ -1215,7 +1252,7 @@ phina.define('Player', {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 /**
@@ -1274,7 +1311,7 @@ phina.define('PlayerDeathEffect', {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 /**
@@ -1360,6 +1397,10 @@ phina.define('PlayerOption', {
                 scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, true, scene));
                 this.shotInterval = 0;
             }
+        }
+
+        // シールド使用時は当たり判定処理を行う。
+        if (this.shield) {
         }
 
         // 座標をスプライトに適用する。
@@ -1470,11 +1511,38 @@ phina.define('PlayerOption', {
             this.nextOption.setShield(this.shield);
         }
     },
+    /**
+     * @function _checkHitChacater
+     * @breif 当たり判定処理
+     * 他のキャラクターとの当たり判定を処理する。
+     *
+     * @param [in/out] scene シーン
+     */
+    _checkHitChacater: function(scene) {
+
+        // キャラクターレイヤーに配置されているキャラクターを取得する。
+        var characters = scene.characters;
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 対象が敵弾の場合
+            if ( characters[i].type === Character.type.ENEMY_SHOT) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
+
+                    // 敵弾反射処理を実行する。
+                    characters[i].reflect();
+                }
+            }
+        }
+    },
 });
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 /**
@@ -1518,12 +1586,8 @@ phina.define('PlayerShot', {
         this.type = Character.type.PLAYER_SHOT;
 
         // 座標、サイズを設定する。
-        this.rect = {
-            x: x,
-            y: y,
-            width: PlayerShot.HIT_WIDTH,
-            height: PlayerShot.HIT_HEIGHT,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, PlayerShot.HIT_WIDTH, PlayerShot.HIT_HEIGHT);
 
         // 攻撃力を設定する。
         if (isOption) {
@@ -1544,19 +1608,30 @@ phina.define('PlayerShot', {
     update: function(scene) {
 
         // 右へ移動する。
-        this.rect.x += 5;
+        this.hitArea.x += 5;
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
-        // 当たり判定処理を行う。
-        if (this._checkHitChacater(scene)) {
+        // 衝突している敵キャラクターを検索する。
+        var hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY]);
+
+        // 衝突している敵キャラクターがいる場合。
+        if (hitCharacters.length > 0) {
+
+            // 敵キャラクターの衝突処理を実行する。
+            hitCharacters[0].hit(this);
+
+            // 敵キャラクターに接触した場合は自分自身は削除する。
+            scene.removeCharacter(this);
+            this.sprite.remove();
+
             // 敵キャラと衝突した場合は処理を終了する。
             return;
         }
         
         // ブロックとの当たり判定処理を行う。
-        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+        if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
             this.sprite.remove();
@@ -1564,52 +1639,17 @@ phina.define('PlayerShot', {
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.rect.x > ScreenSize.STAGE_RECT.width + 4) {
+        if (this.hitArea.x > ScreenSize.STAGE_RECT.width + 4) {
             scene.removeCharacter(this);
             this.sprite.remove();
             return;
         }
     },
-    /**
-     * @function _checkHitChacater
-     * @breif 当たり判定処理
-     * 他のキャラクターとの当たり判定を処理する。
-     *
-     * @param [in/out] scene シーン
-     * @return 敵キャラと衝突した場合trueを返す
-     */
-    _checkHitChacater: function(scene) {
-
-        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = scene.characters;
-
-        // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
-
-            // 対象が敵キャラクターの場合
-            if (characters[i].type === Character.type.ENEMY) {
-
-                // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
-
-                    // 敵キャラクターの衝突処理を実行する。
-                    characters[i].hit(this);
-
-                    // 敵キャラクターに接触した場合は自分自身は削除する。
-                    scene.removeCharacter(this);
-                    this.sprite.remove();
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    },
 });
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 // 拡大率
@@ -1641,7 +1681,7 @@ phina.define('ScreenSize', {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 /**
@@ -1733,7 +1773,7 @@ phina.define('ShieldButton', {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /**
@@ -1869,7 +1909,7 @@ phina.define('Stage', {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {(function(name,data){
@@ -2704,10 +2744,10 @@ phina.define('Stage', {
  "version":1,
  "width":100
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)(module)))
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 /**
@@ -2925,7 +2965,7 @@ phina.define('TileMapManager', {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 /**
@@ -3382,7 +3422,7 @@ phina.define('Util', {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18166,10 +18206,10 @@ phina.namespace(function() {
 });
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20)))
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 var g;
@@ -18196,7 +18236,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -18224,37 +18264,38 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // phina.jsを読み込む
-var phina = __webpack_require__(18);
+var phina = __webpack_require__(19);
 
 // グローバル変数定義用
 phina.define('toritoma', {
 });
 
 // 各ステージのマップデータを読み込む
-var tmx_stage1 = __webpack_require__(15);
+var tmx_stage1 = __webpack_require__(16);
 
 // 各クラス定義を読み込む。
-var myColor = __webpack_require__(7);
-var util = __webpack_require__(17);
-var screenSize = __webpack_require__(12);
+var myColor = __webpack_require__(8);
+var util = __webpack_require__(18);
+var screenSize = __webpack_require__(13);
 var character = __webpack_require__(0);
-var tileMapManager = __webpack_require__(16);
-var stage = __webpack_require__(14);
-var controlSize = __webpack_require__(2);
-var life = __webpack_require__(6);
+var collider = __webpack_require__(2);
+var tileMapManager = __webpack_require__(17);
+var stage = __webpack_require__(15);
+var controlSize = __webpack_require__(3);
+var life = __webpack_require__(7);
 var chickenGauge = __webpack_require__(1);
-var shieldButton = __webpack_require__(13);
-var player = __webpack_require__(8);
-var playerShot = __webpack_require__(11);
-var playerOption = __webpack_require__(10);
-var playerDeathEffect = __webpack_require__(9);
-var explosion = __webpack_require__(5);
-var enemyShot = __webpack_require__(4);
-var dragonfly = __webpack_require__(3);
+var shieldButton = __webpack_require__(14);
+var player = __webpack_require__(9);
+var playerShot = __webpack_require__(12);
+var playerOption = __webpack_require__(11);
+var playerDeathEffect = __webpack_require__(10);
+var explosion = __webpack_require__(6);
+var enemyShot = __webpack_require__(5);
+var dragonfly = __webpack_require__(4);
 
 // マウスが接続されているかどうか
 toritoma.isMouseUsed = false;

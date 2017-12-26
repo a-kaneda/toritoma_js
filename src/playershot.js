@@ -39,12 +39,8 @@ phina.define('PlayerShot', {
         this.type = Character.type.PLAYER_SHOT;
 
         // 座標、サイズを設定する。
-        this.rect = {
-            x: x,
-            y: y,
-            width: PlayerShot.HIT_WIDTH,
-            height: PlayerShot.HIT_HEIGHT,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, PlayerShot.HIT_WIDTH, PlayerShot.HIT_HEIGHT);
 
         // 攻撃力を設定する。
         if (isOption) {
@@ -65,19 +61,30 @@ phina.define('PlayerShot', {
     update: function(scene) {
 
         // 右へ移動する。
-        this.rect.x += 5;
+        this.hitArea.x += 5;
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
-        // 当たり判定処理を行う。
-        if (this._checkHitChacater(scene)) {
+        // 衝突している敵キャラクターを検索する。
+        var hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY]);
+
+        // 衝突している敵キャラクターがいる場合。
+        if (hitCharacters.length > 0) {
+
+            // 敵キャラクターの衝突処理を実行する。
+            hitCharacters[0].hit(this);
+
+            // 敵キャラクターに接触した場合は自分自身は削除する。
+            scene.removeCharacter(this);
+            this.sprite.remove();
+
             // 敵キャラと衝突した場合は処理を終了する。
             return;
         }
         
         // ブロックとの当たり判定処理を行う。
-        if (Util.checkCollidedBlock(this.rect, scene.getStagePosition(), scene.getBlockMap()) != null) {
+        if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
             this.sprite.remove();
@@ -85,45 +92,10 @@ phina.define('PlayerShot', {
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.rect.x > ScreenSize.STAGE_RECT.width + 4) {
+        if (this.hitArea.x > ScreenSize.STAGE_RECT.width + 4) {
             scene.removeCharacter(this);
             this.sprite.remove();
             return;
         }
-    },
-    /**
-     * @function _checkHitChacater
-     * @breif 当たり判定処理
-     * 他のキャラクターとの当たり判定を処理する。
-     *
-     * @param [in/out] scene シーン
-     * @return 敵キャラと衝突した場合trueを返す
-     */
-    _checkHitChacater: function(scene) {
-
-        // 親ノード（キャラクターレイヤー）に配置されているキャラクターを取得する。
-        var characters = scene.characters;
-
-        // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
-
-            // 対象が敵キャラクターの場合
-            if (characters[i].type === Character.type.ENEMY) {
-
-                // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
-
-                    // 敵キャラクターの衝突処理を実行する。
-                    characters[i].hit(this);
-
-                    // 敵キャラクターに接触した場合は自分自身は削除する。
-                    scene.removeCharacter(this);
-                    this.sprite.remove();
-                    return true;
-                }
-            }
-        }
-
-        return false;
     },
 });

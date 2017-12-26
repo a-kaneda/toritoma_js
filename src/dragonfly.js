@@ -36,14 +36,17 @@ phina.define('Dragonfly', {
         // キャラクタータイプを設定する。
         this.type = Character.type.ENEMY;
 
-        // 座標を設定する。
-        this.rect = {
-            x: x,
-            y: y,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = Collider(x, y, Character.enemy['dragonfly'].width, Character.enemy['dragonfly'].height); 
 
-        // パラメータを設定する。
-        Character.setEnemyParam('dragonfly', this);
+        // HPを設定する。
+        this.hp = Character.enemy['dragonfly'].hp;
+
+        // 防御力を設定する。
+        this.defense = Character.enemy['dragonfly'].defense;
+
+        // スコアを設定する。
+        this.score = Character.enemy['dragonfly'].score;
 
         // メンバを初期化する。
         this.shotInterval = 0;
@@ -60,16 +63,16 @@ phina.define('Dragonfly', {
     update: function(scene) {
 
         // 左へ移動する。
-        this.rect.x += Dragonfly.MOVE_SPEED;
+        this.hitArea.x += Dragonfly.MOVE_SPEED;
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this.hp <= 0) {
 
             // 爆発アニメーションを作成する。
-            scene.addCharacter(Explosion(this.rect.x, this.rect.y, scene));
+            scene.addCharacter(Explosion(this.hitArea.x, this.hitArea.y, scene));
 
             // スコアを加算する。
             scene.addScore(this.score);
@@ -86,13 +89,13 @@ phina.define('Dragonfly', {
         if (this.shotInterval >= Dragonfly.SHOT_INTERVAL) {
             // 敵弾が無効化されていない場合は敵弾を生成する。
             if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(EnemyShot(this.rect.x, this.rect.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+                scene.addCharacter(EnemyShot(this.hitArea.x, this.hitArea.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
             }
             this.shotInterval = 0;
         }
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this.rect.x < -this.rect.width * 2) {
+        if (this.hitArea.x < -this.hitArea.width * 2) {
             scene.removeCharacter(this);
             this.sprite.remove();
         }

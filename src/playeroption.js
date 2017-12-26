@@ -83,6 +83,10 @@ phina.define('PlayerOption', {
             }
         }
 
+        // シールド使用時は当たり判定処理を行う。
+        if (this.shield) {
+        }
+
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
     },
@@ -189,6 +193,33 @@ phina.define('PlayerOption', {
         // 次のオプションがある場合は次のオプションのシールド使用不使用を設定する。
         if (this.nextOption !== null) {
             this.nextOption.setShield(this.shield);
+        }
+    },
+    /**
+     * @function _checkHitChacater
+     * @breif 当たり判定処理
+     * 他のキャラクターとの当たり判定を処理する。
+     *
+     * @param [in/out] scene シーン
+     */
+    _checkHitChacater: function(scene) {
+
+        // キャラクターレイヤーに配置されているキャラクターを取得する。
+        var characters = scene.characters;
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (var i = 0; i < characters.length; i++) {
+
+            // 対象が敵弾の場合
+            if ( characters[i].type === Character.type.ENEMY_SHOT) {
+
+                // 接触しているかどうかを調べる。
+                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
+
+                    // 敵弾反射処理を実行する。
+                    characters[i].reflect();
+                }
+            }
         }
     },
 });

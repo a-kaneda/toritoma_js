@@ -13,6 +13,7 @@ var myColor = require('./mycolor.js');
 var util = require('./util.js');
 var screenSize = require('./screensize.js');
 var character = require('./character.js');
+var collider = require('./collider.js');
 var tileMapManager = require('./tilemapmanager.js');
 var stage = require('./stage.js');
 var controlSize = require('./controlsize.js');

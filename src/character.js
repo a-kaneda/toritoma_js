@@ -29,20 +29,5 @@ phina.define('Character', {
                 score: 100,
             },
         },
-        /**
-         * @function setEnemyParam
-         * @brief 敵キャラパラメータの設定
-         * 敵キャラの当たり判定、HP、防御力、スコアを設定する。
-         *
-         * @param enemyType 敵キャラの種類
-         * @param instance 敵キャラオブジェクト
-         */ 
-        setEnemyParam: function(enemyType, instance) {
-            instance.rect.width = Character.enemy[enemyType].width;
-            instance.rect.height = Character.enemy[enemyType].height;
-            instance.hp = Character.enemy[enemyType].hp;
-            instance.defense = Character.enemy[enemyType].defense;
-            instance.score = Character.enemy[enemyType].score;
-        },
     },
 });
