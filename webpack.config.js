@@ -4,7 +4,7 @@ module.exports = {
     entry: './src/main.js',
     output: {
         path: __dirname,
-        filename: './dest/toritoma.js'
+        filename: './dest/main.js'
     },
     module: {
         loaders: [
