@@ -83,12 +83,20 @@ export default class Player {
         this.option = null;
         this.shield = false;
 
-        // デバッグ用
+        // デバッグ用: 死亡しないようにする。
         if (localStorage.noDeath === 'true') {
             this.noDeath = true;
         }
         else {
             this.noDeath = false;
+        }
+
+        // デバッグ用: ショットを撃たないようにする。
+        if (localStorage.noShot === 'true') {
+            this.noShot = true;
+        }
+        else {
+            this.noShot = false;
         }
     }
 
@@ -107,7 +115,7 @@ export default class Player {
         if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
 
             // ブロックによって押されて移動する。
-            var dest = Util.pushCharacter(this.hitArea, scene.getStagePosition(), scene.getBlockMap(), false);
+            const dest = Util.pushCharacter(this.hitArea, scene.getStagePosition(), scene.getBlockMap(), false);
             this.hitArea.x = dest.x;
             this.hitArea.y = dest.y;
         }
@@ -138,7 +146,7 @@ export default class Player {
 
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
             this.shotInterval++;
-            if (this.shotInterval >= SHOT_INTERVAL) {
+            if (this.shotInterval >= SHOT_INTERVAL && !this.noShot) {
                 scene.addCharacter(new PlayerShot(this.hitArea.x, this.hitArea.y, false, scene));
                 this.shotInterval = 0;
             }
@@ -326,8 +334,8 @@ export default class Player {
     _move(x, y, scene) {
 
         // 前回値を保存する。
-        var prevX = this.hitArea.x;
-        var prevY = this.hitArea.y;
+        const prevX = this.hitArea.x;
+        const prevY = this.hitArea.y;
 
         // 死亡中でない場合のみ移動を行う。
         if (this.status != STATUS.DEATH) {
@@ -337,13 +345,13 @@ export default class Player {
         }
 
         // 衝突しているブロックがないか調べる。
-        var block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
+        let block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
 
         // 衝突しているブロックがある場合は移動する。
         while (block != null) {
 
             // 移動位置を計算する。
-            var newPosition = Util.moveByBlock(this.hitArea, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
+            const newPosition = Util.moveByBlock(this.hitArea, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
 
             // 移動できない場合はループを抜ける。
             if (this.hitArea.x == newPosition.x && this.hitArea.y == newPosition.y) {
@@ -406,7 +414,7 @@ export default class Player {
     _checkHitChacater(scene) {
 
         // 衝突している敵キャラクターを検索する。
-        var hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY, Character.type.ENEMY_SHOT]);
+        const hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY, Character.type.ENEMY_SHOT]);
 
         // 衝突している敵キャラクターがいる場合。
         if (hitCharacters.length > 0) {
@@ -446,10 +454,10 @@ export default class Player {
         this.grazeArea.y = this.hitArea.y;
 
         // かすっている敵弾を検索する。
-        var hitCharacters = this.grazeArea.getHitCharacter(scene.characters, [Character.type.ENEMY_SHOT]);
+        const hitCharacters = this.grazeArea.getHitCharacter(scene.characters, [Character.type.ENEMY_SHOT]);
 
         // かすっている敵弾とかすり処理を行う。
-        for (var i = 0; i < hitCharacters.length; i++) {
+        for (let i = 0; i < hitCharacters.length; i++) {
 
             // チキンゲージを増加させる。
             this.chickenGauge += hitCharacters[i].graze();
@@ -471,7 +479,7 @@ export default class Player {
     _updateOptionCount(scene) {
 
         // チキンゲージからオプション個数を計算する
-        var count = Math.floor(this.chickenGauge / (1 / (MAX_OPTION_COUNT + 1)));
+        const count = Math.floor(this.chickenGauge / (1 / (MAX_OPTION_COUNT + 1)));
 
         // オプション個数がある場合
         if (count > 0) {

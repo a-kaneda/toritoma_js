@@ -75,6 +75,27 @@ export default class EnemyShot {
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
+        // タイプが自機弾になっている場合、反射弾として敵との当たり判定を行う。
+        if (this.type === Character.type.PLAYER_SHOT) {
+
+            // 衝突している敵キャラクターを検索する。
+            const hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY]);
+
+            // 衝突している敵キャラクターがいる場合。
+            if (hitCharacters.length > 0) {
+
+                // 敵キャラクターの衝突処理を実行する。
+                hitCharacters[0].hit(this);
+
+                // 敵キャラクターに接触した場合は自分自身は削除する。
+                scene.removeCharacter(this);
+                this.sprite.remove();
+
+                // 敵キャラと衝突した場合は処理を終了する。
+                return;
+            }
+        }
+
         // ブロックとの当たり判定処理を行う。
         if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
@@ -94,7 +115,7 @@ export default class EnemyShot {
             return;
         }
     }
-    
+
     /**
      * @function hit
      * @brief 衝突処理
@@ -118,11 +139,11 @@ export default class EnemyShot {
      * @return ゲージ増加比率
      */
     graze() {
-        var ret = this.grazeRate;
+        const ret = this.grazeRate;
         this.grazeRate = 0;
         return ret;
     }
-    
+
     /**
      * @function reflect
      * @brief 反射処理
@@ -136,5 +157,8 @@ export default class EnemyShot {
         // 攻撃力を設定する。
         this.power = REFLECTION_POWER;
 
+        // 進行方向を反転する。
+        this.speedX *= -1;
+        this.speedY *= -1;
     }
 }

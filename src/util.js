@@ -45,10 +45,10 @@ export default class Util {
     static checkCollidedBlock(character, stagePosition, blockMap) {
 
         // ブロックマップの検索範囲を計算する。
-        var xmin = Math.floor((character.x - character.width / 2 + stagePosition) / Stage.TILE_SIZE);
-        var xmax = Math.ceil((character.x + character.width / 2 + stagePosition) / Stage.TILE_SIZE);
-        var ymin = Math.floor((character.y - character.height / 2) / Stage.TILE_SIZE);
-        var ymax = Math.ceil((character.y + character.height / 2) / Stage.TILE_SIZE);
+        let xmin = Math.floor((character.x - character.width / 2 + stagePosition) / Stage.TILE_SIZE);
+        let xmax = Math.ceil((character.x + character.width / 2 + stagePosition) / Stage.TILE_SIZE);
+        let ymin = Math.floor((character.y - character.height / 2) / Stage.TILE_SIZE);
+        let ymax = Math.ceil((character.y + character.height / 2) / Stage.TILE_SIZE);
 
         // x、yの上下限値をチェックする。
         if (xmin < 0) { 
@@ -65,8 +65,8 @@ export default class Util {
         }
 
         // 周囲のタイルから衝突しているブロックを探す。
-        for (var y = ymin; y <= ymax; y++) {
-            for (var x = xmin; x <= xmax; x++) {
+        for (let y = ymin; y <= ymax; y++) {
+            for (let x = xmin; x <= xmax; x++) {
 
                 // 衝突しているブロックが見つかった場合
                 if (blockMap[y][x] &&
@@ -77,7 +77,7 @@ export default class Util {
 
                     // ブロックの中心座標とサイズを戻り値とする。
                     // 変数名や値はキャラクターに合わせる。
-                    var ret = {
+                    const ret = {
                         x: x * Stage.TILE_SIZE - stagePosition + blockMap[y][x].x + blockMap[y][x].width / 2,
                         y: y * Stage.TILE_SIZE + blockMap[y][x].y + blockMap[y][x].height / 2,
                         width: blockMap[y][x].width,
@@ -113,7 +113,7 @@ export default class Util {
     static moveByBlock(character, prevX, prevY, block, stagePosition, blockMap) {
 
         // 衝突による移動先の座標を現在の座標で初期化する
-        var newPosition = {
+        let newPosition = {
             x: character.x,
             y: character.y,
             width: character.width,
@@ -122,7 +122,7 @@ export default class Util {
 
         // 障害物の横方向の端に合わせて移動した場合は
         // 縦方向の移動は不要になるため、フラグを立てて後で使用する。
-        var isXMoved = false;
+        let isXMoved = false;
 
         // x方向右に進んでいる時に衝突した場合
         if (character.x > prevX &&
@@ -174,7 +174,7 @@ export default class Util {
 
         // 障害物の縦方向の端に合わせて移動した場合は
         // 横方向の移動は不要になるため、フラグを立てて後で使用する。
-        var isYMoved = false;
+        let isYMoved = false;
 
         // y方向上に進んでいる時に衝突した場合
         if (character.y < prevY &&
@@ -228,12 +228,12 @@ export default class Util {
         if (isXMoved && isYMoved) {
 
             // y座標だけ元に戻して衝突するか調べる。
-            var newYPosBackup = newPosition.y;
+            const newYPosBackup = newPosition.y;
             newPosition.y = character.y;
             if (Util.checkCollidedBlock(newPosition, stagePosition, blockMap) != null) {
 
                 // x座標だけ元に戻して衝突するか調べる。
-                var newXPosBackupt = newPosition.x;
+                const newXPosBackupt = newPosition.x;
                 newPosition.x = character.x;
                 newPosition.y = newYPosBackup;
                 if (Util.checkCollidedBlock(newPosition, stagePosition, blockMap) != null) {
@@ -275,7 +275,7 @@ export default class Util {
     static dodgeBlockUp(character, stagePosition, blockMap) {
 
         // 上方向に移動してブロックを回避する。
-        var dest = Util._dodgeBlock(character,
+        const dest = Util._dodgeBlock(character,
                 stagePosition,
                 blockMap,
                 function(dest, block) { dest.y = block.y - block.height / 2 - dest.height / 2; });
@@ -297,7 +297,7 @@ export default class Util {
     static dodgeBlockDown(character, stagePosition, blockMap) {
 
         // 下方向に移動してブロックを回避する。
-        var dest = Util._dodgeBlock(character,
+        const dest = Util._dodgeBlock(character,
                 stagePosition,
                 blockMap,
                 function(dest, block) { dest.y = block.y + block.height / 2 + dest.height / 2; });
@@ -319,7 +319,7 @@ export default class Util {
     static dodgeBlockLeft(character, stagePosition, blockMap) {
 
         // 左方向に移動してブロックを回避する。
-        var dest = Util._dodgeBlock(character,
+        const dest = Util._dodgeBlock(character,
                 stagePosition,
                 blockMap,
                 function(dest, block) { dest.x = block.x - block.width / 2 - dest.width / 2; });
@@ -341,7 +341,7 @@ export default class Util {
     static dodgeBlockRight(character, stagePosition, blockMap) {
 
         // 右方向に移動してブロックを回避する。
-        var dest = Util._dodgeBlock(character,
+        const dest = Util._dodgeBlock(character,
                 stagePosition,
                 blockMap,
                 function(dest, block) { dest.x = block.x + block.width / 2 + dest.width / 2; });
@@ -365,7 +365,7 @@ export default class Util {
     static _dodgeBlock(character, stagePosition, blockMap, move) {
 
         // 移動先座標の情報を現在位置で初期化する。
-        var dest = {
+        const dest = {
             x: character.x,
             y: character.y,
             width: character.width,
@@ -403,7 +403,7 @@ export default class Util {
     static pushCharacter(character, stagePosition, blockMap, canMoveOut) {
 
         // 各方向への回避した場合の移動先座標を求める。
-        var left = Util.dodgeBlockLeft(character, stagePosition, blockMap);
+        const left = Util.dodgeBlockLeft(character, stagePosition, blockMap);
 
         // 画面外への移動を許可する場合は常に左へ移動する。
         if (canMoveOut) {
@@ -411,9 +411,9 @@ export default class Util {
         }
 
         // 各方向への回避した場合の移動先座標を求める。
-        var right = Util.dodgeBlockRight(character, stagePosition, blockMap);
-        var up = Util.dodgeBlockUp(character, stagePosition, blockMap);
-        var down = Util.dodgeBlockDown(character, stagePosition, blockMap);
+        const right = Util.dodgeBlockRight(character, stagePosition, blockMap);
+        const up = Util.dodgeBlockUp(character, stagePosition, blockMap);
+        const down = Util.dodgeBlockDown(character, stagePosition, blockMap);
 
         // 移動先候補を設定する。
         // 移動の優先度は
@@ -421,7 +421,7 @@ export default class Util {
         //   2.スクロールと垂直方向の近い方
         //   3.スクロールと垂直方向の遠い方
         //   4.スクロールと反対方向
-        var movePos = new Array(4);
+        let movePos = new Array(4);
 
         // 1番目はスクロール方向（左方向）とする。
         movePos[0] = left;
@@ -442,7 +442,7 @@ export default class Util {
         movePos[3] = right;
 
         // 4方向へ移動を試みる。
-        for (var i = 0; i < 4; i++) {
+        for (let i = 0; i < 4; i++) {
 
             // 画面範囲外に出ているかをチェックする。
             if (movePos[i].x >= 0 &&

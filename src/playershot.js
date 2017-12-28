@@ -73,7 +73,7 @@ export default class PlayerShot {
         this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
 
         // 衝突している敵キャラクターを検索する。
-        var hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY]);
+        const hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY]);
 
         // 衝突している敵キャラクターがいる場合。
         if (hitCharacters.length > 0) {

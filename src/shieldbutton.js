@@ -51,7 +51,7 @@ export default class ShieldButton {
         this.button.setInteractive(true);
         this.button.addChildTo(this.base);
 
-        var self = this;
+        const self = this;
 
         // タッチ開始イベントのハンドラを作成する。
         this.button.onpointstart = function() {

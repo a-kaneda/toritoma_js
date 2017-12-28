@@ -1,5 +1,6 @@
 import Character from './character.js'
 import Util from './util.js'
+import Collider from './collider.js'
 import PlayerShot from './playershot.js'
 
 // 自機弾発射間隔
@@ -53,18 +54,21 @@ export default class PlayerOption {
         // キャラクタータイプを設定する。
         this.type = Character.type.PLAYER_OPTION;
 
-        // 座標、サイズを設定する。
-        this.rect = {
-            x: x,
-            y: y,
-            width: HIT_WIDTH,
-            height: HIT_HEIGHT,
-        };
+        // 当たり判定を作成する。
+        this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
 
         // メンバを初期化する。
         this.movePosition = [];
         this.nextOption = null;
         this.shotInterval = 0;
+
+        // デバッグ用: ショットを撃たないようにする。
+        if (localStorage.noShot === 'true') {
+            this.noShot = true;
+        }
+        else {
+            this.noShot = false;
+        }
     }
 
     /**
@@ -80,20 +84,22 @@ export default class PlayerOption {
 
         // 弾発射間隔経過しているときは自機弾を発射する
         this.shotInterval++;
-        if (this.shotInterval >= SHOT_INTERVAL) {
+        if (this.shotInterval >= SHOT_INTERVAL && !this.noShot) {
+
             // 敵弾が無効化されていない場合は自機弾を生成する。
             if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(new PlayerShot(this.rect.x, this.rect.y, true, scene));
+                scene.addCharacter(new PlayerShot(this.hitArea.x, this.hitArea.y, true, scene));
                 this.shotInterval = 0;
             }
         }
 
         // シールド使用時は当たり判定処理を行う。
         if (this.shield) {
+            this._checkHitChacater(scene);
         }
 
         // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
     }
 
     /**
@@ -110,18 +116,18 @@ export default class PlayerOption {
 
         // 次のオプションが存在する場合は自分の移動前の座標に移動するように指示する。
         if (this.nextOption !== null) {
-            this.nextOption.move(this.rect.x, this.rect.y);
+            this.nextOption.move(this.hitArea.x, this.hitArea.y);
         }
     
         // 移動先座標が間隔分溜まっている場合は先頭の座標に移動する
         if (this.movePosition.length >= OPTION_SPACE) {
 
             // 先頭の要素を取り出す。
-            var pos = this.movePosition.shift();
+            const pos = this.movePosition.shift();
 
             // 移動する。
-            this.rect.x = pos.x;
-            this.rect.y = pos.y;
+            this.hitArea.x = pos.x;
+            this.hitArea.y = pos.y;
         }
 
         // 移動先座標の配列の末尾に追加する
@@ -145,7 +151,7 @@ export default class PlayerOption {
 
             // 次のオプションが作成されていなければ作成する。
             if (this.nextOption === null) {
-                this.nextOption = new PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
+                this.nextOption = new PlayerOption(this.hitArea.x, this.hitArea.y, this.shield, scene);
                 scene.addCharacter(this.nextOption);
             }
 
@@ -213,22 +219,14 @@ export default class PlayerOption {
      */
     _checkHitChacater(scene) {
 
-        // キャラクターレイヤーに配置されているキャラクターを取得する。
-        var characters = scene.characters;
+        // 衝突している敵弾を検索する。
+        const hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY_SHOT]);
 
-        // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
+        // 衝突している敵キャラクターがいる場合。
+        for (let i = 0; i < hitCharacters.length; i++) {
 
-            // 対象が敵弾の場合
-            if ( characters[i].type === Character.type.ENEMY_SHOT) {
-
-                // 接触しているかどうかを調べる。
-                if (Util.isHitCharacter(this.rect, characters[i].rect)) {
-
-                    // 敵弾反射処理を実行する。
-                    characters[i].reflect();
-                }
-            }
+            // 敵弾反射処理を実行する。
+            hitCharacters[i].reflect();
         }
     }
 }

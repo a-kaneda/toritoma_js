@@ -69,20 +69,20 @@ export default class Stage {
     _execEvent(scene) {
 
         // 画面外2個先の列まで処理を行う。
-        var maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / TILE_SIZE) + 2;
+        const maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / TILE_SIZE) + 2;
 
         // イベント実行する範囲を計算する。
-        var execPos = this.executedCol * TILE_SIZE;
-        var execWidth = (maxCol - this.executedCol) * TILE_SIZE;
+        const execPos = this.executedCol * TILE_SIZE;
+        const execWidth = (maxCol - this.executedCol) * TILE_SIZE;
         
         // イベント実行する範囲がある場合
         if (execWidth > 0) {
 
             // イベントレイヤーのオブジェクトを検索する。
-            var objects = this.mapManager.getObjects('event', execPos, 0, execWidth, ScreenSize.STAGE_RECT.height);
+            const objects = this.mapManager.getObjects('event', execPos, 0, execWidth, ScreenSize.STAGE_RECT.height);
 
             // イベントを実行する。
-            for (var i = 0; i < objects.length; i++) {
+            for (let i = 0; i < objects.length; i++) {
                 switch (objects[i].type) {
                 case 'speed':
                     // スクロールスピードを変更する。

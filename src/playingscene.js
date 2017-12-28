@@ -178,7 +178,7 @@ export default class PlayingScene {
         this.player.update(this);
 
         // 各キャラクターの状態を更新する。
-        for (var i = 0; i < this.characters.length; i++) {
+        for (let i = 0; i < this.characters.length; i++) {
             this.characters[i].update(this);
         }
 
@@ -222,7 +222,7 @@ export default class PlayingScene {
      * @param [in/out] character 削除するキャラクター
      */
     removeCharacter(character) {
-        var i = this.characters.indexOf(character);
+        const i = this.characters.indexOf(character);
         if (i >= 0) {
             this.characters.splice(i, 1);
         }
@@ -317,7 +317,7 @@ export default class PlayingScene {
     _inputKeyboard(app) {
 
         // キーボードを取得する。
-        var key = app.keyboard;
+        const key = app.keyboard;
 
         // カーソルキーの入力によって自機を移動する。
         if (key.getKey('left')) {
@@ -348,10 +348,10 @@ export default class PlayingScene {
      */
     _inputTouch(app) {
 
-        var touches = app.pointers;
-        var sliding = false;
+        const touches = app.pointers;
+        let sliding = false;
 
-        for (var i = 0; i < touches.length; i++) {
+        for (let i = 0; i < touches.length; i++) {
 
             // マウスが接続されていない場合はスライドの処理を行う。
             if (!PointDevice.isMouseUsed) {
@@ -400,10 +400,10 @@ export default class PlayingScene {
         this.gamepadManager.update();
 
         // ゲームパッドを取得する。
-        var gamepad = this.gamepadManager.get();
+        const gamepad = this.gamepadManager.get();
 
         // アナログスティックの入力を取得する。
-        var stick = this.gamepad.getStickDirection(0);
+        const stick = this.gamepad.getStickDirection(0);
 
         if (stick.length() > 0.5) {
             this.player.moveGamepad(stick.x, stick.y, this);
@@ -438,73 +438,78 @@ export default class PlayingScene {
      */
     _createFrameBack() {
 
-        // 左側の枠の座標を計算する。
-        var x = 0;
-        var y = 0;
-        var width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
-        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
+        {
+            // 左側の枠の座標を計算する。
+            let x = 0;
+            let y = 0;
+            let width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+            let height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
-        // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
-        if (width % ControlSize.cs.frameBack.width > 0) {
-            x -= ControlSize.cs.frameBack.width - width % ControlSize.cs.frameBack.width;
-            width += ControlSize.cs.frameBack.width - width % ControlSize.cs.frameBack.width;
-        }
+            // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
+            if (width % ControlSize.cs.frameBack.width > 0) {
+                x -= ControlSize.cs.frameBack.width - width % ControlSize.cs.frameBack.width;
+                width += ControlSize.cs.frameBack.width - width % ControlSize.cs.frameBack.width;
+            }
 
-        // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height > 0) {
-            y -= ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
-            height += ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
-        }
+            // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
+            if (ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height > 0) {
+                y -= ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
+                height += ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
+            }
 
-        // 背景を並べる。
-        for (var i = 0; i < width; i += ControlSize.cs.frameBack.width) {
-            for (var j = 0; j < height; j += ControlSize.cs.frameBack.height) {
-                var back = Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
-                back.setOrigin(0, 0);
-                back.setPosition(x + i, y + j);
-                back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
-                back.addChildTo(this.frameLayer);
+            // 背景を並べる。
+            for (let i = 0; i < width; i += ControlSize.cs.frameBack.width) {
+                for (let j = 0; j < height; j += ControlSize.cs.frameBack.height) {
+                    const back = Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.setOrigin(0, 0);
+                    back.setPosition(x + i, y + j);
+                    back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.addChildTo(this.frameLayer);
+                }
             }
         }
 
-        // 右側の枠の座標を計算する。
-        var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
-        var y = 0;
-        var width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
-        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
+        {
+            // 右側の枠の座標を計算する。
+            const x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
+            let y = 0;
+            const width = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+            let height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
-        // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-        if (ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height > 0) {
-            y -= ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
-            height += ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
-        }
+            // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
+            if (ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height > 0) {
+                y -= ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
+                height += ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
+            }
 
-        // 背景を並べる。
-        for (var i = 0; i < width; i += ControlSize.cs.frameBack.width) {
-            for (var j = 0; j < height; j += ControlSize.cs.frameBack.height) {
-                var back = Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
-                back.setOrigin(0, 0);
-                back.setPosition(x + i, y + j);
-                back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
-                back.addChildTo(this.frameLayer);
+            // 背景を並べる。
+            for (let i = 0; i < width; i += ControlSize.cs.frameBack.width) {
+                for (let j = 0; j < height; j += ControlSize.cs.frameBack.height) {
+                    const back = Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.setOrigin(0, 0);
+                    back.setPosition(x + i, y + j);
+                    back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.addChildTo(this.frameLayer);
+                }
             }
         }
 
-        // 下側の枠の座標を計算する。
-        var x = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
-        var y = ScreenSize.STAGE_RECT.height;
-        var width = ScreenSize.STAGE_RECT.width;
-        var height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
+        {
+            // 下側の枠の座標を計算する。
+            const x = Math.ceil((ScreenSize.SCREEN_WIDTH / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.width) / 2);
+            const y = ScreenSize.STAGE_RECT.height;
+            const width = ScreenSize.STAGE_RECT.width;
+            const height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
 
-
-        // 背景を並べる。
-        for (var i = 0; i < width; i += ControlSize.cs.frameBack.width) {
-            for (var j = 0; j < height; j += ControlSize.cs.frameBack.height) {
-                var back = Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
-                back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
-                back.setOrigin(0, 0);
-                back.setPosition(x + i, y + j);
-                back.addChildTo(this.frameLayer);
+            // 背景を並べる。
+            for (let i = 0; i < width; i += ControlSize.cs.frameBack.width) {
+                for (let j = 0; j < height; j += ControlSize.cs.frameBack.height) {
+                    const back = Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.setOrigin(0, 0);
+                    back.setPosition(x + i, y + j);
+                    back.addChildTo(this.frameLayer);
+                }
             }
         }
     }
@@ -517,73 +522,83 @@ export default class PlayingScene {
      */
     _createFrameBar() {
 
-        // 左側の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x - ControlSize.cs.frameLeft.width;
-        var height = ScreenSize.STAGE_RECT.height;
+        {
+            // 左側の枠の位置を計算する。
+            const x = ScreenSize.STAGE_RECT.x - ControlSize.cs.frameLeft.width;
+            const height = ScreenSize.STAGE_RECT.height;
 
-        // 枠を並べる。
-        for (var i = 0; i < height; i += ControlSize.cs.frameLeft.height) {
-            var bar = Sprite('control', ControlSize.cs.frameLeft.width, ControlSize.cs.frameLeft.height);
-            bar.srcRect.set(ControlSize.cs.frameLeft.x, ControlSize.cs.frameLeft.y, ControlSize.cs.frameLeft.width, ControlSize.cs.frameLeft.height);
+            // 枠を並べる。
+            for (let i = 0; i < height; i += ControlSize.cs.frameLeft.height) {
+                const bar = Sprite('control', ControlSize.cs.frameLeft.width, ControlSize.cs.frameLeft.height);
+                bar.srcRect.set(ControlSize.cs.frameLeft.x, ControlSize.cs.frameLeft.y, ControlSize.cs.frameLeft.width, ControlSize.cs.frameLeft.height);
+                bar.setOrigin(0, 0);
+                bar.setPosition(x, i);
+                bar.addChildTo(this.frameLayer);
+            }
+        }
+
+        {
+            // 右側の枠の位置を計算する。
+            const x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
+            const height = ScreenSize.STAGE_RECT.height;
+
+            // 枠を並べる。
+            for (let i = 0; i < height; i += ControlSize.cs.frameRight.height) {
+                const bar = Sprite('control', ControlSize.cs.frameRight.width, ControlSize.cs.frameRight.height);
+                bar.srcRect.set(ControlSize.cs.frameRight.x, ControlSize.cs.frameRight.y, ControlSize.cs.frameRight.width, ControlSize.cs.frameRight.height);
+                bar.setOrigin(0, 0);
+                bar.setPosition(x, i);
+                bar.addChildTo(this.frameLayer);
+            }
+        }
+
+        {
+            // 下側の枠の位置を計算する。
+            const x = ScreenSize.STAGE_RECT.x;
+            const y = ScreenSize.STAGE_RECT.height;
+            const width = ScreenSize.STAGE_RECT.width;
+
+            // 枠を並べる。
+            for (let i = 0; i < width; i += ControlSize.cs.frameBottom.width) {
+                const bar = Sprite('control', ControlSize.cs.frameBottom.width, ControlSize.cs.frameBottom.height);
+                bar.srcRect.set(ControlSize.cs.frameBottom.x, ControlSize.cs.frameBottom.y, ControlSize.cs.frameBottom.width, ControlSize.cs.frameBottom.height);
+                bar.setOrigin(0, 0);
+                bar.setPosition(x + i, y);
+                bar.addChildTo(this.frameLayer);
+            }
+        }
+
+        {
+            // 左下の枠の位置を計算する。
+            const x = ScreenSize.STAGE_RECT.x - ControlSize.cs.frameBottomLeft.width;
+            const y = ScreenSize.STAGE_RECT.height;
+
+            // 枠を並べる。
+            const bar = Sprite('control', ControlSize.cs.frameBottomLeft.width, ControlSize.cs.frameBottomLeft.height);
+            bar.srcRect.set(ControlSize.cs.frameBottomLeft.x,
+                ControlSize.cs.frameBottomLeft.y,
+                ControlSize.cs.frameBottomLeft.width,
+                ControlSize.cs.frameBottomLeft.height);
             bar.setOrigin(0, 0);
-            bar.setPosition(x, i);
+            bar.setPosition(x, y);
             bar.addChildTo(this.frameLayer);
         }
 
-        // 右側の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
-        var height = ScreenSize.STAGE_RECT.height;
+        {
+            // 右下の枠の位置を計算する。
+            const x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
+            const y = ScreenSize.STAGE_RECT.height;
 
-        // 枠を並べる。
-        for (var i = 0; i < height; i += ControlSize.cs.frameRight.height) {
-            var bar = Sprite('control', ControlSize.cs.frameRight.width, ControlSize.cs.frameRight.height);
-            bar.srcRect.set(ControlSize.cs.frameRight.x, ControlSize.cs.frameRight.y, ControlSize.cs.frameRight.width, ControlSize.cs.frameRight.height);
+            // 枠を並べる。
+            const bar = Sprite('control', ControlSize.cs.frameBottomRight.width, ControlSize.cs.frameBottomRight.height);
+            bar.srcRect.set(ControlSize.cs.frameBottomRight.x,
+                ControlSize.cs.frameBottomRight.y,
+                ControlSize.cs.frameBottomRight.width,
+                ControlSize.cs.frameBottomRight.height);
             bar.setOrigin(0, 0);
-            bar.setPosition(x, i);
+            bar.setPosition(x, y);
             bar.addChildTo(this.frameLayer);
         }
-
-        // 下側の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x;
-        var y = ScreenSize.STAGE_RECT.height;
-        var width = ScreenSize.STAGE_RECT.width;
-
-        // 枠を並べる。
-        for (var i = 0; i < width; i += ControlSize.cs.frameBottom.width) {
-            var bar = Sprite('control', ControlSize.cs.frameBottom.width, ControlSize.cs.frameBottom.height);
-            bar.srcRect.set(ControlSize.cs.frameBottom.x, ControlSize.cs.frameBottom.y, ControlSize.cs.frameBottom.width, ControlSize.cs.frameBottom.height);
-            bar.setOrigin(0, 0);
-            bar.setPosition(x + i, y);
-            bar.addChildTo(this.frameLayer);
-        }
-
-        // 左下の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x - ControlSize.cs.frameBottomLeft.width;
-        var y = ScreenSize.STAGE_RECT.height;
-
-        // 枠を並べる。
-        var bar = Sprite('control', ControlSize.cs.frameBottomLeft.width, ControlSize.cs.frameBottomLeft.height);
-        bar.srcRect.set(ControlSize.cs.frameBottomLeft.x,
-                        ControlSize.cs.frameBottomLeft.y,
-                        ControlSize.cs.frameBottomLeft.width,
-                        ControlSize.cs.frameBottomLeft.height);
-        bar.setOrigin(0, 0);
-        bar.setPosition(x, y);
-        bar.addChildTo(this.frameLayer);
-
-        // 右下の枠の位置を計算する。
-        var x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
-        var y = ScreenSize.STAGE_RECT.height;
-
-        // 枠を並べる。
-        var bar = Sprite('control', ControlSize.cs.frameBottomRight.width, ControlSize.cs.frameBottomRight.height);
-        bar.srcRect.set(ControlSize.cs.frameBottomRight.x,
-                        ControlSize.cs.frameBottomRight.y,
-                        ControlSize.cs.frameBottomRight.width,
-                        ControlSize.cs.frameBottomRight.height);
-        bar.setOrigin(0, 0);
-        bar.setPosition(x, y);
-        bar.addChildTo(this.frameLayer);
     }
 
     /**
@@ -627,7 +642,7 @@ export default class PlayingScene {
 
         // キャラクターの中から敵弾を検索し、削除する。
         // 配列から要素を削除するとインデックスがずれるので後ろからループする。
-        for (var i = this.characters.length - 1; i >= 0; i--) {
+        for (let i = this.characters.length - 1; i >= 0; i--) {
             if (this.characters[i].type == Character.type.ENEMY_SHOT) {
                 this.characters[i].sprite.remove();
                 this.characters.splice(i, 1);

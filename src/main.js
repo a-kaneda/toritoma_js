@@ -1,6 +1,3 @@
-//var phina = require('./vendor/phina.js');
-//var stage1 = require('./stage1.js');
-
 window.DebugObject = {};
 
 import PointDevice from './pointdevice.js'
@@ -75,13 +72,13 @@ phina.define('MainScene', {
 phina.main(function() {
 
     // 画面サイズの補正の有効無効を切り替える。
-    var isFit = true;
+    let isFit = true;
     if (localStorage.disableFit == 'true') {
         isFit = false;
     }
 
     // アプリケーションを生成する。
-    var app = GameApp({
+    let app = GameApp({
         width: ScreenSize.SCREEN_WIDTH,
         height: ScreenSize.SCREEN_HEIGHT,
         startLabel: 'main',
@@ -98,7 +95,7 @@ phina.main(function() {
     // iOSのsafariではユーザが操作時のみ音の再生が可能なため、タッチ時にダミーで音声の再生を行う。
     // https://github.com/phinajs/phina.js/issues/197
     app.domElement.addEventListener('touchend', function dummy() {
-        var s = phina.asset.Sound();
+        const s = phina.asset.Sound();
         s.loadFromBuffer();
         s.play().stop();
         app.domElement.removeEventListener('touchend', dummy);

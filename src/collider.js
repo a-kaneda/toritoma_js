@@ -37,10 +37,10 @@ export default class Collider {
      */
     getHitCharacter(characters, types) {
 
-        var ret = [];
+        let ret = [];
 
         // 各キャラクターとの当たり判定を処理する。
-        for (var i = 0; i < characters.length; i++) {
+        for (let i = 0; i < characters.length; i++) {
 
             // 検索対象のキャラクター種別か調べる。
             if (types.indexOf(characters[i].type) >= 0) {
