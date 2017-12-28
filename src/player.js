@@ -1,42 +1,50 @@
+import ScreenSize from './screensize.js'
+import Character from './character.js'
+import Util from './util.js'
+import Collider from './collider.js'
+import PlayerShot from './playershot.js'
+import PlayerDeathEffect from './playerdeatheffect.js'
+import PlayerOption from './playeroption.js'
+
+// キーボード入力による移動スピード
+const SPEED_BY_KEY = 2;
+// タッチ操作による移動スピード
+const SPEED_BY_TOUCH = 1.8 / ScreenSize.ZOOM_RATIO;
+// ゲームパッドによる移動スピード
+const SPEED_BY_GAMEPAD = 3;
+// 自機弾発射間隔
+const SHOT_INTERVAL = 12;
+// 当たり判定幅
+const HIT_WIDTH = 4;
+// 当たり判定高さ
+const HIT_HEIGHT = 4;
+// かすり当たり判定幅
+const GRAZE_WIDTH = 16;
+// かすり当たり判定高さ
+const GRAZE_HEIGHT = 16;
+// 復活後無敵フレーム数
+const INVINCIBLE_FRAME = 120;
+// 状態
+const STATUS = {
+    // 通常
+    NORMAL: 1,
+    // 死亡
+    DEATH: 2,
+    // 無敵
+    INVINCIBLE: 3,
+};
+// オプション最大数
+const MAX_OPTION_COUNT = 3;
+// シールド使用時のゲージ使用量
+const CONSUMPTION_GAUGE = 0.005;
+
 /**
  * @class Player
  * @brief 自機
  * ユーザー操作に応じて移動する。
  */
-phina.define('Player', {
-    _static: {
-        // キーボード入力による移動スピード
-        SPEED_BY_KEY: 2,
-        // タッチ操作による移動スピード
-        SPEED_BY_TOUCH: 1.8 / ScreenSize.ZOOM_RATIO,
-        // ゲームパッドによる移動スピード
-        SPEED_BY_GAMEPAD: 3,
-        // 自機弾発射間隔
-        SHOT_INTERVAL: 12,
-        // 当たり判定幅
-        HIT_WIDTH: 4,
-        // 当たり判定高さ
-        HIT_HEIGHT: 4,
-        // かすり当たり判定幅
-        GRAZE_WIDTH: 16,
-        // かすり当たり判定高さ
-        GRAZE_HEIGHT: 16,
-        // 復活後無敵フレーム数
-        INVINCIBLE_FRAME: 120,
-        // 状態
-        STATUS: {
-            // 通常
-            NORMAL: 1,
-            // 死亡
-            DEATH: 2,
-            // 無敵
-            INVINCIBLE: 3,
-        },
-        // オプション最大数
-        MAX_OPTION_COUNT: 3,
-        // シールド使用時のゲージ使用量
-        CONSUMPTION_GAUGE: 0.005,
-    },
+export default class Player {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -46,7 +54,7 @@ phina.define('Player', {
      * @param [in] y y座標
      * @param [in/out] scene シーン
      */
-    init: function(x, y, scene) {
+    constructor(x, y, scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_16x16', 16, 16);
@@ -61,14 +69,14 @@ phina.define('Player', {
         this.type = Character.type.PLAYER;
 
         // 当たり判定を作成する。
-        this.hitArea = Collider(x, y, Player.HIT_WIDTH, Player.HIT_HEIGHT);
+        this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
 
         // かすり当たり判定を作成する。
-        this.grazeArea = Collider(x, y, Player.GRAZE_WIDTH, Player.GRAZE_HEIGHT);
+        this.grazeArea = new Collider(x, y, GRAZE_WIDTH, GRAZE_HEIGHT);
 
         // メンバを初期化する。
         this.shotInterval = 0;
-        this.status = Player.STATUS.NORMAL;
+        this.status = STATUS.NORMAL;
         this.power = 1;
         this.invincibleFrame = 0;
         this.chickenGauge = 0;
@@ -82,7 +90,8 @@ phina.define('Player', {
         else {
             this.noDeath = false;
         }
-    },
+    }
+
     /**
      * @function update
      * @brief 更新処理
@@ -92,7 +101,7 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // ブロックと衝突している場合
         if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
@@ -104,7 +113,7 @@ phina.define('Player', {
         }
 
         // 無敵状態の場合
-        if (this.status === Player.STATUS.INVINCIBLE) {
+        if (this.status === STATUS.INVINCIBLE) {
 
             // 無敵状態フレーム数をカウントする。
             this.invincibleFrame--;
@@ -113,7 +122,7 @@ phina.define('Player', {
             if (this.invincibleFrame <= 0) {
 
                 // ステータスを通常状態に戻す。
-                this.status = Player.STATUS.NORMAL;
+                this.status = STATUS.NORMAL;
 
                 // 点滅アニメーションを停止する。
                 this.sprite.tweener.clear();
@@ -125,12 +134,12 @@ phina.define('Player', {
         } 
 
         // 通常状態、無敵状態の場合
-        if (this.status === Player.STATUS.NORMAL || this.status === Player.STATUS.INVINCIBLE) {
+        if (this.status === STATUS.NORMAL || this.status === STATUS.INVINCIBLE) {
 
             // 自機弾発射間隔が経過した場合は自機弾を発射する。
             this.shotInterval++;
-            if (this.shotInterval >= Player.SHOT_INTERVAL) {
-                scene.addCharacter(PlayerShot(this.hitArea.x, this.hitArea.y, false, scene));
+            if (this.shotInterval >= SHOT_INTERVAL) {
+                scene.addCharacter(new PlayerShot(this.hitArea.x, this.hitArea.y, false, scene));
                 this.shotInterval = 0;
             }
 
@@ -139,7 +148,7 @@ phina.define('Player', {
 
             // シールド使用時はチキンゲージを消費する。
             if (this.shield) {
-                this.chickenGauge -= Player.CONSUMPTION_GAUGE;
+                this.chickenGauge -= CONSUMPTION_GAUGE;
                 if (this.chickenGauge < 0) {
                     this.chickenGauge = 0;
                 }
@@ -147,7 +156,7 @@ phina.define('Player', {
         }
 
         // 通常状態の場合
-        if (this.status === Player.STATUS.NORMAL) {
+        if (this.status === STATUS.NORMAL) {
 
             // 敵キャラとの当たり判定処理を行う。
             this._checkHitChacater(scene);
@@ -158,7 +167,8 @@ phina.define('Player', {
 
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
-    },
+    }
+
     /**
      * @function moveKeyLeft
      * @brief 左キーによる移動
@@ -166,11 +176,12 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    moveKeyLeft: function(scene) {
-        this._move(this.hitArea.x - Player.SPEED_BY_KEY,
+    moveKeyLeft(scene) {
+        this._move(this.hitArea.x - SPEED_BY_KEY,
                    this.hitArea.y,
                    scene);
-    },
+    }
+
     /**
      * @function moveKeyRight
      * @brief 右キーによる移動
@@ -178,11 +189,12 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    moveKeyRight: function(scene) {
-        this._move(this.hitArea.x + Player.SPEED_BY_KEY,
+    moveKeyRight(scene) {
+        this._move(this.hitArea.x + SPEED_BY_KEY,
                    this.hitArea.y,
                    scene);
-    },
+    }
+
     /**
      * @function moveKeyUp
      * @brief 上キーによる移動
@@ -190,11 +202,12 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    moveKeyUp: function(scene) {
+    moveKeyUp(scene) {
         this._move(this.hitArea.x,
-                   this.hitArea.y - Player.SPEED_BY_KEY,
+                   this.hitArea.y - SPEED_BY_KEY,
                    scene);
-    },
+    }
+
     /**
      * @function moveKeyDown
      * @brief 下キーによる移動
@@ -202,11 +215,12 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    moveKeyDown: function(scene) {
+    moveKeyDown(scene) {
         this._move(this.hitArea.x,
-                   this.hitArea.y + Player.SPEED_BY_KEY,
+                   this.hitArea.y + SPEED_BY_KEY,
                    scene);
-    },
+    }
+
     /**
      * @function moveTouch
      * @brief タッチによる移動
@@ -216,11 +230,12 @@ phina.define('Player', {
      * @param [in] y y座標方向のタッチ位置スライド量
      * @param [in/out] scene シーン
      */
-    moveTouch: function(x, y, scene) {
-        this._move(this.hitArea.x + x * Player.SPEED_BY_TOUCH,
-                   this.hitArea.y + y * Player.SPEED_BY_TOUCH,
+    moveTouch(x, y, scene) {
+        this._move(this.hitArea.x + x * SPEED_BY_TOUCH,
+                   this.hitArea.y + y * SPEED_BY_TOUCH,
                    scene);
-    },
+    }
+
     /**
      * @function moveTouch
      * @brief ゲームパッドによる移動
@@ -230,11 +245,12 @@ phina.define('Player', {
      * @param [in] y y座標方向のスティック入力値
      * @param [in/out] scene シーン
      */
-    moveGamepad: function(x, y, scene) {
-        this._move(this.hitArea.x + x * Player.SPEED_BY_GAMEPAD,
-                   this.hitArea.y + y * Player.SPEED_BY_GAMEPAD,
+    moveGamepad(x, y, scene) {
+        this._move(this.hitArea.x + x * SPEED_BY_GAMEPAD,
+                   this.hitArea.y + y * SPEED_BY_GAMEPAD,
                    scene);
-    },
+    }
+
     /**
      * @function rebirth
      * @brief 復活処理
@@ -243,16 +259,16 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    rebirth: function(scene) {
+    rebirth(scene) {
 
         // ステータスを無敵状態にする。
-        this.status = Player.STATUS.INVINCIBLE;
+        this.status = STATUS.INVINCIBLE;
 
         // チキンゲージを初期化する。
         this.chickenGauge = 0;
 
         // 無敵状態フレーム数を設定する。
-        this.invincibleFrame = Player.INVINCIBLE_FRAME;
+        this.invincibleFrame = INVINCIBLE_FRAME;
 
         // 画像を表示する。
         this.sprite.alpha = 1;
@@ -266,7 +282,8 @@ phina.define('Player', {
             .set({ alpha: 1 })
             .setLoop(true)
             .play();
-    },
+    }
+
     /**
      * @function getChickenGauge
      * @brief チキンゲージ取得
@@ -274,9 +291,10 @@ phina.define('Player', {
      *
      * @return チキンゲージ
      */
-    getChickenGauge: function() {
+    getChickenGauge() {
         return this.chickenGauge;
-    },
+    }
+
     /**
      * @function setShield
      * @brief シールド使用不使用設定
@@ -285,7 +303,7 @@ phina.define('Player', {
      *
      * @param [in] shield シールド使用不使用
      */
-    setShield: function(shield) {
+    setShield(shield) {
 
         // シールド使用不使用を設定する。
         this.shield = shield;
@@ -294,7 +312,8 @@ phina.define('Player', {
         if (this.option !== null) {
             this.option.setShield(shield);
         }
-    },
+    }
+
     /**
      * @function _move
      * @brief 移動処理
@@ -304,14 +323,14 @@ phina.define('Player', {
      * @param [in] y 移動後のy座標
      * @param [in/out] scene シーン
      */
-    _move: function(x, y, scene) {
+    _move(x, y, scene) {
 
         // 前回値を保存する。
         var prevX = this.hitArea.x;
         var prevY = this.hitArea.y;
 
         // 死亡中でない場合のみ移動を行う。
-        if (this.status != Player.STATUS.DEATH) {
+        if (this.status != STATUS.DEATH) {
             // 現在の座標を変更する。
             this.hitArea.x = x;
             this.hitArea.y = y;
@@ -346,14 +365,15 @@ phina.define('Player', {
         if (this.option !== null) {
             this.option.move(prevX, prevY);
         }
-    },
+    }
+
     /**
      * @function _checkScreenArea
      * @breif 画面外に出ていないかチェックする
      * 画面外に出ていないかチェックする。
      * 画面外に出ていた場合は画面内に座標を補正する。
      */
-    _checkScreenArea: function() {
+    _checkScreenArea() {
 
         // 左側画面範囲外には移動させないようにする。
         if (this.hitArea.x < 0) {
@@ -374,7 +394,8 @@ phina.define('Player', {
         if (this.hitArea.y > ScreenSize.STAGE_RECT.height - 1) {
             this.hitArea.y = ScreenSize.STAGE_RECT.height - 1;
         }
-    },
+    }
+
     /**
      * @function _checkHitChacater
      * @breif 当たり判定処理
@@ -382,7 +403,7 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    _checkHitChacater: function(scene) {
+    _checkHitChacater(scene) {
 
         // 衝突している敵キャラクターを検索する。
         var hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY, Character.type.ENEMY_SHOT]);
@@ -397,10 +418,10 @@ phina.define('Player', {
             if (!this.noDeath) {
 
                 // 死亡時エフェクトを作成する。
-                scene.addCharacter(PlayerDeathEffect(this.hitArea.x, this.hitArea.y, scene));
+                scene.addCharacter(new PlayerDeathEffect(this.hitArea.x, this.hitArea.y, scene));
 
                 // ステータスを死亡に変更する。
-                this.status = Player.STATUS.DEATH;
+                this.status = STATUS.DEATH;
 
                 // 画像を非表示にする。
                 this.sprite.alpha = 0;
@@ -409,7 +430,8 @@ phina.define('Player', {
                 scene.miss();
             }
         }
-    },
+    }
+
     /**
      * @function _checkGraze
      * @breif かすり判定処理
@@ -417,7 +439,7 @@ phina.define('Player', {
      *
      * @param [in/out] scene シーン
      */
-    _checkGraze: function(scene) {
+    _checkGraze(scene) {
 
         // かすり当たり判定位置を更新する。
         this.grazeArea.x = this.hitArea.x;
@@ -437,7 +459,8 @@ phina.define('Player', {
                 this.chickenGauge = 1;
             }
         }
-    },
+    }
+    
     /**
      * @function _updateOptionCount
      * @brief オプション個数更新
@@ -445,17 +468,17 @@ phina.define('Player', {
      * 
      * @param [in/out] scene シーン
      */
-    _updateOptionCount: function(scene) {
+    _updateOptionCount(scene) {
 
         // チキンゲージからオプション個数を計算する
-        var count = Math.floor(this.chickenGauge / (1 / (Player.MAX_OPTION_COUNT + 1)));
+        var count = Math.floor(this.chickenGauge / (1 / (MAX_OPTION_COUNT + 1)));
 
         // オプション個数がある場合
         if (count > 0) {
 
             // オプションが作成されていなければ作成する。
             if (this.option === null) {
-                this.option = PlayerOption(this.hitArea.x, this.hitArea.y, this.shield, scene);
+                this.option = new PlayerOption(this.hitArea.x, this.hitArea.y, this.shield, scene);
                 scene.addCharacter(this.option);
             }
 
@@ -475,5 +498,5 @@ phina.define('Player', {
                 this.option = null;
             }
         }
-    },
-});
+    }
+}

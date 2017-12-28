@@ -3,7 +3,8 @@
  * @brief 爆発
  * 爆発アニメーションを行う。
  */
-phina.define('Explosion', {
+export default class Explosion {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -14,7 +15,7 @@ phina.define('Explosion', {
      * @param [in] y y座標
      * @param [in/out] scene シーン
      */
-    init: function(x, y, scene) {
+    constructor(x, y, scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_16x16', 16, 16);
@@ -30,7 +31,8 @@ phina.define('Explosion', {
 
         // 爆発音を再生する。
         SoundManager.play('bomb_min');
-    },
+    }
+    
     /**
      * @function update
      * @brief 更新処理
@@ -38,12 +40,12 @@ phina.define('Explosion', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // アニメーションが終了すると自分自身を削除する。
         if (this.animation.finished) {
             scene.removeCharacter(this);
             this.sprite.remove();
         }
-    },
-});
+    }
+}

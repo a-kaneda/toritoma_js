@@ -1,19 +1,24 @@
+import ScreenSize from './screensize.js'
+import Character from './character.js'
+import Util from './util.js'
+import Collider from './collider.js'
+
+// 当たり判定幅
+const HIT_WIDTH = 3;
+// 当たり判定高さ
+const HIT_HEIGHT = 3;
+// かすりゲージ増加率
+const GRAZE_RATE = 0.02;
+// 反射弾の攻撃力
+const REFLECTION_POWER = 5;
+
 /**
  * @class EnemyShot
  * @brief 敵弾
  * 敵が発射する弾。
  */
-phina.define('EnemyShot', {
-    _static: {
-        // 当たり判定幅
-        HIT_WIDTH: 3,
-        // 当たり判定高さ
-        HIT_HEIGHT: 3,
-        // かすりゲージ増加率
-        GRAZE_RATE: 0.02,
-        // 反射弾の攻撃力
-        REFLECTION_POWER: 5,
-    },
+export default class EnemyShot {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -25,7 +30,7 @@ phina.define('EnemyShot', {
      * @param [in] speed スピード
      * @param [in/out] scene シーン
      */
-    init: function(x, y, angle, speed, scene) {
+    constructor(x, y, angle, speed, scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_8x8', 8, 8);
@@ -40,7 +45,7 @@ phina.define('EnemyShot', {
         this.type = Character.type.ENEMY_SHOT;
 
         // 当たり判定を作成する。
-        this.hitArea = Collider(x, y, EnemyShot.HIT_WIDTH, EnemyShot.HIT_HEIGHT);
+        this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
 
         // x方向のスピードを計算する。
         this.speedX = Math.cos(angle) * speed;
@@ -50,8 +55,9 @@ phina.define('EnemyShot', {
         this.speedY = Math.sin(angle) * speed * -1;
 
         // かすり時のゲージ増加率を設定する。
-        this.grazeRate = EnemyShot.GRAZE_RATE;
-    },
+        this.grazeRate = GRAZE_RATE;
+    }
+    
     /**
      * @function update
      * @brief 更新処理
@@ -60,7 +66,7 @@ phina.define('EnemyShot', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // スピードに応じて移動する。
         this.hitArea.x += this.speedX;
@@ -87,7 +93,8 @@ phina.define('EnemyShot', {
             this.sprite.remove();
             return;
         }
-    },
+    }
+    
     /**
      * @function hit
      * @brief 衝突処理
@@ -96,12 +103,13 @@ phina.define('EnemyShot', {
      * @param [in] character 衝突したキャラクター
      * @param [in/out] scene シーン
      */
-    hit: function(character, scene) {
+    hit(character, scene) {
 
         // 自分自身を削除する。
         scene.removeCharacter(this);
         this.sprite.remove();
-    },
+    }
+
     /**
      * @function graze
      * @brief かすり処理
@@ -109,23 +117,24 @@ phina.define('EnemyShot', {
      *
      * @return ゲージ増加比率
      */
-    graze: function() {
+    graze() {
         var ret = this.grazeRate;
         this.grazeRate = 0;
         return ret;
-    },
+    }
+    
     /**
      * @function reflect
      * @brief 反射処理
      * 移動方向を180度反転させ、自機弾として扱うようにする。
      */
-    reflect: function() {
+    reflect() {
 
         // キャラクタータイプを自機弾に変更する。
         this.type = Character.type.PLAYER_SHOT;
 
         // 攻撃力を設定する。
-        this.power = EnemyShot.REFLECTION_POWER;
+        this.power = REFLECTION_POWER;
 
-    },
-});
+    }
+}

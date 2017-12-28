@@ -1,18 +1,23 @@
+import Collider from './collider.js'
+import Character from './character.js'
+import Explosion from './explosion.js'
+import EnemyShot from './enemyshot.js'
+
+// 移動スピード
+const MOVE_SPEED = -0.5;
+// 弾のスピード
+const SHOT_SPEED = 0.75;
+// 弾発射間隔（1周目）
+const SHOT_INTERVAL = 120;
+
 /**
  * @class Dragonfly
  * @brief トンボ
  * 左方向に直進する。
  * 左方向に直進する弾を発射する。
  */
-phina.define('Dragonfly', {
-    _static: {
-        // 移動スピード
-        MOVE_SPEED: -0.5,
-        // 弾のスピード
-        SHOT_SPEED: 0.75,
-        // 弾発射間隔（1周目）
-        SHOT_INTERVAL: 120,
-    },
+export default class Dragonfly {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -22,7 +27,7 @@ phina.define('Dragonfly', {
      * @param [in] y y座標
      * @param [in/out] scene シーン
      */
-    init: function(x, y, scene) {
+    constructor(x, y, scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_16x16', 16, 16);
@@ -37,7 +42,7 @@ phina.define('Dragonfly', {
         this.type = Character.type.ENEMY;
 
         // 当たり判定を作成する。
-        this.hitArea = Collider(x, y, Character.enemy['dragonfly'].width, Character.enemy['dragonfly'].height); 
+        this.hitArea = new Collider(x, y, Character.enemy['dragonfly'].width, Character.enemy['dragonfly'].height); 
 
         // HPを設定する。
         this.hp = Character.enemy['dragonfly'].hp;
@@ -50,7 +55,8 @@ phina.define('Dragonfly', {
 
         // メンバを初期化する。
         this.shotInterval = 0;
-    },
+    }
+    
     /**
      * @function update
      * @brief 更新処理
@@ -60,10 +66,10 @@ phina.define('Dragonfly', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // 左へ移動する。
-        this.hitArea.x += Dragonfly.MOVE_SPEED;
+        this.hitArea.x += MOVE_SPEED;
 
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
@@ -72,7 +78,7 @@ phina.define('Dragonfly', {
         if (this.hp <= 0) {
 
             // 爆発アニメーションを作成する。
-            scene.addCharacter(Explosion(this.hitArea.x, this.hitArea.y, scene));
+            scene.addCharacter(new Explosion(this.hitArea.x, this.hitArea.y, scene));
 
             // スコアを加算する。
             scene.addScore(this.score);
@@ -86,10 +92,10 @@ phina.define('Dragonfly', {
 
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this.shotInterval++;
-        if (this.shotInterval >= Dragonfly.SHOT_INTERVAL) {
+        if (this.shotInterval >= SHOT_INTERVAL) {
             // 敵弾が無効化されていない場合は敵弾を生成する。
             if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(EnemyShot(this.hitArea.x, this.hitArea.y, Math.PI, Dragonfly.SHOT_SPEED, scene));
+                scene.addCharacter(new EnemyShot(this.hitArea.x, this.hitArea.y, Math.PI, SHOT_SPEED, scene));
             }
             this.shotInterval = 0;
         }
@@ -99,7 +105,8 @@ phina.define('Dragonfly', {
             scene.removeCharacter(this);
             this.sprite.remove();
         }
-    },
+    }
+    
     /**
      * @function hit
      * @brief 衝突処理
@@ -108,7 +115,8 @@ phina.define('Dragonfly', {
      * @param [in] character 衝突したキャラクター
      * @param [in/out] scene シーン
      */
-    hit: function(character, scene) {
+    hit(character, scene) {
+
         // 衝突したキャラクターが自機または自機弾の場合
         if (character.type === Character.type.PLAYER ||
             character.type === Character.type.PLAYER_SHOT) {
@@ -118,5 +126,5 @@ phina.define('Dragonfly', {
                 this.hp -= character.power - this.defense;
             }
         }
-    },
-});
+    }
+}

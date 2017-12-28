@@ -17,6 +17,7 @@ module.exports = {
     devServer: {
         contentBase: 'dest',
         host: '0.0.0.0',
-        disableHostCheck: true
+        disableHostCheck: true,
+        port: 8080
     }
 };

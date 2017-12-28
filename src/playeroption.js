@@ -1,20 +1,24 @@
+import Character from './character.js'
+import Util from './util.js'
+import PlayerShot from './playershot.js'
+
+// 自機弾発射間隔
+const SHOT_INTERVAL = 12;
+// 当たり判定幅(シールド反射時のみ使用する)
+const HIT_WIDTH = 16;
+// 当たり判定高さ(シールド反射時のみ使用する)
+const HIT_HEIGHT = 16;
+// オプション間の間隔(何フレーム分遅れて移動するか)
+const OPTION_SPACE = 20;
+
 /**
  * @class PlayerOption
  * @brief 自機オプション
  * 自機の後ろについて移動する。
  * チキンゲージの比率に応じて増える。
  */
-phina.define('PlayerOption', {
-    _static: {
-        // 自機弾発射間隔
-        SHOT_INTERVAL: 12,
-        // 当たり判定幅(シールド反射時のみ使用する)
-        HIT_WIDTH: 16,
-        // 当たり判定高さ(シールド反射時のみ使用する)
-        HIT_HEIGHT: 16,
-        // オプション間の間隔(何フレーム分遅れて移動するか)
-        OPTION_SPACE: 20,
-    },
+export default class PlayerOption {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -25,7 +29,7 @@ phina.define('PlayerOption', {
      * @param [in] shield シールド使用不使用
      * @param [in/out] scene シーン
      */
-     init: function(x, y, shield , scene) {
+    constructor(x, y, shield , scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_16x16', 16, 16);
@@ -53,15 +57,16 @@ phina.define('PlayerOption', {
         this.rect = {
             x: x,
             y: y,
-            width: PlayerOption.HIT_WIDTH,
-            height: PlayerOption.HIT_HEIGHT,
+            width: HIT_WIDTH,
+            height: HIT_HEIGHT,
         };
 
         // メンバを初期化する。
         this.movePosition = [];
         this.nextOption = null;
         this.shotInterval = 0;
-     },
+    }
+
     /**
      * @function update
      * @brief 更新処理
@@ -71,14 +76,14 @@ phina.define('PlayerOption', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // 弾発射間隔経過しているときは自機弾を発射する
         this.shotInterval++;
-        if (this.shotInterval >= PlayerOption.SHOT_INTERVAL) {
+        if (this.shotInterval >= SHOT_INTERVAL) {
             // 敵弾が無効化されていない場合は自機弾を生成する。
             if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(PlayerShot(this.rect.x, this.rect.y, true, scene));
+                scene.addCharacter(new PlayerShot(this.rect.x, this.rect.y, true, scene));
                 this.shotInterval = 0;
             }
         }
@@ -89,7 +94,8 @@ phina.define('PlayerOption', {
 
         // 座標をスプライトに適用する。
         this.sprite.setPosition(Math.floor(this.rect.x), Math.floor(this.rect.y));
-    },
+    }
+
     /**
      * @function move
      * @brief 移動処理
@@ -100,7 +106,7 @@ phina.define('PlayerOption', {
      * @param [in] x x座標
      * @param [in] y y座標
      */
-    move: function(x, y) {
+    move(x, y) {
 
         // 次のオプションが存在する場合は自分の移動前の座標に移動するように指示する。
         if (this.nextOption !== null) {
@@ -108,7 +114,7 @@ phina.define('PlayerOption', {
         }
     
         // 移動先座標が間隔分溜まっている場合は先頭の座標に移動する
-        if (this.movePosition.length >= PlayerOption.OPTION_SPACE) {
+        if (this.movePosition.length >= OPTION_SPACE) {
 
             // 先頭の要素を取り出す。
             var pos = this.movePosition.shift();
@@ -120,7 +126,8 @@ phina.define('PlayerOption', {
 
         // 移動先座標の配列の末尾に追加する
         this.movePosition.push({x: x, y: y});
-    },
+    }
+
     /**
      * @function setCount
      * @brief オプション個数設定
@@ -131,14 +138,14 @@ phina.define('PlayerOption', {
      * @param [in] count オプション個数
      * @param [in/out] scene シーン
      */
-    setCount: function(count, scene) {
+    setCount(count, scene) {
 
         // 個数が2個以上の場合はオプションを作成する。
         if (count >= 2) {
 
             // 次のオプションが作成されていなければ作成する。
             if (this.nextOption === null) {
-                this.nextOption = PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
+                this.nextOption = new PlayerOption(this.rect.x, this.rect.y, this.shield, scene);
                 scene.addCharacter(this.nextOption);
             }
 
@@ -163,7 +170,8 @@ phina.define('PlayerOption', {
                 this.sprite.remove();
             }
         }
-    },
+    }
+
     /**
      * @function setShield
      * @brief シールド使用不使用設定
@@ -172,7 +180,7 @@ phina.define('PlayerOption', {
      *
      * @param [in] shield シールド使用不使用
      */
-    setShield: function(shield) {
+    setShield(shield) {
 
         // シールド使用不使用が変化した場合はアニメーションを変更する。
         if (!this.shield && shield) {
@@ -194,7 +202,8 @@ phina.define('PlayerOption', {
         if (this.nextOption !== null) {
             this.nextOption.setShield(this.shield);
         }
-    },
+    }
+    
     /**
      * @function _checkHitChacater
      * @breif 当たり判定処理
@@ -202,7 +211,7 @@ phina.define('PlayerOption', {
      *
      * @param [in/out] scene シーン
      */
-    _checkHitChacater: function(scene) {
+    _checkHitChacater(scene) {
 
         // キャラクターレイヤーに配置されているキャラクターを取得する。
         var characters = scene.characters;
@@ -221,5 +230,5 @@ phina.define('PlayerOption', {
                 }
             }
         }
-    },
-});
+    }
+}

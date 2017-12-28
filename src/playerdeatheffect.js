@@ -3,7 +3,8 @@
  * @brief 自機死亡エフェクト
  * 自機死亡時のエフェクトを表示する。
  */
-phina.define('PlayerDeathEffect', {
+export default class PlayerDeathEffect {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -14,7 +15,7 @@ phina.define('PlayerDeathEffect', {
      * @param [in] y y座標
      * @param [in/out] scene シーン
      */
-    init: function(x, y, scene) {
+    constructor(x, y, scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_16x16', 16, 16);
@@ -30,7 +31,8 @@ phina.define('PlayerDeathEffect', {
 
         // 死亡音を再生する。
         SoundManager.play('miss');
-    },
+    }
+
     /**
      * @function update
      * @brief 更新処理
@@ -39,7 +41,7 @@ phina.define('PlayerDeathEffect', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // 下に落ちる。
         this.sprite.y = Math.floor(this.sprite.y + 1);
@@ -49,5 +51,5 @@ phina.define('PlayerDeathEffect', {
             scene.removeCharacter(this);
             this.sprite.remove();
         }
-    },
-});
+    }
+}

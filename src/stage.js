@@ -1,14 +1,22 @@
+import ScreenSize from './screensize.js'
+import TileMapManager from './tilemapmanager.js'
+import Dragonfly from './dragonfly.js'
+
+// タイルのサイズ
+const TILE_SIZE = 16;
+
 /**
  * @class Stage
  * @brief ステージ管理クラス
  * 
  * ステージのマップ、背景、イベント処理を管理する。
  */
-phina.define('Stage', {
-    _static: {
-        // タイルのサイズ
-        TILE_SIZE: 16,
-    },
+export default class Stage {
+
+    static get TILE_SIZE() {
+        return TILE_SIZE;
+    }
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -19,7 +27,7 @@ phina.define('Stage', {
      * @param [in] scene シーン
      * @param [in/out] layer ステージ画像を配置するレイヤー
      */
-    init: function(mapName, layer) {
+    constructor(mapName, layer) {
 
         // メンバを初期化する。
         this.speed = 0;
@@ -27,12 +35,13 @@ phina.define('Stage', {
         this.executedCol = 0;
         
         // タイルマップを読み込み、背景画像を配置する。
-        this.mapManager = TileMapManager(mapName);
+        this.mapManager = new TileMapManager(mapName);
         this.mapManager.createObjectMap('block', 'collision');
         this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
-    },
+    }
+
     /**
      * @function update
      * @brief 更新処理
@@ -40,14 +49,15 @@ phina.define('Stage', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // イベントを実行する。
         this._execEvent(scene);
 
         // スピードに応じて移動する。
         this._move();
-    },
+    }
+    
     /**
      * @function _execEvent
      * @brief イベント実行処理
@@ -56,14 +66,14 @@ phina.define('Stage', {
      *
      * @param [in/out] scene シーン
      */
-    _execEvent: function(scene) {
+    _execEvent(scene) {
 
         // 画面外2個先の列まで処理を行う。
-        var maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / Stage.TILE_SIZE) + 2;
+        var maxCol = Math.floor((-this.x + ScreenSize.STAGE_RECT.width) / TILE_SIZE) + 2;
 
         // イベント実行する範囲を計算する。
-        var execPos = this.executedCol * Stage.TILE_SIZE;
-        var execWidth = (maxCol - this.executedCol) * Stage.TILE_SIZE;
+        var execPos = this.executedCol * TILE_SIZE;
+        var execWidth = (maxCol - this.executedCol) * TILE_SIZE;
         
         // イベント実行する範囲がある場合
         if (execWidth > 0) {
@@ -93,13 +103,14 @@ phina.define('Stage', {
             // 実行済みの列番号を更新する。
             this.executedCol = maxCol;
         }
-    },
+    }
+    
     /**
      * @function _move
      * @brief 移動処理
      * スピードに応じてマップ全体を移動する。
      */
-    _move: function() {
+    _move() {
 
         // スピードに応じて移動する。
         this.x -= this.speed;
@@ -108,7 +119,8 @@ phina.define('Stage', {
         this.background.x = Math.floor(this.x);
         this.foreground.x = Math.floor(this.x);
         this.block.x = Math.floor(this.x);
-    },
+    }
+
     /**
      * @function _createEnemy
      * @brief 敵生成
@@ -118,13 +130,13 @@ phina.define('Stage', {
      * @param [in] y y座標
      * @param [in/out] scene シーン
      */
-    _createEnemy: function(type, x, y, scene) {
+    _createEnemy(type, x, y, scene) {
         switch (type) {
         case 'dragonfly':
-            scene.addCharacter(Dragonfly(x, y, scene));
+            scene.addCharacter(new Dragonfly(x, y, scene));
             break;
         default:
             break;
         }
-    },
-});
+    }
+}

@@ -5,7 +5,7 @@
   "main": "./src/main.js",
   "scripts": {
     "webpack": "webpack",
-    "start": "webpack-dev-server"
+    "start": "http-server ./src -p 8080"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/a-kaneda/toritoma_js#readme",
   "devDependencies": {
     "html-loader": "^0.5.0",
+    "http-server": "^0.10.0",
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.6.1"
   }

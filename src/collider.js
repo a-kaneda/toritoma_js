@@ -1,9 +1,12 @@
+import Util from './util.js'
+
 /**
  * @class Collider
  * @brief 当たり判定
  * 当たり判定処理を行う。
  */
-phina.define('Collider', {
+export default class Collider {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -14,14 +17,15 @@ phina.define('Collider', {
      * @param [in] width 幅
      * @param [in] height 高さ
      */
-    init: function(x, y, width, height) {
+    constructor(x, y, width, height) {
 
         // メンバ変数に格納する。
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-    },
+    }
+
     /**
      * @function getHitCharacter
      * @brief 衝突キャラクター検索
@@ -31,7 +35,7 @@ phina.define('Collider', {
      * @param [in] types 検索対象のキャラクター種別
      * @return 衝突しているキャラクター配列
      */
-    getHitCharacter: function(characters, types) {
+    getHitCharacter(characters, types) {
 
         var ret = [];
 
@@ -51,5 +55,5 @@ phina.define('Collider', {
         }
 
         return ret;
-    },
-});
+    }
+}

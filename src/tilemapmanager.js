@@ -5,7 +5,7 @@
  * Tiled Map Editorで作成したデータを読み込む。
  * データはjs形式でエクスポートして使用するものとする。
  */
-phina.define('TileMapManager', {
+export default class TileMapManager {
 
     /**
      * @function init
@@ -15,14 +15,14 @@ phina.define('TileMapManager', {
      *
      * @param [in] mapName マップ名
      */
-    init: function(mapName) {
+    constructor(mapName) {
 
         // マップ名に対応するマップを取得する。
         this.map = TileMaps[mapName];
 
         // 空のオブジェクトマップを作成する。
         this.objectMap = {};
-    },
+    }
 
     /**
      * @function getIamge
@@ -33,7 +33,7 @@ phina.define('TileMapManager', {
      * @param [in] layerName レイヤー名
      * @return マップ画像のテクスチャ
      */
-     getIamge: function(layerName) {
+     getIamge(layerName) {
 
         // マップの幅と高さのドット数を求める。
         var width = this.map.width * this.map.tilewidth;
@@ -69,13 +69,14 @@ phina.define('TileMapManager', {
         var texture = phina.asset.Texture();
         texture.domElement = canvas.domElement;
         return texture;
-    },
+    }
+
     /**
      * @function createObjectMap
      * @brief オブジェクトマップ作成処理
      * タイルセットのオブジェクトの情報を
      */
-    createObjectMap: function(layerName, type) {
+    createObjectMap(layerName, type) {
 
         // 指定された種別のオブジェクトマップを作成する。
         this.objectMap[type] = new Array(this.map.height);
@@ -127,7 +128,8 @@ phina.define('TileMapManager', {
                 }
             }
         }
-    },
+    }
+
     /**
      * @function _drawTile
      * @brief タイル描画処理
@@ -140,7 +142,7 @@ phina.define('TileMapManager', {
      * @param [in] x 描画先x座標
      * @param [in] y 描画先y座標
      */
-    _drawTile: function(canvas, tilesets, index, x, y) {
+    _drawTile(canvas, tilesets, index, x, y) {
 
         var imageName;
         var tileX;
@@ -165,7 +167,7 @@ phina.define('TileMapManager', {
 
         // 画像のタイルを切出してcanvasに描画する。
         canvas.context.drawImage(image.domElement, tileX, tileY, tileWidth, tileHeight, x, y, tileWidth, tileHeight);
-    },
+    }
 
     /**
      * @function getObjects
@@ -180,7 +182,8 @@ phina.define('TileMapManager', {
      * @param [in] height 検索範囲高さ
      * @return 検索結果のオブジェクトの配列
      */
-    getObjects: function(layerName, x, y, width, height) {
+    getObjects(layerName, x, y, width, height) {
+
         var objects = [];
 
          // レイヤー名に対応するレイヤーを取得する。
@@ -207,6 +210,6 @@ phina.define('TileMapManager', {
 
         // 検索結果を返す。
         return objects;
-   },
-});
+   }
+}
 

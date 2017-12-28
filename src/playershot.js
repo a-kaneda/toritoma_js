@@ -1,19 +1,24 @@
+import Character from './character.js'
+import Util from './util.js'
+import Collider from './collider.js'
+import ScreenSize from './screensize.js'
+
+// 自機の攻撃力
+const PLAYER_POWER = 4;
+// オプションの攻撃力
+const OPTION_POWER = 2;
+// 当たり判定幅
+const HIT_WIDTH = 3;
+// 当たり判定高さ
+const HIT_HEIGHT = 3;
+
 /**
  * @class PlayerShot
  * @brief 自機弾
  * 右方向に直進する。
  */
-phina.define('PlayerShot', {
-    _static: {
-        // 自機の攻撃力
-        PLAYER_POWER: 4,
-        // オプションの攻撃力
-        OPTION_POWER: 2,
-        // 当たり判定幅
-        HIT_WIDTH: 3,
-        // 当たり判定高さ
-        HIT_HEIGHT: 3,
-    },
+export default class PlayerShot {
+
     /**
      * @function init
      * @brief コンストラクタ
@@ -24,7 +29,7 @@ phina.define('PlayerShot', {
      * @param [in] isOption 発射元がオプションかどうか
      * @param [in/out] scene シーン
      */
-    init: function(x, y, isOption, scene) {
+    constructor(x, y, isOption, scene) {
 
         // スプライトを作成する。
         this.sprite = Sprite('image_8x8', 8, 8);
@@ -40,16 +45,17 @@ phina.define('PlayerShot', {
 
         // 座標、サイズを設定する。
         // 当たり判定を作成する。
-        this.hitArea = Collider(x, y, PlayerShot.HIT_WIDTH, PlayerShot.HIT_HEIGHT);
+        this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
 
         // 攻撃力を設定する。
         if (isOption) {
-            this.power = PlayerShot.OPTION_POWER;
+            this.power = OPTION_POWER;
         }
         else {
-            this.power = PlayerShot.PLAYER_POWER;
+            this.power = PLAYER_POWER;
         }
-    },
+    }
+
     /**
      * @function update
      * @brief 更新処理
@@ -58,7 +64,7 @@ phina.define('PlayerShot', {
      *
      * @param [in/out] scene シーン
      */
-    update: function(scene) {
+    update(scene) {
 
         // 右へ移動する。
         this.hitArea.x += 5;
@@ -97,5 +103,5 @@ phina.define('PlayerShot', {
             this.sprite.remove();
             return;
         }
-    },
-});
+    }
+}
