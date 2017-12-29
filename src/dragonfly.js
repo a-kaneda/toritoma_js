@@ -1,3 +1,5 @@
+/** @module dragonfly */
+
 import Collider from './collider.js'
 import Character from './character.js'
 import Explosion from './explosion.js'
@@ -11,60 +13,84 @@ const SHOT_SPEED = 0.75;
 const SHOT_INTERVAL = 120;
 
 /**
- * @class Dragonfly
- * @brief トンボ
+ * 敵キャラクター、トンボ。
  * 左方向に直進する。
  * 左方向に直進する弾を発射する。
  */
-export default class Dragonfly {
+class Dragonfly {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
+     * コンストラクタ
      *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('dragonfly');
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = Character.type.ENEMY;
 
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new Collider(x, y, Character.enemy['dragonfly'].width, Character.enemy['dragonfly'].height); 
 
-        // HPを設定する。
+        /**
+         * HP
+         * @type {number}
+         */
         this.hp = Character.enemy['dragonfly'].hp;
 
-        // 防御力を設定する。
+        /**
+         * 防御力
+         * @type {number}
+         */
         this.defense = Character.enemy['dragonfly'].defense;
 
-        // スコアを設定する。
+        /**
+         * スコア
+         * @type {number}
+         */
         this.score = Character.enemy['dragonfly'].score;
 
-        // メンバを初期化する。
+        /**
+         * 弾発射間隔
+         * @type {number}
+         */
         this.shotInterval = 0;
     }
     
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 左方向に直進する。
      * 左方向に直進する弾を発射する。
      * 画面外に出ると自分自身を削除する。
      *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -108,12 +134,11 @@ export default class Dragonfly {
     }
     
     /**
-     * @function hit
-     * @brief 衝突処理
+     * 衝突処理。
      * 他のキャラクターと衝突したときの処理を行う。
      *
-     * @param [in] character 衝突したキャラクター
-     * @param [in/out] scene シーン
+     * @param {object} character - 衝突したキャラクター
+     * @param {PlayingScene} scene - シーン
      */
     hit(character, scene) {
 
@@ -128,3 +153,5 @@ export default class Dragonfly {
         }
     }
 }
+
+export default Dragonfly;

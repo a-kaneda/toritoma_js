@@ -1,3 +1,5 @@
+/** @module screensize */
+
 // 拡大率
 const ZOOM_RATIO = 2;
 // スクリーンの幅
@@ -13,30 +15,41 @@ const STAGE_RECT = {
 };
 
 /**
- * @class ScreenSize
- * @brief 画面サイズ
  * 画面サイズを管理する。
  */
-export default class ScreenSize {
+class ScreenSize {
 
-    // 拡大率
+    /**
+     * 拡大率
+     * @type {number}
+     */
     static get ZOOM_RATIO() {
         return ZOOM_RATIO;
     }
 
-    // スクリーンの幅
+    /**
+     * スクリーンの幅
+     * @type {number}
+     */
     static get SCREEN_WIDTH() {
         return SCREEN_WIDTH;
     }
 
-    // スクリーンの高さ
+    /**
+     * スクリーンの高さ
+     * @type {number}
+     */
     static get SCREEN_HEIGHT() {
         return SCREEN_HEIGHT;
     }
 
-    // ゲーム画面のサイズ
+    /**
+     * ゲーム画面のサイズ
+     * @type {Object}
+     */
     static get STAGE_RECT() {
         return STAGE_RECT;
     };
 }
 
+export default ScreenSize;

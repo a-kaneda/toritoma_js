@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: tilemapmanager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: tilemapmanager.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module tilemapmanager */
+
+/**
+ * Tiled Map Editorで作成したデータを読み込む。
+ * データはjs形式でエクスポートして使用するものとする。
+ */
+class TileMapManager {
+
+    /**
+     * 初期化処理。
+     * 使用するマップの名前を指定する。
+     * @param {string} mapName - マップ名
+     */
+    constructor(mapName) {
+
+        /**
+         * マップ名に対応するマップ。
+         * @type {Object}
+         */
+        this.map = TileMaps[mapName];
+
+        /**
+         * オブジェクトマップ。
+         * @type {Object}
+         */
+        this.objectMap = {};
+    }
+
+    /**
+     * 指定したレイヤーの画像をテクスチャとして取得する。
+     * @param {string} layerName - レイヤー名
+     * @return {phina.asset.Texture} マップ画像のテクスチャ
+     */
+     getIamge(layerName) {
+
+        // マップの幅と高さのドット数を求める。
+        const width = this.map.width * this.map.tilewidth;
+        const height = this.map.height * this.map.tileheight;
+
+        // canvasを作成する。
+        const canvas = phina.graphics.Canvas().setSize(width, height);
+
+        // レイヤー名に対応するレイヤーを取得する。
+        let layer;
+        for (let i = 0; i &lt; this.map.layers.length; i++) {
+            if (this.map.layers[i].name == layerName) {
+                layer = this.map.layers[i];
+            }
+        }
+
+        // 各タイルを作成したcanvasに描画していく。
+        for (let i = 0; i &lt; layer.data.length; i++) {
+
+            // タイルが配置されている場合
+            if (layer.data[i] > 0) {
+
+                // 一次元配列になっているので、x座標とy座標を計算する。
+                const x = i % layer.width;
+                const y = Math.floor(i / layer.width);
+
+                // タイルを描画する。
+                this._drawTile(canvas, this.map.tilesets, layer.data[i], x * this.map.tilewidth, y * this.map.tileheight);
+            }
+        }
+
+        // テクスチャを作成し、描画結果として返す。
+        const texture = phina.asset.Texture();
+        texture.domElement = canvas.domElement;
+        return texture;
+    }
+
+    /**
+     * タイルセットのオブジェクトの情報を作成する。
+     * @param {string} layerName - レイヤー名
+     * @param [type} type - オブジェクトの種別
+     */
+    createObjectMap(layerName, type) {
+
+        // 指定された種別のオブジェクトマップを作成する。
+        this.objectMap[type] = new Array(this.map.height);
+        for (let i = 0; i &lt; this.map.height; i++) {
+            this.objectMap[type][i] = new Array(this.map.width);
+        }
+        
+        // レイヤー名に対応するレイヤーを取得する。
+        let layer;
+        for (let i = 0; i &lt; this.map.layers.length; i++) {
+            if (this.map.layers[i].name == layerName) {
+                layer = this.map.layers[i];
+            }
+        }
+
+        // レイヤー内の各タイルを処理する。
+        for (let i = 0; i &lt; layer.data.length; i++) {
+
+            // タイルが配置されている場合
+            const gid = layer.data[i];
+            if (gid > 0) {
+
+                // gidに対応するタイルセットを検索する。
+                for (let j = 0; j &lt; this.map.tilesets.length; j++) {
+
+                    // タイルがあった場合
+                    const tile = this.map.tilesets[j].tiles[gid - 1];
+                    if (tile) {
+
+                        // 指定された種別のオブジェクトを検索する。
+                        for (let k = 0; k &lt; tile.objectgroup.objects.length; k++) {
+
+                            const obj = tile.objectgroup.objects[k];
+                            if (obj.type === type) {
+
+                                // 一次元配列になっているので、x座標とy座標を計算する。
+                                const x = i % layer.width;
+                                const y = Math.floor(i / layer.width);
+
+                                // オブジェクトマップにオブジェクトを格納する。
+                                this.objectMap[type][y][x] = obj;
+
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * canvasにタイルを描画する。タイルセットの名前と同じ名前でphina.jsのassetに登録をしておくこと。
+     * @param {phina.graphics.Canvas} canvas - canvas
+     * @param {Array} tilesets - タイルセット配列
+     * @param {number} index - タイルのgid
+     * @param {number} x - 描画先x座標
+     * @param {number} y - 描画先y座標
+     */
+    _drawTile(canvas, tilesets, index, x, y) {
+
+        let imageName;
+        let tileX;
+        let tileY;
+        let tileWidth;
+        let tileHeight;
+
+        // gidに対応するタイルセットを検索する。
+        for (let i = 0; i &lt; tilesets.length; i++) {
+            if (index >= tilesets[i].firstgid &amp;&amp; index &lt; tilesets[i].firstgid + tilesets[i].tilecount) {
+                imageName = tilesets[i].name;
+                tileX = ((index - tilesets[i].firstgid) % tilesets[i].columns) * tilesets[i].tilewidth;
+                tileY = Math.floor((index - tilesets[i].firstgid) / tilesets[i].columns) * tilesets[i].tileheight;
+                tileWidth = tilesets[i].tilewidth;
+                tileHeight = tilesets[i].tileheight;
+                break;
+            }
+        }
+
+        // 画像を取得する。
+        const image = phina.asset.AssetManager.get('image', imageName);
+
+        // 画像のタイルを切出してcanvasに描画する。
+        canvas.context.drawImage(image.domElement, tileX, tileY, tileWidth, tileHeight, x, y, tileWidth, tileHeight);
+    }
+
+    /**
+     * layerNameで指定されたレイヤーの座標x, yから幅width、高さheightの範囲内にあるオブジェクトを取得する。
+     * @param {string} layerName - レイヤー名
+     * @param {number} x - 検索範囲左上のx座標
+     * @param {number} y - 検索範囲左上のy座標
+     * @apram {number} width - 検索範囲幅
+     * @param {number} height - 検索範囲高さ
+     * @return {Object} 検索結果のオブジェクトの配列
+     */
+    getObjects(layerName, x, y, width, height) {
+
+        let objects = [];
+
+         // レイヤー名に対応するレイヤーを取得する。
+        let layer;
+        for (let i = 0; i &lt; this.map.layers.length; i++) {
+            if (this.map.layers[i].name == layerName) {
+                layer = this.map.layers[i];
+            }
+        }
+
+        // レイヤー内のオブジェクトを検索する。
+        for (let i = 0;i &lt; layer.objects.length; i++) {
+            let object = layer.objects[i];
+
+            // 指定した範囲内に存在するオブジェクトを戻り値に格納する。
+            if (object.x &lt; x + width &amp;&amp;
+                object.x + object.width - 1 >= x &amp;&amp;
+                object.y &lt; y + height &amp;&amp;
+                object.y + object.height - 1>= y) {
+
+                objects.push(object);
+            }
+        }
+
+        // 検索結果を返す。
+        return objects;
+   }
+}
+
+export default TileMapManager;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-character.html">character</a></li><li><a href="module-chickengauge.html">chickengauge</a></li><li><a href="module-collider.html">collider</a></li><li><a href="module-controllsize.html">controllsize</a></li><li><a href="module-dragonfly.html">dragonfly</a></li><li><a href="module-enemyshot.html">enemyshot</a></li><li><a href="module-explosion.html">explosion</a></li><li><a href="module-life.html">life</a></li><li><a href="module-mycolor.html">mycolor</a></li><li><a href="module-player.html">player</a></li><li><a href="module-playerdeatheffect.html">playerdeatheffect</a></li><li><a href="module-playeroption.html">playeroption</a></li><li><a href="module-playershot.html">playershot</a></li><li><a href="module-playingscene.html">playingscene</a></li><li><a href="module-pointdevice.html">pointdevice</a></li><li><a href="module-screensize.html">screensize</a></li><li><a href="module-shieldbutton.html">shieldbutton</a></li><li><a href="module-stage.html">stage</a></li><li><a href="module-tilemapmanager.html">tilemapmanager</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="MainScene.html">MainScene</a></li><li><a href="module-character-Character.html">Character</a></li><li><a href="module-chickengauge-ChickenGauge.html">ChickenGauge</a></li><li><a href="module-collider-Collider.html">Collider</a></li><li><a href="module-controllsize-ControlSize.html">ControlSize</a></li><li><a href="module-dragonfly-Dragonfly.html">Dragonfly</a></li><li><a href="module-enemyshot-EnemyShot.html">EnemyShot</a></li><li><a href="module-explosion-Explosion.html">Explosion</a></li><li><a href="module-life-Life.html">Life</a></li><li><a href="module-mycolor-MyColor.html">MyColor</a></li><li><a href="module-playerdeatheffect-PlayerDeathEffect.html">PlayerDeathEffect</a></li><li><a href="module-playeroption-PlayerOption.html">PlayerOption</a></li><li><a href="module-playershot-PlayerShot.html">PlayerShot</a></li><li><a href="module-player-Player.html">Player</a></li><li><a href="module-playingscene-PlayingScene.html">PlayingScene</a></li><li><a href="module-pointdevice-PointDevice.html">PointDevice</a></li><li><a href="module-screensize-ScreenSize.html">ScreenSize</a></li><li><a href="module-shieldbutton-ShieldButton.html">ShieldButton</a></li><li><a href="module-stage-Stage.html">Stage</a></li><li><a href="module-tilemapmanager-TileMapManager.html">TileMapManager</a></li><li><a href="module-util-Util.html">Util</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ASSETS">ASSETS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Dec 29 2017 14:46:57 GMT+0900 (東京 (標準時))
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

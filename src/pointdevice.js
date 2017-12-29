@@ -1,13 +1,14 @@
+/** @module pointdevice */
+
 /**
  * ポイントデバイスがマウスかタッチパネルかを調べる。
  */
-export default class PointDevice {
+class PointDevice {
 
     /**
      * マウス移動とタッチ操作の際に呼ばれ、
      * タッチ操作でない場合はマウス接続されていると判断する。
-     *
-     * @param event イベント
+     * @param {TouchEvent} event - イベント
      */
     static detectDeviceType(event) {
         PointDevice._isMouseUsed = !event.changedTouches;
@@ -26,11 +27,12 @@ export default class PointDevice {
     }
 
     /**
-     * マウスが接続されているかどうかを取得する。
-     *
-     * @return マウスが接続されているかどうか
+     * マウスが接続されているかどうか。
+     * @type {boolean}
      */
     static get isMouseUsed() {
         return this._isMouseUsed;
     }
 }
+
+export default PointDevice;

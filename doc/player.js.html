@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: player.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: player.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module player */
+
+import ScreenSize from './screensize.js'
+import Character from './character.js'
+import Util from './util.js'
+import Collider from './collider.js'
+import PlayerShot from './playershot.js'
+import PlayerDeathEffect from './playerdeatheffect.js'
+import PlayerOption from './playeroption.js'
+
+// キーボード入力による移動スピード
+const SPEED_BY_KEY = 2;
+// タッチ操作による移動スピード
+const SPEED_BY_TOUCH = 1.8 / ScreenSize.ZOOM_RATIO;
+// ゲームパッドによる移動スピード
+const SPEED_BY_GAMEPAD = 3;
+// 自機弾発射間隔
+const SHOT_INTERVAL = 12;
+// 当たり判定幅
+const HIT_WIDTH = 4;
+// 当たり判定高さ
+const HIT_HEIGHT = 4;
+// かすり当たり判定幅
+const GRAZE_WIDTH = 16;
+// かすり当たり判定高さ
+const GRAZE_HEIGHT = 16;
+// 復活後無敵フレーム数
+const INVINCIBLE_FRAME = 120;
+// 状態
+const STATUS = {
+    // 通常
+    NORMAL: 1,
+    // 死亡
+    DEATH: 2,
+    // 無敵
+    INVINCIBLE: 3,
+};
+// オプション最大数
+const MAX_OPTION_COUNT = 3;
+// シールド使用時のゲージ使用量
+const CONSUMPTION_GAUGE = 0.005;
+
+/**
+ * 自機。ユーザー操作に応じて移動する。
+ */
+class Player {
+
+    /**
+     * コンストラクタ、座標の設定とスプライトシートの設定を行う。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
+     */
+    constructor(x, y, scene) {
+
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
+        this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
+        scene.addCharacterSprite(this.sprite);
+
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
+        this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('player_normal');
+
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
+        this.type = Character.type.PLAYER;
+
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
+        this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
+
+        /**
+         * かすり当たり判定
+         * @type {Collider}
+         */
+        this.grazeArea = new Collider(x, y, GRAZE_WIDTH, GRAZE_HEIGHT);
+
+        /**
+         * 弾発射間隔
+         * @type {number}
+         */
+        this.shotInterval = 0;
+
+        /**
+         * 状態
+         * @type {number}
+         */
+        this.status = STATUS.NORMAL;
+
+        /**
+         * 衝突したときの攻撃力
+         * @type {number}
+         */
+        this.power = 1;
+
+        /**
+         * 無敵状態フレーム数
+         * @tyep {number}
+         */
+        this.invincibleFrame = 0;
+
+        /**
+         * チキンゲージ
+         * @type {number}
+         */
+        this.chickenGauge = 0;
+
+        /**
+         * オプション
+         * @type {PlayerOption}
+         */
+        this.option = null;
+
+        /**
+         * シールド使用不使用
+         * @type {boolean}
+         */
+        this.shield = false;
+
+        /**
+         * デバッグ用フラグ。死亡しないようにする。
+         * @type {boolean}
+         */
+        this.noDeath = false;
+
+        /**
+         * デバッグ用フラグ。自機弾を発射しないようにする。
+         * @type {boolean}
+         */
+        this.noShot = false;
+
+        // デバッグ用: 死亡しないようにする。
+        if (localStorage.noDeath === 'true') {
+            this.noDeath = true;
+        }
+
+        // デバッグ用: ショットを撃たないようにする。
+        if (localStorage.noShot === 'true') {
+            this.noShot = true;
+        }
+    }
+
+    /**
+     * 更新処理。
+     * 座標をスプライトに適用する。
+     * ブロックやキャラクターとの当たり判定処理を行う。
+     * 自機弾を発射する。
+     * @param {PlayingScene} scene - シーン
+     */
+    update(scene) {
+
+        // ブロックと衝突している場合
+        if (Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
+
+            // ブロックによって押されて移動する。
+            const dest = Util.pushCharacter(this.hitArea, scene.getStagePosition(), scene.getBlockMap(), false);
+            this.hitArea.x = dest.x;
+            this.hitArea.y = dest.y;
+        }
+
+        // 無敵状態の場合
+        if (this.status === STATUS.INVINCIBLE) {
+
+            // 無敵状態フレーム数をカウントする。
+            this.invincibleFrame--;
+
+            // 無敵状態フレーム数を経過した場合
+            if (this.invincibleFrame &lt;= 0) {
+
+                // ステータスを通常状態に戻す。
+                this.status = STATUS.NORMAL;
+
+                // 点滅アニメーションを停止する。
+                this.sprite.tweener.clear();
+
+                // アニメーションが非表示で終了している可能性があるので、
+                // 表示状態にする。
+                this.sprite.alpha = 1;
+            }
+        } 
+
+        // 通常状態、無敵状態の場合
+        if (this.status === STATUS.NORMAL || this.status === STATUS.INVINCIBLE) {
+
+            // 自機弾発射間隔が経過した場合は自機弾を発射する。
+            this.shotInterval++;
+            if (this.shotInterval >= SHOT_INTERVAL &amp;&amp; !this.noShot) {
+                scene.addCharacter(new PlayerShot(this.hitArea.x, this.hitArea.y, false, scene));
+                this.shotInterval = 0;
+            }
+
+            // 敵弾とのかすり判定を行う。
+            this._checkGraze(scene);
+
+            // シールド使用時はチキンゲージを消費する。
+            if (this.shield) {
+                this.chickenGauge -= CONSUMPTION_GAUGE;
+                if (this.chickenGauge &lt; 0) {
+                    this.chickenGauge = 0;
+                }
+            }
+        }
+
+        // 通常状態の場合
+        if (this.status === STATUS.NORMAL) {
+
+            // 敵キャラとの当たり判定処理を行う。
+            this._checkHitChacater(scene);
+        }
+
+        // オプション個数を更新する。
+        this._updateOptionCount(scene);
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
+    }
+
+    /**
+     * キーボードの左キー入力による移動処理を行う。
+     * @param {PlayingScene} scene - シーン
+     */
+    moveKeyLeft(scene) {
+        this._move(this.hitArea.x - SPEED_BY_KEY,
+                   this.hitArea.y,
+                   scene);
+    }
+
+    /**
+     * キーボードの右キー入力による移動処理を行う。
+     * @param {PlayingScene} scene - シーン
+     */
+    moveKeyRight(scene) {
+        this._move(this.hitArea.x + SPEED_BY_KEY,
+                   this.hitArea.y,
+                   scene);
+    }
+
+    /**
+     * キーボードの上キー入力による移動処理を行う。
+     * @param {PlayingScene} scene - シーン
+     */
+    moveKeyUp(scene) {
+        this._move(this.hitArea.x,
+                   this.hitArea.y - SPEED_BY_KEY,
+                   scene);
+    }
+
+    /**
+     * キーボードの下キー入力による移動処理を行う。
+     * @param {PlayingScene} scene - シーン
+     */
+    moveKeyDown(scene) {
+        this._move(this.hitArea.x,
+                   this.hitArea.y + SPEED_BY_KEY,
+                   scene);
+    }
+
+    /**
+     * タッチ入力による移動処理を行う。
+     * @param {number} x - x座標方向のタッチ位置スライド量
+     * @param {number} y - y座標方向のタッチ位置スライド量
+     * @param {PlayingScene} scene - シーン
+     */
+    moveTouch(x, y, scene) {
+        this._move(this.hitArea.x + x * SPEED_BY_TOUCH,
+                   this.hitArea.y + y * SPEED_BY_TOUCH,
+                   scene);
+    }
+
+    /**
+     * ゲームパッド入力による移動処理を行う。
+     * @param {number} x - x座標方向のスティック入力値
+     * @param {number} y - y座標方向のスティック入力値
+     * @param {PlayingScene} scene - シーン
+     */
+    moveGamepad(x, y, scene) {
+        this._move(this.hitArea.x + x * SPEED_BY_GAMEPAD,
+                   this.hitArea.y + y * SPEED_BY_GAMEPAD,
+                   scene);
+    }
+
+    /**
+     * 死亡後の復活処理を行う。
+     * 一定時間無敵状態とし、画像を点滅表示する。
+     * @param {PlayingScene} scene - シーン
+     */
+    rebirth(scene) {
+
+        // ステータスを無敵状態にする。
+        this.status = STATUS.INVINCIBLE;
+
+        // チキンゲージを初期化する。
+        this.chickenGauge = 0;
+
+        // 無敵状態フレーム数を設定する。
+        this.invincibleFrame = INVINCIBLE_FRAME;
+
+        // 画像を表示する。
+        this.sprite.alpha = 1;
+
+        // 点滅アニメーションを実行する。
+        // 100ms周期で表示、非表示を切り替える。
+        this.sprite.tweener
+            .wait(100)
+            .set({ alpha: 0 })
+            .wait(100)
+            .set({ alpha: 1 })
+            .setLoop(true)
+            .play();
+    }
+
+    /**
+     * チキンゲージの溜まっている比率を0～1の範囲で取得する。
+     * @return {number} チキンゲージ
+     */
+    getChickenGauge() {
+        return this.chickenGauge;
+    }
+
+    /**
+     * シールド使用不使用を設定する。
+     * オプションがあればオプションの設定も変更する。
+     * @param {boolean} shield - シールド使用不使用
+     */
+    setShield(shield) {
+
+        // シールド使用不使用を設定する。
+        this.shield = shield;
+
+        // オプションがある場合はオプションのシールド使用不使用を設定する。
+        if (this.option !== null) {
+            this.option.setShield(shield);
+        }
+    }
+
+    /**
+     * 座標を変更し、各種当たり判定処理を行う。
+     * @param {number} x - 移動後のx座標
+     * @param {number} y - 移動後のy座標
+     * @param {PlayingScene} scene - シーン
+     */
+    _move(x, y, scene) {
+
+        // 前回値を保存する。
+        const prevX = this.hitArea.x;
+        const prevY = this.hitArea.y;
+
+        // 死亡中でない場合のみ移動を行う。
+        if (this.status != STATUS.DEATH) {
+            // 現在の座標を変更する。
+            this.hitArea.x = x;
+            this.hitArea.y = y;
+        }
+
+        // 衝突しているブロックがないか調べる。
+        let block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
+
+        // 衝突しているブロックがある場合は移動する。
+        while (block != null) {
+
+            // 移動位置を計算する。
+            const newPosition = Util.moveByBlock(this.hitArea, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
+
+            // 移動できない場合はループを抜ける。
+            if (this.hitArea.x == newPosition.x &amp;&amp; this.hitArea.y == newPosition.y) {
+                break;
+            }
+            
+            // 移動後の座標を反映する。
+            this.hitArea.x = newPosition.x;
+            this.hitArea.y = newPosition.y;
+
+            // 移動後に再度衝突していないかチェックする。
+            block = Util.checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap());
+        }
+
+        // 画面外に出ていないかチェックする。
+        this._checkScreenArea();
+
+        // オプションがある場合はオプションを移動前の座標へ移動する。
+        if (this.option !== null) {
+            this.option.move(prevX, prevY);
+        }
+    }
+
+    /**
+     * 画面外に出ていないかチェックする。
+     * 画面外に出ていた場合は画面内に座標を補正する。
+     */
+    _checkScreenArea() {
+
+        // 左側画面範囲外には移動させないようにする。
+        if (this.hitArea.x &lt; 0) {
+            this.hitArea.x = 0;
+        }
+
+        // 右側画面範囲外には移動させないようにする。
+        if (this.hitArea.x > ScreenSize.STAGE_RECT.width - 1) {
+            this.hitArea.x = ScreenSize.STAGE_RECT.width - 1;
+        }
+
+        // 上側画面範囲外には移動させないようにする。
+        if (this.hitArea.y &lt; 0) {
+            this.hitArea.y = 0;
+        }
+
+        // 下側画面範囲外には移動させないようにする。
+        if (this.hitArea.y > ScreenSize.STAGE_RECT.height - 1) {
+            this.hitArea.y = ScreenSize.STAGE_RECT.height - 1;
+        }
+    }
+
+    /**
+     * 他のキャラクターとの当たり判定を処理する。
+     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
+     */
+    _checkHitChacater(scene) {
+
+        // 衝突している敵キャラクターを検索する。
+        const hitCharacters = this.hitArea.getHitCharacter(scene.characters, [Character.type.ENEMY, Character.type.ENEMY_SHOT]);
+
+        // 衝突している敵キャラクターがいる場合。
+        if (hitCharacters.length > 0) {
+
+            // 敵キャラクターの衝突処理を実行する。
+            hitCharacters[0].hit(this, scene);
+
+            // 敵キャラクターに接触した場合は死亡処理を行う。
+            if (!this.noDeath) {
+
+                // 死亡時エフェクトを作成する。
+                scene.addCharacter(new PlayerDeathEffect(this.hitArea.x, this.hitArea.y, scene));
+
+                // ステータスを死亡に変更する。
+                this.status = STATUS.DEATH;
+
+                // 画像を非表示にする。
+                this.sprite.alpha = 0;
+
+                // シーンの死亡時処理を実行する。
+                scene.miss();
+            }
+        }
+    }
+
+    /**
+     * 敵弾とのかすり判定を処理する。
+     * @param {PlayingScene} scene - シーン
+     */
+    _checkGraze(scene) {
+
+        // かすり当たり判定位置を更新する。
+        this.grazeArea.x = this.hitArea.x;
+        this.grazeArea.y = this.hitArea.y;
+
+        // かすっている敵弾を検索する。
+        const hitCharacters = this.grazeArea.getHitCharacter(scene.characters, [Character.type.ENEMY_SHOT]);
+
+        // かすっている敵弾とかすり処理を行う。
+        for (let i = 0; i &lt; hitCharacters.length; i++) {
+
+            // チキンゲージを増加させる。
+            this.chickenGauge += hitCharacters[i].graze();
+
+            // 上限値を超えた場合は上限値に補正する。
+            if (this.chickenGauge > 1) {
+                this.chickenGauge = 1;
+            }
+        }
+    }
+    
+    /**
+     * チキンゲージに応じてオプション個数を更新する。
+     * @param {PlayingScene} scene - シーン
+     */
+    _updateOptionCount(scene) {
+
+        // チキンゲージからオプション個数を計算する
+        const count = Math.floor(this.chickenGauge / (1 / (MAX_OPTION_COUNT + 1)));
+
+        // オプション個数がある場合
+        if (count > 0) {
+
+            // オプションが作成されていなければ作成する。
+            if (this.option === null) {
+                this.option = new PlayerOption(this.hitArea.x, this.hitArea.y, this.shield, scene);
+                scene.addCharacter(this.option);
+            }
+
+            // オプションにオプション個数を設定する。
+            this.option.setCount(count, scene);
+        }
+        // オプション個数がない場合
+        else {
+
+            // オプションが作成されていれば削除する。
+            if (this.option !== null) {
+
+                // オプションにオプション個数を設定し、削除処理を行う。
+                this.option.setCount(count, scene);
+
+                // メンバ変数をクリアする。
+                this.option = null;
+            }
+        }
+    }
+}
+
+export default Player;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-character.html">character</a></li><li><a href="module-chickengauge.html">chickengauge</a></li><li><a href="module-collider.html">collider</a></li><li><a href="module-controllsize.html">controllsize</a></li><li><a href="module-dragonfly.html">dragonfly</a></li><li><a href="module-enemyshot.html">enemyshot</a></li><li><a href="module-explosion.html">explosion</a></li><li><a href="module-life.html">life</a></li><li><a href="module-mycolor.html">mycolor</a></li><li><a href="module-player.html">player</a></li><li><a href="module-playerdeatheffect.html">playerdeatheffect</a></li><li><a href="module-playeroption.html">playeroption</a></li><li><a href="module-playershot.html">playershot</a></li><li><a href="module-playingscene.html">playingscene</a></li><li><a href="module-pointdevice.html">pointdevice</a></li><li><a href="module-screensize.html">screensize</a></li><li><a href="module-shieldbutton.html">shieldbutton</a></li><li><a href="module-stage.html">stage</a></li><li><a href="module-tilemapmanager.html">tilemapmanager</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="MainScene.html">MainScene</a></li><li><a href="module-character-Character.html">Character</a></li><li><a href="module-chickengauge-ChickenGauge.html">ChickenGauge</a></li><li><a href="module-collider-Collider.html">Collider</a></li><li><a href="module-controllsize-ControlSize.html">ControlSize</a></li><li><a href="module-dragonfly-Dragonfly.html">Dragonfly</a></li><li><a href="module-enemyshot-EnemyShot.html">EnemyShot</a></li><li><a href="module-explosion-Explosion.html">Explosion</a></li><li><a href="module-life-Life.html">Life</a></li><li><a href="module-mycolor-MyColor.html">MyColor</a></li><li><a href="module-playerdeatheffect-PlayerDeathEffect.html">PlayerDeathEffect</a></li><li><a href="module-playeroption-PlayerOption.html">PlayerOption</a></li><li><a href="module-playershot-PlayerShot.html">PlayerShot</a></li><li><a href="module-player-Player.html">Player</a></li><li><a href="module-playingscene-PlayingScene.html">PlayingScene</a></li><li><a href="module-pointdevice-PointDevice.html">PointDevice</a></li><li><a href="module-screensize-ScreenSize.html">ScreenSize</a></li><li><a href="module-shieldbutton-ShieldButton.html">ShieldButton</a></li><li><a href="module-stage-Stage.html">Stage</a></li><li><a href="module-tilemapmanager-TileMapManager.html">TileMapManager</a></li><li><a href="module-util-Util.html">Util</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ASSETS">ASSETS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Dec 29 2017 14:46:57 GMT+0900 (東京 (標準時))
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

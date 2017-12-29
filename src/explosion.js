@@ -1,28 +1,36 @@
+/** @module explosion */
+
 /**
- * @class Explosion
- * @brief 爆発
  * 爆発アニメーションを行う。
  */
-export default class Explosion {
+class Explosion {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 座標の設定とアニメーションの設定を行う。
      * 爆発音を再生する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('explosion');
 
@@ -34,11 +42,8 @@ export default class Explosion {
     }
     
     /**
-     * @function update
-     * @brief 更新処理
      * アニメーションが終了すると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -49,3 +54,5 @@ export default class Explosion {
         }
     }
 }
+
+export default Explosion;

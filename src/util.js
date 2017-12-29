@@ -1,22 +1,19 @@
+/** @module util */
+
 import ScreenSize from './screensize.js'
 import Stage from './stage.js'
 
 /**
- * @class Util
- * @brief ユーティリティ
  * アプリ全体で使用する関数群を定義する。
  */
-export default class Util {
+class Util {
 
     /**
-     * @function isHitCharacter
-     * @brief キャラクター同士の当たり判定
+     * キャラクター同士の当たり判定。
      * キャラクター同士が衝突しているかどうかを判定する。
-     *
-     * @param a キャラクター1
-     * @param b キャラクター2
-     * @retval true 衝突している
-     * @retval false 衝突していない
+     * @param {Object} a - キャラクター1
+     * @param {Object} b - キャラクター2
+     * @return {boolean} 衝突しているかどうか
      */
     static isHitCharacter(a, b) {
         if (a.x - a.width / 2 < b.x + b.width / 2 &&
@@ -32,15 +29,13 @@ export default class Util {
     }
 
     /**
-     * @function checkCollidedBlock
-     * @brief 衝突しているブロックを調べる
+     * 衝突しているブロックを調べる。
      * キャラクターの周囲にあるマップを探し、衝突しているブロックがあれば
      * そのブロックの座標とサイズを返す。衝突していなければnullを返す。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 衝突しているブロック、見つからなければnull。
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 衝突しているブロック、見つからなければnull。
      */
     static checkCollidedBlock(character, stagePosition, blockMap) {
 
@@ -93,22 +88,19 @@ export default class Util {
     }
 
     /**
-     * @function moveByBlock
-     * @brief ブロック衝突による移動
      * ブロック衝突による移動を行う。
      * 右方向移動中に衝突した場合はブロックの左端に移動する。他の方向も同様。
      * 移動前から衝突している場合はその方向には移動しない。このケースは
      * ブロック移動による押出処理で対応する。
      * 縦横どちらにも移動する場合には横方向だけ移動して再度衝突をチェックし、
      * 衝突しなければ横方向だけ移動し、衝突すれば縦方向だけ移動する。
-     *
-     * @param [in] character キャラクター
-     * @param [in] prevX 移動前x座標
-     * @param [in] prevY 移動前y座標
-     * @param [in] block 衝突したブロックの位置とサイズ
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の座標
+     * @param {Object} character - キャラクター
+     * @param {number} prevX - 移動前x座標
+     * @param {number} prevY - 移動前y座標
+     * @param {Object} block - 衝突したブロックの位置とサイズ
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の座標
      */
     static moveByBlock(character, prevX, prevY, block, stagePosition, blockMap) {
 
@@ -263,14 +255,12 @@ export default class Util {
     }
 
     /**
-     * @function dodgeBlockUp
-     * @brief ブロックを避けて上に移動する
+     * ブロックを避けて上に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockUp(character, stagePosition, blockMap) {
 
@@ -285,14 +275,12 @@ export default class Util {
     }
 
     /**
-     * @function dodgeBlockDown
-     * @brief ブロックを避けて下に移動する
+     * ブロックを避けて下に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockDown(character, stagePosition, blockMap) {
 
@@ -307,14 +295,12 @@ export default class Util {
     }
 
     /**
-     * @function dodgeBlockLeft
-     * @brief ブロックを避けて左に移動する
+     * ブロックを避けて左に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockLeft(character, stagePosition, blockMap) {
 
@@ -329,14 +315,12 @@ export default class Util {
     }
 
     /**
-     * @function dodgeBlockRight
-     * @brief ブロックを避けて右に移動する
+     * ブロックを避けて右に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockRight(character, stagePosition, blockMap) {
 
@@ -351,16 +335,14 @@ export default class Util {
     }
 
     /**
-     * @function _dodgeBlock
-     * @brief ブロックを避けて移動する
+     * ブロックを避けて移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
      * 衝突していない場合、画面外まで出る場合は移動前の位置を返す。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @param [in] move 移動する方法
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @param {function} move - 移動する方法
+     * @return {Object} 移動後の位置
      */
     static _dodgeBlock(character, stagePosition, blockMap, move) {
 
@@ -390,15 +372,12 @@ export default class Util {
     }
 
     /**
-     * @function pushCharacter
-     * @brief ブロックによるキャラクター押出
      * ブロックとぶつかったキャラクターを押し動かす。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @param [in] canMoveOut 画面外へ移動できるかどうか
-     * @return 移動先座標
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @param {boolean} canMoveOut - 画面外へ移動できるかどうか
+     * @return {Object} 移動先座標
      */
     static pushCharacter(character, stagePosition, blockMap, canMoveOut) {
 
@@ -459,3 +438,5 @@ export default class Util {
         return character;
     }
 }
+
+export default Util;

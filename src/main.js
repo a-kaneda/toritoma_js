@@ -11,7 +11,10 @@ PointDevice.checkDeviceType();
 // phina.js をグローバル領域に展開
 phina.globalize();
 
-// アセット
+/**
+ * アセット
+ * @type {object}
+ */
 const ASSETS = {
     image: {
         'back': './images/back.png',
@@ -35,12 +38,16 @@ const ASSETS = {
 
 /**
  * メインシーン。
+ * @class MainScene
+ * @extend phina.display.DisplayScene
  */
 phina.define('MainScene', {
     superClass: 'DisplayScene',
 
     /**
      * コンストラクタ。
+     * @function init
+     * @member MainScene#init
      */
     init: function() {
         this.superInit({
@@ -54,14 +61,19 @@ phina.define('MainScene', {
         // 背景色を指定する。
         this.backgroundColor = MyColor.BACK_COLOR;
 
-        // 初期シーンを作成する。
+        /**
+         * 実行中のシーン
+         * @type {object}
+         * @member MainScene#scene
+         */
         this.scene = new PlayingScene(this);
     },
 
     /**
      * 更新処理。内部のシーン処理の更新処理を実行する。
-     *
-     * @param app アプリケーション
+     * @function update
+     * @param {phina.game.GameApp} app - アプリケーション
+     * @member MainScene#update
      */
     update: function(app) {
         this.scene.update(app);
@@ -73,7 +85,7 @@ phina.main(function() {
 
     // 画面サイズの補正の有効無効を切り替える。
     let isFit = true;
-    if (localStorage.disableFit == 'true') {
+    if (localStorage.disableFit === 'true') {
         isFit = false;
     }
 
@@ -90,7 +102,9 @@ phina.main(function() {
     app.fps = 60;
 
     // FPSを表示する。（デバッグ用）
-    app.enableStats();
+    if (localStorage.viewFPS === 'true') {
+        app.enableStats();
+    }
 
     // iOSのsafariではユーザが操作時のみ音の再生が可能なため、タッチ時にダミーで音声の再生を行う。
     // https://github.com/phinajs/phina.js/issues/197

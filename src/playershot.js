@@ -1,3 +1,5 @@
+/** @module playershot */
+
 import Character from './character.js'
 import Util from './util.js'
 import Collider from './collider.js'
@@ -13,39 +15,56 @@ const HIT_WIDTH = 3;
 const HIT_HEIGHT = 3;
 
 /**
- * @class PlayerShot
- * @brief 自機弾
+ * 自機弾。
  * 右方向に直進する。
  */
-export default class PlayerShot {
+class PlayerShot {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] isOption 発射元がオプションかどうか
-     * @param [in/out] scene シーン
+     * コンストラクタ。座標の設定とスプライトシートの設定を行う。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} isOption - 発射元がオプションかどうか
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, isOption, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_8x8', 8, 8);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_8x8_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('player_shot');
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = Character.type.PLAYER_SHOT;
 
-        // 座標、サイズを設定する。
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
+
+        /**
+         * 攻撃力
+         * @type {number}
+         */
+        this.power = 0;
 
         // 攻撃力を設定する。
         if (isOption) {
@@ -57,12 +76,10 @@ export default class PlayerShot {
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 右方向に直進する。
      * 画面外に出ると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -105,3 +122,5 @@ export default class PlayerShot {
         }
     }
 }
+
+export default PlayerShot;

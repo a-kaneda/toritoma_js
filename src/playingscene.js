@@ -1,3 +1,5 @@
+/** @module playingscene */
+
 import PointDevice from './pointdevice.js'
 import MyColor from './mycolor.js'
 import ScreenSize from './screensize.js'
@@ -27,60 +29,91 @@ const SHIELD_BUTTON_POS_X = 50;
 const SHIELD_BUTTON_POS_Y = 50;
 
 /**
- * @class PlayingScene
- * @brief メインシーン
  * ゲームの各ステージをプレイするメインのシーン。
  */
-export default class PlayingScene {
+class PlayingScene {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 各種データの初期化と生成を行う。
-     *
-     * @param phinaScene phina.js上のシーンインスタンス
+     * @param {MainScene} phinaScene - phina.js上のシーンインスタンス
      */
     constructor(phinaScene) {
 
         // デバッグ用にシーンをグローバル変数に入れる。
         DebugObject.scene = this;
 
-        // phina.jsのシーンインスタンスを保持する。
+        /**
+         * phina.jsのシーンインスタンス
+         * @type {MainScene}
+         */
         this.phinaScene = phinaScene;
 
-        // ゲームパッドを取得する。
+        /**
+         * ゲームパッドマネージャー。
+         * @type {phina.input.GamepadManager}
+         */
         this.gamepadManager = phina.input.GamepadManager();
+
+        /**
+         * ゲームパッド。
+         * @type {phina.input.Gamepad}
+         */
         this.gamepad = this.gamepadManager.get(0);
 
-        // 背景レイヤーを作成する。
+        /**
+         * 背景レイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.backgroundLayer = DisplayElement().addChildTo(this.phinaScene);
+
+        // 背景レイヤーの位置、サイズを設定する。
         this.backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,
                                          ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this.backgroundLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this.backgroundLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
-        // キャラクターレイヤーを作成する。
+        /**
+         * キャラクターレイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.characterLayer = DisplayElement().addChildTo(this.phinaScene);
+
+        // キャラクターレイヤーの位置、サイズを設定する。
         this.characterLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,
                                         ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this.characterLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this.characterLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
-        // 枠レイヤーを作成する。
+        /**
+         * 枠レイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.frameLayer = DisplayElement().addChildTo(this.phinaScene);
+
+        // 枠レイヤーの位置、サイズを設定する。
         this.frameLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this.frameLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
-        // 情報レイヤーを作成する。
+        /**
+         * 情報レイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.infoLayer = DisplayElement().addChildTo(this.phinaScene);
 
         // ステージの外枠を作成する。
         this._createFrame();
 
-        // ステージを作成する。
+        /**
+         * ステージ
+         * @type {Stage}
+         */
         this.stage = new Stage('stage1', this.backgroundLayer);
 
-        // スコアラベルを作成する。
+        /**
+         * スコアラベルの背景部分。
+         * @type {phina.display.RectangleShape}
+         */
         this.scoreLabelBase = RectangleShape({
             height: 22,
             width: 148,
@@ -90,6 +123,10 @@ export default class PlayingScene {
             y: SCORE_POS_Y,
         }).addChildTo(this.infoLayer);
 
+        /**
+         * スコアラベル。
+         * @type {phina.display.Label}
+         */
         this.scoreLabel = Label({
             text: 'SCORE: 000000',
             fontSize: 20,
@@ -97,10 +134,19 @@ export default class PlayingScene {
             fontFamily: 'noto',
         }).addChildTo(this.scoreLabelBase);
 
+        /**
+         * スコア。
+         * @type {number}
+         */
         this.score = 0;
 
-        // 残機表示を作成する。
+        /**
+         * 残機表示
+         * @type {Life}
+         */
         this.lifeLabel = new Life();
+
+        // 残機表示の位置を設定する。
         this.lifeLabel.getSprite().addChildTo(this.infoLayer);
         this.lifeLabel.getSprite().x = ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO + LIFE_POS_X;
         this.lifeLabel.getSprite().y = LIFE_POS_Y;
@@ -108,30 +154,52 @@ export default class PlayingScene {
         // 残機を初期化する。
         this._setLife(INITIAL_LIFE);
 
-        // シールドボタンを作成する。
+        /**
+         * シールドボタン。
+         * @type {ShieldButton}
+         */
         this.shieldButton = new ShieldButton();
+
+        // シールドボタンの位置を設定する。
         this.shieldButton.getSprite().addChildTo(this.infoLayer);
         this.shieldButton.getSprite().x = ScreenSize.SCREEN_WIDTH - SHIELD_BUTTON_POS_X; 
         this.shieldButton.getSprite().y = ScreenSize.SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y; 
 
-        // チキンゲージを作成する。
+        /**
+         * チキンゲージ。
+         * @type {ChickenGauge}
+         */
         this.chickenGauge = new ChickenGauge();
+
+        // チキンゲージの位置を設定する。
         this.chickenGauge.getSprite().addChildTo(this.infoLayer);
         this.chickenGauge.getSprite().x = Math.round(this.phinaScene.gridX.center());
         this.chickenGauge.getSprite().y = ScreenSize.SCREEN_HEIGHT - CHICKEN_GAUGE_POS_Y;
 
-        // 復活待機フレーム数を初期化する。
+        /**
+         * 復活待機フレーム数。
+         * @type {number}
+         */
         this.rebirthWait = 0;
 
-        // キャラクター管理配列を作成する。
+        /**
+         * キャラクター管理配列。
+         * @type {Array}
+         */
         this.characters = [];
 
-        // 自機を作成する。
+        /**
+         * 自機
+         * @type {Player}
+         */
         this.player = new Player(Math.round(ScreenSize.STAGE_RECT.width / 4),
                                  Math.round(ScreenSize.STAGE_RECT.height / 2),
                                  this);
 
-        // タッチ情報を初期化する。
+        /**
+         * タッチ情報。
+         * @type {Object}
+         */
         this.touch = {id: -1, x:0, y:0};
 
         // BGMの音量を設定する。
@@ -142,12 +210,10 @@ export default class PlayingScene {
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * キー入力処理を行う。
      * ステージ、キャラクターの更新処理を行う。
-     *
-     * @param [in] app アプリケーション
+     * @param {phina.game.GameApp} app - アプリケーション
      */
     update(app) {
 
@@ -193,33 +259,24 @@ export default class PlayingScene {
     }
 
     /**
-     * @function addCharacter
-     * @brief キャラクター追加
      * キャラクターを追加する。
-     *
-     * @param [in] character 追加するキャラクター
+     * @param {Object} character - 追加するキャラクター
      */
     addCharacter(character) {
         this.characters.push(character);
     }
 
     /**
-     * @function addCharacterSprite
-     * @brief キャラクタースプライトの追加
      * キャラクターのスプライトを追加する。
-     *
-     * @param [in/out] sprite 追加するスプライト
+     * @param {phina.display.DisplayElement} sprite - 追加するスプライト
      */
     addCharacterSprite(sprite) {
         sprite.addChildTo(this.characterLayer);
     }
 
     /**
-     * @function removeCharacter
-     * @brief キャラクター削除
      * キャラクターを削除する。
-     *
-     * @param [in/out] character 削除するキャラクター
+     * @param {Object} character - 追加するキャラクター
      */
     removeCharacter(character) {
         const i = this.characters.indexOf(character);
@@ -229,41 +286,30 @@ export default class PlayingScene {
     }
 
     /**
-     * @function addScore
-     * @brief スコア追加
      * スコアを追加する。
-     *
-     * @param [in] score 追加するスコア
+     * @param {number} score - 追加するスコア
      */
     addScore(score) {
         this.score += score;
     }
 
     /**
-     * @function getBlockMap
-     * @brief ブロックマップ取得
      * ブロックマップを取得する。
-     *
-     * @return ブロックマップ
+     * @return {Array} ブロックマップ
      */
     getBlockMap() {
         return this.stage.mapManager.objectMap.collision;
     }
 
     /**
-     * @function getStagePosition
-     * @brief ステージ位置取得
      * ステージが左方向に何ドット移動しているかを取得する。
-     *
-     * @return ステージ位置
+     * @return {number} ステージ位置
      */
     getStagePosition() {
         return -this.stage.x;
     }
 
     /**
-     * @function miss
-     * @brief 自機死亡時処理
      * 自機が死亡したときの処理を行う。
      * 残機が残っていれば、残機を一つ減らし、自機を復活する。
      * 残機が残っていなければゲームオーバー処理を行う。
@@ -289,12 +335,9 @@ export default class PlayingScene {
     }
 
     /**
-     * @function isDisableEnemyShot
-     * @brief 敵弾が無効化されているかどうか
      * 敵弾が無効化されているかどうかを取得する。
      * 自機が死亡して復活するまでの間は敵弾は発生させない。
-     *
-     * @return 敵弾が無効化されているかどうか
+     * @return {boolean} 敵弾が無効化されているかどうか
      */
     isDisableEnemyShot() {
 
@@ -308,11 +351,8 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _inputKeyboard
-     * @brief キーボード入力処理
      * キーボードの入力処理を行う。
-     *
-     * @param [in] app アプリケーション
+     * @param {phina.game.GameApp} app - アプリケーション
      */
     _inputKeyboard(app) {
 
@@ -340,11 +380,8 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _inputTouch
-     * @brief タッチ入力処理
      * タッチの入力処理を行う。
-     *
-     * @param [in] app アプリケーション
+     * @param {phina.game.GameApp} app - アプリケーション
      */
     _inputTouch(app) {
 
@@ -390,8 +427,6 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _inputGamepad
-     * @brief ゲームパッド入力処理
      * ゲームパッドの入力処理を行う。
      */
     _inputGamepad() {
@@ -416,9 +451,6 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _crateFrame
-     * @brief ステージ外枠背景作成
-     *
      * ステージの外側の枠と背景を作成する。
      */
     _createFrame() {
@@ -431,9 +463,6 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _createFrameBack
-     * @brief ステージ外枠背景作成
-     *
      * ステージの外側の背景を作成する。
      */
     _createFrameBack() {
@@ -515,9 +544,6 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _createFrameBar
-     * @brief ステージ外枠作成
-     *
      * ステージの外側の枠を作成する。
      */
     _createFrameBar() {
@@ -602,9 +628,8 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _setLife
-     * @brief 残機設定
      * 残機を変更し、残機ラベルを更新する。
+     * @param {number} life - 残機
      */
     _setLife(life) {
         this.life = life;
@@ -612,8 +637,7 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _rebirthPlayer
-     * @brief 自機復活処理
+     * 自機復活処理。
      * 復活待機フレーム数をカウントし、
      * 待機フレーム数を経過したタイミングで自機を復活する。
      */
@@ -634,8 +658,6 @@ export default class PlayingScene {
     }
 
     /**
-     * @function _removeEnemyShot
-     * @brief 敵弾削除
      * 敵弾をすべて削除する。
      */
     _removeEnemyShot() {
@@ -651,3 +673,5 @@ export default class PlayingScene {
 
     }
 }
+
+export default PlayingScene;

@@ -1,17 +1,15 @@
+/** @module chickengauge */
+
 import ScreenSize from './screensize.js'
 import ControlSize from './controlsize.js'
 
 /**
- * @class ChickenGauge
- * @brief チキンゲージ
  * チキンゲージの画像を表示する。
  */
-export default class ChickenGauge {
+class ChickenGauge {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 画像の読み込みを行う。
+     * コンストラクタ、画像の読み込みを行う。
      */
     constructor() {
 
@@ -48,22 +46,16 @@ export default class ChickenGauge {
     }
 
     /**
-     * @function getSprite
-     * @brief スプライト取得
      * ゲージのたまっている比率に応じたスプライトを取得する。
-     *
-     * @return スプライト
+     * @return {phina.display.DisplayElement} スプライト
      */
     getSprite() {
         return this.base;
     }
 
     /**
-     * @function setRate
-     * @brief ゲージ比率設定
      * ゲージが溜まっている比率を設定する。
-     *
-     * @param [in] rate ゲージが溜まっている比率(0～1)
+     * @param {number} rate - ゲージが溜まっている比率(0～1)
      */
     setRate(rate) {
 
@@ -72,3 +64,5 @@ export default class ChickenGauge {
         this.fullImage.srcRect.width = Math.round(ControlSize.cs.chickenGaugeFull.width * rate);
     }
 }
+
+export default ChickenGauge;

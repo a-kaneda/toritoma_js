@@ -1,28 +1,37 @@
+/** @module playerdeatheffect */
+
 /**
- * @class PlayerDeathEffect
- * @brief 自機死亡エフェクト
  * 自機死亡時のエフェクトを表示する。
  */
-export default class PlayerDeathEffect {
+class PlayerDeathEffect {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 座標の設定とアニメーションの設定を行う。
      * 死亡時SEを再生する。
      *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('player_death');
 
@@ -34,12 +43,9 @@ export default class PlayerDeathEffect {
     }
 
     /**
-     * @function update
-     * @brief 更新処理
-     * 下に落ちる。
+     * 更新処理。下に落ちる。
      * アニメーションが終了すると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -53,3 +59,5 @@ export default class PlayerDeathEffect {
         }
     }
 }
+
+export default PlayerDeathEffect;

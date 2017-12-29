@@ -1,3 +1,9 @@
+/** @module controllsize */
+
+/**
+ * コントロールサイズ
+ * @type {object}
+ */
 const cs = {
     frameBack: {
         x: 0,
@@ -86,14 +92,17 @@ const cs = {
 };
 
 /**
- * @class ControlSize
- * @brief コントロールサイズ
- *
  * control.png内のコントロールの位置とサイズを定義する。
  */
-export default class ControlSize {
+class ControlSize {
 
+    /**
+     * control.png内のコントロールの位置とサイズ
+     * @type {object}
+     */
     static get cs() {
         return cs;
     }
 };
+
+export default ControlSize;

@@ -1,21 +1,17 @@
+/** @module collider */
 import Util from './util.js'
 
 /**
- * @class Collider
- * @brief 当たり判定
  * 当たり判定処理を行う。
  */
-export default class Collider {
+class Collider {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 当たり判定の範囲を設定する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] width 幅
-     * @param [in] height 高さ
+     * コンストラクタ、当たり判定の範囲を設定する。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} width - 幅
+     * @param {number} height - 高さ
      */
     constructor(x, y, width, height) {
 
@@ -27,13 +23,10 @@ export default class Collider {
     }
 
     /**
-     * @function getHitCharacter
-     * @brief 衝突キャラクター検索
      * 衝突しているキャラクターを検索する。
-     *
-     * @param [in] characters キャラクター配列
-     * @param [in] types 検索対象のキャラクター種別
-     * @return 衝突しているキャラクター配列
+     * @param {Array} characters - キャラクター配列
+     * @param {Array} types - 検索対象のキャラクター種別
+     * @return {Array} 衝突しているキャラクター配列
      */
     getHitCharacter(characters, types) {
 
@@ -57,3 +50,5 @@ export default class Collider {
         return ret;
     }
 }
+
+export default Collider;

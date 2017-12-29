@@ -1,3 +1,5 @@
+/** @module stage */
+
 import ScreenSize from './screensize.js'
 import TileMapManager from './tilemapmanager.js'
 import Dragonfly from './dragonfly.js'
@@ -6,48 +8,76 @@ import Dragonfly from './dragonfly.js'
 const TILE_SIZE = 16;
 
 /**
- * @class Stage
- * @brief ステージ管理クラス
- * 
  * ステージのマップ、背景、イベント処理を管理する。
  */
-export default class Stage {
+class Stage {
 
+    /**
+     * タイルサイズ
+     * @type {number}
+     */
     static get TILE_SIZE() {
         return TILE_SIZE;
     }
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * mapNameで指定されたマップを読み込み、background、foreground、blockのレイヤーの画像をlayerに配置する。
      * stageWidthをメンバ変数に格納する。
-     * 
-     * @param [in] manName マップ名
-     * @param [in] scene シーン
-     * @param [in/out] layer ステージ画像を配置するレイヤー
+     * @param {string} manName - マップ名
+     * @param {phina.display.DisplayElement} layer - ステージ画像を配置するレイヤー
      */
     constructor(mapName, layer) {
 
-        // メンバを初期化する。
+        /**
+         * スクロールスピード。
+         * @type {number}
+         */
         this.speed = 0;
+
+        /**
+         * スクロール位置。
+         * @type {number}
+         */
         this.x = 0;
+
+        /**
+         * イベントを実行した列番号。
+         * @type {number}
+         */
         this.executedCol = 0;
-        
-        // タイルマップを読み込み、背景画像を配置する。
+
+        /**
+         * タイルマップ管理クラス。
+         * @type {TileMapManager}
+         */ 
         this.mapManager = new TileMapManager(mapName);
+        
+        // 障害物のマップを作成する。
         this.mapManager.createObjectMap('block', 'collision');
+
+        /**
+         * 背景画像。
+         * @type {phina.display.Sprite}
+         */
         this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+
+        /**
+         * 前景画像。
+         * @type {phina.display.Sprite}
+         */
         this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+
+        /**
+         * 障害物画像。
+         * @type {phina.display.Sprite}
+         */
         this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
     }
 
     /**
-     * @function update
-     * @brief 更新処理
      * ステージの状態を更新する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -59,12 +89,9 @@ export default class Stage {
     }
     
     /**
-     * @function _execEvent
-     * @brief イベント実行処理
      * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
      * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     _execEvent(scene) {
 
@@ -106,8 +133,6 @@ export default class Stage {
     }
     
     /**
-     * @function _move
-     * @brief 移動処理
      * スピードに応じてマップ全体を移動する。
      */
     _move() {
@@ -122,13 +147,10 @@ export default class Stage {
     }
 
     /**
-     * @function _createEnemy
-     * @brief 敵生成
      * 敵キャラクターを生成する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     _createEnemy(type, x, y, scene) {
         switch (type) {
@@ -140,3 +162,5 @@ export default class Stage {
         }
     }
 }
+
+export default Stage;

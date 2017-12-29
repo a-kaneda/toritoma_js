@@ -1,20 +1,28 @@
-// キャラクター種別
+/** @module character */
+
+/**
+ * キャラクター種別
+ * @enum {number}
+ */
 const type = {
-    // 自機
+    /** 自機 */
     PLAYER: 1,
-    // 自機オプション
+    /** 自機オプション */
     PLAYER_OPTION: 2,
-    // 自機弾
+    /** 自機弾 */
     PLAYER_SHOT: 3,
-    // 敵
+    /** 敵 */
     ENEMY: 4,
-    // 敵弾
+    /** 敵弾 */
     ENEMY_SHOT: 5,
 };
 
-// 敵キャラパラメータ
+/**
+ * 敵キャラパラメータ
+ * @type {object}
+ */
 const enemy = {
-    // トンボ
+    /** トンボ */
     dragonfly: {
         width: 16,
         height: 16,
@@ -25,15 +33,25 @@ const enemy = {
 };
 
 /**
- * @class Character
- * @brief キャラクター定数
  * キャラクターに関する定数を管理する。
  */
-export default class Character {
+class Character {
+
+    /**
+     * キャラクタータイプ
+     * @type {Array}
+     */
     static get type() {
         return type;
     }
+
+    /**
+     * 敵キャラクターパラメータ
+     * @type {object}
+     */
     static get enemy() {
         return enemy;
     }
 }
+
+export default Character;

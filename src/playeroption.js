@@ -1,3 +1,5 @@
+/** @module playeroption */
+
 import Character from './character.js'
 import Util from './util.js'
 import Collider from './collider.js'
@@ -13,34 +15,45 @@ const HIT_HEIGHT = 16;
 const OPTION_SPACE = 20;
 
 /**
- * @class PlayerOption
- * @brief 自機オプション
+ * 自機オプション。
  * 自機の後ろについて移動する。
  * チキンゲージの比率に応じて増える。
  */
-export default class PlayerOption {
+class PlayerOption {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 座標の設定とスプライトシートの設定を行う。
      *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] shield シールド使用不使用
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} shield - シールド使用不使用
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, shield , scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // シールド使用不使用を設定する。
+        /**
+         * シールド使用不使用
+         * @type {boolean}
+         */
         this.shield = shield;
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
 
         // シールド使用不使用によって画像を変更する。
@@ -51,34 +64,54 @@ export default class PlayerOption {
             this.animation.gotoAndPlay('player_option_normal');
         }
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = Character.type.PLAYER_OPTION;
 
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
 
-        // メンバを初期化する。
+        /**
+         * 移動位置。一定個数溜まったら、FIFOとして移動位置を適用していく。
+         * @type {Array}
+         */
         this.movePosition = [];
+
+        /**
+         * 次のオプション。
+         * @type {PlayerOption}
+         */
         this.nextOption = null;
+
+        /**
+         * 弾発射間隔。
+         * @type {number}
+         */
         this.shotInterval = 0;
+
+        /**
+         * デバッグ用フラグ。自機弾を発射しないようにする。
+         * @type {boolean}
+         */
+        this.noShot = false;
 
         // デバッグ用: ショットを撃たないようにする。
         if (localStorage.noShot === 'true') {
             this.noShot = true;
         }
-        else {
-            this.noShot = false;
-        }
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 座標をスプライトに適用する。
      * シールド使用時は敵弾との当たり判定処理を行う。
      * 自機弾を発射する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -103,14 +136,11 @@ export default class PlayerOption {
     }
 
     /**
-     * @function move
-     * @brief 移動処理
      * 指定された座標へ移動する。
      * ただし、すぐに移動するのではなく、OPTION_SPACEの間隔分遅れて移動する。
      * オプションが他に存在する場合は、移動前の座標に対して移動を指示する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
+     * @param {number} x - x座標
+     * @param {number} y - y座標
      */
     move(x, y) {
 
@@ -135,14 +165,11 @@ export default class PlayerOption {
     }
 
     /**
-     * @function setCount
-     * @brief オプション個数設定
      * オプションの個数を設定する。
      * 0以下が指定されると自分自身を削除する。
      * 2個以上が指定されると再帰的に次のオプションを作成する。
-     *
-     * @param [in] count オプション個数
-     * @param [in/out] scene シーン
+     * @param {number} count - オプション個数
+     * @param {PlayingScene} scene - シーン
      */
     setCount(count, scene) {
 
@@ -179,12 +206,9 @@ export default class PlayerOption {
     }
 
     /**
-     * @function setShield
-     * @brief シールド使用不使用設定
      * シールド使用不使用を設定する。
      * 次のオプションがあればオプションの設定も変更する。
-     *
-     * @param [in] shield シールド使用不使用
+     * @param {boolean} shield - シールド使用不使用
      */
     setShield(shield) {
 
@@ -211,11 +235,8 @@ export default class PlayerOption {
     }
     
     /**
-     * @function _checkHitChacater
-     * @breif 当たり判定処理
-     * 他のキャラクターとの当たり判定を処理する。
-     *
-     * @param [in/out] scene シーン
+     * 敵弾との当たり判定を処理する。衝突した敵弾の反射処理を行う。
+     * @param {PlayingScene} scene - シーン
      */
     _checkHitChacater(scene) {
 
@@ -230,3 +251,5 @@ export default class PlayerOption {
         }
     }
 }
+
+export default PlayerOption;

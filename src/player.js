@@ -1,3 +1,5 @@
+/** @module player */
+
 import ScreenSize from './screensize.js'
 import Character from './character.js'
 import Util from './util.js'
@@ -39,75 +41,126 @@ const MAX_OPTION_COUNT = 3;
 const CONSUMPTION_GAUGE = 0.005;
 
 /**
- * @class Player
- * @brief 自機
- * ユーザー操作に応じて移動する。
+ * 自機。ユーザー操作に応じて移動する。
  */
-export default class Player {
+class Player {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * コンストラクタ、座標の設定とスプライトシートの設定を行う。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('player_normal');
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = Character.type.PLAYER;
 
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
 
-        // かすり当たり判定を作成する。
+        /**
+         * かすり当たり判定
+         * @type {Collider}
+         */
         this.grazeArea = new Collider(x, y, GRAZE_WIDTH, GRAZE_HEIGHT);
 
-        // メンバを初期化する。
+        /**
+         * 弾発射間隔
+         * @type {number}
+         */
         this.shotInterval = 0;
+
+        /**
+         * 状態
+         * @type {number}
+         */
         this.status = STATUS.NORMAL;
+
+        /**
+         * 衝突したときの攻撃力
+         * @type {number}
+         */
         this.power = 1;
+
+        /**
+         * 無敵状態フレーム数
+         * @tyep {number}
+         */
         this.invincibleFrame = 0;
+
+        /**
+         * チキンゲージ
+         * @type {number}
+         */
         this.chickenGauge = 0;
+
+        /**
+         * オプション
+         * @type {PlayerOption}
+         */
         this.option = null;
+
+        /**
+         * シールド使用不使用
+         * @type {boolean}
+         */
         this.shield = false;
+
+        /**
+         * デバッグ用フラグ。死亡しないようにする。
+         * @type {boolean}
+         */
+        this.noDeath = false;
+
+        /**
+         * デバッグ用フラグ。自機弾を発射しないようにする。
+         * @type {boolean}
+         */
+        this.noShot = false;
 
         // デバッグ用: 死亡しないようにする。
         if (localStorage.noDeath === 'true') {
             this.noDeath = true;
-        }
-        else {
-            this.noDeath = false;
         }
 
         // デバッグ用: ショットを撃たないようにする。
         if (localStorage.noShot === 'true') {
             this.noShot = true;
         }
-        else {
-            this.noShot = false;
-        }
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 座標をスプライトに適用する。
      * ブロックやキャラクターとの当たり判定処理を行う。
      * 自機弾を発射する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -178,11 +231,8 @@ export default class Player {
     }
 
     /**
-     * @function moveKeyLeft
-     * @brief 左キーによる移動
      * キーボードの左キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyLeft(scene) {
         this._move(this.hitArea.x - SPEED_BY_KEY,
@@ -191,11 +241,8 @@ export default class Player {
     }
 
     /**
-     * @function moveKeyRight
-     * @brief 右キーによる移動
      * キーボードの右キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyRight(scene) {
         this._move(this.hitArea.x + SPEED_BY_KEY,
@@ -204,11 +251,8 @@ export default class Player {
     }
 
     /**
-     * @function moveKeyUp
-     * @brief 上キーによる移動
      * キーボードの上キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyUp(scene) {
         this._move(this.hitArea.x,
@@ -217,11 +261,8 @@ export default class Player {
     }
 
     /**
-     * @function moveKeyDown
-     * @brief 下キーによる移動
      * キーボードの下キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyDown(scene) {
         this._move(this.hitArea.x,
@@ -230,13 +271,10 @@ export default class Player {
     }
 
     /**
-     * @function moveTouch
-     * @brief タッチによる移動
      * タッチ入力による移動処理を行う。
-     *
-     * @param [in] x x座標方向のタッチ位置スライド量
-     * @param [in] y y座標方向のタッチ位置スライド量
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標方向のタッチ位置スライド量
+     * @param {number} y - y座標方向のタッチ位置スライド量
+     * @param {PlayingScene} scene - シーン
      */
     moveTouch(x, y, scene) {
         this._move(this.hitArea.x + x * SPEED_BY_TOUCH,
@@ -245,13 +283,10 @@ export default class Player {
     }
 
     /**
-     * @function moveTouch
-     * @brief ゲームパッドによる移動
      * ゲームパッド入力による移動処理を行う。
-     *
-     * @param [in] x x座標方向のスティック入力値
-     * @param [in] y y座標方向のスティック入力値
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標方向のスティック入力値
+     * @param {number} y - y座標方向のスティック入力値
+     * @param {PlayingScene} scene - シーン
      */
     moveGamepad(x, y, scene) {
         this._move(this.hitArea.x + x * SPEED_BY_GAMEPAD,
@@ -260,12 +295,9 @@ export default class Player {
     }
 
     /**
-     * @function rebirth
-     * @brief 復活処理
      * 死亡後の復活処理を行う。
      * 一定時間無敵状態とし、画像を点滅表示する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     rebirth(scene) {
 
@@ -293,23 +325,17 @@ export default class Player {
     }
 
     /**
-     * @function getChickenGauge
-     * @brief チキンゲージ取得
      * チキンゲージの溜まっている比率を0～1の範囲で取得する。
-     *
-     * @return チキンゲージ
+     * @return {number} チキンゲージ
      */
     getChickenGauge() {
         return this.chickenGauge;
     }
 
     /**
-     * @function setShield
-     * @brief シールド使用不使用設定
      * シールド使用不使用を設定する。
      * オプションがあればオプションの設定も変更する。
-     *
-     * @param [in] shield シールド使用不使用
+     * @param {boolean} shield - シールド使用不使用
      */
     setShield(shield) {
 
@@ -323,13 +349,10 @@ export default class Player {
     }
 
     /**
-     * @function _move
-     * @brief 移動処理
      * 座標を変更し、各種当たり判定処理を行う。
-     *
-     * @param [in] x 移動後のx座標
-     * @param [in] y 移動後のy座標
-     * @param [in/out] scene シーン
+     * @param {number} x - 移動後のx座標
+     * @param {number} y - 移動後のy座標
+     * @param {PlayingScene} scene - シーン
      */
     _move(x, y, scene) {
 
@@ -376,8 +399,6 @@ export default class Player {
     }
 
     /**
-     * @function _checkScreenArea
-     * @breif 画面外に出ていないかチェックする
      * 画面外に出ていないかチェックする。
      * 画面外に出ていた場合は画面内に座標を補正する。
      */
@@ -405,11 +426,9 @@ export default class Player {
     }
 
     /**
-     * @function _checkHitChacater
-     * @breif 当たり判定処理
      * 他のキャラクターとの当たり判定を処理する。
-     *
      * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     _checkHitChacater(scene) {
 
@@ -441,11 +460,8 @@ export default class Player {
     }
 
     /**
-     * @function _checkGraze
-     * @breif かすり判定処理
      * 敵弾とのかすり判定を処理する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     _checkGraze(scene) {
 
@@ -470,11 +486,8 @@ export default class Player {
     }
     
     /**
-     * @function _updateOptionCount
-     * @brief オプション個数更新
      * チキンゲージに応じてオプション個数を更新する。
-     * 
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     _updateOptionCount(scene) {
 
@@ -508,3 +521,5 @@ export default class Player {
         }
     }
 }
+
+export default Player;

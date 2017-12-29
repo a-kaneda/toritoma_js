@@ -1,3 +1,5 @@
+/** @module enemyshot */
+
 import ScreenSize from './screensize.js'
 import Character from './character.js'
 import Util from './util.js'
@@ -13,58 +15,74 @@ const GRAZE_RATE = 0.02;
 const REFLECTION_POWER = 5;
 
 /**
- * @class EnemyShot
- * @brief 敵弾
  * 敵が発射する弾。
  */
-export default class EnemyShot {
+class EnemyShot {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] angle 進行方向
-     * @param [in] speed スピード
-     * @param [in/out] scene シーン
+     * コンストラクタ、座標の設定とスプライトシートの設定を行う。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} angle - 進行方向
+     * @param {number} speed - スピード
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, angle, speed, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_8x8', 8, 8);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_8x8_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('enemy_shot');
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = Character.type.ENEMY_SHOT;
 
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
 
-        // x方向のスピードを計算する。
+        /** 
+         * x方向のスピード
+         * @type {number}
+         */
         this.speedX = Math.cos(angle) * speed;
         
-        // y方向のスピードを計算する。
-        // phina.jsの座標系は下方向が正なので逆向きにする。
+        /** 
+         * y方向のスピード。phina.jsの座標系は下方向が正なので逆向きにする。
+         * @type {number}
+         */
         this.speedY = Math.sin(angle) * speed * -1;
 
-        // かすり時のゲージ増加率を設定する。
+        /**
+         * かすり時のゲージ増加率
+         * @type {number}
+         */
         this.grazeRate = GRAZE_RATE;
     }
     
     /**
-     * @function update
-     * @brief 更新処理
      * スピードに応じて移動する。
      * 画面外に出ると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -117,12 +135,9 @@ export default class EnemyShot {
     }
 
     /**
-     * @function hit
-     * @brief 衝突処理
      * 他のキャラクターと衝突したときの処理を行う。
-     *
-     * @param [in] character 衝突したキャラクター
-     * @param [in/out] scene シーン
+     * @param {object} character - 衝突したキャラクター
+     * @param {PlayingScene} scene - シーン
      */
     hit(character, scene) {
 
@@ -132,11 +147,8 @@ export default class EnemyShot {
     }
 
     /**
-     * @function graze
-     * @brief かすり処理
      * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
-     *
-     * @return ゲージ増加比率
+     * @return {number} ゲージ増加比率
      */
     graze() {
         const ret = this.grazeRate;
@@ -145,8 +157,6 @@ export default class EnemyShot {
     }
 
     /**
-     * @function reflect
-     * @brief 反射処理
      * 移動方向を180度反転させ、自機弾として扱うようにする。
      */
     reflect() {
@@ -162,3 +172,5 @@ export default class EnemyShot {
         this.speedY *= -1;
     }
 }
+
+export default EnemyShot;

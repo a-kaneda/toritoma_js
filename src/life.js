@@ -1,3 +1,5 @@
+/** @module life */
+
 import MyColor from './mycolor.js'
 import ScreenSize from './screensize.js'
 import ControlSize from './controlsize.js'
@@ -10,20 +12,20 @@ const IMAGE_POS_X = -16;
 const LABEL_POS_X = 8;
 
 /**
- * @class Life
- * @brief 残機表示
  * 残機を表示する。
  */
-export default class Life {
+class Life {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 画像と数値のラベルをくっつけたコントールを作成する。
      */
     constructor() {
 
-        // ベース部分を作成する。
+        /**
+         * ベース部分
+         * @type {phina.display.RectangleShape}
+         */
         this.base = RectangleShape({
             height: 22,
             width: 52,
@@ -31,15 +33,23 @@ export default class Life {
             strokeWidth: 0,
         });
 
-        // 画像を読み込む。
+        /**
+         * 画像
+         * @type {phina.display.Sprite}
+         */
         this.image = Sprite('control', ControlSize.cs.life.width, ControlSize.cs.life.height);
+
+        // 画像のサイズと位置を設定する。
         this.image.srcRect.set(ControlSize.cs.life.x, ControlSize.cs.life.y, ControlSize.cs.life.width, ControlSize.cs.life.height);
         this.image.scaleX = ScreenSize.ZOOM_RATIO;
         this.image.scaleY = ScreenSize.ZOOM_RATIO;
         this.image.x = IMAGE_POS_X;
         this.image.addChildTo(this.base);
 
-        // ラベルを作成する。
+        /**
+         * ラベル
+         * @type {phina.display.Label}
+         */
         this.label = Label({
             text: ':00',
             fontSize: 20,
@@ -49,25 +59,24 @@ export default class Life {
         this.label.x = LABEL_POS_X;
         this.label.addChildTo(this.base);
 
-        // 残機の初期値は0とする。
+        /**
+         * 残機
+         * @type {number}
+         */
         this.life = 0;
     }
 
     /**
-     * @function getSprite
-     * @brief スプライト取得
      * 残機画像、ラベルを合わせたスプライトを取得する。
-     *
-     * @return スプライト
+     * @return {phina.display.RectangleShape} スプライト
      */
     getSprite() {
         return this.base;
     }
 
     /**
-     * @function setLife
-     * @brief 残機設定
-     * 残機を設定し、
+     * 残機を設定し、ラベルの文字列を変更する。
+     * @param {number} life - 残機
      */
     setLife(life) {
 
@@ -83,3 +92,5 @@ export default class Life {
         this.label.text = ':' + ('00' + this.life).slice(-2);
     }
 }
+
+export default Life;

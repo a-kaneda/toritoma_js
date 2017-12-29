@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: shieldbutton.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: shieldbutton.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module shieldbutton */
+
+import ControlSize from './controlsize.js'
+import ScreenSize from './screensize.js'
+
+// ボタンサイズ
+const BUTTON_SIZE = 128;
+
+/**
+ * シールドボタンの画像表示とタッチ処理を行う。
+ */
+class ShieldButton {
+
+    /**
+     * コンストラクタ。
+     * 画像の読み込みとボタン部分を作成する。
+     */
+    constructor() {
+
+        /**
+         * ベース部分を作成する。
+         * @type {phina.display.DisplayElement}
+         */
+        this.base = DisplayElement();
+
+        /**
+         * タッチしていない状態の画像
+         * @type {phina.display.Sprite}
+         */
+        this.offImage = Sprite('control', ControlSize.cs.shieldButtonOff.width, ControlSize.cs.shieldButtonOff.height);
+
+        // タッチしていない状態のサイズを設定する。
+        this.offImage.srcRect.set(ControlSize.cs.shieldButtonOff.x,
+                                  ControlSize.cs.shieldButtonOff.y,
+                                  ControlSize.cs.shieldButtonOff.width,
+                                  ControlSize.cs.shieldButtonOff.height);
+        this.offImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.offImage.scaleY = ScreenSize.ZOOM_RATIO;
+
+        // ベース部分に追加する。
+        this.offImage.addChildTo(this.base);
+
+        /**
+         * タッチしている状態の画像
+         * @type {phina.display.Sprite}
+         */
+        this.onImage = Sprite('control', ControlSize.cs.shieldButtonOn.width, ControlSize.cs.shieldButtonOn.height);
+
+        // タッチしている状態のサイズを設定する。
+        this.onImage.srcRect.set(ControlSize.cs.shieldButtonOn.x,
+                                 ControlSize.cs.shieldButtonOn.y,
+                                 ControlSize.cs.shieldButtonOn.width,
+                                 ControlSize.cs.shieldButtonOn.height);
+        this.onImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.onImage.scaleY = ScreenSize.ZOOM_RATIO;
+
+        // ベース部分に追加する。
+        this.onImage.addChildTo(this.base);
+
+        /**
+         * ボタン部分。
+         * タップをやりやすくするため、画像より大きめにサイズを取る。
+         * @type {phina.display.RectangleShape}
+         */ 
+        this.button = RectangleShape({
+            height: BUTTON_SIZE,
+            width: BUTTON_SIZE,
+        });
+
+        // ボタン部分を非表示にする。
+        this.button.alpha = 0;
+
+        // タッチ操作を有効にする。
+        this.button.setInteractive(true);
+
+        // ベース部分に追加する。
+        this.button.addChildTo(this.base);
+
+        const self = this;
+
+        // タッチ開始イベントのハンドラを作成する。
+        this.button.onpointstart = function() {
+            self.touch = true;
+            self.offImage.alpha = 0;
+            self.onImage.alpha = 1;
+        };
+
+        // タッチ終了イベントのハンドラを作成する。
+        this.button.onpointend = function() {
+            self.touch = false;
+            self.offImage.alpha = 1;
+            self.onImage.alpha = 0;
+        };
+
+        /**
+         * タッチしているかどうか
+         * @type {boolean}
+         */
+        this.touch = false;
+
+        // 初期状態はタッチしていない状態とする。
+        this.offImage.alpha = 1;
+        this.onImage.alpha = 0;
+    }
+
+    /**
+     * 画像、ボタンを合わせたスプライトを取得する。
+     * @return {phina.display.DisplayElement} スプライト
+     */
+    getSprite() {
+        return this.base;
+    }
+
+    /**
+     * タッチされているかどうかを取得する。
+     * @return {boolean} タッチされているかどうか
+     */
+    isTouch() {
+        return this.touch;
+    }
+}
+
+export default ShieldButton;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-character.html">character</a></li><li><a href="module-chickengauge.html">chickengauge</a></li><li><a href="module-collider.html">collider</a></li><li><a href="module-controllsize.html">controllsize</a></li><li><a href="module-dragonfly.html">dragonfly</a></li><li><a href="module-enemyshot.html">enemyshot</a></li><li><a href="module-explosion.html">explosion</a></li><li><a href="module-life.html">life</a></li><li><a href="module-mycolor.html">mycolor</a></li><li><a href="module-player.html">player</a></li><li><a href="module-playerdeatheffect.html">playerdeatheffect</a></li><li><a href="module-playeroption.html">playeroption</a></li><li><a href="module-playershot.html">playershot</a></li><li><a href="module-playingscene.html">playingscene</a></li><li><a href="module-pointdevice.html">pointdevice</a></li><li><a href="module-screensize.html">screensize</a></li><li><a href="module-shieldbutton.html">shieldbutton</a></li><li><a href="module-stage.html">stage</a></li><li><a href="module-tilemapmanager.html">tilemapmanager</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="MainScene.html">MainScene</a></li><li><a href="module-character-Character.html">Character</a></li><li><a href="module-chickengauge-ChickenGauge.html">ChickenGauge</a></li><li><a href="module-collider-Collider.html">Collider</a></li><li><a href="module-controllsize-ControlSize.html">ControlSize</a></li><li><a href="module-dragonfly-Dragonfly.html">Dragonfly</a></li><li><a href="module-enemyshot-EnemyShot.html">EnemyShot</a></li><li><a href="module-explosion-Explosion.html">Explosion</a></li><li><a href="module-life-Life.html">Life</a></li><li><a href="module-mycolor-MyColor.html">MyColor</a></li><li><a href="module-playerdeatheffect-PlayerDeathEffect.html">PlayerDeathEffect</a></li><li><a href="module-playeroption-PlayerOption.html">PlayerOption</a></li><li><a href="module-playershot-PlayerShot.html">PlayerShot</a></li><li><a href="module-player-Player.html">Player</a></li><li><a href="module-playingscene-PlayingScene.html">PlayingScene</a></li><li><a href="module-pointdevice-PointDevice.html">PointDevice</a></li><li><a href="module-screensize-ScreenSize.html">ScreenSize</a></li><li><a href="module-shieldbutton-ShieldButton.html">ShieldButton</a></li><li><a href="module-stage-Stage.html">Stage</a></li><li><a href="module-tilemapmanager-TileMapManager.html">TileMapManager</a></li><li><a href="module-util-Util.html">Util</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ASSETS">ASSETS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Dec 29 2017 14:46:57 GMT+0900 (東京 (標準時))
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

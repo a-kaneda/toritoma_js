@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: chickengauge.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: chickengauge.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @module chickengauge */
+
+import ScreenSize from './screensize.js'
+import ControlSize from './controlsize.js'
+
+/**
+ * チキンゲージの画像を表示する。
+ */
+class ChickenGauge {
+
+    /**
+     * コンストラクタ、画像の読み込みを行う。
+     */
+    constructor() {
+
+        // ベース部分を作成する。
+        this.base = DisplayElement();
+
+        // 空ゲージの画像を読み込む。
+        this.emptyImage = Sprite('control', ControlSize.cs.chickenGaugeEmpty.width, ControlSize.cs.chickenGaugeEmpty.height);
+        this.emptyImage.srcRect.set(ControlSize.cs.chickenGaugeEmpty.x,
+                                    ControlSize.cs.chickenGaugeEmpty.y,
+                                    ControlSize.cs.chickenGaugeEmpty.width,
+                                    ControlSize.cs.chickenGaugeEmpty.height);
+        this.emptyImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.emptyImage.scaleY = ScreenSize.ZOOM_RATIO;
+        this.emptyImage.addChildTo(this.base);
+
+        // 満ゲージの画像を読み込む。
+        this.fullImage = Sprite('control', ControlSize.cs.chickenGaugeFull.width, ControlSize.cs.chickenGaugeFull.height);
+        this.fullImage.srcRect.set(ControlSize.cs.chickenGaugeFull.x,
+                                   ControlSize.cs.chickenGaugeFull.y,
+                                   ControlSize.cs.chickenGaugeFull.width,
+                                   ControlSize.cs.chickenGaugeFull.height);
+        this.fullImage.scaleX = ScreenSize.ZOOM_RATIO;
+        this.fullImage.scaleY = ScreenSize.ZOOM_RATIO;
+        this.fullImage.addChildTo(this.base);
+
+        // 左端を基準にゲージを増減させるため、原点位置を左端に変更する。
+        this.fullImage.setOrigin(0, 0.5);
+        this.fullImage.x = -ControlSize.cs.chickenGaugeFull.width;
+
+        // ゲージの初期値は0とする。
+        this.fullImage.width = 0;
+        this.fullImage.srcRect.width = 0;
+    }
+
+    /**
+     * ゲージのたまっている比率に応じたスプライトを取得する。
+     * @return {phina.display.DisplayElement} スプライト
+     */
+    getSprite() {
+        return this.base;
+    }
+
+    /**
+     * ゲージが溜まっている比率を設定する。
+     * @param {number} rate - ゲージが溜まっている比率(0～1)
+     */
+    setRate(rate) {
+
+        // 画像の幅を指定された比率に設定する。
+        this.fullImage.width = Math.round(ControlSize.cs.chickenGaugeFull.width * rate);
+        this.fullImage.srcRect.width = Math.round(ControlSize.cs.chickenGaugeFull.width * rate);
+    }
+}
+
+export default ChickenGauge;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-character.html">character</a></li><li><a href="module-chickengauge.html">chickengauge</a></li><li><a href="module-collider.html">collider</a></li><li><a href="module-controllsize.html">controllsize</a></li><li><a href="module-dragonfly.html">dragonfly</a></li><li><a href="module-enemyshot.html">enemyshot</a></li><li><a href="module-explosion.html">explosion</a></li><li><a href="module-life.html">life</a></li><li><a href="module-mycolor.html">mycolor</a></li><li><a href="module-player.html">player</a></li><li><a href="module-playerdeatheffect.html">playerdeatheffect</a></li><li><a href="module-playeroption.html">playeroption</a></li><li><a href="module-playershot.html">playershot</a></li><li><a href="module-playingscene.html">playingscene</a></li><li><a href="module-pointdevice.html">pointdevice</a></li><li><a href="module-screensize.html">screensize</a></li><li><a href="module-shieldbutton.html">shieldbutton</a></li><li><a href="module-stage.html">stage</a></li><li><a href="module-tilemapmanager.html">tilemapmanager</a></li><li><a href="module-util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="MainScene.html">MainScene</a></li><li><a href="module-character-Character.html">Character</a></li><li><a href="module-chickengauge-ChickenGauge.html">ChickenGauge</a></li><li><a href="module-collider-Collider.html">Collider</a></li><li><a href="module-controllsize-ControlSize.html">ControlSize</a></li><li><a href="module-dragonfly-Dragonfly.html">Dragonfly</a></li><li><a href="module-enemyshot-EnemyShot.html">EnemyShot</a></li><li><a href="module-explosion-Explosion.html">Explosion</a></li><li><a href="module-life-Life.html">Life</a></li><li><a href="module-mycolor-MyColor.html">MyColor</a></li><li><a href="module-playerdeatheffect-PlayerDeathEffect.html">PlayerDeathEffect</a></li><li><a href="module-playeroption-PlayerOption.html">PlayerOption</a></li><li><a href="module-playershot-PlayerShot.html">PlayerShot</a></li><li><a href="module-player-Player.html">Player</a></li><li><a href="module-playingscene-PlayingScene.html">PlayingScene</a></li><li><a href="module-pointdevice-PointDevice.html">PointDevice</a></li><li><a href="module-screensize-ScreenSize.html">ScreenSize</a></li><li><a href="module-shieldbutton-ShieldButton.html">ShieldButton</a></li><li><a href="module-stage-Stage.html">Stage</a></li><li><a href="module-tilemapmanager-TileMapManager.html">TileMapManager</a></li><li><a href="module-util-Util.html">Util</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ASSETS">ASSETS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Dec 29 2017 14:46:57 GMT+0900 (東京 (標準時))
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
