@@ -4,9 +4,17 @@
   "description": "",
   "main": "./src/main.js",
   "scripts": {
+    "build": "npm-run-all webpack jsdoc copyall",
     "webpack": "webpack",
     "start": "http-server ./src -p 8080",
-    "jsdoc": "jsdoc ./src -d ./doc"
+    "start_dest": "http-server ./dest -p 8081",
+    "jsdoc": "jsdoc ./src -d ./doc",
+    "copyall": "npm-run-all copy:*",
+    "copy:html": "cpx \"./src/{*.html,*.css}\" ./dest",
+    "copy:resource": "cpx \"./src/**/{*.png,*.json,*.mp3}\" ./dest",
+    "copy:font": "cpx \"./src/fonts/NotoSansCJKjp-Regular-min.ttf\" ./dest/fonts",
+    "copy:map": "cpx \"./src/map/*.js\" ./dest/map",
+    "copy:vendor": "cpx \"./src/vendor/*.js\" ./dest/vendor"
   },
   "repository": {
     "type": "git",
@@ -19,9 +27,11 @@
   },
   "homepage": "https://github.com/a-kaneda/toritoma_js#readme",
   "devDependencies": {
+    "cpx": "^1.5.0",
     "html-loader": "^0.5.0",
     "http-server": "^0.10.0",
     "jsdoc": "^3.5.5",
+    "npm-run-all": "^4.1.2",
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.6.1"
   }
