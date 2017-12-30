@@ -35,6 +35,11 @@
             "frames": [16, 17],
             "next": "dragonfly",
             "frequency": 12
+        },
+        "ant": {
+            "frames": [18, 19],
+            "next": "ant",
+            "frequency": 12
         }
     }
 }

@@ -22,13 +22,21 @@ const type = {
  * @type {object}
  */
 const enemy = {
-    /** トンボ */
+    // トンボ
     dragonfly: {
         width: 16,
         height: 16,
         hp: 3,
         defense: 0,
         score: 100,
+    },
+    // アリ
+    ant: {
+        width: 16,
+        height: 8,
+        hp: 7,
+        defense: 0,
+        score: 200,
     },
 };
 

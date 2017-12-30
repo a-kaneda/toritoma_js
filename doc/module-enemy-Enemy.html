@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Collider</title>
+    <title>JSDoc: Class: Enemy</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Collider</h1>
+    <h1 class="page-title">Class: Enemy</h1>
 
     
 
@@ -29,9 +29,9 @@
 <header>
     
         <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="module-collider.html">collider</a>~</span>Collider<span class="signature">(x, y, width, height)</span><span class="type-signature"></span></h2>
+            <span class="ancestors"><a href="module-enemy.html">enemy</a>~</span>Enemy<span class="signature">(x, y, type, scene)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">当たり判定処理を行う。</div>
+            <div class="class-description">敵キャラクター。</div>
         
     
 </header>
@@ -46,7 +46,7 @@
     
 
     
-    <h4 class="name" id="Collider"><span class="type-signature"></span>new Collider<span class="signature">(x, y, width, height)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Enemy"><span class="type-signature"></span>new Enemy<span class="signature">(x, y, type, scene)</span><span class="type-signature"></span></h4>
     
 
     
@@ -54,7 +54,7 @@
 
 
 <div class="description">
-    コンストラクタ、当たり判定の範囲を設定する。
+    コンストラクタ。
 </div>
 
 
@@ -136,13 +136,13 @@
 
         <tr>
             
-                <td class="name"><code>width</code></td>
+                <td class="name"><code>type</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
 
 
             
@@ -152,20 +152,20 @@
 
             
 
-            <td class="description last">幅</td>
+            <td class="description last">種別。</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>height</code></td>
+                <td class="name"><code>scene</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">PlayingScene</span>
 
 
             
@@ -175,7 +175,7 @@
 
             
 
-            <td class="description last">高さ</td>
+            <td class="description last">シーン</td>
         </tr>
 
     
@@ -216,7 +216,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="collider.js.html">collider.js</a>, <a href="collider.js.html#line9">line 9</a>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -260,6 +260,514 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="animation"><span class="type-signature"></span>animation<span class="type-signature"> :phina.accessory.FrameAnimation</span></h4>
+
+
+
+
+<div class="description">
+    アニメーション
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">phina.accessory.FrameAnimation</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="defense"><span class="type-signature"></span>defense<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    防御力
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line62">line 62</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="hitArea"><span class="type-signature"></span>hitArea<span class="type-signature"> :Collider</span></h4>
+
+
+
+
+<div class="description">
+    当たり判定
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Collider</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="hp"><span class="type-signature"></span>hp<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    HP
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line56">line 56</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="score"><span class="type-signature"></span>score<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    スコア
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line68">line 68</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="sprite"><span class="type-signature"></span>sprite<span class="type-signature"> :phina.display.Sprite</span></h4>
+
+
+
+
+<div class="description">
+    スプライト
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">phina.display.Sprite</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line25">line 25</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="type"><span class="type-signature"></span>type<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    キャラクタータイプ
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line44">line 44</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -270,7 +778,7 @@
     
 
     
-    <h4 class="name" id="getBlockY"><span class="type-signature"></span>getBlockY<span class="signature">(isUpside, xpos, stagePosition, blockMap)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="death"><span class="type-signature"></span>death<span class="signature">(scene)</span><span class="type-signature"></span></h4>
     
 
     
@@ -278,7 +786,7 @@
 
 
 <div class="description">
-    Y軸方向に障害物を検索する。
+    死亡処理。爆発アニメーションを発生させ、スコアを加算し、自分自身を削除する。
 </div>
 
 
@@ -314,13 +822,13 @@
 
         <tr>
             
-                <td class="name"><code>isUpside</code></td>
+                <td class="name"><code>scene</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">boolean</span>
+<span class="param-type">PlayingScene</span>
 
 
             
@@ -330,76 +838,7 @@
 
             
 
-            <td class="description last">上向きに検索する場合true</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>xpos</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">x座標</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>stagePosition</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">ステージのスクロール位置</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>blockMap</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">障害物マップ</td>
+            <td class="description last">シーン</td>
         </tr>
 
     
@@ -440,7 +879,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="collider.js.html">collider.js</a>, <a href="collider.js.html#line65">line 65</a>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line102">line 102</a>
     </li></ul></dd>
     
 
@@ -463,30 +902,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    見つかった障害物、見つからなかった場合は、
-    上方向の検索の場合はステージ上端、
-    下方向の検索の場合はステージ下端を返す。
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -498,7 +913,7 @@
     
 
     
-    <h4 class="name" id="getBlockYDownside"><span class="type-signature"></span>getBlockYDownside<span class="signature">(xpos, stagePosition, blockMap)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="hit"><span class="type-signature"></span>hit<span class="signature">(character, scene)</span><span class="type-signature"></span></h4>
     
 
     
@@ -506,7 +921,8 @@
 
 
 <div class="description">
-    Y軸下方向に障害物を検索する。
+    衝突処理。
+他のキャラクターと衝突したときの処理を行う。
 </div>
 
 
@@ -542,13 +958,13 @@
 
         <tr>
             
-                <td class="name"><code>xpos</code></td>
+                <td class="name"><code>character</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">object</span>
 
 
             
@@ -558,20 +974,20 @@
 
             
 
-            <td class="description last">x座標</td>
+            <td class="description last">衝突したキャラクター</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>stagePosition</code></td>
+                <td class="name"><code>scene</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">PlayingScene</span>
 
 
             
@@ -581,30 +997,7 @@
 
             
 
-            <td class="description last">ステージのスクロール位置</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>blockMap</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">障害物マップ</td>
+            <td class="description last">シーン</td>
         </tr>
 
     
@@ -645,7 +1038,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="collider.js.html">collider.js</a>, <a href="collider.js.html#line126">line 126</a>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line85">line 85</a>
     </li></ul></dd>
     
 
@@ -668,28 +1061,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    見つかった障害物、見つからなかった場合は、ステージ下端を返す。
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -701,7 +1072,7 @@
     
 
     
-    <h4 class="name" id="getBlockYUpside"><span class="type-signature"></span>getBlockYUpside<span class="signature">(xpos, stagePosition, blockMap)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(scene)</span><span class="type-signature"></span></h4>
     
 
     
@@ -709,7 +1080,7 @@
 
 
 <div class="description">
-    Y軸上方向に障害物を検索する。
+    更新処理。
 </div>
 
 
@@ -745,13 +1116,13 @@
 
         <tr>
             
-                <td class="name"><code>xpos</code></td>
+                <td class="name"><code>scene</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">PlayingScene</span>
 
 
             
@@ -761,53 +1132,7 @@
 
             
 
-            <td class="description last">x座標</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>stagePosition</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">ステージのスクロール位置</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>blockMap</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">障害物マップ</td>
+            <td class="description last">シーン</td>
         </tr>
 
     
@@ -848,7 +1173,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="collider.js.html">collider.js</a>, <a href="collider.js.html#line82">line 82</a>
+        <a href="enemy.js.html">enemy.js</a>, <a href="enemy.js.html#line75">line 75</a>
     </li></ul></dd>
     
 
@@ -871,208 +1196,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    見つかった障害物、見つからなかった場合は、ステージ上端を返す。
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getHitCharacter"><span class="type-signature"></span>getHitCharacter<span class="signature">(characters, types)</span><span class="type-signature"> &rarr; {Array}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    衝突しているキャラクターを検索する。
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>characters</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">キャラクター配列</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>types</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">検索対象のキャラクター種別</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="collider.js.html">collider.js</a>, <a href="collider.js.html#line33">line 33</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    衝突しているキャラクター配列
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 

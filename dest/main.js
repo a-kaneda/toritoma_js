@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 17);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -71,6 +71,8 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/** @module screensize */
+
 // 拡大率
 const ZOOM_RATIO = 2;
 // スクリーンの幅
@@ -86,35 +88,44 @@ const STAGE_RECT = {
 };
 
 /**
- * @class ScreenSize
- * @brief 画面サイズ
  * 画面サイズを管理する。
  */
 class ScreenSize {
 
-    // 拡大率
+    /**
+     * 拡大率
+     * @type {number}
+     */
     static get ZOOM_RATIO() {
         return ZOOM_RATIO;
     }
 
-    // スクリーンの幅
+    /**
+     * スクリーンの幅
+     * @type {number}
+     */
     static get SCREEN_WIDTH() {
         return SCREEN_WIDTH;
     }
 
-    // スクリーンの高さ
+    /**
+     * スクリーンの高さ
+     * @type {number}
+     */
     static get SCREEN_HEIGHT() {
         return SCREEN_HEIGHT;
     }
 
-    // ゲーム画面のサイズ
+    /**
+     * ゲーム画面のサイズ
+     * @type {Object}
+     */
     static get STAGE_RECT() {
         return STAGE_RECT;
     };
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = ScreenSize;
 
-
+/* harmony default export */ __webpack_exports__["a"] = (ScreenSize);
 
 
 /***/ }),
@@ -122,21 +133,29 @@ class ScreenSize {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-// キャラクター種別
+/** @module character */
+
+/**
+ * キャラクター種別
+ * @enum {number}
+ */
 const type = {
-    // 自機
+    /** 自機 */
     PLAYER: 1,
-    // 自機オプション
+    /** 自機オプション */
     PLAYER_OPTION: 2,
-    // 自機弾
+    /** 自機弾 */
     PLAYER_SHOT: 3,
-    // 敵
+    /** 敵 */
     ENEMY: 4,
-    // 敵弾
+    /** 敵弾 */
     ENEMY_SHOT: 5,
 };
 
-// 敵キャラパラメータ
+/**
+ * 敵キャラパラメータ
+ * @type {object}
+ */
 const enemy = {
     // トンボ
     dragonfly: {
@@ -146,23 +165,39 @@ const enemy = {
         defense: 0,
         score: 100,
     },
+    // アリ
+    ant: {
+        width: 16,
+        height: 8,
+        hp: 7,
+        defense: 0,
+        score: 200,
+    },
 };
 
 /**
- * @class Character
- * @brief キャラクター定数
  * キャラクターに関する定数を管理する。
  */
 class Character {
+
+    /**
+     * キャラクタータイプ
+     * @type {Array}
+     */
     static get type() {
         return type;
     }
+
+    /**
+     * 敵キャラクターパラメータ
+     * @type {object}
+     */
     static get enemy() {
         return enemy;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Character;
 
+/* harmony default export */ __webpack_exports__["a"] = (Character);
 
 
 /***/ }),
@@ -170,96 +205,24 @@ class Character {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(3);
-
-
-/**
- * @class Collider
- * @brief 当たり判定
- * 当たり判定処理を行う。
- */
-class Collider {
-
-    /**
-     * @function init
-     * @brief コンストラクタ
-     * 当たり判定の範囲を設定する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] width 幅
-     * @param [in] height 高さ
-     */
-    constructor(x, y, width, height) {
-
-        // メンバ変数に格納する。
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-
-    /**
-     * @function getHitCharacter
-     * @brief 衝突キャラクター検索
-     * 衝突しているキャラクターを検索する。
-     *
-     * @param [in] characters キャラクター配列
-     * @param [in] types 検索対象のキャラクター種別
-     * @return 衝突しているキャラクター配列
-     */
-    getHitCharacter(characters, types) {
-
-        let ret = [];
-
-        // 各キャラクターとの当たり判定を処理する。
-        for (let i = 0; i < characters.length; i++) {
-
-            // 検索対象のキャラクター種別か調べる。
-            if (types.indexOf(characters[i].type) >= 0) {
-
-                // 接触しているかどうかを調べる。
-                if (__WEBPACK_IMPORTED_MODULE_0__util_js__["a" /* default */].isHitCharacter(this, characters[i].hitArea)) {
-
-                    // 見つかったキャラクターを戻り値に追加する。
-                    ret.push(characters[i]);
-                }
-            }
-        }
-
-        return ret;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Collider;
-
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__stage_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__stage_js__ = __webpack_require__(6);
+/** @module util */
+
 
 
 
 /**
- * @class Util
- * @brief ユーティリティ
  * アプリ全体で使用する関数群を定義する。
  */
 class Util {
 
     /**
-     * @function isHitCharacter
-     * @brief キャラクター同士の当たり判定
+     * キャラクター同士の当たり判定。
      * キャラクター同士が衝突しているかどうかを判定する。
-     *
-     * @param a キャラクター1
-     * @param b キャラクター2
-     * @retval true 衝突している
-     * @retval false 衝突していない
+     * @param {Object} a - キャラクター1
+     * @param {Object} b - キャラクター2
+     * @return {boolean} 衝突しているかどうか
      */
     static isHitCharacter(a, b) {
         if (a.x - a.width / 2 < b.x + b.width / 2 &&
@@ -275,15 +238,13 @@ class Util {
     }
 
     /**
-     * @function checkCollidedBlock
-     * @brief 衝突しているブロックを調べる
+     * 衝突しているブロックを調べる。
      * キャラクターの周囲にあるマップを探し、衝突しているブロックがあれば
      * そのブロックの座標とサイズを返す。衝突していなければnullを返す。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 衝突しているブロック、見つからなければnull。
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 衝突しているブロック、見つからなければnull。
      */
     static checkCollidedBlock(character, stagePosition, blockMap) {
 
@@ -336,22 +297,19 @@ class Util {
     }
 
     /**
-     * @function moveByBlock
-     * @brief ブロック衝突による移動
      * ブロック衝突による移動を行う。
      * 右方向移動中に衝突した場合はブロックの左端に移動する。他の方向も同様。
      * 移動前から衝突している場合はその方向には移動しない。このケースは
      * ブロック移動による押出処理で対応する。
      * 縦横どちらにも移動する場合には横方向だけ移動して再度衝突をチェックし、
      * 衝突しなければ横方向だけ移動し、衝突すれば縦方向だけ移動する。
-     *
-     * @param [in] character キャラクター
-     * @param [in] prevX 移動前x座標
-     * @param [in] prevY 移動前y座標
-     * @param [in] block 衝突したブロックの位置とサイズ
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の座標
+     * @param {Object} character - キャラクター
+     * @param {number} prevX - 移動前x座標
+     * @param {number} prevY - 移動前y座標
+     * @param {Object} block - 衝突したブロックの位置とサイズ
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の座標
      */
     static moveByBlock(character, prevX, prevY, block, stagePosition, blockMap) {
 
@@ -506,14 +464,12 @@ class Util {
     }
 
     /**
-     * @function dodgeBlockUp
-     * @brief ブロックを避けて上に移動する
+     * ブロックを避けて上に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockUp(character, stagePosition, blockMap) {
 
@@ -528,14 +484,12 @@ class Util {
     }
 
     /**
-     * @function dodgeBlockDown
-     * @brief ブロックを避けて下に移動する
+     * ブロックを避けて下に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockDown(character, stagePosition, blockMap) {
 
@@ -550,14 +504,12 @@ class Util {
     }
 
     /**
-     * @function dodgeBlockLeft
-     * @brief ブロックを避けて左に移動する
+     * ブロックを避けて左に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockLeft(character, stagePosition, blockMap) {
 
@@ -572,14 +524,12 @@ class Util {
     }
 
     /**
-     * @function dodgeBlockRight
-     * @brief ブロックを避けて右に移動する
+     * ブロックを避けて右に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @return {Object} 移動後の位置
      */
     static dodgeBlockRight(character, stagePosition, blockMap) {
 
@@ -594,16 +544,14 @@ class Util {
     }
 
     /**
-     * @function _dodgeBlock
-     * @brief ブロックを避けて移動する
+     * ブロックを避けて移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
      * 衝突していない場合、画面外まで出る場合は移動前の位置を返す。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @param [in] move 移動する方法
-     * @return 移動後の位置
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @param {function} move - 移動する方法
+     * @return {Object} 移動後の位置
      */
     static _dodgeBlock(character, stagePosition, blockMap, move) {
 
@@ -633,15 +581,12 @@ class Util {
     }
 
     /**
-     * @function pushCharacter
-     * @brief ブロックによるキャラクター押出
      * ブロックとぶつかったキャラクターを押し動かす。
-     *
-     * @param [in] character キャラクター
-     * @param [in] stagePosition ステージ位置
-     * @param [in] blockMap ブロックマップ
-     * @param [in] canMoveOut 画面外へ移動できるかどうか
-     * @return 移動先座標
+     * @param {Object} character - キャラクター
+     * @param {number} stagePosition - ステージ位置
+     * @param {Array} blockMap - ブロックマップ
+     * @param {boolean} canMoveOut - 画面外へ移動できるかどうか
+     * @return {Object} 移動先座標
      */
     static pushCharacter(character, stagePosition, blockMap, canMoveOut) {
 
@@ -701,9 +646,203 @@ class Util {
         // どちらにも移動できない場合は移動前の位置を返す。
         return character;
     }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Util;
 
+    /**
+     * srcを始点、destを終点としたときの角度を求める。
+     * @param {Object} src - 始点
+     * @param {Object} dest - 終点
+     * @return {number} 角度
+     */
+    static calcAngle(src, dest) {
+
+        // x座標の差分を計算する。
+        const diffX = dest.x - src.x;
+
+        // phina.jsではy座標は上が原点のため、反転させる。
+        const diffY = src.y - dest.y;
+
+        // 角度を計算する。
+        const ret = Math.atan2(diffY, diffX);
+
+        return ret;
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Util);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__stage_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize_js__ = __webpack_require__(0);
+/** @module collider */
+
+
+
+
+/**
+ * 当たり判定処理を行う。
+ */
+class Collider {
+
+    /**
+     * コンストラクタ、当たり判定の範囲を設定する。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} width - 幅
+     * @param {number} height - 高さ
+     */
+    constructor(x, y, width, height) {
+
+        // メンバ変数に格納する。
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
+     * 衝突しているキャラクターを検索する。
+     * @param {Array} characters - キャラクター配列
+     * @param {Array} types - 検索対象のキャラクター種別
+     * @return {Array} 衝突しているキャラクター配列
+     */
+    getHitCharacter(characters, types) {
+
+        let ret = [];
+
+        // 各キャラクターとの当たり判定を処理する。
+        for (let i = 0; i < characters.length; i++) {
+
+            // 検索対象のキャラクター種別か調べる。
+            if (types.indexOf(characters[i].type) >= 0) {
+
+                // 接触しているかどうかを調べる。
+                if (__WEBPACK_IMPORTED_MODULE_0__util_js__["a" /* default */].isHitCharacter(this, characters[i].hitArea)) {
+
+                    // 見つかったキャラクターを戻り値に追加する。
+                    ret.push(characters[i]);
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Y軸方向に障害物を検索する。
+     * @param {boolean} isUpside - 上向きに検索する場合true
+     * @param {number} xpos - x座標
+     * @param {number} stagePosition - ステージのスクロール位置
+     * @param {Array} blockMap - 障害物マップ
+     * @return {Object} 見つかった障害物、見つからなかった場合は、
+     *     上方向の検索の場合はステージ上端、
+     *     下方向の検索の場合はステージ下端を返す。
+     */
+    getBlockY(isUpside, xpos, stagePosition, blockMap) {
+
+        if (isUpside) {
+            return this.getBlockYUpside(xpos, stagePosition, blockMap);
+        }
+        else {
+            return this.getBlockYDownside(xpos, stagePosition, blockMap);
+        }
+    }
+
+    /**
+     * Y軸上方向に障害物を検索する。
+     * @param {number} xpos - x座標
+     * @param {number} stagePosition - ステージのスクロール位置
+     * @param {Array} blockMap - 障害物マップ
+     * @return {Object} 見つかった障害物、見つからなかった場合は、ステージ上端を返す。
+     */
+    getBlockYUpside(xpos, stagePosition, blockMap) {
+
+        // 検索開始位置を自分の位置からとする。
+        const ybegin = Math.min(Math.floor(this.y / __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE), blockMap.length - 1);
+
+        // x方向のインデックスを計算する。
+        const x = Math.floor((xpos + stagePosition) / __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE)
+
+        // 下から上方向に検索する。
+        for (let y = ybegin; y >= 0; y--) {
+
+            if (blockMap[y][x]) {
+
+                // ブロックの中心座標とサイズを戻り値とする。
+                // 変数名や値はキャラクターに合わせる。
+                const ret = {
+                    x: x * __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE - stagePosition + blockMap[y][x].x + blockMap[y][x].width / 2,
+                    y: y * __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE + blockMap[y][x].y + blockMap[y][x].height / 2,
+                    width: blockMap[y][x].width,
+                    height: blockMap[y][x].height,
+                };
+
+                return ret;
+            }
+        }
+
+        // 見つからなかった場合、ステージ上端を返す。
+        const ret = {
+            x: __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT / 2,
+            y: 0,
+            width: __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT,
+            height: 0,
+        };
+
+        return ret;
+    }
+
+    /**
+     * Y軸下方向に障害物を検索する。
+     * @param {number} xpos - x座標
+     * @param {number} stagePosition - ステージのスクロール位置
+     * @param {Array} blockMap - 障害物マップ
+     * @return {Object} 見つかった障害物、見つからなかった場合は、ステージ下端を返す。
+     */
+    getBlockYDownside(xpos, stagePosition, blockMap) {
+
+        // 検索開始位置を自分の位置からとする。
+        const ybegin = Math.min(Math.floor(this.y / __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE), blockMap.length - 1);
+
+        // x方向のインデックスを計算する。
+        const x = Math.floor((xpos + stagePosition) / __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE)
+
+        // 上から下方向に検索する。
+        for (let y = ybegin; y < blockMap.length; y++) {
+
+            if (blockMap[y][x]) {
+
+                // ブロックの中心座標とサイズを戻り値とする。
+                // 変数名や値はキャラクターに合わせる。
+                const ret = {
+                    x: x * __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE - stagePosition + blockMap[y][x].x + blockMap[y][x].width / 2,
+                    y: y * __WEBPACK_IMPORTED_MODULE_1__stage_js__["a" /* default */].TILE_SIZE + blockMap[y][x].y + blockMap[y][x].height / 2,
+                    width: blockMap[y][x].width,
+                    height: blockMap[y][x].height,
+                };
+
+                return ret;
+            }
+        }
+
+        // 見つからなかった場合、ステージ下端を返す。
+        const ret = {
+            x: __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.width / 2,
+            y: __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.height,
+            width: __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.width,
+            height: 0,
+        };
+
+        return ret;
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Collider);
 
 
 /***/ }),
@@ -711,6 +850,12 @@ class Util {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/** @module controllsize */
+
+/**
+ * コントロールサイズ
+ * @type {object}
+ */
 const cs = {
     frameBack: {
         x: 0,
@@ -799,19 +944,20 @@ const cs = {
 };
 
 /**
- * @class ControlSize
- * @brief コントロールサイズ
- *
  * control.png内のコントロールの位置とサイズを定義する。
  */
 class ControlSize {
 
+    /**
+     * control.png内のコントロールの位置とサイズ
+     * @type {object}
+     */
     static get cs() {
         return cs;
     }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = ControlSize;
-;
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (ControlSize);
 
 
 /***/ }),
@@ -819,6 +965,8 @@ class ControlSize {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/** @module mycolor */
+
 // 使用する色、0:薄い、3:濃い
 const COLORS = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
 // 背景色
@@ -827,23 +975,36 @@ const BACK_COLOR = '#9cb389';
 const FORE_COLOR = '#12241A';
 
 /**
- * @class MyColor
- * @brief 色定義
  * ゲーム内で使用する色を定義する。
  */
 class MyColor {
+    
+    /**
+     * 使用する色、0:薄い、3:濃い
+     * @type {string}
+     */
     static get COLORS() {
         return COLORS;
     }
+
+    /**
+     * 背景色
+     * @type {string}
+     */
     static get BACK_COLOR() {
         return BACK_COLOR;
     }
+
+    /**
+     * 前景色
+     * @type {string}
+     */
     static get FORE_COLOR() {
         return FORE_COLOR;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = MyColor;
 
+/* harmony default export */ __webpack_exports__["a"] = (MyColor);
 
 
 /***/ }),
@@ -851,6 +1012,189 @@ class MyColor {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager_js__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly_js__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant_js__ = __webpack_require__(12);
+/** @module stage */
+
+
+
+
+
+
+// タイルのサイズ
+const TILE_SIZE = 16;
+
+/**
+ * ステージのマップ、背景、イベント処理を管理する。
+ */
+class Stage {
+
+    /**
+     * タイルサイズ
+     * @type {number}
+     */
+    static get TILE_SIZE() {
+        return TILE_SIZE;
+    }
+
+    /**
+     * コンストラクタ。
+     * mapNameで指定されたマップを読み込み、background、foreground、blockのレイヤーの画像をlayerに配置する。
+     * stageWidthをメンバ変数に格納する。
+     * @param {string} manName - マップ名
+     * @param {phina.display.DisplayElement} layer - ステージ画像を配置するレイヤー
+     */
+    constructor(mapName, layer) {
+
+        /**
+         * スクロールスピード。
+         * @type {number}
+         */
+        this.speed = 0;
+
+        /**
+         * スクロール位置。
+         * @type {number}
+         */
+        this.x = 0;
+
+        /**
+         * イベントを実行した列番号。
+         * @type {number}
+         */
+        this.executedCol = 0;
+
+        /**
+         * タイルマップ管理クラス。
+         * @type {TileMapManager}
+         */ 
+        this.mapManager = new __WEBPACK_IMPORTED_MODULE_1__tilemapmanager_js__["a" /* default */](mapName);
+        
+        // 障害物のマップを作成する。
+        this.mapManager.createObjectMap('block', 'collision');
+
+        /**
+         * 背景画像。
+         * @type {phina.display.Sprite}
+         */
+        this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+
+        /**
+         * 前景画像。
+         * @type {phina.display.Sprite}
+         */
+        this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+
+        /**
+         * 障害物画像。
+         * @type {phina.display.Sprite}
+         */
+        this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+    }
+
+    /**
+     * ステージの状態を更新する。
+     * @param {PlayingScene} scene - シーン
+     */
+    update(scene) {
+
+        // イベントを実行する。
+        this._execEvent(scene);
+
+        // スピードに応じて移動する。
+        this._move();
+    }
+    
+    /**
+     * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
+     * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
+     * @param {PlayingScene} scene - シーン
+     */
+    _execEvent(scene) {
+
+        // 画面外2個先の列まで処理を行う。
+        const maxCol = Math.floor((-this.x + __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.width) / TILE_SIZE) + 2;
+
+        // イベント実行する範囲を計算する。
+        const execPos = this.executedCol * TILE_SIZE;
+        const execWidth = (maxCol - this.executedCol) * TILE_SIZE;
+        
+        // イベント実行する範囲がある場合
+        if (execWidth > 0) {
+
+            // イベントレイヤーのオブジェクトを検索する。
+            const objects = this.mapManager.getObjects('event', execPos, 0, execWidth, __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.height);
+
+            // イベントを実行する。
+            for (let i = 0; i < objects.length; i++) {
+                switch (objects[i].type) {
+                case 'speed':
+                    // スクロールスピードを変更する。
+                    this.speed = objects[i].properties.speed;
+                    break;
+                case 'enemy':
+                    // 敵キャラを生成する。
+                    this._createEnemy(objects[i].name,
+                                      this.x + objects[i].x + objects[i].width / 2,
+                                      objects[i].y + objects[i].height / 2,
+                                      scene);
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            // 実行済みの列番号を更新する。
+            this.executedCol = maxCol;
+        }
+    }
+    
+    /**
+     * スピードに応じてマップ全体を移動する。
+     */
+    _move() {
+
+        // スピードに応じて移動する。
+        this.x -= this.speed;
+
+        // 各画像を座標に合わせて移動する。
+        this.background.x = Math.floor(this.x);
+        this.foreground.x = Math.floor(this.x);
+        this.block.x = Math.floor(this.x);
+    }
+
+    /**
+     * 敵キャラクターを生成する。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
+     */
+    _createEnemy(type, x, y, scene) {
+        switch (type) {
+            case 'dragonfly':
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__dragonfly_js__["a" /* default */](x, y, scene));
+                break;
+            case 'ant':
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_3__ant_js__["a" /* default */](x, y, scene));
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Stage);
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/** @module pointdevice */
+
 /**
  * ポイントデバイスがマウスかタッチパネルかを調べる。
  */
@@ -859,8 +1203,7 @@ class PointDevice {
     /**
      * マウス移動とタッチ操作の際に呼ばれ、
      * タッチ操作でない場合はマウス接続されていると判断する。
-     *
-     * @param event イベント
+     * @param {TouchEvent} event - イベント
      */
     static detectDeviceType(event) {
         PointDevice._isMouseUsed = !event.changedTouches;
@@ -879,27 +1222,341 @@ class PointDevice {
     }
 
     /**
-     * マウスが接続されているかどうかを取得する。
-     *
-     * @return マウスが接続されているかどうか
+     * マウスが接続されているかどうか。
+     * @type {boolean}
      */
     static get isMouseUsed() {
         return this._isMouseUsed;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PointDevice;
 
+/* harmony default export */ __webpack_exports__["a"] = (PointDevice);
 
 
 /***/ }),
-/* 7 */
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion_js__ = __webpack_require__(15);
+/** @module enemy */
+
+
+
+
+
+/**
+ * 敵キャラクター。
+ */
+class Enemy {
+
+    /**
+     * コンストラクタ。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {string} type - 種別。
+     * @param {PlayingScene} scene - シーン
+     */
+    constructor(x, y, type, scene) {
+
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
+        this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
+        scene.addCharacterSprite(this.sprite);
+
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
+        this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay(type);
+
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
+        this.type = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.ENEMY;
+
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
+        this.hitArea = new __WEBPACK_IMPORTED_MODULE_0__collider_js__["a" /* default */](x, y, __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy[type].width, __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy[type].height); 
+
+        /**
+         * HP
+         * @type {number}
+         */
+        this.hp = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy[type].hp;
+
+        /**
+         * 防御力
+         * @type {number}
+         */
+        this.defense = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy[type].defense;
+
+        /**
+         * スコア
+         * @type {number}
+         */
+        this.score = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy[type].score;
+    }
+    
+    /**
+     * 更新処理。
+     * @param {PlayingScene} scene - シーン
+     */
+    update(scene) {
+    }
+    
+    /**
+     * 衝突処理。
+     * 他のキャラクターと衝突したときの処理を行う。
+     *
+     * @param {object} character - 衝突したキャラクター
+     * @param {PlayingScene} scene - シーン
+     */
+    hit(character, scene) {
+
+        // 衝突したキャラクターが自機または自機弾の場合
+        if (character.type === __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER ||
+            character.type === __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER_SHOT) {
+
+            // 相手の攻撃力と自分の防御力の差をダメージとしてHPから減らす。
+            if (this.defense < character.power) {
+                this.hp -= character.power - this.defense;
+            }
+        }
+    }
+
+    /**
+     * 死亡処理。爆発アニメーションを発生させ、スコアを加算し、自分自身を削除する。
+     * @param {PlayingScene} scene - シーン
+     */
+    death(scene) {
+
+        // 爆発アニメーションを作成する。
+        scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__explosion_js__["a" /* default */](this.hitArea.x, this.hitArea.y, scene));
+
+        // スコアを加算する。
+        scene.addScore(this.score);
+
+        // 自分自身を削除する。
+        scene.removeCharacter(this);
+        this.sprite.remove();
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Enemy);
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__collider_js__ = __webpack_require__(3);
+/** @module enemyshot */
+
+
+
+
+
+
+// 当たり判定幅
+const HIT_WIDTH = 3;
+// 当たり判定高さ
+const HIT_HEIGHT = 3;
+// かすりゲージ増加率
+const GRAZE_RATE = 0.02;
+// 反射弾の攻撃力
+const REFLECTION_POWER = 5;
+
+/**
+ * 敵が発射する弾。
+ */
+class EnemyShot {
+
+    /**
+     * コンストラクタ、座標の設定とスプライトシートの設定を行う。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} angle - 進行方向
+     * @param {number} speed - スピード
+     * @param {PlayingScene} scene - シーン
+     */
+    constructor(x, y, angle, speed, scene) {
+
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
+        this.sprite = Sprite('image_8x8', 8, 8);
+
+        // スプライトをシーンに追加する。
+        scene.addCharacterSprite(this.sprite);
+
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
+        this.animation = FrameAnimation('image_8x8_ss');
+
+        // アニメーションの設定を行う。
+        this.animation.attachTo(this.sprite);
+        this.animation.gotoAndPlay('enemy_shot');
+
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
+        this.type = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.ENEMY_SHOT;
+
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
+        this.hitArea = new __WEBPACK_IMPORTED_MODULE_3__collider_js__["a" /* default */](x, y, HIT_WIDTH, HIT_HEIGHT);
+
+        /** 
+         * x方向のスピード
+         * @type {number}
+         */
+        this.speedX = Math.cos(angle) * speed;
+        
+        /** 
+         * y方向のスピード。phina.jsの座標系は下方向が正なので逆向きにする。
+         * @type {number}
+         */
+        this.speedY = Math.sin(angle) * speed * -1;
+
+        /**
+         * かすり時のゲージ増加率
+         * @type {number}
+         */
+        this.grazeRate = GRAZE_RATE;
+    }
+    
+    /**
+     * スピードに応じて移動する。
+     * 画面外に出ると自分自身を削除する。
+     * @param {PlayingScene} scene - シーン
+     */
+    update(scene) {
+
+        // スピードに応じて移動する。
+        this.hitArea.x += this.speedX;
+        this.hitArea.y += this.speedY;
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
+
+        // タイプが自機弾になっている場合、反射弾として敵との当たり判定を行う。
+        if (this.type === __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER_SHOT) {
+
+            // 衝突している敵キャラクターを検索する。
+            const hitCharacters = this.hitArea.getHitCharacter(scene.characters, [__WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.ENEMY]);
+
+            // 衝突している敵キャラクターがいる場合。
+            if (hitCharacters.length > 0) {
+
+                // 敵キャラクターの衝突処理を実行する。
+                hitCharacters[0].hit(this);
+
+                // 敵キャラクターに接触した場合は自分自身は削除する。
+                scene.removeCharacter(this);
+                this.sprite.remove();
+
+                // 敵キャラと衝突した場合は処理を終了する。
+                return;
+            }
+        }
+
+        // ブロックとの当たり判定処理を行う。
+        if (__WEBPACK_IMPORTED_MODULE_2__util_js__["a" /* default */].checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
+            // ブロックと衝突した場合は自分自身を削除する。
+            scene.removeCharacter(this);
+            this.sprite.remove();
+            return;
+        }
+
+        // 画面外に出た場合は自分自身を削除する。
+        if (this.hitArea.x < -this.hitArea.width * 2 ||
+            this.hitArea.x > __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.width + this.hitArea.width * 2 ||
+            this.hitArea.y < -this.hitArea.height * 2 ||
+            this.hitArea.y > __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.height + this.hitArea.height * 2) {
+
+            scene.removeCharacter(this);
+            this.sprite.remove();
+            return;
+        }
+    }
+
+    /**
+     * 他のキャラクターと衝突したときの処理を行う。
+     * @param {object} character - 衝突したキャラクター
+     * @param {PlayingScene} scene - シーン
+     */
+    hit(character, scene) {
+
+        // 自分自身を削除する。
+        scene.removeCharacter(this);
+        this.sprite.remove();
+    }
+
+    /**
+     * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
+     * @return {number} ゲージ増加比率
+     */
+    graze() {
+        const ret = this.grazeRate;
+        this.grazeRate = 0;
+        return ret;
+    }
+
+    /**
+     * 移動方向を180度反転させ、自機弾として扱うようにする。
+     */
+    reflect() {
+
+        // キャラクタータイプを自機弾に変更する。
+        this.type = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER_SHOT;
+
+        // 攻撃力を設定する。
+        this.power = REFLECTION_POWER;
+
+        // 進行方向を反転する。
+        this.speedX *= -1;
+        this.speedY *= -1;
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (EnemyShot);
+
+
+/***/ }),
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize_js__ = __webpack_require__(0);
+/** @module playershot */
+
 
 
 
@@ -915,39 +1572,56 @@ const HIT_WIDTH = 3;
 const HIT_HEIGHT = 3;
 
 /**
- * @class PlayerShot
- * @brief 自機弾
+ * 自機弾。
  * 右方向に直進する。
  */
 class PlayerShot {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] isOption 発射元がオプションかどうか
-     * @param [in/out] scene シーン
+     * コンストラクタ。座標の設定とスプライトシートの設定を行う。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} isOption - 発射元がオプションかどうか
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, isOption, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_8x8', 8, 8);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_8x8_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('player_shot');
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = __WEBPACK_IMPORTED_MODULE_0__character_js__["a" /* default */].type.PLAYER_SHOT;
 
-        // 座標、サイズを設定する。
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new __WEBPACK_IMPORTED_MODULE_2__collider_js__["a" /* default */](x, y, HIT_WIDTH, HIT_HEIGHT);
+
+        /**
+         * 攻撃力
+         * @type {number}
+         */
+        this.power = 0;
 
         // 攻撃力を設定する。
         if (isOption) {
@@ -959,12 +1633,10 @@ class PlayerShot {
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 右方向に直進する。
      * 画面外に出ると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -1007,179 +1679,27 @@ class PlayerShot {
         }
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PlayerShot;
 
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager_js__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly_js__ = __webpack_require__(11);
-
-
-
-
-// タイルのサイズ
-const TILE_SIZE = 16;
-
-/**
- * @class Stage
- * @brief ステージ管理クラス
- * 
- * ステージのマップ、背景、イベント処理を管理する。
- */
-class Stage {
-
-    static get TILE_SIZE() {
-        return TILE_SIZE;
-    }
-
-    /**
-     * @function init
-     * @brief コンストラクタ
-     * mapNameで指定されたマップを読み込み、background、foreground、blockのレイヤーの画像をlayerに配置する。
-     * stageWidthをメンバ変数に格納する。
-     * 
-     * @param [in] manName マップ名
-     * @param [in] scene シーン
-     * @param [in/out] layer ステージ画像を配置するレイヤー
-     */
-    constructor(mapName, layer) {
-
-        // メンバを初期化する。
-        this.speed = 0;
-        this.x = 0;
-        this.executedCol = 0;
-        
-        // タイルマップを読み込み、背景画像を配置する。
-        this.mapManager = new __WEBPACK_IMPORTED_MODULE_1__tilemapmanager_js__["a" /* default */](mapName);
-        this.mapManager.createObjectMap('block', 'collision');
-        this.background = Sprite(this.mapManager.getIamge('background')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
-        this.foreground = Sprite(this.mapManager.getIamge('foreground')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
-        this.block = Sprite(this.mapManager.getIamge('block')).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
-    }
-
-    /**
-     * @function update
-     * @brief 更新処理
-     * ステージの状態を更新する。
-     *
-     * @param [in/out] scene シーン
-     */
-    update(scene) {
-
-        // イベントを実行する。
-        this._execEvent(scene);
-
-        // スピードに応じて移動する。
-        this._move();
-    }
-    
-    /**
-     * @function _execEvent
-     * @brief イベント実行処理
-     * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
-     * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
-     *
-     * @param [in/out] scene シーン
-     */
-    _execEvent(scene) {
-
-        // 画面外2個先の列まで処理を行う。
-        const maxCol = Math.floor((-this.x + __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.width) / TILE_SIZE) + 2;
-
-        // イベント実行する範囲を計算する。
-        const execPos = this.executedCol * TILE_SIZE;
-        const execWidth = (maxCol - this.executedCol) * TILE_SIZE;
-        
-        // イベント実行する範囲がある場合
-        if (execWidth > 0) {
-
-            // イベントレイヤーのオブジェクトを検索する。
-            const objects = this.mapManager.getObjects('event', execPos, 0, execWidth, __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.height);
-
-            // イベントを実行する。
-            for (let i = 0; i < objects.length; i++) {
-                switch (objects[i].type) {
-                case 'speed':
-                    // スクロールスピードを変更する。
-                    this.speed = objects[i].properties.speed;
-                    break;
-                case 'enemy':
-                    // 敵キャラを生成する。
-                    this._createEnemy(objects[i].name,
-                                      this.x + objects[i].x + objects[i].width / 2,
-                                      objects[i].y + objects[i].height / 2,
-                                      scene);
-                    break;
-                default:
-                    break;
-                }
-            }
-
-            // 実行済みの列番号を更新する。
-            this.executedCol = maxCol;
-        }
-    }
-    
-    /**
-     * @function _move
-     * @brief 移動処理
-     * スピードに応じてマップ全体を移動する。
-     */
-    _move() {
-
-        // スピードに応じて移動する。
-        this.x -= this.speed;
-
-        // 各画像を座標に合わせて移動する。
-        this.background.x = Math.floor(this.x);
-        this.foreground.x = Math.floor(this.x);
-        this.block.x = Math.floor(this.x);
-    }
-
-    /**
-     * @function _createEnemy
-     * @brief 敵生成
-     * 敵キャラクターを生成する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
-     */
-    _createEnemy(type, x, y, scene) {
-        switch (type) {
-        case 'dragonfly':
-            scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__dragonfly_js__["a" /* default */](x, y, scene));
-            break;
-        default:
-            break;
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Stage;
-
+/* harmony default export */ __webpack_exports__["a"] = (PlayerShot);
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice_js__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor_js__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize_js__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage_js__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player_js__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life_js__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge_js__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player_js__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life_js__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge_js__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton_js__ = __webpack_require__(21);
+/** @module playingscene */
+
 
 
 
@@ -1209,60 +1729,91 @@ const SHIELD_BUTTON_POS_X = 50;
 const SHIELD_BUTTON_POS_Y = 50;
 
 /**
- * @class PlayingScene
- * @brief メインシーン
  * ゲームの各ステージをプレイするメインのシーン。
  */
 class PlayingScene {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 各種データの初期化と生成を行う。
-     *
-     * @param phinaScene phina.js上のシーンインスタンス
+     * @param {MainScene} phinaScene - phina.js上のシーンインスタンス
      */
     constructor(phinaScene) {
 
         // デバッグ用にシーンをグローバル変数に入れる。
         DebugObject.scene = this;
 
-        // phina.jsのシーンインスタンスを保持する。
+        /**
+         * phina.jsのシーンインスタンス
+         * @type {MainScene}
+         */
         this.phinaScene = phinaScene;
 
-        // ゲームパッドを取得する。
+        /**
+         * ゲームパッドマネージャー。
+         * @type {phina.input.GamepadManager}
+         */
         this.gamepadManager = phina.input.GamepadManager();
+
+        /**
+         * ゲームパッド。
+         * @type {phina.input.Gamepad}
+         */
         this.gamepad = this.gamepadManager.get(0);
 
-        // 背景レイヤーを作成する。
+        /**
+         * 背景レイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.backgroundLayer = DisplayElement().addChildTo(this.phinaScene);
+
+        // 背景レイヤーの位置、サイズを設定する。
         this.backgroundLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO,
                                          __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO);
         this.backgroundLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO;
         this.backgroundLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO;
 
-        // キャラクターレイヤーを作成する。
+        /**
+         * キャラクターレイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.characterLayer = DisplayElement().addChildTo(this.phinaScene);
+
+        // キャラクターレイヤーの位置、サイズを設定する。
         this.characterLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO,
                                         __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO);
         this.characterLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO;
         this.characterLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO;
 
-        // 枠レイヤーを作成する。
+        /**
+         * 枠レイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.frameLayer = DisplayElement().addChildTo(this.phinaScene);
+
+        // 枠レイヤーの位置、サイズを設定する。
         this.frameLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO;
         this.frameLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO;
 
-        // 情報レイヤーを作成する。
+        /**
+         * 情報レイヤー。
+         * @type {phina.display.DisplayElement}
+         */
         this.infoLayer = DisplayElement().addChildTo(this.phinaScene);
 
         // ステージの外枠を作成する。
         this._createFrame();
 
-        // ステージを作成する。
+        /**
+         * ステージ
+         * @type {Stage}
+         */
         this.stage = new __WEBPACK_IMPORTED_MODULE_5__stage_js__["a" /* default */]('stage1', this.backgroundLayer);
 
-        // スコアラベルを作成する。
+        /**
+         * スコアラベルの背景部分。
+         * @type {phina.display.RectangleShape}
+         */
         this.scoreLabelBase = RectangleShape({
             height: 22,
             width: 148,
@@ -1272,6 +1823,10 @@ class PlayingScene {
             y: SCORE_POS_Y,
         }).addChildTo(this.infoLayer);
 
+        /**
+         * スコアラベル。
+         * @type {phina.display.Label}
+         */
         this.scoreLabel = Label({
             text: 'SCORE: 000000',
             fontSize: 20,
@@ -1279,10 +1834,19 @@ class PlayingScene {
             fontFamily: 'noto',
         }).addChildTo(this.scoreLabelBase);
 
+        /**
+         * スコア。
+         * @type {number}
+         */
         this.score = 0;
 
-        // 残機表示を作成する。
+        /**
+         * 残機表示
+         * @type {Life}
+         */
         this.lifeLabel = new __WEBPACK_IMPORTED_MODULE_7__life_js__["a" /* default */]();
+
+        // 残機表示の位置を設定する。
         this.lifeLabel.getSprite().addChildTo(this.infoLayer);
         this.lifeLabel.getSprite().x = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].ZOOM_RATIO + LIFE_POS_X;
         this.lifeLabel.getSprite().y = LIFE_POS_Y;
@@ -1290,30 +1854,52 @@ class PlayingScene {
         // 残機を初期化する。
         this._setLife(INITIAL_LIFE);
 
-        // シールドボタンを作成する。
+        /**
+         * シールドボタン。
+         * @type {ShieldButton}
+         */
         this.shieldButton = new __WEBPACK_IMPORTED_MODULE_9__shieldbutton_js__["a" /* default */]();
+
+        // シールドボタンの位置を設定する。
         this.shieldButton.getSprite().addChildTo(this.infoLayer);
         this.shieldButton.getSprite().x = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].SCREEN_WIDTH - SHIELD_BUTTON_POS_X; 
         this.shieldButton.getSprite().y = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y; 
 
-        // チキンゲージを作成する。
+        /**
+         * チキンゲージ。
+         * @type {ChickenGauge}
+         */
         this.chickenGauge = new __WEBPACK_IMPORTED_MODULE_8__chickengauge_js__["a" /* default */]();
+
+        // チキンゲージの位置を設定する。
         this.chickenGauge.getSprite().addChildTo(this.infoLayer);
         this.chickenGauge.getSprite().x = Math.round(this.phinaScene.gridX.center());
         this.chickenGauge.getSprite().y = __WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].SCREEN_HEIGHT - CHICKEN_GAUGE_POS_Y;
 
-        // 復活待機フレーム数を初期化する。
+        /**
+         * 復活待機フレーム数。
+         * @type {number}
+         */
         this.rebirthWait = 0;
 
-        // キャラクター管理配列を作成する。
+        /**
+         * キャラクター管理配列。
+         * @type {Array}
+         */
         this.characters = [];
 
-        // 自機を作成する。
+        /**
+         * 自機
+         * @type {Player}
+         */
         this.player = new __WEBPACK_IMPORTED_MODULE_6__player_js__["a" /* default */](Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.width / 4),
                                  Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize_js__["a" /* default */].STAGE_RECT.height / 2),
                                  this);
 
-        // タッチ情報を初期化する。
+        /**
+         * タッチ情報。
+         * @type {Object}
+         */
         this.touch = {id: -1, x:0, y:0};
 
         // BGMの音量を設定する。
@@ -1324,12 +1910,10 @@ class PlayingScene {
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * キー入力処理を行う。
      * ステージ、キャラクターの更新処理を行う。
-     *
-     * @param [in] app アプリケーション
+     * @param {phina.game.GameApp} app - アプリケーション
      */
     update(app) {
 
@@ -1375,33 +1959,24 @@ class PlayingScene {
     }
 
     /**
-     * @function addCharacter
-     * @brief キャラクター追加
      * キャラクターを追加する。
-     *
-     * @param [in] character 追加するキャラクター
+     * @param {Object} character - 追加するキャラクター
      */
     addCharacter(character) {
         this.characters.push(character);
     }
 
     /**
-     * @function addCharacterSprite
-     * @brief キャラクタースプライトの追加
      * キャラクターのスプライトを追加する。
-     *
-     * @param [in/out] sprite 追加するスプライト
+     * @param {phina.display.DisplayElement} sprite - 追加するスプライト
      */
     addCharacterSprite(sprite) {
         sprite.addChildTo(this.characterLayer);
     }
 
     /**
-     * @function removeCharacter
-     * @brief キャラクター削除
      * キャラクターを削除する。
-     *
-     * @param [in/out] character 削除するキャラクター
+     * @param {Object} character - 追加するキャラクター
      */
     removeCharacter(character) {
         const i = this.characters.indexOf(character);
@@ -1411,41 +1986,49 @@ class PlayingScene {
     }
 
     /**
-     * @function addScore
-     * @brief スコア追加
      * スコアを追加する。
-     *
-     * @param [in] score 追加するスコア
+     * @param {number} score - 追加するスコア
      */
     addScore(score) {
         this.score += score;
     }
 
     /**
-     * @function getBlockMap
-     * @brief ブロックマップ取得
      * ブロックマップを取得する。
-     *
-     * @return ブロックマップ
+     * @return {Array} ブロックマップ
      */
     getBlockMap() {
         return this.stage.mapManager.objectMap.collision;
     }
 
     /**
-     * @function getStagePosition
-     * @brief ステージ位置取得
      * ステージが左方向に何ドット移動しているかを取得する。
-     *
-     * @return ステージ位置
+     * @return {number} ステージ位置
      */
     getStagePosition() {
         return -this.stage.x;
     }
 
     /**
-     * @function miss
-     * @brief 自機死亡時処理
+     * ステージのスクロールスピード
+     * @type {number}
+     */
+    get scrollSpeed() {
+        return this.stage.speed;
+    }
+
+    /**
+     * 自機の位置
+     * @type {Object}
+     */
+    get playerPosition() {
+        return {
+            x: this.player.hitArea.x,
+            y: this.player.hitArea.y,
+        };
+    }
+
+    /**
      * 自機が死亡したときの処理を行う。
      * 残機が残っていれば、残機を一つ減らし、自機を復活する。
      * 残機が残っていなければゲームオーバー処理を行う。
@@ -1471,12 +2054,9 @@ class PlayingScene {
     }
 
     /**
-     * @function isDisableEnemyShot
-     * @brief 敵弾が無効化されているかどうか
      * 敵弾が無効化されているかどうかを取得する。
      * 自機が死亡して復活するまでの間は敵弾は発生させない。
-     *
-     * @return 敵弾が無効化されているかどうか
+     * @return {boolean} 敵弾が無効化されているかどうか
      */
     isDisableEnemyShot() {
 
@@ -1490,11 +2070,8 @@ class PlayingScene {
     }
 
     /**
-     * @function _inputKeyboard
-     * @brief キーボード入力処理
      * キーボードの入力処理を行う。
-     *
-     * @param [in] app アプリケーション
+     * @param {phina.game.GameApp} app - アプリケーション
      */
     _inputKeyboard(app) {
 
@@ -1522,11 +2099,8 @@ class PlayingScene {
     }
 
     /**
-     * @function _inputTouch
-     * @brief タッチ入力処理
      * タッチの入力処理を行う。
-     *
-     * @param [in] app アプリケーション
+     * @param {phina.game.GameApp} app - アプリケーション
      */
     _inputTouch(app) {
 
@@ -1572,8 +2146,6 @@ class PlayingScene {
     }
 
     /**
-     * @function _inputGamepad
-     * @brief ゲームパッド入力処理
      * ゲームパッドの入力処理を行う。
      */
     _inputGamepad() {
@@ -1598,9 +2170,6 @@ class PlayingScene {
     }
 
     /**
-     * @function _crateFrame
-     * @brief ステージ外枠背景作成
-     *
      * ステージの外側の枠と背景を作成する。
      */
     _createFrame() {
@@ -1613,9 +2182,6 @@ class PlayingScene {
     }
 
     /**
-     * @function _createFrameBack
-     * @brief ステージ外枠背景作成
-     *
      * ステージの外側の背景を作成する。
      */
     _createFrameBack() {
@@ -1697,9 +2263,6 @@ class PlayingScene {
     }
 
     /**
-     * @function _createFrameBar
-     * @brief ステージ外枠作成
-     *
      * ステージの外側の枠を作成する。
      */
     _createFrameBar() {
@@ -1784,9 +2347,8 @@ class PlayingScene {
     }
 
     /**
-     * @function _setLife
-     * @brief 残機設定
      * 残機を変更し、残機ラベルを更新する。
+     * @param {number} life - 残機
      */
     _setLife(life) {
         this.life = life;
@@ -1794,8 +2356,7 @@ class PlayingScene {
     }
 
     /**
-     * @function _rebirthPlayer
-     * @brief 自機復活処理
+     * 自機復活処理。
      * 復活待機フレーム数をカウントし、
      * 待機フレーム数を経過したタイミングで自機を復活する。
      */
@@ -1816,8 +2377,6 @@ class PlayingScene {
     }
 
     /**
-     * @function _removeEnemyShot
-     * @brief 敵弾削除
      * 敵弾をすべて削除する。
      */
     _removeEnemyShot() {
@@ -1833,31 +2392,353 @@ class PlayingScene {
 
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PlayingScene;
 
+/* harmony default export */ __webpack_exports__["a"] = (PlayingScene);
 
 
 /***/ }),
-/* 10 */
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(8);
+/** @module ant */
+
+
+
+
+
+// 弾のスピード
+const SHOT_SPEED = 0.5;
+// 移動スピード
+const MOVE_SPEED = 0.5;
+// 移動するフレーム数
+const MOVE_FRAME = 120;
+// 弾発射間隔
+const SHOT_INTERVAL = 30;
+// 弾発射時間
+const SHOT_FRAME = 120;
+// 状態
+const STATE = {
+    LEFT_MOVE: 1,   // 左移動
+    RIGHT_MOVE: 2,  // 右移動
+    FIRE: 3,        // 弾発射
+};
+
+/**
+ * 敵キャラクター、アリ。
+ * 天井または地面に張り付いて歩く。
+ *
+ * 左移動:左方向への移動。一定時間経過後に弾発射に遷移する。
+ * 
+ * 弾発射:停止して弾の発射。自機に向かって1-wayを一定数発射する。
+ * 一定時間経過後に右移動に遷移する。
+ * 
+ * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
+ */
+class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
+
+    /**
+     * コンストラクタ
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
+     */
+    constructor(x, y, scene) {
+
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'ant', scene);
+
+        /**
+         * 弾発射間隔
+         * @type {number}
+         */
+        this.shotInterval = 0;
+
+        /**
+         * 状態。左移動、弾発射、右移動と遷移する。
+         * @type {number}
+         */
+        this.state = STATE.LEFT_MOVE;
+
+        /**
+         * 状態変化間隔。
+         * @type {number}
+         */
+        this.stateChangeInterval = 0;
+
+        /**
+         * 逆さまかどうか。
+         * @type {boolean}
+         */
+        this.isUpsideDown = this.checkUpsideDown(scene);
+
+        // 逆さまな場合は画像の上下を反転する。
+        if (this.isUpsideDown) {
+            this.sprite.scaleY = -1;
+        }
+    }
+    
+    /**
+     * 更新処理。
+     * 天井または地面に張り付いて歩く。
+     *
+     * 初期状態:上下どちらに張り付くか判定する。距離の近い方に張り付く。
+     * 天井に張り付く場合は画像を上下反転する。
+     * 
+     * 左移動:左方向への移動。一定時間経過後に弾発射に遷移する。
+     * 
+     * 弾発射:停止して弾の発射。自機に向かって1-wayを一定数発射する。
+     * 一定時間経過後に右移動に遷移する。
+     * 
+     * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
+     * @param {PlayingScene} scene - シーン
+     */
+    update(scene) {
+
+        // スクロールに合わせて移動する。
+        this.hitArea.x -= scene.scrollSpeed;
+
+        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
+        if (this.hp <= 0) {
+
+            this.death(scene);
+
+            return;
+        }
+
+        // 状態によって処理を分岐する
+        switch (this.state) {
+            case STATE.LEFT_MOVE:   // 左移動
+
+                // 左へ移動する。
+                this.hitArea.x -= MOVE_SPEED;
+
+                // 左右反転はなしにする。
+                this.sprite.scaleX = 1;
+
+                // 状態遷移間隔が経過したら弾発射状態に遷移する。
+                this.stateChangeInterval++;
+                if (this.stateChangeInterval >= MOVE_FRAME) {
+
+                    // 弾発射に遷移する。
+                    this.state = STATE.FIRE;
+
+                    // 次の状態遷移への間隔を初期化する。
+                    this.stateChangeInterval = 0;
+                    
+                    // 弾発射間隔を初期化する。
+                    this.shotInterval = 0;
+                }
+
+                break;
+
+            case STATE.RIGHT_MOVE:  // 右移動
+
+                // 右へ移動する。
+                this.hitArea.x += MOVE_SPEED;
+
+                // 左右反転はありにする。
+                this.sprite.scaleX = -1;
+
+                // 状態遷移間隔が経過したら弾発射状態に遷移する。
+                this.stateChangeInterval++;
+                if (this.stateChangeInterval >= MOVE_FRAME) {
+
+                    // 弾発射に遷移する。
+                    this.state = STATE.FIRE;
+
+                    // 次の状態遷移への間隔を初期化する。
+                    this.stateChangeInterval = 0;
+                    
+                    // 弾発射間隔を初期化する。
+                    this.shotInterval = 0;
+                }
+
+                break;
+
+            case STATE.FIRE:        // 弾発射
+
+                // 自分より右側に自機がいれば左右反転する。
+                if (this.hitArea.x < scene.playerPosition.x) {
+                    this.sprite.scaleX = -1;
+                }
+                else {
+                    this.sprite.scaleX = 1;
+                }
+
+                // 状態遷移間隔が経過したら右移動状態に遷移する。
+                this.stateChangeInterval++;
+                if (this.stateChangeInterval >= SHOT_FRAME ) {
+
+                    // 右移動に遷移する。
+                    this.state = STATE.RIGHT_MOVE;
+
+                    // 次の状態遷移への間隔を初期化する。
+                    this.stateChangeInterval = 0;
+                }
+
+                // 弾発射間隔が経過したら弾を発射する。
+                this.shotInterval++;
+                if (this.shotInterval >= SHOT_INTERVAL) {
+
+                    // 敵弾が無効化されていない場合は敵弾を生成する。
+                    if (!scene.isDisableEnemyShot()) {
+
+                        // 自機へ向けて弾を発射する。
+                        scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__["a" /* default */](this.hitArea.x,
+                                                         this.hitArea.y,
+                                                         __WEBPACK_IMPORTED_MODULE_0__util_js__["a" /* default */].calcAngle(this.hitArea, scene.playerPosition),
+                                                         SHOT_SPEED,
+                                                         scene));
+                    }
+                    this.shotInterval = 0;
+                }
+
+                break;
+
+            default:
+                break;
+        }
+
+        // 障害物との衝突判定を行う。
+        this.checkBlockHit(scene);
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
+
+        // 画面外に出た場合は自分自身を削除する。
+        if (this.hitArea.x < -this.hitArea.width * 2) {
+            scene.removeCharacter(this);
+            this.sprite.remove();
+        }
+    }
+
+    /**
+     * 逆さま判定。上下の障害物の距離を調べ、上の障害物の方が近い場合は上下反転しているものとする。
+     * @param {PlayingScene} scene - シーン
+     * @return {boolean} 逆さまかどうか
+     */
+    checkUpsideDown(scene) {
+
+        // 上方向の障害物を検索する。
+        const upsideBlock = this.hitArea.getBlockY(true, this.hitArea.x, scene.getStagePosition(), scene.getBlockMap());
+
+        // 下方向の障害物を検索する。
+        const downsideBlock = this.hitArea.getBlockY(false, this.hitArea.x, scene.getStagePosition(), scene.getBlockMap());
+
+        // 上方向の障害物の方が近い場合は逆さまと判断する。
+        if (this.hitArea.y - (upsideBlock.y + upsideBlock.height / 2) < (downsideBlock.y - downsideBlock.height / 2) - this.hitArea.y) {
+
+            return true;
+        }
+        else {
+
+            return false;
+        }
+    }
+
+    /**
+     * 障害物との衝突を処理する。
+     * 通常は自分の足元の一番上の障害物の位置にy座標を合わせ、逆さまの場合は一番下の障害物に合わせる。
+     * ブロック半分までの段差は超えられるものとし、それ以上の段差がある場合は手前の障害物の上で停止する。
+     * @param {PlayingScene} scene - シーン
+     */
+    checkBlockHit(scene) {
+
+        // 移動可能な段差
+        const MOVABLE_STEP = 8;
+
+        // 左側の足元の障害物を検索する。
+        const leftBlock = this.hitArea.getBlockY(this.isUpsideDown,
+                                                 this.hitArea.x - this.hitArea.width / 2,
+                                                 scene.getStagePosition(),
+                                                 scene.getBlockMap());
+
+        // 右側の足元の障害物を検索する。
+        const rightBlock = this.hitArea.getBlockY(this.isUpsideDown,
+                                                  this.hitArea.x + this.hitArea.width / 2,
+                                                  scene.getStagePosition(),
+                                                  scene.getBlockMap());
+
+        // 逆さまの場合は障害物の上端の値を使用し、通常の場合は下端の値を使用する。
+        let leftBlockPos = 0;
+        let rightBlockPos = 0;
+        if (this.isUpsideDown) {
+            leftBlockPos = leftBlock.y + leftBlock.height / 2;
+            rightBlockPos = rightBlock.y + rightBlock.height / 2;
+        }
+        else {
+            leftBlockPos = leftBlock.y - leftBlock.height / 2;
+            rightBlockPos = rightBlock.y - rightBlock.height / 2;
+        }
+
+        // 左右の段差が移動可能な段差を超えている場合
+        if (Math.abs(leftBlockPos - rightBlockPos) > MOVABLE_STEP) {
+
+            // 進行方向と反対の障害物に合わせる。
+            if (this.state === STATE.LEFT_MOVE) {
+                this.hitArea.x = rightBlock.x - rightBlock.width / 2 + this.hitArea.width / 2;
+
+                if (this.isUpsideDown) {
+                    this.hitArea.y = rightBlock.y + rightBlock.width / 2 + this.hitArea.height / 2;
+                }
+                else {
+                    this.hitArea.y = rightBlock.y - rightBlock.width / 2 - this.hitArea.height / 2;
+                }
+            }
+            else {
+                this.hitArea.x = leftBlock.x - leftBlock.width / 2 + this.hitArea.width / 2;
+
+                if (this.isUpsideDown) {
+                    this.hitArea.y = leftBlock.y + leftBlock.width / 2 + this.hitArea.height / 2;
+                }
+                else {
+                    this.hitArea.y = leftBlock.y - leftBlock.width / 2 - this.hitArea.height / 2;
+                }
+            }
+        }
+        else {
+
+            // 逆さまの場合は下の方に合わせる。
+            if (this.isUpsideDown) {
+
+                this.hitArea.y = Math.max(leftBlockPos, rightBlockPos) + this.hitArea.height / 2;
+
+            }
+            // 通常の場合は上の方に合わせる。
+            else {
+
+                this.hitArea.y = Math.min(leftBlockPos, rightBlockPos) - this.hitArea.height / 2;
+            }
+        }
+    }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Ant);
+
+
+/***/ }),
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(4);
+/** @module chickengauge */
+
 
 
 
 /**
- * @class ChickenGauge
- * @brief チキンゲージ
  * チキンゲージの画像を表示する。
  */
 class ChickenGauge {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 画像の読み込みを行う。
+     * コンストラクタ、画像の読み込みを行う。
      */
     constructor() {
 
@@ -1894,22 +2775,16 @@ class ChickenGauge {
     }
 
     /**
-     * @function getSprite
-     * @brief スプライト取得
      * ゲージのたまっている比率に応じたスプライトを取得する。
-     *
-     * @return スプライト
+     * @return {phina.display.DisplayElement} スプライト
      */
     getSprite() {
         return this.base;
     }
 
     /**
-     * @function setRate
-     * @brief ゲージ比率設定
      * ゲージが溜まっている比率を設定する。
-     *
-     * @param [in] rate ゲージが溜まっている比率(0～1)
+     * @param {number} rate - ゲージが溜まっている比率(0～1)
      */
     setRate(rate) {
 
@@ -1918,20 +2793,18 @@ class ChickenGauge {
         this.fullImage.srcRect.width = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.width * rate);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = ChickenGauge;
 
+/* harmony default export */ __webpack_exports__["a"] = (ChickenGauge);
 
 
 /***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion_js__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__enemyshot_js__ = __webpack_require__(12);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemy_js__ = __webpack_require__(8);
+/** @module dragonfly */
 
 
 
@@ -1944,60 +2817,36 @@ const SHOT_SPEED = 0.75;
 const SHOT_INTERVAL = 120;
 
 /**
- * @class Dragonfly
- * @brief トンボ
+ * 敵キャラクター、トンボ。
  * 左方向に直進する。
  * 左方向に直進する弾を発射する。
  */
-class Dragonfly {
+class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default */] {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * コンストラクタ
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
-        this.sprite = Sprite('image_16x16', 16, 16);
-        scene.addCharacterSprite(this.sprite);
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'dragonfly', scene);
 
-        // アニメーションの設定を行う。
-        this.animation = FrameAnimation('image_16x16_ss');
-        this.animation.attachTo(this.sprite);
-        this.animation.gotoAndPlay('dragonfly');
-
-        // キャラクタータイプを設定する。
-        this.type = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.ENEMY;
-
-        // 当たり判定を作成する。
-        this.hitArea = new __WEBPACK_IMPORTED_MODULE_0__collider_js__["a" /* default */](x, y, __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy['dragonfly'].width, __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy['dragonfly'].height); 
-
-        // HPを設定する。
-        this.hp = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy['dragonfly'].hp;
-
-        // 防御力を設定する。
-        this.defense = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy['dragonfly'].defense;
-
-        // スコアを設定する。
-        this.score = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].enemy['dragonfly'].score;
-
-        // メンバを初期化する。
+        /**
+         * 弾発射間隔
+         * @type {number}
+         */
         this.shotInterval = 0;
     }
     
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 左方向に直進する。
      * 左方向に直進する弾を発射する。
      * 画面外に出ると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -2010,15 +2859,7 @@ class Dragonfly {
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this.hp <= 0) {
 
-            // 爆発アニメーションを作成する。
-            scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__explosion_js__["a" /* default */](this.hitArea.x, this.hitArea.y, scene));
-
-            // スコアを加算する。
-            scene.addScore(this.score);
-
-            // 自分自身を削除する。
-            scene.removeCharacter(this);
-            this.sprite.remove();
+            this.death(scene);
 
             return;
         }
@@ -2028,7 +2869,7 @@ class Dragonfly {
         if (this.shotInterval >= SHOT_INTERVAL) {
             // 敵弾が無効化されていない場合は敵弾を生成する。
             if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_3__enemyshot_js__["a" /* default */](this.hitArea.x, this.hitArea.y, Math.PI, SHOT_SPEED, scene));
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__["a" /* default */](this.hitArea.x, this.hitArea.y, Math.PI, SHOT_SPEED, scene));
             }
             this.shotInterval = 0;
         }
@@ -2039,239 +2880,49 @@ class Dragonfly {
             this.sprite.remove();
         }
     }
-    
-    /**
-     * @function hit
-     * @brief 衝突処理
-     * 他のキャラクターと衝突したときの処理を行う。
-     *
-     * @param [in] character 衝突したキャラクター
-     * @param [in/out] scene シーン
-     */
-    hit(character, scene) {
-
-        // 衝突したキャラクターが自機または自機弾の場合
-        if (character.type === __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER ||
-            character.type === __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER_SHOT) {
-
-            // 相手の攻撃力と自分の防御力の差をダメージとしてHPから減らす。
-            if (this.defense < character.power) {
-                this.hp -= character.power - this.defense;
-            }
-        }
-    }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Dragonfly;
 
+/* harmony default export */ __webpack_exports__["a"] = (Dragonfly);
 
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__collider_js__ = __webpack_require__(2);
-
-
-
-
-
-// 当たり判定幅
-const HIT_WIDTH = 3;
-// 当たり判定高さ
-const HIT_HEIGHT = 3;
-// かすりゲージ増加率
-const GRAZE_RATE = 0.02;
-// 反射弾の攻撃力
-const REFLECTION_POWER = 5;
+/** @module explosion */
 
 /**
- * @class EnemyShot
- * @brief 敵弾
- * 敵が発射する弾。
- */
-class EnemyShot {
-
-    /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] angle 進行方向
-     * @param [in] speed スピード
-     * @param [in/out] scene シーン
-     */
-    constructor(x, y, angle, speed, scene) {
-
-        // スプライトを作成する。
-        this.sprite = Sprite('image_8x8', 8, 8);
-        scene.addCharacterSprite(this.sprite);
-
-        // アニメーションの設定を行う。
-        this.animation = FrameAnimation('image_8x8_ss');
-        this.animation.attachTo(this.sprite);
-        this.animation.gotoAndPlay('enemy_shot');
-
-        // キャラクタータイプを設定する。
-        this.type = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.ENEMY_SHOT;
-
-        // 当たり判定を作成する。
-        this.hitArea = new __WEBPACK_IMPORTED_MODULE_3__collider_js__["a" /* default */](x, y, HIT_WIDTH, HIT_HEIGHT);
-
-        // x方向のスピードを計算する。
-        this.speedX = Math.cos(angle) * speed;
-        
-        // y方向のスピードを計算する。
-        // phina.jsの座標系は下方向が正なので逆向きにする。
-        this.speedY = Math.sin(angle) * speed * -1;
-
-        // かすり時のゲージ増加率を設定する。
-        this.grazeRate = GRAZE_RATE;
-    }
-    
-    /**
-     * @function update
-     * @brief 更新処理
-     * スピードに応じて移動する。
-     * 画面外に出ると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
-     */
-    update(scene) {
-
-        // スピードに応じて移動する。
-        this.hitArea.x += this.speedX;
-        this.hitArea.y += this.speedY;
-
-        // 座標をスプライトに適用する。
-        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
-
-        // タイプが自機弾になっている場合、反射弾として敵との当たり判定を行う。
-        if (this.type === __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER_SHOT) {
-
-            // 衝突している敵キャラクターを検索する。
-            const hitCharacters = this.hitArea.getHitCharacter(scene.characters, [__WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.ENEMY]);
-
-            // 衝突している敵キャラクターがいる場合。
-            if (hitCharacters.length > 0) {
-
-                // 敵キャラクターの衝突処理を実行する。
-                hitCharacters[0].hit(this);
-
-                // 敵キャラクターに接触した場合は自分自身は削除する。
-                scene.removeCharacter(this);
-                this.sprite.remove();
-
-                // 敵キャラと衝突した場合は処理を終了する。
-                return;
-            }
-        }
-
-        // ブロックとの当たり判定処理を行う。
-        if (__WEBPACK_IMPORTED_MODULE_2__util_js__["a" /* default */].checkCollidedBlock(this.hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
-            // ブロックと衝突した場合は自分自身を削除する。
-            scene.removeCharacter(this);
-            this.sprite.remove();
-            return;
-        }
-
-        // 画面外に出た場合は自分自身を削除する。
-        if (this.hitArea.x < -this.hitArea.width * 2 ||
-            this.hitArea.x > __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.width + this.hitArea.width * 2 ||
-            this.hitArea.y < -this.hitArea.height * 2 ||
-            this.hitArea.y > __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].STAGE_RECT.height + this.hitArea.height * 2) {
-
-            scene.removeCharacter(this);
-            this.sprite.remove();
-            return;
-        }
-    }
-
-    /**
-     * @function hit
-     * @brief 衝突処理
-     * 他のキャラクターと衝突したときの処理を行う。
-     *
-     * @param [in] character 衝突したキャラクター
-     * @param [in/out] scene シーン
-     */
-    hit(character, scene) {
-
-        // 自分自身を削除する。
-        scene.removeCharacter(this);
-        this.sprite.remove();
-    }
-
-    /**
-     * @function graze
-     * @brief かすり処理
-     * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
-     *
-     * @return ゲージ増加比率
-     */
-    graze() {
-        const ret = this.grazeRate;
-        this.grazeRate = 0;
-        return ret;
-    }
-
-    /**
-     * @function reflect
-     * @brief 反射処理
-     * 移動方向を180度反転させ、自機弾として扱うようにする。
-     */
-    reflect() {
-
-        // キャラクタータイプを自機弾に変更する。
-        this.type = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER_SHOT;
-
-        // 攻撃力を設定する。
-        this.power = REFLECTION_POWER;
-
-        // 進行方向を反転する。
-        this.speedX *= -1;
-        this.speedY *= -1;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = EnemyShot;
-
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/**
- * @class Explosion
- * @brief 爆発
  * 爆発アニメーションを行う。
  */
 class Explosion {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 座標の設定とアニメーションの設定を行う。
      * 爆発音を再生する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('explosion');
 
@@ -2283,11 +2934,8 @@ class Explosion {
     }
     
     /**
-     * @function update
-     * @brief 更新処理
      * アニメーションが終了すると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -2298,18 +2946,20 @@ class Explosion {
         }
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Explosion;
 
+/* harmony default export */ __webpack_exports__["a"] = (Explosion);
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(4);
+/** @module life */
+
 
 
 
@@ -2322,20 +2972,20 @@ const IMAGE_POS_X = -16;
 const LABEL_POS_X = 8;
 
 /**
- * @class Life
- * @brief 残機表示
  * 残機を表示する。
  */
 class Life {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 画像と数値のラベルをくっつけたコントールを作成する。
      */
     constructor() {
 
-        // ベース部分を作成する。
+        /**
+         * ベース部分
+         * @type {phina.display.RectangleShape}
+         */
         this.base = RectangleShape({
             height: 22,
             width: 52,
@@ -2343,15 +2993,23 @@ class Life {
             strokeWidth: 0,
         });
 
-        // 画像を読み込む。
+        /**
+         * 画像
+         * @type {phina.display.Sprite}
+         */
         this.image = Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.width, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.height);
+
+        // 画像のサイズと位置を設定する。
         this.image.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.x, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.y, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.width, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.height);
         this.image.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this.image.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this.image.x = IMAGE_POS_X;
         this.image.addChildTo(this.base);
 
-        // ラベルを作成する。
+        /**
+         * ラベル
+         * @type {phina.display.Label}
+         */
         this.label = Label({
             text: ':00',
             fontSize: 20,
@@ -2361,25 +3019,24 @@ class Life {
         this.label.x = LABEL_POS_X;
         this.label.addChildTo(this.base);
 
-        // 残機の初期値は0とする。
+        /**
+         * 残機
+         * @type {number}
+         */
         this.life = 0;
     }
 
     /**
-     * @function getSprite
-     * @brief スプライト取得
      * 残機画像、ラベルを合わせたスプライトを取得する。
-     *
-     * @return スプライト
+     * @return {phina.display.RectangleShape} スプライト
      */
     getSprite() {
         return this.base;
     }
 
     /**
-     * @function setLife
-     * @brief 残機設定
-     * 残機を設定し、
+     * 残機を設定し、ラベルの文字列を変更する。
+     * @param {number} life - 残機
      */
     setLife(life) {
 
@@ -2395,20 +3052,20 @@ class Life {
         this.label.text = ':' + ('00' + this.life).slice(-2);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Life;
 
+/* harmony default export */ __webpack_exports__["a"] = (Life);
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice_js__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playingscene_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playingscene_js__ = __webpack_require__(11);
 window.DebugObject = {};
 
 
@@ -2422,7 +3079,10 @@ __WEBPACK_IMPORTED_MODULE_0__pointdevice_js__["a" /* default */].checkDeviceType
 // phina.js をグローバル領域に展開
 phina.globalize();
 
-// アセット
+/**
+ * アセット
+ * @type {object}
+ */
 const ASSETS = {
     image: {
         'back': './images/back.png',
@@ -2446,12 +3106,16 @@ const ASSETS = {
 
 /**
  * メインシーン。
+ * @class MainScene
+ * @extend phina.display.DisplayScene
  */
 phina.define('MainScene', {
     superClass: 'DisplayScene',
 
     /**
      * コンストラクタ。
+     * @function init
+     * @member MainScene#init
      */
     init: function() {
         this.superInit({
@@ -2465,14 +3129,19 @@ phina.define('MainScene', {
         // 背景色を指定する。
         this.backgroundColor = __WEBPACK_IMPORTED_MODULE_2__mycolor_js__["a" /* default */].BACK_COLOR;
 
-        // 初期シーンを作成する。
+        /**
+         * 実行中のシーン
+         * @type {object}
+         * @member MainScene#scene
+         */
         this.scene = new __WEBPACK_IMPORTED_MODULE_3__playingscene_js__["a" /* default */](this);
     },
 
     /**
      * 更新処理。内部のシーン処理の更新処理を実行する。
-     *
-     * @param app アプリケーション
+     * @function update
+     * @param {phina.game.GameApp} app - アプリケーション
+     * @member MainScene#update
      */
     update: function(app) {
         this.scene.update(app);
@@ -2484,7 +3153,7 @@ phina.main(function() {
 
     // 画面サイズの補正の有効無効を切り替える。
     let isFit = true;
-    if (localStorage.disableFit == 'true') {
+    if (localStorage.disableFit === 'true') {
         isFit = false;
     }
 
@@ -2501,7 +3170,9 @@ phina.main(function() {
     app.fps = 60;
 
     // FPSを表示する。（デバッグ用）
-    app.enableStats();
+    if (localStorage.viewFPS === 'true') {
+        app.enableStats();
+    }
 
     // iOSのsafariではユーザが操作時のみ音の再生が可能なため、タッチ時にダミーで音声の再生を行う。
     // https://github.com/phinajs/phina.js/issues/197
@@ -2518,17 +3189,19 @@ phina.main(function() {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__collider_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playershot_js__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playerdeatheffect_js__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__playeroption_js__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__collider_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playershot_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playerdeatheffect_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__playeroption_js__ = __webpack_require__(20);
+/** @module player */
+
 
 
 
@@ -2570,75 +3243,126 @@ const MAX_OPTION_COUNT = 3;
 const CONSUMPTION_GAUGE = 0.005;
 
 /**
- * @class Player
- * @brief 自機
- * ユーザー操作に応じて移動する。
+ * 自機。ユーザー操作に応じて移動する。
  */
 class Player {
 
     /**
-     * @function init
-     * @brief コンストラクタ
-     * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * コンストラクタ、座標の設定とスプライトシートの設定を行う。
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('player_normal');
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = __WEBPACK_IMPORTED_MODULE_1__character_js__["a" /* default */].type.PLAYER;
 
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new __WEBPACK_IMPORTED_MODULE_3__collider_js__["a" /* default */](x, y, HIT_WIDTH, HIT_HEIGHT);
 
-        // かすり当たり判定を作成する。
+        /**
+         * かすり当たり判定
+         * @type {Collider}
+         */
         this.grazeArea = new __WEBPACK_IMPORTED_MODULE_3__collider_js__["a" /* default */](x, y, GRAZE_WIDTH, GRAZE_HEIGHT);
 
-        // メンバを初期化する。
+        /**
+         * 弾発射間隔
+         * @type {number}
+         */
         this.shotInterval = 0;
+
+        /**
+         * 状態
+         * @type {number}
+         */
         this.status = STATUS.NORMAL;
+
+        /**
+         * 衝突したときの攻撃力
+         * @type {number}
+         */
         this.power = 1;
+
+        /**
+         * 無敵状態フレーム数
+         * @tyep {number}
+         */
         this.invincibleFrame = 0;
+
+        /**
+         * チキンゲージ
+         * @type {number}
+         */
         this.chickenGauge = 0;
+
+        /**
+         * オプション
+         * @type {PlayerOption}
+         */
         this.option = null;
+
+        /**
+         * シールド使用不使用
+         * @type {boolean}
+         */
         this.shield = false;
+
+        /**
+         * デバッグ用フラグ。死亡しないようにする。
+         * @type {boolean}
+         */
+        this.noDeath = false;
+
+        /**
+         * デバッグ用フラグ。自機弾を発射しないようにする。
+         * @type {boolean}
+         */
+        this.noShot = false;
 
         // デバッグ用: 死亡しないようにする。
         if (localStorage.noDeath === 'true') {
             this.noDeath = true;
-        }
-        else {
-            this.noDeath = false;
         }
 
         // デバッグ用: ショットを撃たないようにする。
         if (localStorage.noShot === 'true') {
             this.noShot = true;
         }
-        else {
-            this.noShot = false;
-        }
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 座標をスプライトに適用する。
      * ブロックやキャラクターとの当たり判定処理を行う。
      * 自機弾を発射する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -2709,11 +3433,8 @@ class Player {
     }
 
     /**
-     * @function moveKeyLeft
-     * @brief 左キーによる移動
      * キーボードの左キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyLeft(scene) {
         this._move(this.hitArea.x - SPEED_BY_KEY,
@@ -2722,11 +3443,8 @@ class Player {
     }
 
     /**
-     * @function moveKeyRight
-     * @brief 右キーによる移動
      * キーボードの右キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyRight(scene) {
         this._move(this.hitArea.x + SPEED_BY_KEY,
@@ -2735,11 +3453,8 @@ class Player {
     }
 
     /**
-     * @function moveKeyUp
-     * @brief 上キーによる移動
      * キーボードの上キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyUp(scene) {
         this._move(this.hitArea.x,
@@ -2748,11 +3463,8 @@ class Player {
     }
 
     /**
-     * @function moveKeyDown
-     * @brief 下キーによる移動
      * キーボードの下キー入力による移動処理を行う。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     moveKeyDown(scene) {
         this._move(this.hitArea.x,
@@ -2761,13 +3473,10 @@ class Player {
     }
 
     /**
-     * @function moveTouch
-     * @brief タッチによる移動
      * タッチ入力による移動処理を行う。
-     *
-     * @param [in] x x座標方向のタッチ位置スライド量
-     * @param [in] y y座標方向のタッチ位置スライド量
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標方向のタッチ位置スライド量
+     * @param {number} y - y座標方向のタッチ位置スライド量
+     * @param {PlayingScene} scene - シーン
      */
     moveTouch(x, y, scene) {
         this._move(this.hitArea.x + x * SPEED_BY_TOUCH,
@@ -2776,13 +3485,10 @@ class Player {
     }
 
     /**
-     * @function moveTouch
-     * @brief ゲームパッドによる移動
      * ゲームパッド入力による移動処理を行う。
-     *
-     * @param [in] x x座標方向のスティック入力値
-     * @param [in] y y座標方向のスティック入力値
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標方向のスティック入力値
+     * @param {number} y - y座標方向のスティック入力値
+     * @param {PlayingScene} scene - シーン
      */
     moveGamepad(x, y, scene) {
         this._move(this.hitArea.x + x * SPEED_BY_GAMEPAD,
@@ -2791,12 +3497,9 @@ class Player {
     }
 
     /**
-     * @function rebirth
-     * @brief 復活処理
      * 死亡後の復活処理を行う。
      * 一定時間無敵状態とし、画像を点滅表示する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     rebirth(scene) {
 
@@ -2824,23 +3527,17 @@ class Player {
     }
 
     /**
-     * @function getChickenGauge
-     * @brief チキンゲージ取得
      * チキンゲージの溜まっている比率を0～1の範囲で取得する。
-     *
-     * @return チキンゲージ
+     * @return {number} チキンゲージ
      */
     getChickenGauge() {
         return this.chickenGauge;
     }
 
     /**
-     * @function setShield
-     * @brief シールド使用不使用設定
      * シールド使用不使用を設定する。
      * オプションがあればオプションの設定も変更する。
-     *
-     * @param [in] shield シールド使用不使用
+     * @param {boolean} shield - シールド使用不使用
      */
     setShield(shield) {
 
@@ -2854,13 +3551,10 @@ class Player {
     }
 
     /**
-     * @function _move
-     * @brief 移動処理
      * 座標を変更し、各種当たり判定処理を行う。
-     *
-     * @param [in] x 移動後のx座標
-     * @param [in] y 移動後のy座標
-     * @param [in/out] scene シーン
+     * @param {number} x - 移動後のx座標
+     * @param {number} y - 移動後のy座標
+     * @param {PlayingScene} scene - シーン
      */
     _move(x, y, scene) {
 
@@ -2907,8 +3601,6 @@ class Player {
     }
 
     /**
-     * @function _checkScreenArea
-     * @breif 画面外に出ていないかチェックする
      * 画面外に出ていないかチェックする。
      * 画面外に出ていた場合は画面内に座標を補正する。
      */
@@ -2936,11 +3628,9 @@ class Player {
     }
 
     /**
-     * @function _checkHitChacater
-     * @breif 当たり判定処理
      * 他のキャラクターとの当たり判定を処理する。
-     *
      * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     _checkHitChacater(scene) {
 
@@ -2972,11 +3662,8 @@ class Player {
     }
 
     /**
-     * @function _checkGraze
-     * @breif かすり判定処理
      * 敵弾とのかすり判定を処理する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     _checkGraze(scene) {
 
@@ -3001,11 +3688,8 @@ class Player {
     }
     
     /**
-     * @function _updateOptionCount
-     * @brief オプション個数更新
      * チキンゲージに応じてオプション個数を更新する。
-     * 
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     _updateOptionCount(scene) {
 
@@ -3039,40 +3723,49 @@ class Player {
         }
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Player;
 
+/* harmony default export */ __webpack_exports__["a"] = (Player);
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/** @module playerdeatheffect */
+
 /**
- * @class PlayerDeathEffect
- * @brief 自機死亡エフェクト
  * 自機死亡時のエフェクトを表示する。
  */
 class PlayerDeathEffect {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 座標の設定とアニメーションの設定を行う。
      * 死亡時SEを再生する。
      *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
         this.animation.gotoAndPlay('player_death');
 
@@ -3084,12 +3777,9 @@ class PlayerDeathEffect {
     }
 
     /**
-     * @function update
-     * @brief 更新処理
-     * 下に落ちる。
+     * 更新処理。下に落ちる。
      * アニメーションが終了すると自分自身を削除する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -3103,19 +3793,21 @@ class PlayerDeathEffect {
         }
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PlayerDeathEffect;
 
+/* harmony default export */ __webpack_exports__["a"] = (PlayerDeathEffect);
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot_js__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot_js__ = __webpack_require__(10);
+/** @module playeroption */
+
 
 
 
@@ -3131,34 +3823,45 @@ const HIT_HEIGHT = 16;
 const OPTION_SPACE = 20;
 
 /**
- * @class PlayerOption
- * @brief 自機オプション
+ * 自機オプション。
  * 自機の後ろについて移動する。
  * チキンゲージの比率に応じて増える。
  */
 class PlayerOption {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 座標の設定とスプライトシートの設定を行う。
      *
-     * @param [in] x x座標
-     * @param [in] y y座標
-     * @param [in] shield シールド使用不使用
-     * @param [in/out] scene シーン
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {number} shield - シールド使用不使用
+     * @param {PlayingScene} scene - シーン
      */
     constructor(x, y, shield , scene) {
 
-        // スプライトを作成する。
+        /** 
+         * スプライト
+         * @type {phina.display.Sprite}
+         */
         this.sprite = Sprite('image_16x16', 16, 16);
+
+        // スプライトをシーンに追加する。
         scene.addCharacterSprite(this.sprite);
 
-        // シールド使用不使用を設定する。
+        /**
+         * シールド使用不使用
+         * @type {boolean}
+         */
         this.shield = shield;
 
-        // アニメーションの設定を行う。
+        /**
+         * アニメーション
+         * @type {phina.accessory.FrameAnimation}
+         */
         this.animation = FrameAnimation('image_16x16_ss');
+
+        // アニメーションの設定を行う。
         this.animation.attachTo(this.sprite);
 
         // シールド使用不使用によって画像を変更する。
@@ -3169,34 +3872,54 @@ class PlayerOption {
             this.animation.gotoAndPlay('player_option_normal');
         }
 
-        // キャラクタータイプを設定する。
+        /**
+         * キャラクタータイプ
+         * @type {number}
+         */
         this.type = __WEBPACK_IMPORTED_MODULE_0__character_js__["a" /* default */].type.PLAYER_OPTION;
 
-        // 当たり判定を作成する。
+        /**
+         * 当たり判定
+         * @type {Collider}
+         */
         this.hitArea = new __WEBPACK_IMPORTED_MODULE_2__collider_js__["a" /* default */](x, y, HIT_WIDTH, HIT_HEIGHT);
 
-        // メンバを初期化する。
+        /**
+         * 移動位置。一定個数溜まったら、FIFOとして移動位置を適用していく。
+         * @type {Array}
+         */
         this.movePosition = [];
+
+        /**
+         * 次のオプション。
+         * @type {PlayerOption}
+         */
         this.nextOption = null;
+
+        /**
+         * 弾発射間隔。
+         * @type {number}
+         */
         this.shotInterval = 0;
+
+        /**
+         * デバッグ用フラグ。自機弾を発射しないようにする。
+         * @type {boolean}
+         */
+        this.noShot = false;
 
         // デバッグ用: ショットを撃たないようにする。
         if (localStorage.noShot === 'true') {
             this.noShot = true;
         }
-        else {
-            this.noShot = false;
-        }
     }
 
     /**
-     * @function update
-     * @brief 更新処理
+     * 更新処理。
      * 座標をスプライトに適用する。
      * シールド使用時は敵弾との当たり判定処理を行う。
      * 自機弾を発射する。
-     *
-     * @param [in/out] scene シーン
+     * @param {PlayingScene} scene - シーン
      */
     update(scene) {
 
@@ -3221,14 +3944,11 @@ class PlayerOption {
     }
 
     /**
-     * @function move
-     * @brief 移動処理
      * 指定された座標へ移動する。
      * ただし、すぐに移動するのではなく、OPTION_SPACEの間隔分遅れて移動する。
      * オプションが他に存在する場合は、移動前の座標に対して移動を指示する。
-     *
-     * @param [in] x x座標
-     * @param [in] y y座標
+     * @param {number} x - x座標
+     * @param {number} y - y座標
      */
     move(x, y) {
 
@@ -3253,14 +3973,11 @@ class PlayerOption {
     }
 
     /**
-     * @function setCount
-     * @brief オプション個数設定
      * オプションの個数を設定する。
      * 0以下が指定されると自分自身を削除する。
      * 2個以上が指定されると再帰的に次のオプションを作成する。
-     *
-     * @param [in] count オプション個数
-     * @param [in/out] scene シーン
+     * @param {number} count - オプション個数
+     * @param {PlayingScene} scene - シーン
      */
     setCount(count, scene) {
 
@@ -3297,12 +4014,9 @@ class PlayerOption {
     }
 
     /**
-     * @function setShield
-     * @brief シールド使用不使用設定
      * シールド使用不使用を設定する。
      * 次のオプションがあればオプションの設定も変更する。
-     *
-     * @param [in] shield シールド使用不使用
+     * @param {boolean} shield - シールド使用不使用
      */
     setShield(shield) {
 
@@ -3329,11 +4043,8 @@ class PlayerOption {
     }
     
     /**
-     * @function _checkHitChacater
-     * @breif 当たり判定処理
-     * 他のキャラクターとの当たり判定を処理する。
-     *
-     * @param [in/out] scene シーン
+     * 敵弾との当たり判定を処理する。衝突した敵弾の反射処理を行う。
+     * @param {PlayingScene} scene - シーン
      */
     _checkHitChacater(scene) {
 
@@ -3348,17 +4059,19 @@ class PlayerOption {
         }
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = PlayerOption;
 
+/* harmony default export */ __webpack_exports__["a"] = (PlayerOption);
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize_js__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
+/** @module shieldbutton */
+
 
 
 
@@ -3366,50 +4079,73 @@ class PlayerOption {
 const BUTTON_SIZE = 128;
 
 /**
- * @class ShieldButton
- * @brief シールドボタン
  * シールドボタンの画像表示とタッチ処理を行う。
  */
 class ShieldButton {
 
     /**
-     * @function init
-     * @brief コンストラクタ
+     * コンストラクタ。
      * 画像の読み込みとボタン部分を作成する。
      */
     constructor() {
 
-        // ベース部分を作成する。
+        /**
+         * ベース部分を作成する。
+         * @type {phina.display.DisplayElement}
+         */
         this.base = DisplayElement();
 
-        // タッチしていない状態の画像を読み込む。
+        /**
+         * タッチしていない状態の画像
+         * @type {phina.display.Sprite}
+         */
         this.offImage = Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.height);
+
+        // タッチしていない状態のサイズを設定する。
         this.offImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.x,
                                   __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.y,
                                   __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.width,
                                   __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.height);
         this.offImage.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this.offImage.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
+
+        // ベース部分に追加する。
         this.offImage.addChildTo(this.base);
 
-        // タッチしている状態の画像を読み込む。
+        /**
+         * タッチしている状態の画像
+         * @type {phina.display.Sprite}
+         */
         this.onImage = Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.height);
+
+        // タッチしている状態のサイズを設定する。
         this.onImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.x,
                                  __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.y,
                                  __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.width,
                                  __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.height);
         this.onImage.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this.onImage.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
+
+        // ベース部分に追加する。
         this.onImage.addChildTo(this.base);
 
-        // ボタン部分を作成する。
-        // タップをやりやすくするため、画像より大きめにサイズを取る。
+        /**
+         * ボタン部分。
+         * タップをやりやすくするため、画像より大きめにサイズを取る。
+         * @type {phina.display.RectangleShape}
+         */ 
         this.button = RectangleShape({
             height: BUTTON_SIZE,
             width: BUTTON_SIZE,
         });
+
+        // ボタン部分を非表示にする。
         this.button.alpha = 0;
+
+        // タッチ操作を有効にする。
         this.button.setInteractive(true);
+
+        // ベース部分に追加する。
         this.button.addChildTo(this.base);
 
         const self = this;
@@ -3428,77 +4164,74 @@ class ShieldButton {
             self.onImage.alpha = 0;
         };
 
-        // 初期状態はタッチしていない状態とする。
+        /**
+         * タッチしているかどうか
+         * @type {boolean}
+         */
         this.touch = false;
+
+        // 初期状態はタッチしていない状態とする。
         this.offImage.alpha = 1;
         this.onImage.alpha = 0;
     }
 
     /**
-     * @function getSprite
-     * @brief スプライト取得
      * 画像、ボタンを合わせたスプライトを取得する。
-     *
-     * @return スプライト
+     * @return {phina.display.DisplayElement} スプライト
      */
     getSprite() {
         return this.base;
     }
 
     /**
-     * @function isTouch
-     * @brief タッチ状態取得
      * タッチされているかどうかを取得する。
-     *
-     * @return タッチされているかどうか
+     * @return {boolean} タッチされているかどうか
      */
     isTouch() {
         return this.touch;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = ShieldButton;
 
+/* harmony default export */ __webpack_exports__["a"] = (ShieldButton);
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/** @module tilemapmanager */
+
 /**
- * @class TileMapManager
- * @brief Tiled Map Editorデータ管理クラス
- * 
  * Tiled Map Editorで作成したデータを読み込む。
  * データはjs形式でエクスポートして使用するものとする。
  */
 class TileMapManager {
 
     /**
-     * @function init
-     * @brief 初期化処理
-     *
+     * 初期化処理。
      * 使用するマップの名前を指定する。
-     *
-     * @param [in] mapName マップ名
+     * @param {string} mapName - マップ名
      */
     constructor(mapName) {
 
-        // マップ名に対応するマップを取得する。
+        /**
+         * マップ名に対応するマップ。
+         * @type {Object}
+         */
         this.map = TileMaps[mapName];
 
-        // 空のオブジェクトマップを作成する。
+        /**
+         * オブジェクトマップ。
+         * @type {Object}
+         */
         this.objectMap = {};
     }
 
     /**
-     * @function getIamge
-     * @brief レイヤー画像取得処理
-     *
      * 指定したレイヤーの画像をテクスチャとして取得する。
-     *
-     * @param [in] layerName レイヤー名
-     * @return マップ画像のテクスチャ
+     * @param {string} layerName - レイヤー名
+     * @return {phina.asset.Texture} マップ画像のテクスチャ
      */
      getIamge(layerName) {
 
@@ -3539,9 +4272,9 @@ class TileMapManager {
     }
 
     /**
-     * @function createObjectMap
-     * @brief オブジェクトマップ作成処理
-     * タイルセットのオブジェクトの情報を
+     * タイルセットのオブジェクトの情報を作成する。
+     * @param {string} layerName - レイヤー名
+     * @param [type} type - オブジェクトの種別
      */
     createObjectMap(layerName, type) {
 
@@ -3598,16 +4331,12 @@ class TileMapManager {
     }
 
     /**
-     * @function _drawTile
-     * @brief タイル描画処理
-     *
      * canvasにタイルを描画する。タイルセットの名前と同じ名前でphina.jsのassetに登録をしておくこと。
-     * 
-     * @param [in/out] canvas canvas
-     * @param [in] tilesets タイルセット配列
-     * @param [in] index タイルのgid
-     * @param [in] x 描画先x座標
-     * @param [in] y 描画先y座標
+     * @param {phina.graphics.Canvas} canvas - canvas
+     * @param {Array} tilesets - タイルセット配列
+     * @param {number} index - タイルのgid
+     * @param {number} x - 描画先x座標
+     * @param {number} y - 描画先y座標
      */
     _drawTile(canvas, tilesets, index, x, y) {
 
@@ -3637,17 +4366,13 @@ class TileMapManager {
     }
 
     /**
-     * @function getObjects
-     * @brief オブジェクト検索処理
-     * 
      * layerNameで指定されたレイヤーの座標x, yから幅width、高さheightの範囲内にあるオブジェクトを取得する。
-     *
-     * @param [in] layerName レイヤー名
-     * @param [in] x 検索範囲左上のx座標
-     * @param [in] y 検索範囲左上のy座標
-     * @apram [in] width 検索範囲幅
-     * @param [in] height 検索範囲高さ
-     * @return 検索結果のオブジェクトの配列
+     * @param {string} layerName - レイヤー名
+     * @param {number} x - 検索範囲左上のx座標
+     * @param {number} y - 検索範囲左上のy座標
+     * @apram {number} width - 検索範囲幅
+     * @param {number} height - 検索範囲高さ
+     * @return {Object} 検索結果のオブジェクトの配列
      */
     getObjects(layerName, x, y, width, height) {
 
@@ -3679,9 +4404,8 @@ class TileMapManager {
         return objects;
    }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = TileMapManager;
 
-
+/* harmony default export */ __webpack_exports__["a"] = (TileMapManager);
 
 
 /***/ })

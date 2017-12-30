@@ -1,0 +1,314 @@
+/** @module ant */
+
+import Util from './util.js'
+import EnemyShot from './enemyshot.js'
+import Enemy from './enemy.js'
+
+// 弾のスピード
+const SHOT_SPEED = 0.5;
+// 移動スピード
+const MOVE_SPEED = 0.5;
+// 移動するフレーム数
+const MOVE_FRAME = 120;
+// 弾発射間隔
+const SHOT_INTERVAL = 30;
+// 弾発射時間
+const SHOT_FRAME = 120;
+// 状態
+const STATE = {
+    LEFT_MOVE: 1,   // 左移動
+    RIGHT_MOVE: 2,  // 右移動
+    FIRE: 3,        // 弾発射
+};
+
+/**
+ * 敵キャラクター、アリ。
+ * 天井または地面に張り付いて歩く。
+ *
+ * 左移動:左方向への移動。一定時間経過後に弾発射に遷移する。
+ * 
+ * 弾発射:停止して弾の発射。自機に向かって1-wayを一定数発射する。
+ * 一定時間経過後に右移動に遷移する。
+ * 
+ * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
+ */
+class Ant extends Enemy {
+
+    /**
+     * コンストラクタ
+     * @param {number} x - x座標
+     * @param {number} y - y座標
+     * @param {PlayingScene} scene - シーン
+     */
+    constructor(x, y, scene) {
+
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'ant', scene);
+
+        /**
+         * 弾発射間隔
+         * @type {number}
+         */
+        this.shotInterval = 0;
+
+        /**
+         * 状態。左移動、弾発射、右移動と遷移する。
+         * @type {number}
+         */
+        this.state = STATE.LEFT_MOVE;
+
+        /**
+         * 状態変化間隔。
+         * @type {number}
+         */
+        this.stateChangeInterval = 0;
+
+        /**
+         * 逆さまかどうか。
+         * @type {boolean}
+         */
+        this.isUpsideDown = this.checkUpsideDown(scene);
+
+        // 逆さまな場合は画像の上下を反転する。
+        if (this.isUpsideDown) {
+            this.sprite.scaleY = -1;
+        }
+    }
+    
+    /**
+     * 更新処理。
+     * 天井または地面に張り付いて歩く。
+     *
+     * 初期状態:上下どちらに張り付くか判定する。距離の近い方に張り付く。
+     * 天井に張り付く場合は画像を上下反転する。
+     * 
+     * 左移動:左方向への移動。一定時間経過後に弾発射に遷移する。
+     * 
+     * 弾発射:停止して弾の発射。自機に向かって1-wayを一定数発射する。
+     * 一定時間経過後に右移動に遷移する。
+     * 
+     * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
+     * @param {PlayingScene} scene - シーン
+     */
+    update(scene) {
+
+        // スクロールに合わせて移動する。
+        this.hitArea.x -= scene.scrollSpeed;
+
+        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
+        if (this.hp <= 0) {
+
+            this.death(scene);
+
+            return;
+        }
+
+        // 状態によって処理を分岐する
+        switch (this.state) {
+            case STATE.LEFT_MOVE:   // 左移動
+
+                // 左へ移動する。
+                this.hitArea.x -= MOVE_SPEED;
+
+                // 左右反転はなしにする。
+                this.sprite.scaleX = 1;
+
+                // 状態遷移間隔が経過したら弾発射状態に遷移する。
+                this.stateChangeInterval++;
+                if (this.stateChangeInterval >= MOVE_FRAME) {
+
+                    // 弾発射に遷移する。
+                    this.state = STATE.FIRE;
+
+                    // 次の状態遷移への間隔を初期化する。
+                    this.stateChangeInterval = 0;
+                    
+                    // 弾発射間隔を初期化する。
+                    this.shotInterval = 0;
+                }
+
+                break;
+
+            case STATE.RIGHT_MOVE:  // 右移動
+
+                // 右へ移動する。
+                this.hitArea.x += MOVE_SPEED;
+
+                // 左右反転はありにする。
+                this.sprite.scaleX = -1;
+
+                // 状態遷移間隔が経過したら弾発射状態に遷移する。
+                this.stateChangeInterval++;
+                if (this.stateChangeInterval >= MOVE_FRAME) {
+
+                    // 弾発射に遷移する。
+                    this.state = STATE.FIRE;
+
+                    // 次の状態遷移への間隔を初期化する。
+                    this.stateChangeInterval = 0;
+                    
+                    // 弾発射間隔を初期化する。
+                    this.shotInterval = 0;
+                }
+
+                break;
+
+            case STATE.FIRE:        // 弾発射
+
+                // 自分より右側に自機がいれば左右反転する。
+                if (this.hitArea.x < scene.playerPosition.x) {
+                    this.sprite.scaleX = -1;
+                }
+                else {
+                    this.sprite.scaleX = 1;
+                }
+
+                // 状態遷移間隔が経過したら右移動状態に遷移する。
+                this.stateChangeInterval++;
+                if (this.stateChangeInterval >= SHOT_FRAME ) {
+
+                    // 右移動に遷移する。
+                    this.state = STATE.RIGHT_MOVE;
+
+                    // 次の状態遷移への間隔を初期化する。
+                    this.stateChangeInterval = 0;
+                }
+
+                // 弾発射間隔が経過したら弾を発射する。
+                this.shotInterval++;
+                if (this.shotInterval >= SHOT_INTERVAL) {
+
+                    // 敵弾が無効化されていない場合は敵弾を生成する。
+                    if (!scene.isDisableEnemyShot()) {
+
+                        // 自機へ向けて弾を発射する。
+                        scene.addCharacter(new EnemyShot(this.hitArea.x,
+                                                         this.hitArea.y,
+                                                         Util.calcAngle(this.hitArea, scene.playerPosition),
+                                                         SHOT_SPEED,
+                                                         scene));
+                    }
+                    this.shotInterval = 0;
+                }
+
+                break;
+
+            default:
+                break;
+        }
+
+        // 障害物との衝突判定を行う。
+        this.checkBlockHit(scene);
+
+        // 座標をスプライトに適用する。
+        this.sprite.setPosition(Math.floor(this.hitArea.x), Math.floor(this.hitArea.y));
+
+        // 画面外に出た場合は自分自身を削除する。
+        if (this.hitArea.x < -this.hitArea.width * 2) {
+            scene.removeCharacter(this);
+            this.sprite.remove();
+        }
+    }
+
+    /**
+     * 逆さま判定。上下の障害物の距離を調べ、上の障害物の方が近い場合は上下反転しているものとする。
+     * @param {PlayingScene} scene - シーン
+     * @return {boolean} 逆さまかどうか
+     */
+    checkUpsideDown(scene) {
+
+        // 上方向の障害物を検索する。
+        const upsideBlock = this.hitArea.getBlockY(true, this.hitArea.x, scene.getStagePosition(), scene.getBlockMap());
+
+        // 下方向の障害物を検索する。
+        const downsideBlock = this.hitArea.getBlockY(false, this.hitArea.x, scene.getStagePosition(), scene.getBlockMap());
+
+        // 上方向の障害物の方が近い場合は逆さまと判断する。
+        if (this.hitArea.y - (upsideBlock.y + upsideBlock.height / 2) < (downsideBlock.y - downsideBlock.height / 2) - this.hitArea.y) {
+
+            return true;
+        }
+        else {
+
+            return false;
+        }
+    }
+
+    /**
+     * 障害物との衝突を処理する。
+     * 通常は自分の足元の一番上の障害物の位置にy座標を合わせ、逆さまの場合は一番下の障害物に合わせる。
+     * ブロック半分までの段差は超えられるものとし、それ以上の段差がある場合は手前の障害物の上で停止する。
+     * @param {PlayingScene} scene - シーン
+     */
+    checkBlockHit(scene) {
+
+        // 移動可能な段差
+        const MOVABLE_STEP = 8;
+
+        // 左側の足元の障害物を検索する。
+        const leftBlock = this.hitArea.getBlockY(this.isUpsideDown,
+                                                 this.hitArea.x - this.hitArea.width / 2,
+                                                 scene.getStagePosition(),
+                                                 scene.getBlockMap());
+
+        // 右側の足元の障害物を検索する。
+        const rightBlock = this.hitArea.getBlockY(this.isUpsideDown,
+                                                  this.hitArea.x + this.hitArea.width / 2,
+                                                  scene.getStagePosition(),
+                                                  scene.getBlockMap());
+
+        // 逆さまの場合は障害物の上端の値を使用し、通常の場合は下端の値を使用する。
+        let leftBlockPos = 0;
+        let rightBlockPos = 0;
+        if (this.isUpsideDown) {
+            leftBlockPos = leftBlock.y + leftBlock.height / 2;
+            rightBlockPos = rightBlock.y + rightBlock.height / 2;
+        }
+        else {
+            leftBlockPos = leftBlock.y - leftBlock.height / 2;
+            rightBlockPos = rightBlock.y - rightBlock.height / 2;
+        }
+
+        // 左右の段差が移動可能な段差を超えている場合
+        if (Math.abs(leftBlockPos - rightBlockPos) > MOVABLE_STEP) {
+
+            // 進行方向と反対の障害物に合わせる。
+            if (this.state === STATE.LEFT_MOVE) {
+                this.hitArea.x = rightBlock.x - rightBlock.width / 2 + this.hitArea.width / 2;
+
+                if (this.isUpsideDown) {
+                    this.hitArea.y = rightBlock.y + rightBlock.width / 2 + this.hitArea.height / 2;
+                }
+                else {
+                    this.hitArea.y = rightBlock.y - rightBlock.width / 2 - this.hitArea.height / 2;
+                }
+            }
+            else {
+                this.hitArea.x = leftBlock.x - leftBlock.width / 2 + this.hitArea.width / 2;
+
+                if (this.isUpsideDown) {
+                    this.hitArea.y = leftBlock.y + leftBlock.width / 2 + this.hitArea.height / 2;
+                }
+                else {
+                    this.hitArea.y = leftBlock.y - leftBlock.width / 2 - this.hitArea.height / 2;
+                }
+            }
+        }
+        else {
+
+            // 逆さまの場合は下の方に合わせる。
+            if (this.isUpsideDown) {
+
+                this.hitArea.y = Math.max(leftBlockPos, rightBlockPos) + this.hitArea.height / 2;
+
+            }
+            // 通常の場合は上の方に合わせる。
+            else {
+
+                this.hitArea.y = Math.min(leftBlockPos, rightBlockPos) - this.hitArea.height / 2;
+            }
+        }
+    }
+}
+
+export default Ant;

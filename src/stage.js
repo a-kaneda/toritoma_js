@@ -3,6 +3,7 @@
 import ScreenSize from './screensize.js'
 import TileMapManager from './tilemapmanager.js'
 import Dragonfly from './dragonfly.js'
+import Ant from './ant.js'
 
 // タイルのサイズ
 const TILE_SIZE = 16;
@@ -154,11 +155,14 @@ class Stage {
      */
     _createEnemy(type, x, y, scene) {
         switch (type) {
-        case 'dragonfly':
-            scene.addCharacter(new Dragonfly(x, y, scene));
-            break;
-        default:
-            break;
+            case 'dragonfly':
+                scene.addCharacter(new Dragonfly(x, y, scene));
+                break;
+            case 'ant':
+                scene.addCharacter(new Ant(x, y, scene));
+                break;
+            default:
+                break;
         }
     }
 }

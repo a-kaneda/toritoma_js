@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: character.js</title>
+    <title>JSDoc: Module: enemy</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,83 +17,59 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: character.js</h1>
+    <h1 class="page-title">Module: enemy</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/** @module character */
+        
+    
+</header>
 
-/**
- * キャラクター種別
- * @enum {number}
- */
-const type = {
-    /** 自機 */
-    PLAYER: 1,
-    /** 自機オプション */
-    PLAYER_OPTION: 2,
-    /** 自機弾 */
-    PLAYER_SHOT: 3,
-    /** 敵 */
-    ENEMY: 4,
-    /** 敵弾 */
-    ENEMY_SHOT: 5,
-};
+<article>
+    <div class="container-overview">
+    
+        
 
-/**
- * 敵キャラパラメータ
- * @type {object}
- */
-const enemy = {
-    // トンボ
-    dragonfly: {
-        width: 16,
-        height: 16,
-        hp: 3,
-        defense: 0,
-        score: 100,
-    },
-    // アリ
-    ant: {
-        width: 16,
-        height: 8,
-        hp: 7,
-        defense: 0,
-        score: 200,
-    },
-};
+        
+    
+    </div>
 
-/**
- * キャラクターに関する定数を管理する。
- */
-class Character {
+    
 
-    /**
-     * キャラクタータイプ
-     * @type {Array}
-     */
-    static get type() {
-        return type;
-    }
+    
 
-    /**
-     * 敵キャラクターパラメータ
-     * @type {object}
-     */
-    static get enemy() {
-        return enemy;
-    }
-}
+    
+        <h3 class="subsection-title">Classes</h3>
 
-export default Character;
-</code></pre>
-        </article>
-    </section>
+        <dl>
+            <dt><a href="module-enemy-Enemy.html">Enemy</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

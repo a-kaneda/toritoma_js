@@ -310,6 +310,25 @@ class PlayingScene {
     }
 
     /**
+     * ステージのスクロールスピード
+     * @type {number}
+     */
+    get scrollSpeed() {
+        return this.stage.speed;
+    }
+
+    /**
+     * 自機の位置
+     * @type {Object}
+     */
+    get playerPosition() {
+        return {
+            x: this.player.hitArea.x,
+            y: this.player.hitArea.y,
+        };
+    }
+
+    /**
      * 自機が死亡したときの処理を行う。
      * 残機が残っていれば、残機を一つ減らし、自機を復活する。
      * 残機が残っていなければゲームオーバー処理を行う。
