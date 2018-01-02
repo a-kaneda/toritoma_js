@@ -4,13 +4,12 @@
   "description": "",
   "main": "./src/main.js",
   "scripts": {
-    "build": "npm-run-all webpack jsdoc copyall",
+    "build": "npm-run-all tsc webpack",
+    "tsc": "tsc -p ./tsconfig.json",
     "webpack": "webpack",
-    "start": "http-server ./src -p 8080",
-    "start_dest": "http-server ./dest -p 8081",
-    "jsdoc": "jsdoc ./src -d ./doc",
+    "start": "http-server ./dest -p 8080",
     "copyall": "npm-run-all copy:*",
-    "copy:html": "cpx \"./src/{*.html,*.css}\" ./dest",
+    "copy:html": "cpx \"./src/html/{*.html,*.css}\" ./dest",
     "copy:resource": "cpx \"./src/**/{*.png,*.json,*.mp3}\" ./dest",
     "copy:font": "cpx \"./src/fonts/NotoSansCJKjp-Regular-min.ttf\" ./dest/fonts",
     "copy:map": "cpx \"./src/map/*.js\" ./dest/map",
@@ -32,6 +31,8 @@
     "http-server": "^0.10.0",
     "jsdoc": "^3.5.5",
     "npm-run-all": "^4.1.2",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2",
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.6.1"
   }
