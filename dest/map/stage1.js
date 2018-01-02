@@ -821,6 +821,72 @@
                  "width":16,
                  "x":1408,
                  "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":80,
+                 "name":"ladybug",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":960,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":81,
+                 "name":"ladybug",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1072,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":82,
+                 "name":"ladybug",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1184,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":83,
+                 "name":"ladybug",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1248,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":84,
+                 "name":"ladybug",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1328,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":85,
+                 "name":"ladybug",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1376,
+                 "y":96
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -828,7 +894,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":80,
+ "nextobjectid":86,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

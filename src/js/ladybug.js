@@ -1,18 +1,17 @@
-/** @module dragonfly */
-import EnemyShot from './enemyshot.js';
-import Enemy from './enemy.js';
+import Enemy from './enemy';
+import EnemyShot from './enemyshot';
+import Util from './util';
+// 弾発射間隔
+const SHOT_INTERVAL = 60;
 // 移動スピード
-const MOVE_SPEED = 0.5;
+const MOVE_SPEED = 0.65;
 // 弾のスピード
 const SHOT_SPEED = 0.75;
-// 弾発射間隔（1周目）
-const SHOT_INTERVAL = 120;
 /**
- * 敵キャラクター、トンボ。
- * 左方向に直進する。
- * 左方向に直進する弾を発射する。
+ * 敵キャラ、テントウムシ。
+ * まっすぐ進む。一定間隔で自機を狙う1-way弾発射。
  */
-class Dragonfly extends Enemy {
+class Ladybug extends Enemy {
     /**
      * コンストラクタ
      * @param x x座標
@@ -21,7 +20,7 @@ class Dragonfly extends Enemy {
      */
     constructor(x, y, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'dragonfly', scene);
+        super(x, y, 'ladybug', scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
     }
@@ -38,9 +37,10 @@ class Dragonfly extends Enemy {
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
-            EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 1, 0, SHOT_SPEED, false, scene);
+            // 自機へ向けて弾を発射する。
+            EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Util.calcAngle(this._hitArea, scene.playerPosition), 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
     }
 }
-export default Dragonfly;
+export default Ladybug;

@@ -2,7 +2,6 @@ import Util from './util.js'
 import EnemyShot from './enemyshot.js'
 import Enemy from './enemy.js'
 import PlayingScene from './playingscene'
-import ScreenSize from './screensize'
 
 // 弾のスピード
 const SHOT_SPEED = 0.5;
@@ -73,7 +72,7 @@ class Ant extends Enemy {
     }
     
     /**
-     * 更新処理。
+     * 敵キャラクター種別ごとの固有の処理。
      * 天井または地面に張り付いて歩く。
      *
      * 初期状態:上下どちらに張り付くか判定する。距離の近い方に張り付く。
@@ -87,18 +86,10 @@ class Ant extends Enemy {
      * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
      * @param scene シーン
      */
-    public update(scene: PlayingScene): void {
+    protected action(scene: PlayingScene): void {
 
         // スクロールに合わせて移動する。
         this._hitArea.x -= scene.scrollSpeed;
-
-        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
-        if (this._hp <= 0) {
-
-            this.death(scene);
-
-            return;
-        }
 
         // 状態によって処理を分岐する
         switch (this._state) {
@@ -196,17 +187,6 @@ class Ant extends Enemy {
 
         // 障害物との衝突判定を行う。
         this._checkBlockHit(scene);
-
-        // 座標をスプライトに適用する。
-        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
-
-        // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2 ||
-            this._hitArea.x > ScreenSize.STAGE_RECT.width + this._hitArea.width * 2) {
-
-            scene.removeCharacter(this);
-            this._sprite.remove();
-        }
     }
 
     /**

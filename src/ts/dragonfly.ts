@@ -2,10 +2,10 @@
 
 import EnemyShot from './enemyshot.js'
 import Enemy from './enemy.js'
-import Playingscene from './playingscene';
+import PlayingScene from './playingscene';
 
 // 移動スピード
-const MOVE_SPEED = -0.5;
+const MOVE_SPEED = 0.5;
 // 弾のスピード
 const SHOT_SPEED = 0.75;
 // 弾発射間隔（1周目）
@@ -27,7 +27,7 @@ class Dragonfly extends Enemy {
      * @param y y座標
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: Playingscene) {
+    constructor(x: number, y: number, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
         super(x, y, 'dragonfly', scene);
@@ -37,39 +37,22 @@ class Dragonfly extends Enemy {
     }
     
     /**
-     * 更新処理。
+     * 敵キャラクター種別ごとの固有の処理。
      * 左方向に直進する。
      * 左方向に直進する弾を発射する。
      * 画面外に出ると自分自身を削除する。
      * @param scene シーン
      */
-    public update(scene: Playingscene): void {
+    protected action(scene: PlayingScene): void {
 
         // 左へ移動する。
-        this._hitArea.x += MOVE_SPEED;
-
-        // 座標をスプライトに適用する。
-        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
-
-        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
-        if (this._hp <= 0) {
-
-            this.death(scene);
-
-            return;
-        }
+        this._hitArea.x -= MOVE_SPEED;
 
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
             EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
-        }
-
-        // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2) {
-            scene.removeCharacter(this);
-            this._sprite.remove();
         }
     }
 }

@@ -55,20 +55,12 @@ class Butterfly extends Enemy {
     }
 
     /**
-     * 更新処理。
+     * 敵キャラクター種別ごとの固有の処理。
      * 上下に斜めに移動しながら左へ進む。
      * 定周期で左方向へ3-way弾を発射する。
      * @param scene シーン
      */
-    public update(scene: PlayingScene): void {
-
-        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
-        if (this._hp <= 0) {
-
-            this.death(scene);
-
-            return;
-        }
+    protected action(scene: PlayingScene): void {
 
         // 状態変化間隔を経過している場合は上下移動の状態を変化させる。
         this._stateChangeInterval++;
@@ -100,15 +92,6 @@ class Butterfly extends Enemy {
             EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 3, Math.PI / 8.0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
-
-        // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2) {
-            scene.removeCharacter(this);
-            this._sprite.remove();
-        }        
-
-        // 座標をスプライトに適用する。
-        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
 }
 

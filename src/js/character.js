@@ -42,7 +42,15 @@ const enemy = {
         hp: 10,
         defense: 0,
         score: 200,
-    }
+    },
+    // テントウムシ
+    ladybug: {
+        width: 16,
+        height: 16,
+        hp: 18,
+        defense: 0,
+        score: 200,
+    },
 };
 /**
  * キャラクターに関する定数を管理する。

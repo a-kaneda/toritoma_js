@@ -2,6 +2,7 @@
 import Collider from './collider';
 import Character from './character';
 import Explosion from './explosion';
+import ScreenSize from './screensize';
 /**
  * 敵キャラクター。
  */
@@ -44,6 +45,23 @@ class Enemy {
      * @param scene シーン
      */
     update(scene) {
+        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
+        if (this._hp <= 0) {
+            this.death(scene);
+            return;
+        }
+        // 画面外に出た場合は自分自身を削除する。
+        // 画面外に出た場合は自分自身を削除する。
+        if (this._hitArea.x < -this._hitArea.width * 2 ||
+            this._hitArea.x > ScreenSize.STAGE_RECT.width + this._hitArea.width * 2) {
+            scene.removeCharacter(this);
+            this._sprite.remove();
+            return;
+        }
+        // キャラクター種別ごとの固有の処理を行う。
+        this.action(scene);
+        // 座標をスプライトに適用する。
+        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
      * 攻撃処理。

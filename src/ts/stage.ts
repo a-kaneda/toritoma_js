@@ -6,6 +6,7 @@ import PlayingScene from './playingscene'
 import Dragonfly from './dragonfly'
 import Ant from './ant'
 import Butterfly from './butterfly'
+import Ladybug from './ladybug'
 
 // タイルのサイズ
 const TILE_SIZE = 16;
@@ -201,6 +202,9 @@ class Stage {
                 break;
             case 'butterfly':
                 scene.addCharacter(new Butterfly(x, y, scene));
+                break;
+            case 'ladybug':
+                scene.addCharacter(new Ladybug(x, y, scene));
                 break;
             default:
                 break;

@@ -57,7 +57,15 @@ const enemy: { [key: string]: EnemyParam} = {
         hp: 10,
         defense: 0,
         score: 200,
-    }
+    },
+    // テントウムシ
+    ladybug: {
+        width: 16,
+        height: 16,
+        hp: 18,
+        defense: 0,
+        score: 200,
+    },
 };
 
 /**

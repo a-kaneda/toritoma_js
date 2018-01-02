@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 17);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -159,7 +159,15 @@ const enemy = {
         hp: 10,
         defense: 0,
         score: 200,
-    }
+    },
+    // テントウムシ
+    ladybug: {
+        width: 16,
+        height: 16,
+        hp: 18,
+        defense: 0,
+        score: 200,
+    },
 };
 /**
  * キャラクターに関する定数を管理する。
@@ -843,48 +851,12 @@ class ControlSize {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/** @module mycolor */
-// 使用する色、0:薄い、3:濃い
-const COLORS = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
-// 背景色
-const BACK_COLOR = '#9cb389';
-// 前景色
-const FORE_COLOR = '#12241A';
-/**
- * ゲーム内で使用する色を定義する。
- */
-class MyColor {
-    /**
-     * 使用する色、0:薄い、3:濃い
-     */
-    static get COLORS() {
-        return COLORS;
-    }
-    /**
-     * 背景色
-     */
-    static get BACK_COLOR() {
-        return BACK_COLOR;
-    }
-    /**
-     * 前景色
-     */
-    static get FORE_COLOR() {
-        return FORE_COLOR;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (MyColor);
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 /** @module enemy */
+
 
 
 
@@ -930,6 +902,23 @@ class Enemy {
      * @param scene シーン
      */
     update(scene) {
+        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
+        if (this._hp <= 0) {
+            this.death(scene);
+            return;
+        }
+        // 画面外に出た場合は自分自身を削除する。
+        // 画面外に出た場合は自分自身を削除する。
+        if (this._hitArea.x < -this._hitArea.width * 2 ||
+            this._hitArea.x > __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].STAGE_RECT.width + this._hitArea.width * 2) {
+            scene.removeCharacter(this);
+            this._sprite.remove();
+            return;
+        }
+        // キャラクター種別ごとの固有の処理を行う。
+        this.action(scene);
+        // 座標をスプライトに適用する。
+        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
      * 攻撃処理。
@@ -961,7 +950,7 @@ class Enemy {
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1127,6 +1116,44 @@ class EnemyShot {
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/** @module mycolor */
+// 使用する色、0:薄い、3:濃い
+const COLORS = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
+// 背景色
+const BACK_COLOR = '#9cb389';
+// 前景色
+const FORE_COLOR = '#12241A';
+/**
+ * ゲーム内で使用する色を定義する。
+ */
+class MyColor {
+    /**
+     * 使用する色、0:薄い、3:濃い
+     */
+    static get COLORS() {
+        return COLORS;
+    }
+    /**
+     * 背景色
+     */
+    static get BACK_COLOR() {
+        return BACK_COLOR;
+    }
+    /**
+     * 前景色
+     */
+    static get FORE_COLOR() {
+        return FORE_COLOR;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (MyColor);
+
+
+/***/ }),
 /* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1281,11 +1308,13 @@ class PlayerShot {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(17);
 /** @module stage */
+
 
 
 
@@ -1437,6 +1466,9 @@ class Stage {
             case 'butterfly':
                 scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_4__butterfly__["a" /* default */](x, y, scene));
                 break;
+            case 'ladybug':
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_5__ladybug__["a" /* default */](x, y, scene));
+                break;
             default:
                 break;
         }
@@ -1450,16 +1482,45 @@ class Stage {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/** @module util */
+/**
+ * アプリ全体で使用する関数群を定義する。
+ */
+class Util {
+    /**
+     * srcを始点、destを終点としたときの角度を求める。
+     * @param src 始点
+     * @param dest 終点
+     * @return 角度
+     */
+    static calcAngle(src, dest) {
+        // x座標の差分を計算する。
+        const diffX = dest.x - src.x;
+        // phina.jsではy座標は上が原点のため、反転させる。
+        const diffY = src.y - dest.y;
+        // 角度を計算する。
+        const ret = Math.atan2(diffY, diffX);
+        return ret;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Util);
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(23);
 /** @module playingscene */
 
 
@@ -1978,15 +2039,13 @@ class PlayingScene {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(4);
 
 
 
@@ -2041,7 +2100,7 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
         }
     }
     /**
-     * 更新処理。
+     * 敵キャラクター種別ごとの固有の処理。
      * 天井または地面に張り付いて歩く。
      *
      * 初期状態:上下どちらに張り付くか判定する。距離の近い方に張り付く。
@@ -2055,14 +2114,9 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
      * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
      * @param scene シーン
      */
-    update(scene) {
+    action(scene) {
         // スクロールに合わせて移動する。
         this._hitArea.x -= scene.scrollSpeed;
-        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
-        if (this._hp <= 0) {
-            this.death(scene);
-            return;
-        }
         // 状態によって処理を分岐する
         switch (this._state) {
             case STATE.LEFT_MOVE:// 左移動
@@ -2126,14 +2180,6 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
         }
         // 障害物との衝突判定を行う。
         this._checkBlockHit(scene);
-        // 座標をスプライトに適用する。
-        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
-        // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2 ||
-            this._hitArea.x > __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].STAGE_RECT.width + this._hitArea.width * 2) {
-            scene.removeCharacter(this);
-            this._sprite.remove();
-        }
     }
     /**
      * 逆さま判定。上下の障害物の距離を調べ、上の障害物の方が近い場合は上下反転しているものとする。
@@ -2214,12 +2260,12 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(5);
 
 
 // 状態
@@ -2261,17 +2307,12 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
         this._stateChangeInterval = 0;
     }
     /**
-     * 更新処理。
+     * 敵キャラクター種別ごとの固有の処理。
      * 上下に斜めに移動しながら左へ進む。
      * 定周期で左方向へ3-way弾を発射する。
      * @param scene シーン
      */
-    update(scene) {
-        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
-        if (this._hp <= 0) {
-            this.death(scene);
-            return;
-        }
+    action(scene) {
         // 状態変化間隔を経過している場合は上下移動の状態を変化させる。
         this._stateChangeInterval++;
         if (this._stateChangeInterval >= STATE_CHANGE_INTERVAL) {
@@ -2298,20 +2339,13 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
             __WEBPACK_IMPORTED_MODULE_1__enemyshot__["a" /* default */].fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 3, Math.PI / 8.0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
-        // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2) {
-            scene.removeCharacter(this);
-            this._sprite.remove();
-        }
-        // 座標をスプライトに適用する。
-        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Butterfly);
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2368,17 +2402,17 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemy_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemy_js__ = __webpack_require__(4);
 /** @module dragonfly */
 
 
 // 移動スピード
-const MOVE_SPEED = -0.5;
+const MOVE_SPEED = 0.5;
 // 弾のスピード
 const SHOT_SPEED = 0.75;
 // 弾発射間隔（1周目）
@@ -2402,32 +2436,20 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
         this._shotInterval = 0;
     }
     /**
-     * 更新処理。
+     * 敵キャラクター種別ごとの固有の処理。
      * 左方向に直進する。
      * 左方向に直進する弾を発射する。
      * 画面外に出ると自分自身を削除する。
      * @param scene シーン
      */
-    update(scene) {
+    action(scene) {
         // 左へ移動する。
-        this._hitArea.x += MOVE_SPEED;
-        // 座標をスプライトに適用する。
-        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
-        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
-        if (this._hp <= 0) {
-            this.death(scene);
-            return;
-        }
+        this._hitArea.x -= MOVE_SPEED;
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
             __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__["a" /* default */].fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
-        }
-        // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2) {
-            scene.removeCharacter(this);
-            this._sprite.remove();
         }
     }
 }
@@ -2435,7 +2457,7 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2496,11 +2518,67 @@ class Explosion {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(10);
+
+
+
+// 弾発射間隔
+const SHOT_INTERVAL = 60;
+// 移動スピード
+const MOVE_SPEED = 0.65;
+// 弾のスピード
+const SHOT_SPEED = 0.75;
+/**
+ * 敵キャラ、テントウムシ。
+ * まっすぐ進む。一定間隔で自機を狙う1-way弾発射。
+ */
+class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param scene シーン
+     */
+    constructor(x, y, scene) {
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'ladybug', scene);
+        // 弾発射間隔を初期化する。
+        this._shotInterval = 0;
+    }
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * 左方向に直進する。
+     * 左方向に直進する弾を発射する。
+     * 画面外に出ると自分自身を削除する。
+     * @param scene シーン
+     */
+    action(scene) {
+        // 左へ移動する。
+        this._hitArea.x -= MOVE_SPEED;
+        // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
+        this._shotInterval++;
+        if (this._shotInterval >= SHOT_INTERVAL) {
+            // 自機へ向けて弾を発射する。
+            __WEBPACK_IMPORTED_MODULE_1__enemyshot__["a" /* default */].fireNWay(this._hitArea.x, this._hitArea.y, __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 1, 0, SHOT_SPEED, false, scene);
+            this._shotInterval = 0;
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Ladybug);
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(3);
 /** @module life */
@@ -2573,15 +2651,15 @@ class Life {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice_js__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor_js__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playingscene_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playingscene_js__ = __webpack_require__(11);
 
 
 
@@ -2677,7 +2755,7 @@ phina.main(function () {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2685,8 +2763,8 @@ phina.main(function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(22);
 
 
 
@@ -3069,7 +3147,7 @@ class Player {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3134,7 +3212,7 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3335,7 +3413,7 @@ class PlayerOption {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3415,7 +3493,7 @@ class ShieldButton {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3607,35 +3685,6 @@ class TileMapManager {
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (TileMapManager);
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/** @module util */
-/**
- * アプリ全体で使用する関数群を定義する。
- */
-class Util {
-    /**
-     * srcを始点、destを終点としたときの角度を求める。
-     * @param src 始点
-     * @param dest 終点
-     * @return 角度
-     */
-    static calcAngle(src, dest) {
-        // x座標の差分を計算する。
-        const diffX = dest.x - src.x;
-        // phina.jsではy座標は上が原点のため、反転させる。
-        const diffY = src.y - dest.y;
-        // 角度を計算する。
-        const ret = Math.atan2(diffY, diffX);
-        return ret;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Util);
 
 
 /***/ })

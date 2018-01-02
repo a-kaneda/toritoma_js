@@ -6,11 +6,12 @@ import Explosion from './explosion'
 import PlayingScene from './playingscene'
 import CharacterIF from './characterif'
 import Rect from './rect'
+import ScreenSize from './screensize'
 
 /**
  * 敵キャラクター。
  */
-class Enemy implements CharacterIF {
+abstract class Enemy implements CharacterIF {
 
     /** スプライト */
     protected _sprite: phina.display.Sprite;
@@ -73,6 +74,28 @@ class Enemy implements CharacterIF {
      * @param scene シーン
      */
     public update(scene: PlayingScene): void {
+
+        // HPが0になった場合は破壊処理を行い、自分自身を削除する。
+        if (this._hp <= 0) {
+            this.death(scene);
+            return;
+        }
+
+        // 画面外に出た場合は自分自身を削除する。
+        // 画面外に出た場合は自分自身を削除する。
+        if (this._hitArea.x < -this._hitArea.width * 2 ||
+            this._hitArea.x > ScreenSize.STAGE_RECT.width + this._hitArea.width * 2) {
+
+            scene.removeCharacter(this);
+            this._sprite.remove();
+            return;
+        }
+
+        // キャラクター種別ごとの固有の処理を行う。
+        this.action(scene);
+
+        // 座標をスプライトに適用する。
+        this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     
     /**
@@ -105,6 +128,12 @@ class Enemy implements CharacterIF {
         scene.removeCharacter(this);
         this._sprite.remove();
     }
+
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * @param scene シーン
+     */
+    protected abstract action(scene: PlayingScene): void;
 }
 
 export default Enemy;

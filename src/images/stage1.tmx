@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="100" height="9" tilewidth="16" tileheight="16" nextobjectid="80">
+<map version="1.0" tiledversion="1.0.3" orientation="orthogonal" renderorder="right-down" width="100" height="9" tilewidth="16" tileheight="16" nextobjectid="86">
  <tileset firstgid="1" name="back" tilewidth="16" tileheight="16" tilecount="64" columns="8">
   <image source="back.png" trans="ff00ff" width="128" height="128"/>
   <tile id="32">
@@ -162,5 +162,11 @@
   <object id="77" name="butterfly" type="enemy" x="1088" y="64" width="16" height="16"/>
   <object id="78" name="butterfly" type="enemy" x="1280" y="80" width="16" height="16"/>
   <object id="79" name="butterfly" type="enemy" x="1408" y="80" width="16" height="16"/>
+  <object id="80" name="ladybug" type="enemy" x="960" y="80" width="16" height="16"/>
+  <object id="81" name="ladybug" type="enemy" x="1072" y="48" width="16" height="16"/>
+  <object id="82" name="ladybug" type="enemy" x="1184" y="80" width="16" height="16"/>
+  <object id="83" name="ladybug" type="enemy" x="1248" y="48" width="16" height="16"/>
+  <object id="84" name="ladybug" type="enemy" x="1328" y="64" width="16" height="16"/>
+  <object id="85" name="ladybug" type="enemy" x="1376" y="96" width="16" height="16"/>
  </objectgroup>
 </map>

@@ -34,17 +34,22 @@
         "dragonfly": {
             "frames": [16, 17],
             "next": "dragonfly",
-            "frequency": 12
+            "frequency": 30
         },
         "ant": {
             "frames": [18, 19],
             "next": "ant",
-            "frequency": 12
+            "frequency": 30
         },
         "butterfly": {
             "frames": [20, 21],
             "next": "butterfly",
-            "frequency": 12
+            "frequency": 30
+        },
+        "ladybug": {
+            "frames": [22, 23],
+            "next": "ladybug",
+            "frequency": 6
         }
     }
 }
