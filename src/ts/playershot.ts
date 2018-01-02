@@ -117,6 +117,11 @@ class PlayerShot implements CharacterIF {
             return;
         }
 
+        // 画面外の敵にダメージを与えないように画面端付近で攻撃力を0にする。
+        if (this._hitArea.x > ScreenSize.STAGE_RECT.width - this._hitArea.width) {
+            this._power = 0;
+        }
+
         // 画面外に出た場合は自分自身を削除する。
         if (this._hitArea.x > ScreenSize.STAGE_RECT.width + 4) {
             scene.removeCharacter(this);
