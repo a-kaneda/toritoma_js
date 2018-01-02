@@ -62,10 +62,7 @@ class Dragonfly extends Enemy {
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
-            // 敵弾が無効化されていない場合は敵弾を生成する。
-            if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(new EnemyShot(this._hitArea.x, this._hitArea.y, Math.PI, SHOT_SPEED, scene));
-            }
+            EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
 

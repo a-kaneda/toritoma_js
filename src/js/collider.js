@@ -6,10 +6,10 @@ import ScreenSize from './screensize.js';
 class Collider {
     /**
      * コンストラクタ、当たり判定の範囲を設定する。
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {number} width - 幅
-     * @param {number} height - 高さ
+     * @param x x座標
+     * @param y y座標
+     * @param width 幅
+     * @param height 高さ
      */
     constructor(x, y, width, height) {
         // メンバ変数に格納する。
@@ -18,35 +18,43 @@ class Collider {
         this._width = width;
         this._height = height;
     }
+    /** x座標 */
     get x() {
         return this._x;
     }
+    /** x座標 */
     set x(value) {
         this._x = value;
     }
+    /** y座標 */
     get y() {
         return this._y;
     }
+    /** y座標 */
     set y(value) {
         this._y = value;
     }
+    /** 幅 */
     get width() {
         return this._width;
     }
+    /** 幅 */
     set width(value) {
         this._width = value;
     }
+    /** 高さ */
     get height() {
         return this._height;
     }
+    /** 高さ */
     set height(value) {
         this._height = value;
     }
     /**
      * 衝突しているキャラクターを検索する。
-     * @param {Array} characters - キャラクター配列
-     * @param {Array} types - 検索対象のキャラクター種別
-     * @return {Array} 衝突しているキャラクター配列
+     * @param characters キャラクター配列
+     * @param types 検索対象のキャラクター種別
+     * @return 衝突しているキャラクター配列
      */
     getHitCharacter(characters, types) {
         let ret = [];
@@ -65,11 +73,11 @@ class Collider {
     }
     /**
      * Y軸方向に障害物を検索する。
-     * @param {boolean} isUpside - 上向きに検索する場合true
-     * @param {number} xpos - x座標
-     * @param {number} stagePosition - ステージのスクロール位置
-     * @param {Array} blockMap - 障害物マップ
-     * @return {Object} 見つかった障害物、見つからなかった場合は、
+     * @param isUpside 上向きに検索する場合true
+     * @param xpos x座標
+     * @param stagePosition ステージのスクロール位置
+     * @param blockMap 障害物マップ
+     * @return 見つかった障害物、見つからなかった場合は、
      *     上方向の検索の場合はステージ上端、
      *     下方向の検索の場合はステージ下端を返す。
      */
@@ -83,10 +91,10 @@ class Collider {
     }
     /**
      * Y軸上方向に障害物を検索する。
-     * @param {number} xpos - x座標
-     * @param {number} stagePosition - ステージのスクロール位置
-     * @param {Array} blockMap - 障害物マップ
-     * @return {Object} 見つかった障害物、見つからなかった場合は、ステージ上端を返す。
+     * @param xpos x座標
+     * @param stagePosition ステージのスクロール位置
+     * @param blockMap 障害物マップ
+     * @return 見つかった障害物、見つからなかった場合は、ステージ上端を返す。
      */
     getBlockYUpside(xpos, stagePosition, blockMap) {
         // 検索開始位置を自分の位置からとする。
@@ -118,10 +126,10 @@ class Collider {
     }
     /**
      * Y軸下方向に障害物を検索する。
-     * @param {number} xpos - x座標
-     * @param {number} stagePosition - ステージのスクロール位置
-     * @param {Array} blockMap - 障害物マップ
-     * @return {Object} 見つかった障害物、見つからなかった場合は、ステージ下端を返す。
+     * @param xpos x座標
+     * @param stagePosition ステージのスクロール位置
+     * @param blockMap 障害物マップ
+     * @return 見つかった障害物、見つからなかった場合は、ステージ下端を返す。
      */
     getBlockYDownside(xpos, stagePosition, blockMap) {
         // 検索開始位置を自分の位置からとする。
@@ -154,9 +162,8 @@ class Collider {
     /**
      * キャラクター同士の当たり判定。
      * キャラクター同士が衝突しているかどうかを判定する。
-     * @param {Object} a - キャラクター1
-     * @param {Object} target - キャラクター2
-     * @return {boolean} 衝突しているかどうか
+     * @param target 対象のキャラクター
+     * @return 衝突しているかどうか
      */
     isHitCharacter(target) {
         if (this.x - this.width / 2 < target.x + target.width / 2 &&
@@ -173,10 +180,10 @@ class Collider {
      * 衝突しているブロックを調べる。
      * キャラクターの周囲にあるマップを探し、衝突しているブロックがあれば
      * そのブロックの座標とサイズを返す。衝突していなければnullを返す。
-     * @param {Object} character - キャラクター
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @return {Object} 衝突しているブロック、見つからなければnull。
+     * @param character キャラクター
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @return 衝突しているブロック、見つからなければnull。
      */
     checkCollidedBlock(character, stagePosition, blockMap) {
         // ブロックマップの検索範囲を計算する。
@@ -227,13 +234,13 @@ class Collider {
      * ブロック移動による押出処理で対応する。
      * 縦横どちらにも移動する場合には横方向だけ移動して再度衝突をチェックし、
      * 衝突しなければ横方向だけ移動し、衝突すれば縦方向だけ移動する。
-     * @param {Object} character - キャラクター
-     * @param {number} prevX - 移動前x座標
-     * @param {number} prevY - 移動前y座標
-     * @param {Object} block - 衝突したブロックの位置とサイズ
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @return {Object} 移動後の座標
+     * @param character キャラクター
+     * @param prevX 移動前x座標
+     * @param prevY 移動前y座標
+     * @param block 衝突したブロックの位置とサイズ
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @return 移動後の座標
      */
     moveByBlock(character, prevX, prevY, block, stagePosition, blockMap) {
         // 衝突による移動先の座標を現在の座標で初期化する
@@ -363,10 +370,10 @@ class Collider {
     /**
      * ブロックを避けて上に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     * @param {Object} character - キャラクター
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @return {Object} 移動後の位置
+     * @param character キャラクター
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @return 移動後の位置
      */
     _dodgeBlockUp(character, stagePosition, blockMap) {
         // 上方向に移動してブロックを回避する。
@@ -377,10 +384,10 @@ class Collider {
     /**
      * ブロックを避けて下に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     * @param {Object} character - キャラクター
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @return {Object} 移動後の位置
+     * @param character キャラクター
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @return 移動後の位置
      */
     _dodgeBlockDown(character, stagePosition, blockMap) {
         // 下方向に移動してブロックを回避する。
@@ -391,10 +398,10 @@ class Collider {
     /**
      * ブロックを避けて左に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     * @param {Object} character - キャラクター
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @return {Object} 移動後の位置
+     * @param character キャラクター
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @return 移動後の位置
      */
     _dodgeBlockLeft(character, stagePosition, blockMap) {
         // 左方向に移動してブロックを回避する。
@@ -405,10 +412,10 @@ class Collider {
     /**
      * ブロックを避けて右に移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
-     * @param {Object} character - キャラクター
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @return {Object} 移動後の位置
+     * @param character キャラクター
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @return 移動後の位置
      */
     _dodgeBlockRight(character, stagePosition, blockMap) {
         // 右方向に移動してブロックを回避する。
@@ -420,11 +427,11 @@ class Collider {
      * ブロックを避けて移動する。
      * ブロックと衝突しないようにするにはどこまで移動すればよいかを調べる。
      * 衝突していない場合、画面外まで出る場合は移動前の位置を返す。
-     * @param {Object} character - キャラクター
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @param {function} move - 移動する方法
-     * @return {Object} 移動後の位置
+     * @param character キャラクター
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @param move 移動する方法
+     * @return 移動後の位置
      */
     _dodgeBlock(character, stagePosition, blockMap, move) {
         // 移動先座標の情報を現在位置で初期化する。
@@ -449,11 +456,11 @@ class Collider {
     }
     /**
      * ブロックとぶつかったキャラクターを押し動かす。
-     * @param {Object} character - キャラクター
-     * @param {number} stagePosition - ステージ位置
-     * @param {Array} blockMap - ブロックマップ
-     * @param {boolean} canMoveOut - 画面外へ移動できるかどうか
-     * @return {Object} 移動先座標
+     * @param character キャラクター
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     * @param canMoveOut 画面外へ移動できるかどうか
+     * @return 移動先座標
      */
     pushCharacter(character, stagePosition, blockMap, canMoveOut) {
         // 各方向への回避した場合の移動先座標を求める。

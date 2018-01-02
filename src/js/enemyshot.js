@@ -15,62 +15,73 @@ const REFLECTION_POWER = 5;
  */
 class EnemyShot {
     /**
-     * コンストラクタ、座標の設定とスプライトシートの設定を行う。
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {number} angle - 進行方向
-     * @param {number} speed - スピード
-     * @param {PlayingScene} scene - シーン
+     * n-way弾を作成する。
+     * @param x x座標
+     * @param y y座標
+     * @param angle 発射する方向
+     * @param count 個数
+     * @param interval 弾の間隔の角度
+     * @param speed 弾のスピード
+     * @param isScroll スクロールに合わせて移動するかどうか
+     * @param scene シーン
      */
-    constructor(x, y, angle, speed, scene) {
-        /**
-         * スプライト
-         * @type {phina.display.Sprite}
-         */
+    static fireNWay(x, y, angle, count, interval, speed, isScroll, scene) {
+        // 敵弾が無効化されていない場合は処理をしない。。
+        if (scene.isDisableEnemyShot()) {
+            return;
+        }
+        // 指定された個数分、弾を生成する。
+        for (let i = 0; i < count; i++) {
+            // 中央の角度からどれだけずらすかを計算する。
+            const angleDiff = (-1 * (count - 1 - 2 * i) / 2) * interval;
+            // 弾を生成する。
+            scene.addCharacter(new EnemyShot(x, y, angle + angleDiff, speed, isScroll, scene));
+        }
+    }
+    /**
+     * コンストラクタ、座標の設定とスプライトシートの設定を行う。
+     * @param x x座標
+     * @param y y座標
+     * @param angle 進行方向
+     * @param speed スピード
+     * @param isScroll スクロールに合わせて移動するかどうか
+     * @param scene シーン
+     */
+    constructor(x, y, angle, speed, isScroll, scene) {
+        // スプライト画像を読み込む。
         this._sprite = new phina.display.Sprite('image_8x8', 8, 8);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
-        /**
-         * アニメーション
-         * @type {phina.accessory.FrameAnimation}
-         */
-        this._animation = new phina.accessory.FrameAnimation('image_8x8_ss');
         // アニメーションの設定を行う。
+        this._animation = new phina.accessory.FrameAnimation('image_8x8_ss');
         this._animation.attachTo(this._sprite);
         this._animation.gotoAndPlay('enemy_shot');
         // キャラクター種別を敵弾とする。
         this._type = Character.type.ENEMY_SHOT;
-        /**
-         * 当たり判定
-         * @type {Collider}
-         */
+        // 当たり判定を作成する。
         this._hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
-        /**
-         * x方向のスピード
-         * @type {number}
-         */
+        // x方向のスピードを計算する。
         this._speedX = Math.cos(angle) * speed;
-        /**
-         * y方向のスピード。phina.jsの座標系は下方向が正なので逆向きにする。
-         * @type {number}
-         */
+        // y方向のスピードを計算する。
+        // phina.jsの座標系は下方向が正なので逆向きにする。
         this._speedY = Math.sin(angle) * speed * -1;
-        /**
-         * かすり時のゲージ増加率
-         * @type {number}
-         */
+        // スクロールに合わせて移動するかどうかを設定する。
+        this._isScroll = isScroll;
+        // かすり時のゲージ増加率を設定する。
         this._grazeRate = GRAZE_RATE;
     }
+    /** キャラクター種別 */
     get type() {
         return this._type;
     }
+    /** 位置とサイズ */
     get rect() {
         return this._hitArea;
     }
     /**
      * スピードに応じて移動する。
      * 画面外に出ると自分自身を削除する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     update(scene) {
         // スピードに応じて移動する。
@@ -115,7 +126,7 @@ class EnemyShot {
     }
     /**
      * 削除する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     remove(scene) {
         // 自分自身を削除する。
@@ -124,7 +135,7 @@ class EnemyShot {
     }
     /**
      * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
-     * @return {number} ゲージ増加比率
+     * @return ゲージ増加比率
      */
     graze() {
         const ret = this._grazeRate;

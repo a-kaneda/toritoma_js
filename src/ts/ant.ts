@@ -171,20 +171,20 @@ class Ant extends Enemy {
                     this._stateChangeInterval = 0;
                 }
 
-                // 弾発射間隔が経過したら弾を発射する。
+                // 弾発射間隔が経過したら自機へ向けて1-way弾を発射する。
                 this._shotInterval++;
                 if (this._shotInterval >= SHOT_INTERVAL) {
 
-                    // 敵弾が無効化されていない場合は敵弾を生成する。
-                    if (!scene.isDisableEnemyShot()) {
-
-                        // 自機へ向けて弾を発射する。
-                        scene.addCharacter(new EnemyShot(this._hitArea.x,
-                                                         this._hitArea.y,
-                                                         Util.calcAngle(this._hitArea, scene.playerPosition),
-                                                         SHOT_SPEED,
-                                                         scene));
-                    }
+                    // 自機へ向けて弾を発射する。
+                    EnemyShot.fireNWay(this._hitArea.x,
+                                        this._hitArea.y, 
+                                        Util.calcAngle(this._hitArea, scene.playerPosition), 
+                                        1, 
+                                        0, 
+                                        SHOT_SPEED, 
+                                        false, 
+                                        scene);
+                                        
                     this._shotInterval = 0;
                 }
 

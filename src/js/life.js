@@ -17,20 +17,14 @@ class Life {
      * 画像と数値のラベルをくっつけたコントールを作成する。
      */
     constructor() {
-        /**
-         * ベース部分
-         * @type {phina.display.RectangleShape}
-         */
+        // ベース部分を作成する。
         this._base = new phina.display.RectangleShape({
             height: 22,
             width: 52,
             fill: MyColor.BACK_COLOR,
             strokeWidth: 0,
         });
-        /**
-         * 画像
-         * @type {phina.display.Sprite}
-         */
+        // スプライト画像を読み込む。
         this._image = new phina.display.Sprite('control', ControlSize.cs.life.width, ControlSize.cs.life.height);
         // 画像のサイズと位置を設定する。
         this._image.srcRect.set(ControlSize.cs.life.x, ControlSize.cs.life.y, ControlSize.cs.life.width, ControlSize.cs.life.height);
@@ -38,10 +32,7 @@ class Life {
         this._image.scaleY = ScreenSize.ZOOM_RATIO;
         this._image.x = IMAGE_POS_X;
         this._image.addChildTo(this._base);
-        /**
-         * ラベル
-         * @type {phina.display.Label}
-         */
+        // ラベルを作成する。
         this._label = new phina.display.Label({
             text: ':00',
             fontSize: 20,
@@ -50,22 +41,17 @@ class Life {
         });
         this._label.x = LABEL_POS_X;
         this._label.addChildTo(this._base);
-        /**
-         * 残機
-         * @type {number}
-         */
+        // 残機を初期化する。
         this._life = 0;
     }
     /**
-     * 残機画像、ラベルを合わせたスプライトを取得する。
-     * @return {phina.display.RectangleShape} スプライト
+     * 残機画像、ラベルを合わせたスプライト。
      */
     get sprite() {
         return this._base;
     }
     /**
-     * 残機を設定し、ラベルの文字列を変更する。
-     * @param {number} value - 残機
+     * 残機。ラベルの文字列も連動して変化する。
      */
     set life(value) {
         // 残機を変更する。

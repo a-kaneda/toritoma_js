@@ -11,21 +11,18 @@ const FORE_COLOR = '#12241A';
 class MyColor {
     /**
      * 使用する色、0:薄い、3:濃い
-     * @type {string}
      */
     static get COLORS() {
         return COLORS;
     }
     /**
      * 背景色
-     * @type {string}
      */
     static get BACK_COLOR() {
         return BACK_COLOR;
     }
     /**
      * 前景色
-     * @type {string}
      */
     static get FORE_COLOR() {
         return FORE_COLOR;

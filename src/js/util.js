@@ -5,9 +5,9 @@
 class Util {
     /**
      * srcを始点、destを終点としたときの角度を求める。
-     * @param {Object} src - 始点
-     * @param {Object} dest - 終点
-     * @return {number} 角度
+     * @param src 始点
+     * @param dest 終点
+     * @return 角度
      */
     static calcAngle(src, dest) {
         // x座標の差分を計算する。

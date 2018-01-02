@@ -1,6 +1,5 @@
 /**
  * キャラクター種別
- * @enum {number}
  */
 const type = {
     /** 自機 */
@@ -17,8 +16,7 @@ const type = {
     EFFECT: 6,
 };
 /**
- * 敵キャラパラメータ
- * @type {object}
+ * 敵キャラパラメータ定義。
  */
 const enemy = {
     // トンボ
@@ -37,25 +35,36 @@ const enemy = {
         defense: 0,
         score: 200,
     },
+    // チョウ
+    butterfly: {
+        width: 16,
+        height: 16,
+        hp: 10,
+        defense: 0,
+        score: 200,
+    }
 };
 /**
  * キャラクターに関する定数を管理する。
  */
 class Character {
     /**
-     * キャラクタータイプ
-     * @type {Array}
+     * キャラクタータイプ。
      */
     static get type() {
         return type;
     }
     /**
-     * 敵キャラクターパラメータ
-     * @type {object}
+     * 敵キャラクターパラメータ。
      */
     static get enemy() {
         return enemy;
     }
+    /**
+     * 指定されたキャラクターが敵かどうかを判定する。
+     * @param obj キャラクター
+     * @return 敵かどうか
+     */
     static isEnemy(obj) {
         if (obj.type === Character.type.ENEMY) {
             return true;
@@ -64,6 +73,11 @@ class Character {
             return false;
         }
     }
+    /**
+     * 指定されたキャラクターが敵弾かどうかを判定する。
+     * @param obj キャラクター
+     * @return 敵弾かどうか
+     */
     static isEnemyShot(obj) {
         if (obj.type === Character.type.ENEMY_SHOT) {
             return true;

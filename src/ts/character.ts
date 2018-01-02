@@ -50,6 +50,14 @@ const enemy: { [key: string]: EnemyParam} = {
         defense: 0,
         score: 200,
     },
+    // チョウ
+    butterfly: {
+        width: 16,
+        height: 16,
+        hp: 10,
+        defense: 0,
+        score: 200,
+    }
 };
 
 /**

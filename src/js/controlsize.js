@@ -1,6 +1,5 @@
 /**
  * コントロールサイズ
- * @type {object}
  */
 const cs = {
     frameBack: {
@@ -93,8 +92,7 @@ const cs = {
  */
 class ControlSize {
     /**
-     * control.png内のコントロールの位置とサイズ
-     * @type {object}
+     * control.png内のコントロールの位置とサイズ。
      */
     static get cs() {
         return cs;

@@ -2,13 +2,12 @@ import PointDevice from './pointdevice.js';
 import ScreenSize from './screensize.js';
 import MyColor from './mycolor.js';
 import PlayingScene from './playingscene.js';
-// phina.js をグローバル領域に展開
+// phina.jsをグローバル領域に展開する。
 phina.globalize();
 // マウスが接続されているかどうかを調べる。
 PointDevice.checkDeviceType();
 /**
- * アセット
- * @type {object}
+ * アセット定義。
  */
 const ASSETS = {
     image: {
@@ -32,17 +31,14 @@ const ASSETS = {
 };
 /**
  * メインシーン。
- * @class MainScene
- * @extend phina.display.DisplayScene
  */
 phina.define('MainScene', {
     superClass: 'DisplayScene',
     /**
      * コンストラクタ。
-     * @function init
-     * @member MainScene#init
      */
     init: function () {
+        // 親クラスのコンストラクタを呼び出す。
         this.superInit({
             width: ScreenSize.SCREEN_WIDTH,
             height: ScreenSize.SCREEN_HEIGHT,
@@ -51,18 +47,12 @@ phina.define('MainScene', {
         this.canvas.imageSmoothingEnabled = false;
         // 背景色を指定する。
         this.backgroundColor = MyColor.BACK_COLOR;
-        /**
-         * 実行中のシーン
-         * @type {object}
-         * @member MainScene#scene
-         */
+        // 初期シーンを設定する。
         this.scene = new PlayingScene(this);
     },
     /**
      * 更新処理。内部のシーン処理の更新処理を実行する。
-     * @function update
-     * @param {phina.game.GameApp} app - アプリケーション
-     * @member MainScene#update
+     * @param app アプリケーション
      */
     update: function (app) {
         this.scene.update(app);
@@ -87,7 +77,7 @@ phina.main(function () {
     app.fps = 60;
     // FPSを表示する。（デバッグ用）
     if (localStorage.viewFPS === 'true') {
-        //        app.enableStats();
+        app.enableStats();
     }
     // iOSのsafariではユーザが操作時のみ音の再生が可能なため、タッチ時にダミーで音声の再生を行う。
     // https://github.com/phinajs/phina.js/issues/197

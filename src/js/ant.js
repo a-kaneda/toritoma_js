@@ -1,7 +1,7 @@
-/** @module ant */
 import Util from './util.js';
 import EnemyShot from './enemyshot.js';
 import Enemy from './enemy.js';
+import ScreenSize from './screensize';
 // 弾のスピード
 const SHOT_SPEED = 0.5;
 // 移動スピード
@@ -32,28 +32,20 @@ const STATE = {
 class Ant extends Enemy {
     /**
      * コンストラクタ
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {PlayingScene} scene - シーン
+     * @param x x座標
+     * @param y y座標
+     * @param scene シーン
      */
     constructor(x, y, scene) {
         // 親クラスのコンストラクタを実行する。
         super(x, y, 'ant', scene);
+        // 弾発射間隔を初期化する。
         this._shotInterval = 0;
-        /**
-         * 状態。左移動、弾発射、右移動と遷移する。
-         * @type {number}
-         */
+        // 初期状態は左移動とする。
         this._state = STATE.LEFT_MOVE;
-        /**
-         * 状態変化間隔。
-         * @type {number}
-         */
+        // 状態変化間隔を初期化する。
         this._stateChangeInterval = 0;
-        /**
-         * 逆さまかどうか。
-         * @type {boolean}
-         */
+        // 上下の障害物との距離から逆さまかどうかを判定する。
         this._isUpsideDown = this._checkUpsideDown(scene);
         // 逆さまな場合は画像の上下を反転する。
         if (this._isUpsideDown) {
@@ -73,7 +65,7 @@ class Ant extends Enemy {
      * 一定時間経過後に右移動に遷移する。
      *
      * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     update(scene) {
         // スクロールに合わせて移動する。
@@ -133,14 +125,11 @@ class Ant extends Enemy {
                     // 次の状態遷移への間隔を初期化する。
                     this._stateChangeInterval = 0;
                 }
-                // 弾発射間隔が経過したら弾を発射する。
+                // 弾発射間隔が経過したら自機へ向けて1-way弾を発射する。
                 this._shotInterval++;
                 if (this._shotInterval >= SHOT_INTERVAL) {
-                    // 敵弾が無効化されていない場合は敵弾を生成する。
-                    if (!scene.isDisableEnemyShot()) {
-                        // 自機へ向けて弾を発射する。
-                        scene.addCharacter(new EnemyShot(this._hitArea.x, this._hitArea.y, Util.calcAngle(this._hitArea, scene.playerPosition), SHOT_SPEED, scene));
-                    }
+                    // 自機へ向けて弾を発射する。
+                    EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Util.calcAngle(this._hitArea, scene.playerPosition), 1, 0, SHOT_SPEED, false, scene);
                     this._shotInterval = 0;
                 }
                 break;
@@ -152,15 +141,16 @@ class Ant extends Enemy {
         // 座標をスプライトに適用する。
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
         // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2) {
+        if (this._hitArea.x < -this._hitArea.width * 2 ||
+            this._hitArea.x > ScreenSize.STAGE_RECT.width + this._hitArea.width * 2) {
             scene.removeCharacter(this);
             this._sprite.remove();
         }
     }
     /**
      * 逆さま判定。上下の障害物の距離を調べ、上の障害物の方が近い場合は上下反転しているものとする。
-     * @param {PlayingScene} scene - シーン
-     * @return {boolean} 逆さまかどうか
+     * @param scene シーン
+     * @return 逆さまかどうか
      */
     _checkUpsideDown(scene) {
         // 上方向の障害物を検索する。
@@ -179,7 +169,7 @@ class Ant extends Enemy {
      * 障害物との衝突を処理する。
      * 通常は自分の足元の一番上の障害物の位置にy座標を合わせ、逆さまの場合は一番下の障害物に合わせる。
      * ブロック半分までの段差は超えられるものとし、それ以上の段差がある場合は手前の障害物の上で停止する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     _checkBlockHit(scene) {
         // 移動可能な段差

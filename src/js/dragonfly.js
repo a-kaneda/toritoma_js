@@ -15,17 +15,14 @@ const SHOT_INTERVAL = 120;
 class Dragonfly extends Enemy {
     /**
      * コンストラクタ
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {PlayingScene} scene - シーン
+     * @param x x座標
+     * @param y y座標
+     * @param scene シーン
      */
     constructor(x, y, scene) {
         // 親クラスのコンストラクタを実行する。
         super(x, y, 'dragonfly', scene);
-        /**
-         * 弾発射間隔
-         * @type {number}
-         */
+        // 弾発射間隔を初期化する。
         this._shotInterval = 0;
     }
     /**
@@ -33,7 +30,7 @@ class Dragonfly extends Enemy {
      * 左方向に直進する。
      * 左方向に直進する弾を発射する。
      * 画面外に出ると自分自身を削除する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     update(scene) {
         // 左へ移動する。
@@ -48,10 +45,7 @@ class Dragonfly extends Enemy {
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
-            // 敵弾が無効化されていない場合は敵弾を生成する。
-            if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(new EnemyShot(this._hitArea.x, this._hitArea.y, Math.PI, SHOT_SPEED, scene));
-            }
+            EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
         // 画面外に出た場合は自分自身を削除する。

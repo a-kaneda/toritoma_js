@@ -12,15 +12,9 @@ class ShieldButton {
      * 画像の読み込みとボタン部分を作成する。
      */
     constructor() {
-        /**
-         * ベース部分を作成する。
-         * @type {phina.display.DisplayElement}
-         */
+        // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
-        /**
-         * タッチしていない状態の画像
-         * @type {phina.display.Sprite}
-         */
+        // タッチしていない状態の画像を読み込む。
         this._offImage = new phina.display.Sprite('control', ControlSize.cs.shieldButtonOff.width, ControlSize.cs.shieldButtonOff.height);
         // タッチしていない状態のサイズを設定する。
         this._offImage.srcRect.set(ControlSize.cs.shieldButtonOff.x, ControlSize.cs.shieldButtonOff.y, ControlSize.cs.shieldButtonOff.width, ControlSize.cs.shieldButtonOff.height);
@@ -28,10 +22,7 @@ class ShieldButton {
         this._offImage.scaleY = ScreenSize.ZOOM_RATIO;
         // ベース部分に追加する。
         this._offImage.addChildTo(this._base);
-        /**
-         * タッチしている状態の画像
-         * @type {phina.display.Sprite}
-         */
+        // タッチしている状態の画像を読み込む。
         this._onImage = new phina.display.Sprite('control', ControlSize.cs.shieldButtonOn.width, ControlSize.cs.shieldButtonOn.height);
         // タッチしている状態のサイズを設定する。
         this._onImage.srcRect.set(ControlSize.cs.shieldButtonOn.x, ControlSize.cs.shieldButtonOn.y, ControlSize.cs.shieldButtonOn.width, ControlSize.cs.shieldButtonOn.height);
@@ -39,11 +30,8 @@ class ShieldButton {
         this._onImage.scaleY = ScreenSize.ZOOM_RATIO;
         // ベース部分に追加する。
         this._onImage.addChildTo(this._base);
-        /**
-         * ボタン部分。
-         * タップをやりやすくするため、画像より大きめにサイズを取る。
-         * @type {phina.display.RectangleShape}
-         */
+        // ボタン部分を作成する。
+        // タップをやりやすくするため、画像より大きめにサイズを取る。
         this._button = new phina.display.RectangleShape({
             height: BUTTON_SIZE,
             width: BUTTON_SIZE,
@@ -66,26 +54,16 @@ class ShieldButton {
             this._offImage.alpha = 1;
             this._onImage.alpha = 0;
         });
-        /**
-         * タッチしているかどうか
-         * @type {boolean}
-         */
-        this._touch = false;
         // 初期状態はタッチしていない状態とする。
+        this._touch = false;
         this._offImage.alpha = 1;
         this._onImage.alpha = 0;
     }
-    /**
-     * 画像、ボタンを合わせたスプライトを取得する。
-     * @return {phina.display.DisplayElement} スプライト
-     */
+    /** 画像、ボタンを合わせたスプライト。 */
     get sprite() {
         return this._base;
     }
-    /**
-     * タッチされているかどうかを取得する。
-     * @return {boolean} タッチされているかどうか
-     */
+    /** タッチされているかどうか。 */
     get isTouch() {
         return this._touch;
     }

@@ -7,24 +7,18 @@ class TileMapManager {
     /**
      * 初期化処理。
      * 使用するマップの名前を指定する。
-     * @param {string} mapName - マップ名
+     * @param mapName マップ名
      */
     constructor(mapName) {
-        /**
-         * マップ名に対応するマップ。
-         * @type {Object}
-         */
+        // マップ名に対応するマップを取得する。
         this._map = TileMaps[mapName];
-        /**
-         * オブジェクトマップ。
-         * @type {Object}
-         */
+        // オブジェクトマップを初期化する。
         this._objectMap = {};
     }
     /**
      * 指定したレイヤーの画像をテクスチャとして取得する。
-     * @param {string} layerName - レイヤー名
-     * @return {phina.asset.Texture} マップ画像のテクスチャ
+     * @param layerName レイヤー名
+     * @return マップ画像のテクスチャ
      */
     getIamge(layerName) {
         // マップの幅と高さのドット数を求める。
@@ -63,8 +57,8 @@ class TileMapManager {
     }
     /**
      * タイルセットのオブジェクトの情報を作成する。
-     * @param {string} layerName - レイヤー名
-     * @param [type} type - オブジェクトの種別
+     * @param layerName レイヤー名
+     * @param type オブジェクトの種別
      */
     createObjectMap(layerName, type) {
         // 指定された種別のオブジェクトマップを作成する。
@@ -115,12 +109,12 @@ class TileMapManager {
     }
     /**
      * layerNameで指定されたレイヤーの座標x, yから幅width、高さheightの範囲内にあるオブジェクトを取得する。
-     * @param {string} layerName - レイヤー名
-     * @param {number} x - 検索範囲左上のx座標
-     * @param {number} y - 検索範囲左上のy座標
-     * @param {number} width - 検索範囲幅
-     * @param {number} height - 検索範囲高さ
-     * @return {Object} 検索結果のオブジェクトの配列
+     * @param layerName レイヤー名
+     * @param x 検索範囲左上のx座標
+     * @param y 検索範囲左上のy座標
+     * @param width 検索範囲幅
+     * @param height 検索範囲高さ
+     * @return 検索結果のオブジェクトの配列
      */
     getObjects(layerName, x, y, width, height) {
         let objects = [];
@@ -153,7 +147,7 @@ class TileMapManager {
     }
     /**
      * オブジェクトマップを取得する。
-     * @param name - レイヤー名
+     * @param name レイヤー名
      * @return オブジェクトマップ
      */
     getObjectMap(name) {
@@ -161,11 +155,11 @@ class TileMapManager {
     }
     /**
      * canvasにタイルを描画する。タイルセットの名前と同じ名前でphina.jsのassetに登録をしておくこと。
-     * @param {phina.graphics.Canvas} canvas - canvas
-     * @param {Array} tilesets - タイルセット配列
-     * @param {number} index - タイルのgid
-     * @param {number} x - 描画先x座標
-     * @param {number} y - 描画先y座標
+     * @param canvas canvas
+     * @param tilesets タイルセット配列
+     * @param index タイルのgid
+     * @param x 描画先x座標
+     * @param y 描画先y座標
      */
     _drawTile(canvas, tilesets, index, x, y) {
         // gidに対応するタイルセットを検索する。

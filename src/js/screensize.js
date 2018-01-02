@@ -16,31 +16,19 @@ const STAGE_RECT = {
  * 画面サイズを管理する。
  */
 class ScreenSize {
-    /**
-     * 拡大率
-     * @type {number}
-     */
+    /** 拡大率 */
     static get ZOOM_RATIO() {
         return ZOOM_RATIO;
     }
-    /**
-     * スクリーンの幅
-     * @type {number}
-     */
+    /** スクリーンの幅 */
     static get SCREEN_WIDTH() {
         return SCREEN_WIDTH;
     }
-    /**
-     * スクリーンの高さ
-     * @type {number}
-     */
+    /** スクリーンの高さ */
     static get SCREEN_HEIGHT() {
         return SCREEN_HEIGHT;
     }
-    /**
-     * ゲーム画面のサイズ
-     * @type {Object}
-     */
+    /** ゲーム画面のサイズ */
     static get STAGE_RECT() {
         return STAGE_RECT;
     }

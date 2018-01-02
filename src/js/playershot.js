@@ -17,37 +17,22 @@ const HIT_HEIGHT = 3;
 class PlayerShot {
     /**
      * コンストラクタ。座標の設定とスプライトシートの設定を行う。
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {number} isOption - 発射元がオプションかどうか
-     * @param {PlayingScene} scene - シーン
+     * @param x x座標
+     * @param y y座標
+     * @param isOption 発射元がオプションかどうか
+     * @param scene シーン
      */
     constructor(x, y, isOption, scene) {
-        /**
-         * スプライト
-         * @type {phina.display.Sprite}
-         */
+        // スプライト画像を読み込む。
         this._sprite = new phina.display.Sprite('image_8x8', 8, 8);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
-        /**
-         * アニメーション
-         * @type {phina.accessory.FrameAnimation}
-         */
-        this._animation = new phina.accessory.FrameAnimation('image_8x8_ss');
         // アニメーションの設定を行う。
+        this._animation = new phina.accessory.FrameAnimation('image_8x8_ss');
         this._animation.attachTo(this._sprite);
         this._animation.gotoAndPlay('player_shot');
-        /**
-         * 当たり判定
-         * @type {Collider}
-         */
+        // 当たり判定を作成する。
         this._hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
-        /**
-         * 攻撃力
-         * @type {number}
-         */
-        this._power = 0;
         // 攻撃力を設定する。
         if (isOption) {
             this._power = OPTION_POWER;
@@ -56,9 +41,11 @@ class PlayerShot {
             this._power = PLAYER_POWER;
         }
     }
+    /** キャラクター種別 */
     get type() {
         return Character.type.PLAYER_SHOT;
     }
+    /** 位置とサイズ */
     get rect() {
         return this._hitArea;
     }
@@ -66,7 +53,7 @@ class PlayerShot {
      * 更新処理。
      * 右方向に直進する。
      * 画面外に出ると自分自身を削除する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     update(scene) {
         // 右へ移動する。

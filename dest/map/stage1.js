@@ -766,6 +766,61 @@
                  "width":16,
                  "x":1328,
                  "y":112
+                }, 
+                {
+                 "height":16,
+                 "id":75,
+                 "name":"butterfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":576,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":76,
+                 "name":"butterfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":784,
+                 "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":77,
+                 "name":"butterfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1088,
+                 "y":64
+                }, 
+                {
+                 "height":16,
+                 "id":78,
+                 "name":"butterfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1280,
+                 "y":80
+                }, 
+                {
+                 "height":16,
+                 "id":79,
+                 "name":"butterfly",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1408,
+                 "y":80
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -773,7 +828,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":75,
+ "nextobjectid":80,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

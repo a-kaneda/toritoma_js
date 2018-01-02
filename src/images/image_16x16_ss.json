@@ -40,6 +40,11 @@
             "frames": [18, 19],
             "next": "ant",
             "frequency": 12
+        },
+        "butterfly": {
+            "frames": [20, 21],
+            "next": "butterfly",
+            "frequency": 12
         }
     }
 }

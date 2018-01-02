@@ -32,66 +32,39 @@ class PlayingScene {
     /**
      * コンストラクタ。
      * 各種データの初期化と生成を行う。
-     * @param {MainScene} phinaScene - phina.js上のシーンインスタンス
+     * @param phinaScene phina.js上のシーンインスタンス
      */
     constructor(phinaScene) {
-        /**
-         * phina.jsのシーンインスタンス
-         * @type {MainScene}
-         */
+        // phina.jsのシーンインスタンスを設定する。
         this._phinaScene = phinaScene;
-        /**
-         * ゲームパッドマネージャー。
-         * @type {phina.input.GamepadManager}
-         */
+        // ゲームパッドマネージャーを作成する。
         this._gamepadManager = new phina.input.GamepadManager();
-        /**
-         * ゲームパッド。
-         * @type {phina.input.Gamepad}
-         */
+        // ゲームパッドを取得する。
         this._gamepad = this._gamepadManager.get(0);
-        /**
-         * 背景レイヤー。
-         * @type {phina.display.DisplayElement}
-         */
+        // 背景レイヤーを作成する。
         this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO, ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this._backgroundLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._backgroundLayer.scaleY = ScreenSize.ZOOM_RATIO;
-        /**
-         * キャラクターレイヤー。
-         * @type {phina.display.DisplayElement}
-         */
+        // キャラクターレイヤーを作成する。
         this._characterLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // キャラクターレイヤーの位置、サイズを設定する。
         this._characterLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO, ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this._characterLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._characterLayer.scaleY = ScreenSize.ZOOM_RATIO;
-        /**
-         * 枠レイヤー。
-         * @type {phina.display.DisplayElement}
-         */
+        // 枠レイヤーを作成する。
         this._frameLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 枠レイヤーの位置、サイズを設定する。
         this._frameLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._frameLayer.scaleY = ScreenSize.ZOOM_RATIO;
-        /**
-         * 情報レイヤー。
-         * @type {phina.display.DisplayElement}
-         */
+        // 情報レイヤーを作成する。
         this._infoLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // ステージの外枠を作成する。
         this._createFrame();
-        /**
-         * ステージ
-         * @type {Stage}
-         */
+        // 初期ステージを読み込む。
         this._stage = new Stage('stage1', this._backgroundLayer);
-        /**
-         * スコアラベルの背景部分。
-         * @type {phina.display.RectangleShape}
-         */
+        // スコアラベルの背景部分を作成する。
         this._scoreLabelBase = new phina.display.RectangleShape({
             height: 22,
             width: 148,
@@ -100,25 +73,16 @@ class PlayingScene {
             x: Math.round(this._phinaScene.gridX.center()),
             y: SCORE_POS_Y,
         }).addChildTo(this._infoLayer);
-        /**
-         * スコアラベル。
-         * @type {phina.display.Label}
-         */
+        // スコアラベルを作成する。
         this._scoreLabel = new phina.display.Label({
             text: 'SCORE: 000000',
             fontSize: 20,
             fill: MyColor.FORE_COLOR,
             fontFamily: 'noto',
         }).addChildTo(this._scoreLabelBase);
-        /**
-         * スコア。
-         * @type {number}
-         */
+        // スコアを初期化する。
         this._score = 0;
-        /**
-         * 残機表示
-         * @type {Life}
-         */
+        // 残機表示を作成する。
         this._lifeLabel = new Life();
         // 残機表示の位置を設定する。
         this._lifeLabel.sprite.addChildTo(this._infoLayer);
@@ -126,43 +90,25 @@ class PlayingScene {
         this._lifeLabel.sprite.y = LIFE_POS_Y;
         // 残機を初期化する。
         this._setLife(INITIAL_LIFE);
-        /**
-         * シールドボタン。
-         * @type {ShieldButton}
-         */
+        // シールドボタンを作成する。
         this._shieldButton = new ShieldButton();
         // シールドボタンの位置を設定する。
         this._shieldButton.sprite.addChildTo(this._infoLayer);
         this._shieldButton.sprite.x = ScreenSize.SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
         this._shieldButton.sprite.y = ScreenSize.SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
-        /**
-         * チキンゲージ。
-         * @type {ChickenGauge}
-         */
+        // チキンゲージを作成する。
         this._chickenGauge = new ChickenGauge();
         // チキンゲージの位置を設定する。
         this._chickenGauge.sprite.addChildTo(this._infoLayer);
         this._chickenGauge.sprite.x = Math.round(this._phinaScene.gridX.center());
         this._chickenGauge.sprite.y = ScreenSize.SCREEN_HEIGHT - CHICKEN_GAUGE_POS_Y;
-        /**
-         * 復活待機フレーム数。
-         * @type {number}
-         */
+        // 復活待機フレーム数を初期化する。
         this._rebirthWait = 0;
-        /**
-         * キャラクター管理配列。
-         * @type {Array}
-         */
+        // キャラクター管理配列を作成する。
         this._characters = [];
-        /**
-         * 自機
-         * @type {Player}
-         */
+        // 自機を作成する。
         this._player = new Player(Math.round(ScreenSize.STAGE_RECT.width / 4), Math.round(ScreenSize.STAGE_RECT.height / 2), this);
-        /**
-         * タッチ情報。
-         * @type {Object}
-         */
+        // タッチ情報を初期化する。
         this._touch = { id: -1, x: 0, y: 0 };
         // BGMの音量を設定する。
         phina.asset.SoundManager.setVolumeMusic(0.2);
@@ -173,7 +119,7 @@ class PlayingScene {
      * 更新処理。
      * キー入力処理を行う。
      * ステージ、キャラクターの更新処理を行う。
-     * @param {phina.game.GameApp} app - アプリケーション
+     * @param app アプリケーション
      */
     update(app) {
         // ボタン入力状態を初期化する。
@@ -208,21 +154,21 @@ class PlayingScene {
     }
     /**
      * キャラクターを追加する。
-     * @param {Object} character - 追加するキャラクター
+     * @param character 追加するキャラクター
      */
     addCharacter(character) {
         this._characters.push(character);
     }
     /**
      * キャラクターのスプライトを追加する。
-     * @param {phina.display.DisplayElement} sprite - 追加するスプライト
+     * @param sprite 追加するスプライト
      */
     addCharacterSprite(sprite) {
         sprite.addChildTo(this._characterLayer);
     }
     /**
      * キャラクターを削除する。
-     * @param {Object} character - 削除するキャラクター
+     * @param character 削除するキャラクター
      */
     removeCharacter(character) {
         const i = this._characters.indexOf(character);
@@ -232,39 +178,34 @@ class PlayingScene {
     }
     /**
      * スコアを追加する。
-     * @param {number} score - 追加するスコア
+     * @param score 追加するスコア
      */
     addScore(score) {
         this._score += score;
     }
     /**
      * ブロックマップを取得する。
-     * @return {Array} ブロックマップ
+     * @return ブロックマップ
      */
     getBlockMap() {
         return this._stage.blockMap;
     }
     /**
      * ステージが左方向に何ドット移動しているかを取得する。
-     * @return {number} ステージ位置
+     * @return ステージ位置
      */
     getStagePosition() {
         return -this._stage.x;
     }
-    /**
-     * ステージのスクロールスピード
-     * @type {number}
-     */
+    /** ステージのスクロールスピード */
     get scrollSpeed() {
         return this._stage.speed;
     }
+    /** キャラクター管理配列 */
     get characters() {
         return this._characters;
     }
-    /**
-     * 自機の位置
-     * @type {Object}
-     */
+    /** 自機の位置 */
     get playerPosition() {
         return {
             x: this._player.rect.x,
@@ -293,7 +234,7 @@ class PlayingScene {
     /**
      * 敵弾が無効化されているかどうかを取得する。
      * 自機が死亡して復活するまでの間は敵弾は発生させない。
-     * @return {boolean} 敵弾が無効化されているかどうか
+     * @return 敵弾が無効化されているかどうか
      */
     isDisableEnemyShot() {
         // 復活待機フレームが設定されている場合は敵弾は無効とする。
@@ -306,7 +247,7 @@ class PlayingScene {
     }
     /**
      * キーボードの入力処理を行う。
-     * @param {phina.game.GameApp} app - アプリケーション
+     * @param app アプリケーション
      */
     _inputKeyboard(app) {
         // キーボードを取得する。
@@ -331,7 +272,7 @@ class PlayingScene {
     }
     /**
      * タッチの入力処理を行う。
-     * @param {phina.game.GameApp} app - アプリケーション
+     * @param app アプリケーション
      */
     _inputTouch(app) {
         const touches = app.pointers;
@@ -535,7 +476,7 @@ class PlayingScene {
     }
     /**
      * 残機を変更し、残機ラベルを更新する。
-     * @param {number} life - 残機
+     * @param life 残機
      */
     _setLife(life) {
         this._life = life;

@@ -37,6 +37,44 @@ class EnemyShot {
     private _grazeRate: number;
     /** キャラクター種別 */
     private _type: number;
+    /** スクロールに合わせて移動するかどうか */
+    private _isScroll: boolean;
+
+    /**
+     * n-way弾を作成する。
+     * @param x x座標
+     * @param y y座標
+     * @param angle 発射する方向
+     * @param count 個数 
+     * @param interval 弾の間隔の角度 
+     * @param speed 弾のスピード
+     * @param isScroll スクロールに合わせて移動するかどうか
+     * @param scene シーン
+     */
+    public static fireNWay(x: number,
+                           y: number, 
+                           angle: number,
+                           count: number, 
+                           interval: number, 
+                           speed: number, 
+                           isScroll: boolean, 
+                           scene: PlayingScene): void {
+
+        // 敵弾が無効化されていない場合は処理をしない。。
+        if (scene.isDisableEnemyShot()) {
+            return;
+        }
+    
+        // 指定された個数分、弾を生成する。
+        for (let i = 0; i < count; i++) {
+
+            // 中央の角度からどれだけずらすかを計算する。
+            const angleDiff = (-1 * (count - 1 - 2 * i) / 2) * interval;
+
+            // 弾を生成する。
+            scene.addCharacter(new EnemyShot(x, y, angle + angleDiff, speed, isScroll, scene));
+        }
+    }
 
     /**
      * コンストラクタ、座標の設定とスプライトシートの設定を行う。
@@ -44,9 +82,10 @@ class EnemyShot {
      * @param y y座標
      * @param angle 進行方向
      * @param speed スピード
+     * @param isScroll スクロールに合わせて移動するかどうか
      * @param scene シーン
      */
-    constructor(x: number, y: number, angle: number, speed: number, scene: PlayingScene) {
+    constructor(x: number, y: number, angle: number, speed: number, isScroll: boolean, scene: PlayingScene) {
 
         // スプライト画像を読み込む。
         this._sprite = new phina.display.Sprite('image_8x8', 8, 8);
@@ -71,6 +110,9 @@ class EnemyShot {
         // y方向のスピードを計算する。
         // phina.jsの座標系は下方向が正なので逆向きにする。
         this._speedY = Math.sin(angle) * speed * -1;
+
+        // スクロールに合わせて移動するかどうかを設定する。
+        this._isScroll = isScroll;
 
         // かすり時のゲージ増加率を設定する。
         this._grazeRate = GRAZE_RATE;

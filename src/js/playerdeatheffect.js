@@ -8,25 +8,17 @@ class PlayerDeathEffect {
      * コンストラクタ。
      * 座標の設定とアニメーションの設定を行う。
      * 死亡時SEを再生する。
-     *
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {PlayingScene} scene - シーン
+     * @param x x座標
+     * @param y y座標
+     * @param scene シーン
      */
     constructor(x, y, scene) {
-        /**
-         * スプライト
-         * @type {phina.display.Sprite}
-         */
+        // スプライト画像を読み込む。
         this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
-        /**
-         * アニメーション
-         * @type {phina.accessory.FrameAnimation}
-         */
-        this._animation = new phina.accessory.FrameAnimation('image_16x16_ss');
         // アニメーションの設定を行う。
+        this._animation = new phina.accessory.FrameAnimation('image_16x16_ss');
         this._animation.attachTo(this._sprite);
         this._animation.gotoAndPlay('player_death');
         // 座標をスプライトに適用する。
@@ -34,9 +26,11 @@ class PlayerDeathEffect {
         // 死亡音を再生する。
         phina.asset.SoundManager.play('miss');
     }
+    /** キャラクター種別 */
     get type() {
         return Character.type.EFFECT;
     }
+    /** 位置とサイズ */
     get rect() {
         return {
             x: this._sprite.x,
@@ -48,7 +42,7 @@ class PlayerDeathEffect {
     /**
      * 更新処理。下に落ちる。
      * アニメーションが終了すると自分自身を削除する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     update(scene) {
         // 下に落ちる。

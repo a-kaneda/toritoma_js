@@ -19,31 +19,20 @@ class PlayerOption {
     /**
      * コンストラクタ。
      * 座標の設定とスプライトシートの設定を行う。
-     *
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {number} shield - シールド使用不使用
-     * @param {PlayingScene} scene - シーン
+     * @param x x座標
+     * @param y y座標
+     * @param shield シールド使用不使用
+     * @param scene シーン
      */
     constructor(x, y, shield, scene) {
-        /**
-         * スプライト
-         * @type {phina.display.Sprite}
-         */
+        // スプライト画像を読み込む。
         this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
-        /**
-         * シールド使用不使用
-         * @type {boolean}
-         */
+        // シールド使用不使用を設定する。
         this._shield = shield;
-        /**
-         * アニメーション
-         * @type {phina.accessory.FrameAnimation}
-         */
-        this._animation = new phina.accessory.FrameAnimation('image_16x16_ss');
         // アニメーションの設定を行う。
+        this._animation = new phina.accessory.FrameAnimation('image_16x16_ss');
         this._animation.attachTo(this._sprite);
         // シールド使用不使用によって画像を変更する。
         if (this._shield) {
@@ -52,39 +41,27 @@ class PlayerOption {
         else {
             this._animation.gotoAndPlay('player_option_normal');
         }
-        /**
-         * 当たり判定
-         * @type {Collider}
-         */
+        // 当たり判定を作成する。
         this._hitArea = new Collider(x, y, HIT_WIDTH, HIT_HEIGHT);
-        /**
-         * 移動位置。一定個数溜まったら、FIFOとして移動位置を適用していく。
-         * @type {Array}
-         */
+        // 移動位置の配列を作成する。
         this._movePosition = [];
-        /**
-         * 次のオプション。
-         * @type {PlayerOption}
-         */
+        // 次のオプションは初期状態はなしとする。
         this._nextOption = null;
-        /**
-         * 弾発射間隔。
-         * @type {number}
-         */
+        // 弾発射間隔を初期化する。
         this._shotInterval = 0;
-        /**
-         * デバッグ用フラグ。自機弾を発射しないようにする。
-         * @type {boolean}
-         */
-        this._noShot = false;
         // デバッグ用: ショットを撃たないようにする。
         if (localStorage.noShot === 'true') {
             this._noShot = true;
         }
+        else {
+            this._noShot = false;
+        }
     }
+    /** キャラクター種別 */
     get type() {
         return Character.type.PLAYER_OPTION;
     }
+    /** 位置とサイズ */
     get rect() {
         return this._hitArea;
     }
@@ -93,7 +70,7 @@ class PlayerOption {
      * 座標をスプライトに適用する。
      * シールド使用時は敵弾との当たり判定処理を行う。
      * 自機弾を発射する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     update(scene) {
         // 弾発射間隔経過しているときは自機弾を発射する
@@ -116,8 +93,8 @@ class PlayerOption {
      * 指定された座標へ移動する。
      * ただし、すぐに移動するのではなく、OPTION_SPACEの間隔分遅れて移動する。
      * オプションが他に存在する場合は、移動前の座標に対して移動を指示する。
-     * @param {number} x - x座標
-     * @param {number} y - y座標
+     * @param x x座標
+     * @param y y座標
      */
     move(x, y) {
         // 次のオプションが存在する場合は自分の移動前の座標に移動するように指示する。
@@ -141,8 +118,8 @@ class PlayerOption {
      * オプションの個数を設定する。
      * 0以下が指定されると自分自身を削除する。
      * 2個以上が指定されると再帰的に次のオプションを作成する。
-     * @param {number} count - オプション個数
-     * @param {PlayingScene} scene - シーン
+     * @param count オプション個数
+     * @param scene シーン
      */
     setCount(count, scene) {
         // 個数が2個以上の場合はオプションを作成する。
@@ -173,7 +150,7 @@ class PlayerOption {
     /**
      * シールド使用不使用を設定する。
      * 次のオプションがあればオプションの設定も変更する。
-     * @param {boolean} shield - シールド使用不使用
+     * @param shield シールド使用不使用
      */
     setShield(shield) {
         // シールド使用不使用が変化した場合はアニメーションを変更する。
@@ -197,7 +174,7 @@ class PlayerOption {
     }
     /**
      * 敵弾との当たり判定を処理する。衝突した敵弾の反射処理を行う。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     _checkHitChacater(scene) {
         // 衝突している敵弾を検索する。

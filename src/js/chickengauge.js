@@ -1,4 +1,3 @@
-/** @module chickengauge */
 import ScreenSize from './screensize.js';
 import ControlSize from './controlsize.js';
 /**
@@ -31,15 +30,14 @@ class ChickenGauge {
         this._fullImage.srcRect.width = 0;
     }
     /**
-     * ゲージのたまっている比率に応じたスプライトを取得する。
-     * @return {phina.display.DisplayElement} スプライト
+     * ゲージのたまっている比率に応じたスプライト。
      */
     get sprite() {
         return this._base;
     }
     /**
-     * ゲージが溜まっている比率を設定する。
-     * @param {number} value - ゲージが溜まっている比率(0～1)
+     * ゲージが溜まっている比率(0～1)。
+     * 満ゲージの表示幅を連動して変更させる。
      */
     set rate(value) {
         // 画像の幅を指定された比率に設定する。

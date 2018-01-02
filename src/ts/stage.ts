@@ -2,9 +2,10 @@
 
 import ScreenSize from './screensize'
 import TileMapManager from './tilemapmanager'
+import PlayingScene from './playingscene'
 import Dragonfly from './dragonfly'
 import Ant from './ant'
-import PlayingScene from './playingscene'
+import Butterfly from './butterfly'
 
 // タイルのサイズ
 const TILE_SIZE = 16;
@@ -197,6 +198,9 @@ class Stage {
                 break;
             case 'ant':
                 scene.addCharacter(new Ant(x, y, scene));
+                break;
+            case 'butterfly':
+                scene.addCharacter(new Butterfly(x, y, scene));
                 break;
             default:
                 break;

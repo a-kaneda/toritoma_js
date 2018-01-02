@@ -3,16 +3,14 @@ import ScreenSize from './screensize';
 import TileMapManager from './tilemapmanager';
 import Dragonfly from './dragonfly';
 import Ant from './ant';
+import Butterfly from './butterfly';
 // タイルのサイズ
 const TILE_SIZE = 16;
 /**
  * ステージのマップ、背景、イベント処理を管理する。
  */
 class Stage {
-    /**
-     * タイルサイズ
-     * @type {number}
-     */
+    /** タイルサイズ */
     static get TILE_SIZE() {
         return TILE_SIZE;
     }
@@ -24,32 +22,17 @@ class Stage {
      * @param {phina.display.DisplayElement} layer - ステージ画像を配置するレイヤー
      */
     constructor(mapName, layer) {
-        /**
-         * スクロールスピード。
-         * @type {number}
-         */
+        // スクロールスピードを初期化する。
         this._speed = 0;
-        /**
-         * スクロール位置。
-         * @type {number}
-         */
+        // スクロール位置を初期化する。
         this._x = 0;
-        /**
-         * イベントを実行した列番号。
-         * @type {number}
-         */
+        // イベントを実行した列番号を初期化する。
         this._executedCol = 0;
-        /**
-         * タイルマップ管理クラス。
-         * @type {TileMapManager}
-         */
+        // タイルマップ管理クラスを作成する。
         this._mapManager = new TileMapManager(mapName);
         // 障害物のマップを作成する。
         this._mapManager.createObjectMap('block', 'collision');
-        /**
-         * 背景画像。
-         * @type {phina.display.Sprite}
-         */
+        // 背景画像を読み込む。
         const backgroundTexture = this._mapManager.getIamge('background');
         if (backgroundTexture !== null) {
             this._background = new phina.display.Sprite(backgroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
@@ -57,10 +40,7 @@ class Stage {
         else {
             this._background = null;
         }
-        /**
-         * 前景画像。
-         * @type {phina.display.Sprite}
-         */
+        // 前景画像を読み込む。
         const foregroundTexture = this._mapManager.getIamge('foreground');
         if (foregroundTexture != null) {
             this._foreground = new phina.display.Sprite(foregroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
@@ -68,10 +48,7 @@ class Stage {
         else {
             this._foreground = null;
         }
-        /**
-         * 障害物画像。
-         * @type {phina.display.Sprite}
-         */
+        // 障害物画像を読み込む。
         const blockTexture = this._mapManager.getIamge('block');
         if (blockTexture != null) {
             this._block = new phina.display.Sprite(blockTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
@@ -80,18 +57,21 @@ class Stage {
             this._block = null;
         }
     }
+    /** スクロール位置 */
     get x() {
         return this._x;
     }
+    /** スクロールスピード */
     get speed() {
         return this._speed;
     }
+    /** 障害物マップ */
     get blockMap() {
         return this._mapManager.getObjectMap('collision');
     }
     /**
      * ステージの状態を更新する。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     update(scene) {
         // イベントを実行する。
@@ -102,7 +82,7 @@ class Stage {
     /**
      * マップのイベントレイヤーのオブジェクトを取得し、イベントを実行する。
      * 実行する範囲は前回実行した列から現在画面に表示している列 + 2列。
-     * @param {PlayingScene} scene - シーン
+     * @param scene シーン
      */
     _execEvent(scene) {
         // 画面外2個先の列まで処理を行う。
@@ -154,9 +134,10 @@ class Stage {
     }
     /**
      * 敵キャラクターを生成する。
-     * @param {number} x - x座標
-     * @param {number} y - y座標
-     * @param {PlayingScene} scene - シーン
+     * @param type 敵キャラクターの種類
+     * @param x x座標
+     * @param y y座標
+     * @param scene シーン
      */
     _createEnemy(type, x, y, scene) {
         switch (type) {
@@ -165,6 +146,9 @@ class Stage {
                 break;
             case 'ant':
                 scene.addCharacter(new Ant(x, y, scene));
+                break;
+            case 'butterfly':
+                scene.addCharacter(new Butterfly(x, y, scene));
                 break;
             default:
                 break;
