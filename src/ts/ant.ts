@@ -1,7 +1,8 @@
 import Util from './util.js'
 import EnemyShot from './enemyshot.js'
 import Enemy from './enemy.js'
-import Playingscene from './playingscene';
+import PlayingScene from './playingscene'
+import ScreenSize from './screensize'
 
 // 弾のスピード
 const SHOT_SPEED = 0.5;
@@ -48,7 +49,7 @@ class Ant extends Enemy {
      * @param y y座標
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: Playingscene) {
+    constructor(x: number, y: number, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
         super(x, y, 'ant', scene);
@@ -86,7 +87,7 @@ class Ant extends Enemy {
      * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
      * @param scene シーン
      */
-    public update(scene: Playingscene): void {
+    public update(scene: PlayingScene): void {
 
         // スクロールに合わせて移動する。
         this._hitArea.x -= scene.scrollSpeed;
@@ -200,7 +201,9 @@ class Ant extends Enemy {
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
 
         // 画面外に出た場合は自分自身を削除する。
-        if (this._hitArea.x < -this._hitArea.width * 2) {
+        if (this._hitArea.x < -this._hitArea.width * 2 ||
+            this._hitArea.x > ScreenSize.STAGE_RECT.width + this._hitArea.width * 2) {
+
             scene.removeCharacter(this);
             this._sprite.remove();
         }
@@ -211,7 +214,7 @@ class Ant extends Enemy {
      * @param scene シーン
      * @return 逆さまかどうか
      */
-    private _checkUpsideDown(scene: Playingscene): boolean {
+    private _checkUpsideDown(scene: PlayingScene): boolean {
 
         // 上方向の障害物を検索する。
         const upsideBlock = this._hitArea.getBlockY(true, this._hitArea.x, scene.getStagePosition(), scene.getBlockMap());
@@ -236,7 +239,7 @@ class Ant extends Enemy {
      * ブロック半分までの段差は超えられるものとし、それ以上の段差がある場合は手前の障害物の上で停止する。
      * @param scene シーン
      */
-    private _checkBlockHit(scene: Playingscene): void {
+    private _checkBlockHit(scene: PlayingScene): void {
 
         // 移動可能な段差
         const MOVABLE_STEP = 8;
