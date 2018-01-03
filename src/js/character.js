@@ -15,41 +15,65 @@ const type = {
     /** エフェクト */
     EFFECT: 6,
 };
+/** 敵キャラ死亡エフェクト */
+export var DeathEffect;
+(function (DeathEffect) {
+    DeathEffect[DeathEffect["NORMAL"] = 0] = "NORMAL";
+    DeathEffect[DeathEffect["BOSS"] = 1] = "BOSS";
+})(DeathEffect || (DeathEffect = {}));
 /**
  * 敵キャラパラメータ定義。
  */
 const enemy = {
     // トンボ
     dragonfly: {
+        size: 16,
         width: 16,
         height: 16,
         hp: 3,
         defense: 0,
         score: 100,
+        death: DeathEffect.NORMAL,
     },
     // アリ
     ant: {
+        size: 16,
         width: 16,
         height: 8,
         hp: 7,
         defense: 0,
         score: 200,
+        death: DeathEffect.NORMAL,
     },
     // チョウ
     butterfly: {
+        size: 16,
         width: 16,
         height: 16,
         hp: 10,
         defense: 0,
         score: 200,
+        death: DeathEffect.NORMAL,
     },
     // テントウムシ
     ladybug: {
+        size: 16,
         width: 16,
         height: 16,
         hp: 18,
         defense: 0,
         score: 200,
+        death: DeathEffect.NORMAL,
+    },
+    // カブトムシ
+    rhinocerosbeetle: {
+        size: 64,
+        width: 64,
+        height: 40,
+        hp: 1000,
+        defense: 0,
+        score: 3000,
+        death: DeathEffect.BOSS,
     },
 };
 /**

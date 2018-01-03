@@ -7,6 +7,7 @@ import PlayingScene from './playingscene'
 import CharacterIF from './characterif'
 import Rect from './rect'
 import ScreenSize from './screensize'
+import {DeathEffect} from './character'
 
 /**
  * 敵キャラクター。
@@ -25,6 +26,10 @@ abstract class Enemy implements CharacterIF {
     private _animation: phina.accessory.FrameAnimation;
     /** 防御力 */
     private _defense: number;
+    /** 死亡エフェクト */
+    private _death: DeathEffect;
+    /** 死亡エフェクト間隔 */
+    private _deathInterval: number;
 
     /**
      * コンストラクタ。
@@ -35,14 +40,21 @@ abstract class Enemy implements CharacterIF {
      */
     constructor(x: number, y: number, type: string, scene: PlayingScene) {
 
+        // サイズを取得する。
+        const size = Character.enemy[type].size;
+
+        // サイズに応じて画像、スプライトシートのファイル名を変える。
+        const imageFile = 'image_' + size + 'x' + size;
+        const ssFile = 'image_' + size + 'x' + size + '_ss';
+
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.display.Sprite(imageFile, 16, 16);
 
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
 
         // アニメーションの設定を行う。
-        this._animation = new phina.accessory.FrameAnimation('image_16x16_ss');
+        this._animation = new phina.accessory.FrameAnimation(ssFile);
         this._animation.attachTo(this._sprite);
         this._animation.gotoAndPlay(type);
 
@@ -57,14 +69,20 @@ abstract class Enemy implements CharacterIF {
 
         // スコアを設定する。
         this._score = Character.enemy[type].score;
+
+        // 死亡エフェクトを設定する。
+        this._death = Character.enemy[type].death;
+
+        // 死亡エフェクト間隔を初期化する。
+        this._deathInterval = 0;
     }
 
-    // キャラクター種別。
+    /** キャラクター種別。 */
     public get type(): number {
         return Character.type.ENEMY;
     }
 
-    // 位置とサイズ。
+    /** 位置とサイズ。 */
     public get rect(): Rect {
         return this._hitArea;
     }
@@ -77,7 +95,7 @@ abstract class Enemy implements CharacterIF {
 
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
         if (this._hp <= 0) {
-            this.death(scene);
+            this._deathEffect(scene);
             return;
         }
 
@@ -113,10 +131,30 @@ abstract class Enemy implements CharacterIF {
     }
 
     /**
-     * 死亡処理。爆発アニメーションを発生させ、スコアを加算し、自分自身を削除する。
+     * 死亡処理。
      * @param scene シーン
      */
-    protected death(scene: PlayingScene): void {
+    private _deathEffect(scene: PlayingScene): void {
+
+        switch (this._death) {
+            case DeathEffect.NORMAL:
+                this._deathNormal(scene);
+                break;
+
+            case DeathEffect.BOSS:
+                this._deathBoss(scene);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 雑魚敵の死亡処理。爆発アニメーションを発生させ、スコアを加算し、自分自身を削除する。
+     * @param scene シーン
+     */
+    private _deathNormal(scene: PlayingScene): void {
 
         // 爆発アニメーションを作成する。
         scene.addCharacter(new Explosion(this._hitArea.x, this._hitArea.y, scene));
@@ -127,6 +165,41 @@ abstract class Enemy implements CharacterIF {
         // 自分自身を削除する。
         scene.removeCharacter(this);
         this._sprite.remove();
+    }
+
+    /**
+     * ボス敵の死亡処理。一定時間爆発アニメーションを発生させ、スコアを加算し、自分自身を削除する。
+     * @param scene シーン
+     */
+    private _deathBoss(scene: PlayingScene): void {
+        
+        // 爆発の間隔
+        const EXPLOSION_INTERVAL = 20;
+        // 状態遷移間隔
+        const STATE_INTERVAL = 300;
+        
+        // 爆発の間隔が経過している場合は爆発を発生させる。
+        this._deathInterval++;
+        if (this._deathInterval % EXPLOSION_INTERVAL == 0) {
+            
+            // 爆発発生位置を決める。
+            const x = this._hitArea.x + (Math.random() - 0.5) * this._hitArea.width;
+            const y = this._hitArea.y + (Math.random() - 0.5) * this._hitArea.height;
+            
+            // 爆発アニメーションを作成する。
+            scene.addCharacter(new Explosion(x, y, scene));
+        }
+
+        // 状態遷移間隔が経過している場合は死亡処理を行う。
+        if (this._deathInterval > STATE_INTERVAL) {
+
+            // スコアを加算する。
+            scene.addScore(this._score);
+
+            // 自分自身を削除する。
+            scene.removeCharacter(this);
+            this._sprite.remove();
+        }
     }
 
     /**

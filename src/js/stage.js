@@ -5,6 +5,7 @@ import Dragonfly from './dragonfly';
 import Ant from './ant';
 import Butterfly from './butterfly';
 import Ladybug from './ladybug';
+import RhinocerosBeetle from './rhinocerosbeetle';
 // タイルのサイズ
 const TILE_SIZE = 16;
 /**
@@ -153,6 +154,9 @@ class Stage {
                 break;
             case 'ladybug':
                 scene.addCharacter(new Ladybug(x, y, scene));
+                break;
+            case 'rhinocerosbeetle':
+                scene.addCharacter(new RhinocerosBeetle(x, y, scene));
                 break;
             default:
                 break;

@@ -15,10 +15,12 @@ const ASSETS = {
         'control': './images/control.png',
         'image_8x8': './images/image_8x8.png',
         'image_16x16': './images/image_16x16.png',
+        'image_64x64': './images/image_64x64.png',
     },
     spritesheet: {
         'image_8x8_ss': './images/image_8x8_ss.json',
         'image_16x16_ss': './images/image_16x16_ss.json',
+        'image_64x64_ss': './images/image_64x64_ss.json',
     },
     sound: {
         'stage1': './sound/stage1.mp3',

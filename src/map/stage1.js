@@ -887,6 +887,17 @@
                  "width":16,
                  "x":1376,
                  "y":96
+                }, 
+                {
+                 "height":16,
+                 "id":86,
+                 "name":"rhinocerosbeetle",
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":16,
+                 "x":1536,
+                 "y":48
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -894,7 +905,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":86,
+ "nextobjectid":87,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",
