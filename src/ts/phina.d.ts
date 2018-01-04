@@ -153,7 +153,7 @@ declare module phina {
         class Vector2 {
             x: number;
             y: number;
-            length: number;
+            length(): number;
         }
     }
 

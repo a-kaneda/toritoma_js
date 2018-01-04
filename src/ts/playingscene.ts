@@ -465,7 +465,8 @@ class PlayingScene {
         // アナログスティックの入力を取得する。
         const stick = this._gamepad.getStickDirection(0);
 
-        if (stick.length > 0.5) {
+        // アナログスティックの入力値が閾値を超えている場合は移動する。
+        if (stick.length() > 0.5) {
             this._player.moveGamepad(stick.x, stick.y, this);
         }
 
