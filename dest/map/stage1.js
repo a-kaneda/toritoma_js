@@ -898,6 +898,44 @@
                  "width":16,
                  "x":1536,
                  "y":48
+                }, 
+                {
+                 "height":16,
+                 "id":87,
+                 "name":"stage1",
+                 "properties":
+                    {
+                     "speed":0.25
+                    },
+                 "propertytypes":
+                    {
+                     "speed":"float"
+                    },
+                 "rotation":0,
+                 "type":"bgm",
+                 "visible":true,
+                 "width":16,
+                 "x":0,
+                 "y":16
+                }, 
+                {
+                 "height":16,
+                 "id":88,
+                 "name":"boss",
+                 "properties":
+                    {
+                     "speed":0.25
+                    },
+                 "propertytypes":
+                    {
+                     "speed":"float"
+                    },
+                 "rotation":0,
+                 "type":"bgm",
+                 "visible":true,
+                 "width":16,
+                 "x":1536,
+                 "y":16
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -905,7 +943,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":87,
+ "nextobjectid":89,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.0.3",

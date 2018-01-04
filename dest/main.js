@@ -814,10 +814,12 @@ class Enemy {
         this._death = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].death;
         // 死亡エフェクト間隔を初期化する。
         this._deathInterval = 0;
+        // キャラクター種別を設定する。
+        this._type = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].type.ENEMY;
     }
     /** キャラクター種別。 */
     get type() {
-        return __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].type.ENEMY;
+        return this._type;
     }
     /** 位置とサイズ。 */
     get rect() {
@@ -896,6 +898,8 @@ class Enemy {
         const EXPLOSION_INTERVAL = 20;
         // 状態遷移間隔
         const STATE_INTERVAL = 300;
+        // ボス死亡エフェクト中はキャラクター種別をエフェクトに変更する。
+        this._type = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].type.EFFECT;
         // 爆発の間隔が経過している場合は爆発を発生させる。
         this._deathInterval++;
         if (this._deathInterval % EXPLOSION_INTERVAL == 0) {
@@ -1030,6 +1034,9 @@ class EnemyShot {
                     // 敵キャラクターに接触した場合は自分自身は削除する。
                     scene.removeCharacter(this);
                     this._sprite.remove();
+                    // ヒット音を再生するために自機弾衝突フラグを立てる。
+                    // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
+                    scene.isHitPlayerShot = true;
                     // 敵キャラと衝突した場合は処理を終了する。
                     return;
                 }
@@ -1383,6 +1390,9 @@ class PlayerShot {
                 // 敵キャラクターに接触した場合は自分自身は削除する。
                 scene.removeCharacter(this);
                 this._sprite.remove();
+                // ヒット音を再生するために自機弾衝突フラグを立てる。
+                // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
+                scene.isHitPlayerShot = true;
                 // 敵キャラと衝突した場合は処理を終了する。
                 return;
             }
@@ -1532,6 +1542,10 @@ class Stage {
                         // 敵キャラを生成する。
                         this._createEnemy(obj.name, this._x + obj.x + obj.width / 2, obj.y + obj.height / 2, scene);
                         break;
+                    case 'bgm':
+                        // BGMを再生する。
+                        phina.asset.SoundManager.playMusic(obj.name);
+                        break;
                     default:
                         break;
                 }
@@ -1604,7 +1618,6 @@ class Stage {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(24);
-/** @module playingscene */
 
 
 
@@ -1631,6 +1644,8 @@ const CHICKEN_GAUGE_POS_Y = 12;
 const SHIELD_BUTTON_POS_X = 50;
 // シールドボタン位置y座標(画面下からの位置)
 const SHIELD_BUTTON_POS_Y = 50;
+// 自機弾衝突音発生間隔
+const HIT_PLAYER_SHOT_INTERVAL = 6;
 /**
  * ゲームの各ステージをプレイするメインのシーン。
  */
@@ -1716,10 +1731,10 @@ class PlayingScene {
         this._player = new __WEBPACK_IMPORTED_MODULE_6__player__["a" /* default */](Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width / 4), Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height / 2), this);
         // タッチ情報を初期化する。
         this._touch = { id: -1, x: 0, y: 0 };
-        // BGMの音量を設定する。
-        phina.asset.SoundManager.setVolumeMusic(0.2);
-        // BGMを再生する。
-        phina.asset.SoundManager.playMusic('stage1');
+        // 自機弾衝突フラグを初期化する。
+        this._isHitPlayerShot = false;
+        // 自機弾衝突音発生間隔を初期化する。
+        this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
     }
     /**
      * 更新処理。
@@ -1747,9 +1762,19 @@ class PlayingScene {
         this._stage.update(this);
         // プレイヤーの状態を更新する。
         this._player.update(this);
+        // 自機弾衝突フラグを初期化する。
+        this._isHitPlayerShot = false;
         // 各キャラクターの状態を更新する。
         for (let i = 0; i < this._characters.length; i++) {
             this._characters[i].update(this);
+        }
+        // 自機弾が衝突した場合はSEを鳴らす。
+        // 連続で音が鳴らないように音を鳴らしたときは自機音衝突間隔を初期化して、
+        // 規定フレーム分経過するまで次の音が鳴らないようにする。
+        this._hitPlayerShotInterval++;
+        if (this._isHitPlayerShot && this._hitPlayerShotInterval > HIT_PLAYER_SHOT_INTERVAL) {
+            phina.asset.SoundManager.play('hit');
+            this._hitPlayerShotInterval = 0;
         }
         // 自機復活処理を行う。
         this._rebirthPlayer();
@@ -1817,6 +1842,10 @@ class PlayingScene {
             x: this._player.rect.x,
             y: this._player.rect.y,
         };
+    }
+    /** 自機弾衝突フラグ */
+    set isHitPlayerShot(value) {
+        this._isHitPlayerShot = value;
     }
     /**
      * 自機が死亡したときの処理を行う。
@@ -2769,6 +2798,8 @@ const ASSETS = {
     },
     sound: {
         'stage1': './sound/stage1.mp3',
+        'boss': './sound/boss.mp3',
+        'hit': './sound/hit.mp3',
         'bomb_min': './sound/bomb_min.mp3',
         'miss': './sound/miss.mp3',
     },
@@ -2794,6 +2825,9 @@ phina.define('MainScene', {
         this.canvas.imageSmoothingEnabled = false;
         // 背景色を指定する。
         this.backgroundColor = __WEBPACK_IMPORTED_MODULE_2__mycolor_js__["a" /* default */].BACK_COLOR;
+        // BGMとSEの音量を設定する。
+        phina.asset.SoundManager.setVolume(0.5);
+        phina.asset.SoundManager.setVolumeMusic(0.2);
         // 初期シーンを設定する。
         this.scene = new __WEBPACK_IMPORTED_MODULE_3__playingscene_js__["a" /* default */](this);
     },

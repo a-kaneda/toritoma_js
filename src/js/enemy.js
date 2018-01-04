@@ -41,10 +41,12 @@ class Enemy {
         this._death = Character.enemy[type].death;
         // 死亡エフェクト間隔を初期化する。
         this._deathInterval = 0;
+        // キャラクター種別を設定する。
+        this._type = Character.type.ENEMY;
     }
     /** キャラクター種別。 */
     get type() {
-        return Character.type.ENEMY;
+        return this._type;
     }
     /** 位置とサイズ。 */
     get rect() {
@@ -123,6 +125,8 @@ class Enemy {
         const EXPLOSION_INTERVAL = 20;
         // 状態遷移間隔
         const STATE_INTERVAL = 300;
+        // ボス死亡エフェクト中はキャラクター種別をエフェクトに変更する。
+        this._type = Character.type.EFFECT;
         // 爆発の間隔が経過している場合は爆発を発生させる。
         this._deathInterval++;
         if (this._deathInterval % EXPLOSION_INTERVAL == 0) {

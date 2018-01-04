@@ -27,6 +27,8 @@ const ASSETS = {
     },
     sound: {
         'stage1': './sound/stage1.mp3',
+        'boss': './sound/boss.mp3',
+        'hit': './sound/hit.mp3',
         'bomb_min': './sound/bomb_min.mp3',
         'miss': './sound/miss.mp3',
     },
@@ -58,6 +60,10 @@ phina.define('MainScene', {
         // 背景色を指定する。
         this.backgroundColor = MyColor.BACK_COLOR;
 
+        // BGMとSEの音量を設定する。
+        phina.asset.SoundManager.setVolume(0.5);
+        phina.asset.SoundManager.setVolumeMusic(0.2);
+        
         // 初期シーンを設定する。
         this.scene = new PlayingScene(this);
     },

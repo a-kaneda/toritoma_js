@@ -30,6 +30,8 @@ abstract class Enemy implements CharacterIF {
     private _death: DeathEffect;
     /** 死亡エフェクト間隔 */
     private _deathInterval: number;
+    /** キャラクター種別 */
+    private _type: number;
 
     /**
      * コンストラクタ。
@@ -75,11 +77,14 @@ abstract class Enemy implements CharacterIF {
 
         // 死亡エフェクト間隔を初期化する。
         this._deathInterval = 0;
+
+        // キャラクター種別を設定する。
+        this._type = Character.type.ENEMY;
     }
 
     /** キャラクター種別。 */
     public get type(): number {
-        return Character.type.ENEMY;
+        return this._type;
     }
 
     /** 位置とサイズ。 */
@@ -177,6 +182,9 @@ abstract class Enemy implements CharacterIF {
         const EXPLOSION_INTERVAL = 20;
         // 状態遷移間隔
         const STATE_INTERVAL = 300;
+
+        // ボス死亡エフェクト中はキャラクター種別をエフェクトに変更する。
+        this._type = Character.type.EFFECT;
         
         // 爆発の間隔が経過している場合は爆発を発生させる。
         this._deathInterval++;

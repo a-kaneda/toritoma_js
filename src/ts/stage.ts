@@ -141,21 +141,25 @@ class Stage {
             for (let obj of objects) 
             {
                 switch (obj.type) {
-                case 'speed':
-                    // スクロールスピードを変更する。
-                    if (obj.properties !== undefined) {
-                        this._speed = obj.properties.speed;
-                    }
-                    break;
-                case 'enemy':
-                    // 敵キャラを生成する。
-                    this._createEnemy(obj.name,
-                                      this._x + obj.x + obj.width / 2,
-                                      obj.y + obj.height / 2,
-                                      scene);
-                    break;
-                default:
-                    break;
+                    case 'speed':
+                        // スクロールスピードを変更する。
+                        if (obj.properties !== undefined) {
+                            this._speed = obj.properties.speed;
+                        }
+                        break;
+                    case 'enemy':
+                        // 敵キャラを生成する。
+                        this._createEnemy(obj.name,
+                                        this._x + obj.x + obj.width / 2,
+                                        obj.y + obj.height / 2,
+                                        scene);
+                        break;
+                    case 'bgm':
+                        // BGMを再生する。
+                        phina.asset.SoundManager.playMusic(obj.name);
+                        break;
+                    default:
+                        break;
                 }
             }
 

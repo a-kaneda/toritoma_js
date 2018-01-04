@@ -133,6 +133,7 @@ declare module phina {
         }
 
         class SoundManager {
+            static setVolume(volume: number): void;
             static playMusic(name: string, fadeTime?: number, loop?: boolean, when?: number, offset?: number, duration?: number): phina.asset.Sound | boolean;
             static setVolumeMusic(volume: number): SoundManager;
             static play(name: string, when?: number, offset?: number, duration?: number): phina.asset.Sound;

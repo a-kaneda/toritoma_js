@@ -1,4 +1,3 @@
-/** @module playingscene */
 import PointDevice from './pointdevice';
 import MyColor from './mycolor';
 import ScreenSize from './screensize';
@@ -25,6 +24,8 @@ const CHICKEN_GAUGE_POS_Y = 12;
 const SHIELD_BUTTON_POS_X = 50;
 // シールドボタン位置y座標(画面下からの位置)
 const SHIELD_BUTTON_POS_Y = 50;
+// 自機弾衝突音発生間隔
+const HIT_PLAYER_SHOT_INTERVAL = 6;
 /**
  * ゲームの各ステージをプレイするメインのシーン。
  */
@@ -110,10 +111,10 @@ class PlayingScene {
         this._player = new Player(Math.round(ScreenSize.STAGE_RECT.width / 4), Math.round(ScreenSize.STAGE_RECT.height / 2), this);
         // タッチ情報を初期化する。
         this._touch = { id: -1, x: 0, y: 0 };
-        // BGMの音量を設定する。
-        phina.asset.SoundManager.setVolumeMusic(0.2);
-        // BGMを再生する。
-        phina.asset.SoundManager.playMusic('stage1');
+        // 自機弾衝突フラグを初期化する。
+        this._isHitPlayerShot = false;
+        // 自機弾衝突音発生間隔を初期化する。
+        this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
     }
     /**
      * 更新処理。
@@ -141,9 +142,19 @@ class PlayingScene {
         this._stage.update(this);
         // プレイヤーの状態を更新する。
         this._player.update(this);
+        // 自機弾衝突フラグを初期化する。
+        this._isHitPlayerShot = false;
         // 各キャラクターの状態を更新する。
         for (let i = 0; i < this._characters.length; i++) {
             this._characters[i].update(this);
+        }
+        // 自機弾が衝突した場合はSEを鳴らす。
+        // 連続で音が鳴らないように音を鳴らしたときは自機音衝突間隔を初期化して、
+        // 規定フレーム分経過するまで次の音が鳴らないようにする。
+        this._hitPlayerShotInterval++;
+        if (this._isHitPlayerShot && this._hitPlayerShotInterval > HIT_PLAYER_SHOT_INTERVAL) {
+            phina.asset.SoundManager.play('hit');
+            this._hitPlayerShotInterval = 0;
         }
         // 自機復活処理を行う。
         this._rebirthPlayer();
@@ -211,6 +222,10 @@ class PlayingScene {
             x: this._player.rect.x,
             y: this._player.rect.y,
         };
+    }
+    /** 自機弾衝突フラグ */
+    set isHitPlayerShot(value) {
+        this._isHitPlayerShot = value;
     }
     /**
      * 自機が死亡したときの処理を行う。

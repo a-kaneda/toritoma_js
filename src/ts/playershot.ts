@@ -104,6 +104,10 @@ class PlayerShot implements CharacterIF {
                 scene.removeCharacter(this);
                 this._sprite.remove();
 
+                // ヒット音を再生するために自機弾衝突フラグを立てる。
+                // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
+                scene.isHitPlayerShot = true;
+
                 // 敵キャラと衝突した場合は処理を終了する。
                 return;
             }  
