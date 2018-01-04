@@ -82,6 +82,10 @@ class RhinocerosBeetle extends Enemy {
         this._moveState = MOVE_STATE.LEFT_MOVE;
         // 初期弾発射状態は弾発射なしとする。
         this._shotState = SHOT_STATE.NO_SHOT;
+        // 初期HPを最大値として記憶しておく。
+        this._maxHP = this._hp;
+        // ボスHPゲージを満タンで表示する。
+        scene.bossLife = 1;
     }
     /**
      * 敵キャラクター種別ごとの固有の処理。
@@ -209,6 +213,13 @@ class RhinocerosBeetle extends Enemy {
                 break;
             default:
                 break;
+        }
+        // ボスHPゲージの表示を更新する。
+        if (this._hp > 0) {
+            scene.bossLife = this._hp / this._maxHP;
+        }
+        else {
+            scene.bossLife = 0;
         }
     }
 }

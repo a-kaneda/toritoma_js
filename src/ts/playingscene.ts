@@ -7,6 +7,7 @@ import Stage from './stage'
 import Player from './player'
 import Life from './life'
 import ChickenGauge from './chickengauge'
+import BossLifeGauge from './bosslifegauge'
 import ShieldButton from './shieldbutton'
 import CharacterIF from './characterif'
 import Point from './point';
@@ -27,6 +28,10 @@ const CHICKEN_GAUGE_POS_Y = 12;
 const SHIELD_BUTTON_POS_X = 50;
 // シールドボタン位置y座標(画面下からの位置)
 const SHIELD_BUTTON_POS_Y = 50;
+// ボスHPゲージ位置x座標(ステージ左端からの位置)
+const BOSS_LIFE_GAUGE_POS_X = 360;
+// ボスHPゲージ位置x座標(画面上からの位置)
+const BOSS_LIFE_GAUGE_POS_Y = 144;
 // 自機弾衝突音発生間隔
 const HIT_PLAYER_SHOT_INTERVAL = 6;
 
@@ -65,6 +70,8 @@ class PlayingScene {
     private _shieldButton: ShieldButton;
     /** チキンゲージ。 */
     private _chickenGauge: ChickenGauge;
+    /** ボスHPゲージ。 */
+    private _bossLifeGauge: BossLifeGauge;
     /** 復活待機フレーム数。 */
     private _rebirthWait: number;
     /** キャラクター管理配列。 */
@@ -177,6 +184,17 @@ class PlayingScene {
         this._chickenGauge.sprite.addChildTo(this._infoLayer);
         this._chickenGauge.sprite.x = Math.round(this._phinaScene.gridX.center());
         this._chickenGauge.sprite.y = ScreenSize.SCREEN_HEIGHT - CHICKEN_GAUGE_POS_Y;
+
+        // ボスHPゲージを作成する。
+        this._bossLifeGauge = new BossLifeGauge();
+
+        // ボスHPゲージの位置を設定する。
+        this._bossLifeGauge.sprite.addChildTo(this._infoLayer);
+        this._bossLifeGauge.sprite.x = ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO + BOSS_LIFE_GAUGE_POS_X;
+        this._bossLifeGauge.sprite.y = BOSS_LIFE_GAUGE_POS_Y;
+
+        // 初期状態はボスHPゲージは非表示とする。
+        this._bossLifeGauge.sprite.alpha = 0;
 
         // 復活待機フレーム数を初期化する。
         this._rebirthWait = 0;
@@ -332,6 +350,16 @@ class PlayingScene {
     /** 自機弾衝突フラグ */
     public set isHitPlayerShot(value: boolean) {
         this._isHitPlayerShot = value;
+    }
+
+    /** ボスHPゲージの比率。 */
+    public set bossLife(value: number) {
+
+        // ボスHPゲージを表示する。
+        this._bossLifeGauge.sprite.alpha = 1;
+
+        // ゲージを設定する。
+        this._bossLifeGauge.rate = value;
     }
 
     /**
