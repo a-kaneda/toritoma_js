@@ -2865,8 +2865,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-// phina.jsをグローバル領域に展開する。
-phina.globalize();
 // マウスが接続されているかどうかを調べる。
 __WEBPACK_IMPORTED_MODULE_0__pointdevice_js__["a" /* default */].checkDeviceType();
 /**
@@ -2897,10 +2895,58 @@ const ASSETS = {
     },
 };
 /**
+ * ローディングシーン。
+ */
+phina.define('LoadingScene', {
+    superClass: 'phina.display.DisplayScene',
+    /**
+     * コンストラクタ。
+     * @param options 起動パラメータ。
+     */
+    init: function (options) {
+        this.superInit(options);
+        // 背景色を指定する。
+        this.backgroundColor = __WEBPACK_IMPORTED_MODULE_2__mycolor_js__["a" /* default */].BACK_COLOR;
+        // MONOCHROMESOFTのラベルを作成する。
+        const label = new phina.display.Label({
+            text: 'MONOCHROMESOFT',
+            fontSize: 32,
+            fill: __WEBPACK_IMPORTED_MODULE_2__mycolor_js__["a" /* default */].FORE_COLOR,
+        })
+            .addChildTo(this)
+            .setPosition(this.width / 2, this.height / 2);
+        // 進捗バーを作成する。
+        const progressbar = new phina.display.RectangleShape({
+            height: 20,
+            width: 0,
+            fill: __WEBPACK_IMPORTED_MODULE_2__mycolor_js__["a" /* default */].FORE_COLOR,
+            strokeWidth: 0,
+            padding: 0,
+        })
+            .addChildTo(this)
+            .setOrigin(0, 0.5)
+            .setPosition(0, this.height * 0.75);
+        // ローダーを作成する。
+        const loader = new phina.asset.AssetLoader();
+        // ロードが進行したときの処理を作成する。
+        loader.on('progress', (event) => {
+            const e = event;
+            progressbar.width = e.progress * this.width;
+        });
+        // ローダーによるロード完了ハンドラを設定する。
+        loader.on('load', () => {
+            // Appコアにロード完了を伝える（==次のSceneへ移行）
+            this.flare('loaded');
+        });
+        // ロード開始
+        loader.load(options.assets);
+    },
+});
+/**
  * メインシーン。
  */
 phina.define('MainScene', {
-    superClass: 'DisplayScene',
+    superClass: 'phina.display.DisplayScene',
     /**
      * コンストラクタ。
      */
@@ -4113,7 +4159,7 @@ class TileMapManager {
                 break;
             }
         }
-        // 見つからなかった場合はしょりを終了する。
+        // 見つからなかった場合は処理を終了する。
         if (found < 0) {
             return;
         }

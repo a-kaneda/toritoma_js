@@ -4,6 +4,12 @@ declare module phina {
     function define(path: string, params: any): void;
     function main(func: () => void): void;
 
+    type ProgressEvent = {
+        key: string,
+        asset: any,
+        progress: number;
+    };
+
     module app {
 
         class Element extends phina.util.EventDispatcher {
@@ -20,6 +26,7 @@ declare module phina {
             scaleX: number;
             scaleY: number;
             setPosition(x: number, y: number): this;
+            setOrigin(x: number, y: number): this;
             setInteractive(flag: boolean, type?: string): this;
         }
 
@@ -56,7 +63,6 @@ declare module phina {
         class Sprite extends phina.display.DisplayElement {
             srcRect: phina.geom.Rect;
             constructor(image: string | phina.asset.Texture, width?: number, height?: number);
-            setOrigin(x: number, y: number): this;
         }
 
         class Label extends phina.display.Shape {
@@ -115,6 +121,11 @@ declare module phina {
 
         class Asset extends phina.util.EventDispatcher {
 
+        }
+
+        class AssetLoader extends phina.util.EventDispatcher {
+            constructor(params?: any);
+            load(params?: any): this;
         }
 
         class Texture {
@@ -187,7 +198,7 @@ declare module phina {
     module util {
 
         class EventDispatcher {
-            on(type: string, listener: (event: Event) => void): this;
+            on(type: string, listener: (event: any) => void): this;
         }
 
         class Grid {

@@ -218,7 +218,7 @@ class TileMapManager {
             }
         }
         
-        // 見つからなかった場合はしょりを終了する。
+        // 見つからなかった場合は処理を終了する。
         if (found < 0) {
             return;
         }

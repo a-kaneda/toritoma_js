@@ -3,9 +3,6 @@ import ScreenSize from './screensize.js'
 import MyColor from './mycolor.js'
 import PlayingScene from './playingscene.js'
 
-// phina.jsをグローバル領域に展開する。
-phina.globalize();
-
 // マウスが接続されているかどうかを調べる。
 PointDevice.checkDeviceType();
 
@@ -38,10 +35,70 @@ const ASSETS = {
 };
 
 /**
+ * ローディングシーン。
+ */
+phina.define('LoadingScene', {
+    superClass: 'phina.display.DisplayScene',
+
+    /**
+     * コンストラクタ。
+     * @param options 起動パラメータ。
+     */
+    init: function(options: any) {
+        this.superInit(options);
+
+        // 背景色を指定する。
+        this.backgroundColor = MyColor.BACK_COLOR;
+
+        // MONOCHROMESOFTのラベルを作成する。
+        const label = new phina.display.Label({
+            text: 'MONOCHROMESOFT',
+            fontSize: 32,
+            fill: MyColor.FORE_COLOR,
+        })
+        .addChildTo(this)
+        .setPosition(this.width / 2, this.height / 2);
+
+        // 進捗バーを作成する。
+        const progressbar = new phina.display.RectangleShape({
+            height: 20,
+            width: 0,
+            fill: MyColor.FORE_COLOR,
+            strokeWidth: 0,
+            padding: 0,
+        })
+        .addChildTo(this)
+        .setOrigin(0, 0.5)
+        .setPosition(0, this.height * 0.75);
+        
+        // ローダーを作成する。
+        const loader = new phina.asset.AssetLoader();
+
+        // ロードが進行したときの処理を作成する。
+        loader.on('progress', (event: any) => {
+            const e = <phina.ProgressEvent>event;
+            
+            // 進捗率に応じてプログレスバーの幅を広げる。
+            progressbar.width = e.progress * this.width;
+        });
+    
+        // ローダーによるロード完了ハンドラを設定する。
+        loader.on('load', () => {
+
+            // Appコアにロード完了を伝える（==次のSceneへ移行）
+            this.flare('loaded');
+        });
+  
+        // ロード開始
+        loader.load(options.assets);
+    },
+});
+
+/**
  * メインシーン。
  */
 phina.define('MainScene', {
-    superClass: 'DisplayScene',
+    superClass: 'phina.display.DisplayScene',
 
     /**
      * コンストラクタ。
