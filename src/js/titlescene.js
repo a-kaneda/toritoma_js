@@ -7,9 +7,13 @@ const TITLE_POS_X = 130;
 // タイトルの位置、y座標
 const TITLE_POS_Y = 150;
 // ボタンの位置、x座標
-const BUTTON_POS_X = 370;
+const BUTTON_POS_X = 360;
 // ボタンの位置、y座標
 const BUTTON_POS_Y = [64, 128, 192, 256];
+// ボタンの幅
+const BUTTON_WIDTH = 208;
+// ボタンの高さ
+const BUTTON_HEIGHT = 48;
 /**
  * タイトルのシーン
  */
@@ -33,7 +37,7 @@ class TitleScene {
         title.scaleY = ScreenSize.ZOOM_RATIO;
         window.debug['title'] = title;
         // ゲームスタートボタンを作成する。
-        const gameStartButton = new Button(100, 200)
+        const gameStartButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('GAME START')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])

@@ -351,6 +351,54 @@ const cs = {
         width: 8,
         height: 8,
     },
+    buttonTopLeft: {
+        x: 144,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonTop: {
+        x: 152,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonTopRight: {
+        x: 160,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonLeft: {
+        x: 144,
+        y: 40,
+        width: 8,
+        height: 8,
+    },
+    buttonRight: {
+        x: 160,
+        y: 40,
+        width: 8,
+        height: 8,
+    },
+    buttonBottomLeft: {
+        x: 144,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
+    buttonBottom: {
+        x: 152,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
+    buttonBottomRight: {
+        x: 160,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
 };
 /**
  * control.png内のコントロールの位置とサイズを定義する。
@@ -1639,9 +1687,13 @@ const TITLE_POS_X = 130;
 // タイトルの位置、y座標
 const TITLE_POS_Y = 150;
 // ボタンの位置、x座標
-const BUTTON_POS_X = 370;
+const BUTTON_POS_X = 360;
 // ボタンの位置、y座標
 const BUTTON_POS_Y = [64, 128, 192, 256];
+// ボタンの幅
+const BUTTON_WIDTH = 208;
+// ボタンの高さ
+const BUTTON_HEIGHT = 48;
 /**
  * タイトルのシーン
  */
@@ -1665,7 +1717,7 @@ class TitleScene {
         title.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
         window.debug['title'] = title;
         // ゲームスタートボタンを作成する。
-        const gameStartButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](100, 200)
+        const gameStartButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('GAME START')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
@@ -2063,6 +2115,10 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
+
+
 
 class Button {
     /**
@@ -2073,12 +2129,14 @@ class Button {
     constructor(width, height) {
         // ベース部分を作成する。
         this._base = new phina.display.RectangleShape({
-            width: height,
-            height: width,
+            width: width + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
+            height: height + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
             fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].BACK_COLOR,
             strokeWidth: 0,
             padding: 0,
         });
+        // 枠を作成する。
+        this._createFrames(width, height);
         // ラベルを作成する。
         this._label = new phina.display.Label({
             text: '',
@@ -2134,6 +2192,71 @@ class Button {
     setLabel(label) {
         this._label.text = label;
         return this;
+    }
+    /**
+     * ボタンの枠の部分を作成する。
+     * @param width 幅
+     * @param height 高さ
+     */
+    _createFrames(width, height) {
+        // フレーム1個分のサイズを取得する。
+        const FrameSize = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
+        for (let x = -width / 2; x <= width / 2; x += FrameSize) {
+            for (let y = -height / 2; y <= height / 2; y += FrameSize) {
+                // 一番上
+                if (y === -height / 2) {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, 'buttonTopLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        this._createFrame(x, y, 'buttonTop');
+                    }
+                    else {
+                        this._createFrame(x, y, 'buttonTopRight');
+                    }
+                }
+                else if (y + FrameSize <= height / 2) {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, 'buttonLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        // 上下左右真ん中部分は画像無し。
+                    }
+                    else {
+                        this._createFrame(x, y, 'buttonRight');
+                    }
+                }
+                else {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, 'buttonBottomLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        this._createFrame(x, y, 'buttonBottom');
+                    }
+                    else {
+                        this._createFrame(x, y, 'buttonBottomRight');
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 枠の画像を読み込み、ベースに配置する。
+     * @param x x座標
+     * @param y y座標
+     * @param type 枠のタイプ
+     */
+    _createFrame(x, y, type) {
+        // 枠の画像を読み込む。
+        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
+        frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
+        frame.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
+        frame.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
+        frame.addChildTo(this._base)
+            .setPosition(x, y);
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Button);

@@ -104,6 +104,54 @@ const cs = {
         width: 8,
         height: 8,
     },
+    buttonTopLeft: {
+        x: 144,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonTop: {
+        x: 152,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonTopRight: {
+        x: 160,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonLeft: {
+        x: 144,
+        y: 40,
+        width: 8,
+        height: 8,
+    },
+    buttonRight: {
+        x: 160,
+        y: 40,
+        width: 8,
+        height: 8,
+    },
+    buttonBottomLeft: {
+        x: 144,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
+    buttonBottom: {
+        x: 152,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
+    buttonBottomRight: {
+        x: 160,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
 };
 /**
  * control.png内のコントロールの位置とサイズを定義する。
