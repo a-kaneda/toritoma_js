@@ -2,7 +2,13 @@ import Scene from './scene'
 import Button from './button'
 import MainScene from './mainscene.d'
 import PlayinScene from './playingscene'
+import ControlSize from './controlsize'
+import ScreenSize from './screensize'
 
+// タイトルの位置、x座標
+const TITLE_POS_X = 130;
+// タイトルの位置、y座標
+const TITLE_POS_Y = 150;
 // ボタンの位置、x座標
 const BUTTON_POS_X = 370;
 // ボタンの位置、y座標
@@ -30,6 +36,19 @@ class TitleScene implements Scene {
 
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+
+        // タイトルロゴを作成する。
+        const title = new phina.display.Sprite('control', ControlSize.cs.title.width, ControlSize.cs.title.height)
+        .addChildTo(this._rootNode)
+        .setPosition(TITLE_POS_X, TITLE_POS_Y);
+        title.srcRect.set(ControlSize.cs.title.x,
+            ControlSize.cs.title.y,
+            ControlSize.cs.title.width,
+            ControlSize.cs.title.height);
+        title.scaleX = ScreenSize.ZOOM_RATIO;
+        title.scaleY = ScreenSize.ZOOM_RATIO;
+
+        window.debug['title'] = title;
 
         // ゲームスタートボタンを作成する。
         const gameStartButton = new Button(100, 200)

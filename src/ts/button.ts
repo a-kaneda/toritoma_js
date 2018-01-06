@@ -41,7 +41,6 @@ class Button {
         
         // タッチ開始イベントのハンドラを作成する。
         this._base.on('pointstart', (event: Event) => {
-            console.log(this._handler);
             if (this._handler !== null) {
                 this._handler();
             }

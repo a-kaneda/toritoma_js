@@ -245,6 +245,133 @@ class Character {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/**
+ * コントロールサイズ
+ */
+const cs = {
+    title: {
+        x: 0,
+        y: 0,
+        width: 128,
+        height: 112,
+    },
+    chickenGaugeEmpty: {
+        x: 0,
+        y: 112,
+        width: 128,
+        height: 8,
+    },
+    chickenGaugeFull: {
+        x: 0,
+        y: 120,
+        width: 128,
+        height: 8,
+    },
+    bossLifeGaugeEmpty: {
+        x: 128,
+        y: 0,
+        width: 8,
+        height: 96,
+    },
+    bossLifeGaugeFull: {
+        x: 136,
+        y: 0,
+        width: 8,
+        height: 96,
+    },
+    shieldButtonOff: {
+        x: 144,
+        y: 0,
+        width: 32,
+        height: 32,
+    },
+    shieldButtonOn: {
+        x: 176,
+        y: 0,
+        width: 32,
+        height: 32,
+    },
+    frameBack: {
+        x: 208,
+        y: 0,
+        width: 16,
+        height: 16,
+    },
+    frameLeftTop: {
+        x: 224,
+        y: 0,
+        width: 4,
+        height: 4,
+    },
+    frameTop: {
+        x: 228,
+        y: 0,
+        width: 4,
+        height: 4,
+    },
+    frameRightTop: {
+        x: 232,
+        y: 0,
+        width: 4,
+        height: 4,
+    },
+    frameLeft: {
+        x: 224,
+        y: 4,
+        width: 4,
+        height: 4,
+    },
+    frameRight: {
+        x: 232,
+        y: 4,
+        width: 4,
+        height: 4,
+    },
+    frameBottomLeft: {
+        x: 224,
+        y: 8,
+        width: 4,
+        height: 4,
+    },
+    frameBottom: {
+        x: 228,
+        y: 8,
+        width: 4,
+        height: 4,
+    },
+    frameBottomRight: {
+        x: 232,
+        y: 8,
+        width: 4,
+        height: 4,
+    },
+    life: {
+        x: 240,
+        y: 0,
+        width: 8,
+        height: 8,
+    },
+};
+/**
+ * control.png内のコントロールの位置とサイズを定義する。
+ */
+class ControlSize {
+    /**
+     * control.png内のコントロールの位置とサイズ。
+     */
+    static get cs() {
+        return cs;
+    }
+}
+;
+/* harmony default export */ __webpack_exports__["a"] = (ControlSize);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 
@@ -763,132 +890,11 @@ class Collider {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/**
- * コントロールサイズ
- */
-const cs = {
-    chickenGaugeEmpty: {
-        x: 0,
-        y: 0,
-        width: 128,
-        height: 8,
-    },
-    chickenGaugeFull: {
-        x: 0,
-        y: 8,
-        width: 128,
-        height: 8,
-    },
-    bossLifeGaugeEmpty: {
-        x: 0,
-        y: 16,
-        width: 8,
-        height: 96,
-    },
-    bossLifeGaugeFull: {
-        x: 8,
-        y: 16,
-        width: 8,
-        height: 96,
-    },
-    shieldButtonOff: {
-        x: 16,
-        y: 16,
-        width: 32,
-        height: 32,
-    },
-    shieldButtonOn: {
-        x: 48,
-        y: 16,
-        width: 32,
-        height: 32,
-    },
-    frameBack: {
-        x: 80,
-        y: 16,
-        width: 16,
-        height: 16,
-    },
-    frameLeftTop: {
-        x: 96,
-        y: 16,
-        width: 4,
-        height: 4,
-    },
-    frameTop: {
-        x: 100,
-        y: 16,
-        width: 4,
-        height: 4,
-    },
-    frameRightTop: {
-        x: 104,
-        y: 16,
-        width: 4,
-        height: 4,
-    },
-    frameLeft: {
-        x: 96,
-        y: 20,
-        width: 4,
-        height: 4,
-    },
-    frameRight: {
-        x: 104,
-        y: 20,
-        width: 4,
-        height: 4,
-    },
-    frameBottomLeft: {
-        x: 96,
-        y: 24,
-        width: 4,
-        height: 4,
-    },
-    frameBottom: {
-        x: 100,
-        y: 24,
-        width: 4,
-        height: 4,
-    },
-    frameBottomRight: {
-        x: 104,
-        y: 24,
-        width: 4,
-        height: 4,
-    },
-    life: {
-        x: 112,
-        y: 16,
-        width: 8,
-        height: 8,
-    },
-};
-/**
- * control.png内のコントロールの位置とサイズを定義する。
- */
-class ControlSize {
-    /**
-     * control.png内のコントロールの位置とサイズ。
-     */
-    static get cs() {
-        return cs;
-    }
-}
-;
-/* harmony default export */ __webpack_exports__["a"] = (ControlSize);
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
@@ -1050,7 +1056,7 @@ class Enemy {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(3);
 /** @module enemyshot */
 
 
@@ -1327,7 +1333,7 @@ class PointDevice {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /** @module playershot */
 
@@ -1622,8 +1628,16 @@ class Stage {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 
 
+
+
+// タイトルの位置、x座標
+const TITLE_POS_X = 130;
+// タイトルの位置、y座標
+const TITLE_POS_Y = 150;
 // ボタンの位置、x座標
 const BUTTON_POS_X = 370;
 // ボタンの位置、y座標
@@ -1642,6 +1656,14 @@ class TitleScene {
         this._phinaScene = phinaScene;
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        // タイトルロゴを作成する。
+        const title = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height)
+            .addChildTo(this._rootNode)
+            .setPosition(TITLE_POS_X, TITLE_POS_Y);
+        title.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height);
+        title.scaleX = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
+        title.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
+        window.debug['title'] = title;
         // ゲームスタートボタンを作成する。
         const gameStartButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](100, 200)
             .addChildTo(this._rootNode)
@@ -1900,8 +1922,8 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
 
 
 /**
@@ -1915,20 +1937,20 @@ class BossLifeGauge {
         // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
         // 空ゲージの画像を読み込む。
-        this._emptyImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeEmpty.height);
-        this._emptyImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeEmpty.x, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeEmpty.y, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeEmpty.height);
-        this._emptyImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
-        this._emptyImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
+        this._emptyImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.height);
+        this._emptyImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.height);
+        this._emptyImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        this._emptyImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         this._emptyImage.addChildTo(this._base);
         // 満ゲージの画像を読み込む。
-        this._fullImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.height);
-        this._fullImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.x, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.y, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.height);
-        this._fullImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
-        this._fullImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
+        this._fullImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height);
+        this._fullImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height);
+        this._fullImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        this._fullImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         this._fullImage.addChildTo(this._base);
         // 上端を基準にゲージを増減させるため、原点位置を下端に変更する。
         this._fullImage.setOrigin(0.5, 1);
-        this._fullImage.y = __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.height;
+        this._fullImage.y = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height;
     }
     /**
      * ゲージのたまっている比率に応じたスプライト。
@@ -1942,9 +1964,9 @@ class BossLifeGauge {
      */
     set rate(value) {
         // 画像の高さを指定された比率に設定する。
-        this._fullImage.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.height * value);
-        this._fullImage.srcRect.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.height * value);
-        this._fullImage.srcRect.y = __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.y + __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.bossLifeGaugeFull.height - this._fullImage.srcRect.height;
+        this._fullImage.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height * value);
+        this._fullImage.srcRect.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height * value);
+        this._fullImage.srcRect.y = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.y + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height - this._fullImage.srcRect.height;
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (BossLifeGauge);
@@ -2070,7 +2092,6 @@ class Button {
         this._base.setInteractive(true);
         // タッチ開始イベントのハンドラを作成する。
         this._base.on('pointstart', (event) => {
-            console.log(this._handler);
             if (this._handler !== null) {
                 this._handler();
             }
@@ -2124,7 +2145,7 @@ class Button {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(2);
 
 
 /**
@@ -2354,7 +2375,7 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(2);
 /** @module life */
 
 
@@ -2591,7 +2612,7 @@ phina.main(function () {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(24);
@@ -3047,7 +3068,7 @@ class PlayerDeathEffect {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(9);
 /** @module playeroption */
 
@@ -3250,7 +3271,7 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(22);
@@ -4052,7 +4073,7 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize_js__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 /** @module shieldbutton */
 

@@ -1,5 +1,5 @@
-import ScreenSize from './screensize.js';
-import ControlSize from './controlsize.js';
+import ScreenSize from './screensize';
+import ControlSize from './controlsize';
 /**
  * ボスHPゲージの画像を表示する。
  */
