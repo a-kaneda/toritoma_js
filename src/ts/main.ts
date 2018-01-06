@@ -1,7 +1,15 @@
-import PointDevice from './pointdevice.js'
-import ScreenSize from './screensize.js'
-import MyColor from './mycolor.js'
-import PlayingScene from './playingscene.js'
+import PointDevice from './pointdevice'
+import ScreenSize from './screensize'
+import MyColor from './mycolor'
+import TitleScene from './titlescene'
+
+declare global {
+    interface Window {
+        // デバッグ用グローバル変数
+        debug: {[key: string]: any},
+    }
+}
+window.debug = {};
 
 // マウスが接続されているかどうかを調べる。
 PointDevice.checkDeviceType();
@@ -77,7 +85,7 @@ phina.define('LoadingScene', {
         // ロードが進行したときの処理を作成する。
         loader.on('progress', (event: any) => {
             const e = <phina.ProgressEvent>event;
-            
+
             // 進捗率に応じてプログレスバーの幅を広げる。
             progressbar.width = e.progress * this.width;
         });
@@ -105,6 +113,8 @@ phina.define('MainScene', {
      */
     init: function() {
 
+        window.debug['scene'] = this;
+
         // 親クラスのコンストラクタを呼び出す。
         this.superInit({
             width: ScreenSize.SCREEN_WIDTH,
@@ -122,7 +132,7 @@ phina.define('MainScene', {
         phina.asset.SoundManager.setVolumeMusic(0.2);
         
         // 初期シーンを設定する。
-        this.scene = new PlayingScene(this);
+        this.scene = new TitleScene(this);
     },
 
     /**

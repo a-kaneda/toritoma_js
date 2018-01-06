@@ -10,7 +10,8 @@ import ChickenGauge from './chickengauge'
 import BossLifeGauge from './bosslifegauge'
 import ShieldButton from './shieldbutton'
 import CharacterIF from './characterif'
-import Point from './point';
+import Point from './point'
+import Scene from './scene'
 
 // 初期残機
 const INITIAL_LIFE = 2;
@@ -38,7 +39,7 @@ const HIT_PLAYER_SHOT_INTERVAL = 6;
 /**
  * ゲームの各ステージをプレイするメインのシーン。
  */
-class PlayingScene {
+class PlayingScene implements Scene {
 
     /** phina.jsのシーンインスタンス */
     private _phinaScene: phina.display.DisplayScene;

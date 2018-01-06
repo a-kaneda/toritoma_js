@@ -1,7 +1,8 @@
-import PointDevice from './pointdevice.js';
-import ScreenSize from './screensize.js';
-import MyColor from './mycolor.js';
-import PlayingScene from './playingscene.js';
+import PointDevice from './pointdevice';
+import ScreenSize from './screensize';
+import MyColor from './mycolor';
+import TitleScene from './titlescene';
+window.debug = {};
 // マウスが接続されているかどうかを調べる。
 PointDevice.checkDeviceType();
 /**
@@ -68,6 +69,7 @@ phina.define('LoadingScene', {
         // ロードが進行したときの処理を作成する。
         loader.on('progress', (event) => {
             const e = event;
+            // 進捗率に応じてプログレスバーの幅を広げる。
             progressbar.width = e.progress * this.width;
         });
         // ローダーによるロード完了ハンドラを設定する。
@@ -88,6 +90,7 @@ phina.define('MainScene', {
      * コンストラクタ。
      */
     init: function () {
+        window.debug['scene'] = this;
         // 親クラスのコンストラクタを呼び出す。
         this.superInit({
             width: ScreenSize.SCREEN_WIDTH,
@@ -101,7 +104,7 @@ phina.define('MainScene', {
         phina.asset.SoundManager.setVolume(0.5);
         phina.asset.SoundManager.setVolumeMusic(0.2);
         // 初期シーンを設定する。
-        this.scene = new PlayingScene(this);
+        this.scene = new TitleScene(this);
     },
     /**
      * 更新処理。内部のシーン処理の更新処理を実行する。

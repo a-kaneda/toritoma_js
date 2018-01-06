@@ -1,0 +1,68 @@
+import Scene from './scene'
+import Button from './button'
+import MainScene from './mainscene.d'
+import PlayinScene from './playingscene'
+
+// ボタンの位置、x座標
+const BUTTON_POS_X = 370;
+// ボタンの位置、y座標
+const BUTTON_POS_Y = [64, 128, 192, 256];
+
+/**
+ * タイトルのシーン
+ */
+class TitleScene implements Scene {
+
+    /** phina.jsのシーンインスタンス */
+    private _phinaScene: MainScene;
+    /** 全ノードのルート */
+    private _rootNode: phina.display.DisplayElement;
+
+    /**
+     * コンストラクタ。
+     * 各種データの初期化と生成を行う。
+     * @param phinaScene phina.js上のシーンインスタンス
+     */
+    constructor(phinaScene: MainScene) {
+
+        // phina.jsのシーンインスタンスを設定する。
+        this._phinaScene = phinaScene;
+
+        // ルートノードを作成し、シーンに配置する。
+        this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+
+        // ゲームスタートボタンを作成する。
+        const gameStartButton = new Button(100, 200)
+        .addChildTo(this._rootNode)
+        .setLabel('GAME START')
+        .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
+        .setHandler(() => {this._replaceScene('PlayingScene')});
+    }
+
+    /**
+     * 更新処理。
+     * キー入力処理を行う。
+     * @param app アプリケーション
+     */
+    public update(app: phina.game.GameApp): void {
+
+    }
+
+    /**
+     * PlayingSceneにシーンを遷移する。
+     * @param sceneName シーン名
+     */
+    private _replaceScene(sceneName: 'PlayingScene'): void {
+        this._rootNode.remove();
+
+        switch (sceneName) {
+            case 'PlayingScene':
+                this._phinaScene.scene = new PlayinScene(this._phinaScene);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+export default TitleScene;
