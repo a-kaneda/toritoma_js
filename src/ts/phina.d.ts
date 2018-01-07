@@ -19,6 +19,7 @@ declare module phina {
         }
 
         class Object2D extends phina.app.Element {
+            children: phina.app.Element[];
             x: number;
             y: number;
             width: number;

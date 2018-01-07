@@ -2,6 +2,12 @@ import MyColor from './mycolor'
 import ControlSize from './controlsize'
 import ScreenSize from './screensize'
 
+// ボタン選択からハンドラ実行までのインターバル(msec)
+const EXEC_INTERVAL = 500;
+
+/**
+ * ボタン。
+ */
 class Button {
 
     /** ベース部分 */
@@ -46,9 +52,7 @@ class Button {
         
         // タッチ開始イベントのハンドラを作成する。
         this._base.on('pointstart', (event: Event) => {
-            if (this._handler !== null) {
-                this._handler();
-            }
+            this.select();
         });
     }
 
@@ -91,6 +95,35 @@ class Button {
      */
     public setLabel(label: string): this {
         this._label.text = label;
+        return this;
+    }
+
+    /**
+     * ボタン選択時の処理を行う。
+     * @return 自インスタンス
+     */
+    public select(): this {
+
+        // 効果音を鳴らす。
+        phina.asset.SoundManager.play('select');
+
+        // 点滅アニメーションを実行する。
+        // 100ms周期で表示、非表示を切り替える。
+        this._base.tweener.wait(100)
+        .set({ alpha: 0 })
+        .wait(100)
+        .set({ alpha: 1 })
+        .wait(100)
+        .set({ alpha: 0 })
+        .wait(100)
+        .set({ alpha: 1 })
+        .play();
+            
+        // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
+        if (this._handler !== null) {
+            setTimeout(this._handler, EXEC_INTERVAL);
+        }
+
         return this;
     }
 

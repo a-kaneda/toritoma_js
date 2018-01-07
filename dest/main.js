@@ -2120,6 +2120,11 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 
+// ボタン選択からハンドラ実行までのインターバル(msec)
+const EXEC_INTERVAL = 500;
+/**
+ * ボタン。
+ */
 class Button {
     /**
      * コンストラクタ。
@@ -2150,9 +2155,7 @@ class Button {
         this._base.setInteractive(true);
         // タッチ開始イベントのハンドラを作成する。
         this._base.on('pointstart', (event) => {
-            if (this._handler !== null) {
-                this._handler();
-            }
+            this.select();
         });
     }
     /**
@@ -2191,6 +2194,30 @@ class Button {
      */
     setLabel(label) {
         this._label.text = label;
+        return this;
+    }
+    /**
+     * ボタン選択時の処理を行う。
+     * @return 自インスタンス
+     */
+    select() {
+        // 効果音を鳴らす。
+        phina.asset.SoundManager.play('select');
+        // 点滅アニメーションを実行する。
+        // 100ms周期で表示、非表示を切り替える。
+        this._base.tweener.wait(100)
+            .set({ alpha: 0 })
+            .wait(100)
+            .set({ alpha: 1 })
+            .wait(100)
+            .set({ alpha: 0 })
+            .wait(100)
+            .set({ alpha: 1 })
+            .play();
+        // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
+        if (this._handler !== null) {
+            setTimeout(this._handler, EXEC_INTERVAL);
+        }
         return this;
     }
     /**
@@ -2604,6 +2631,7 @@ const ASSETS = {
     sound: {
         'stage1': './sound/stage1.mp3',
         'boss': './sound/boss.mp3',
+        'select': './sound/select.mp3',
         'hit': './sound/hit.mp3',
         'bomb_min': './sound/bomb_min.mp3',
         'miss': './sound/miss.mp3',
