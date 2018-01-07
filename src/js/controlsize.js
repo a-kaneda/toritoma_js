@@ -104,6 +104,12 @@ const cs = {
         width: 8,
         height: 8,
     },
+    cursor: {
+        x: 224,
+        y: 15,
+        width: 22,
+        height: 17,
+    },
     buttonTopLeft: {
         x: 144,
         y: 32,

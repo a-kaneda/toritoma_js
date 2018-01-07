@@ -15,7 +15,11 @@ class Button {
     /** ラベル */
     private _label: phina.display.Label;
     /** イベントハンドラ */
-    private _handler: null | (() => void);
+    private _handler: (() => void) | null;
+    /** 有効無効取得関数 */
+    private _isDisable: (() => boolean) | null;
+    /** 有効無効設定関数 */
+    private _setDisable: ((value: boolean) => void) | null;
 
     /**
      * コンストラクタ。
@@ -39,13 +43,19 @@ class Button {
         // ラベルを作成する。
         this._label = new phina.display.Label({
             text: '',
-            fontSize: 32,
+            fontSize: 24,
             fill: MyColor.FORE_COLOR,
             fontFamily: 'noto',
         }).addChildTo(this._base);
 
         // イベントハンドラを初期化する。
         this._handler = null;
+
+        // 有効無効判定関数を初期化する。
+        this._isDisable = null;
+
+        // 有効無効設定関数を初期化する。
+        this._setDisable = null;
 
         // タッチ操作を有効にする。
         this._base.setInteractive(true);
@@ -99,10 +109,31 @@ class Button {
     }
 
     /**
+     * 有効無効に関する関数を設定する。
+     * @param isDiable 有効無効判定関数
+     * @param setDisable 有効無効設定関数
+     */
+    public setDisableFunc(isDiable: () => boolean, setDisable: (value: boolean) => void): this {
+        this._isDisable = isDiable;
+        this._setDisable = setDisable;
+        return this;
+    }
+
+    /**
      * ボタン選択時の処理を行う。
      * @return 自インスタンス
      */
     public select(): this {
+
+        // 無効な状態に設定されている場合は何も処理をしない。
+        if (this._isDisable !== null && this._isDisable()) {
+            return this;
+        }
+
+        // 実行中は入力を無効化する。
+        if (this._setDisable !== null) {
+            this._setDisable(true);
+        }
 
         // 効果音を鳴らす。
         phina.asset.SoundManager.play('select');

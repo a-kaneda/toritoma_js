@@ -34,6 +34,7 @@ const ASSETS = {
         'stage1': './sound/stage1.mp3',
         'boss': './sound/boss.mp3',
         'select': './sound/select.mp3',
+        'cursor': './sound/cursor.mp3',
         'hit': './sound/hit.mp3',
         'bomb_min': './sound/bomb_min.mp3',
         'miss': './sound/miss.mp3',
