@@ -2860,7 +2860,7 @@ phina.define('LoadingScene', {
         // 進捗バーを作成する。
         const progressbar = new phina.display.RectangleShape({
             height: 20,
-            width: 0,
+            width: 1,
             fill: __WEBPACK_IMPORTED_MODULE_2__mycolor__["a" /* default */].FORE_COLOR,
             strokeWidth: 0,
             padding: 0,
@@ -2874,7 +2874,15 @@ phina.define('LoadingScene', {
         loader.on('progress', (event) => {
             const e = event;
             // 進捗率に応じてプログレスバーの幅を広げる。
-            progressbar.width = e.progress * this.width;
+            // 進捗が0以下の場合は幅を1にする。
+            // chromeだと問題ないが、safariでdrawImageの幅を0にすると
+            // InvalidStateError DOM Exception 11が発生するため。
+            if (e.progress <= 0) {
+                progressbar.width = 1;
+            }
+            else {
+                progressbar.width = e.progress * this.width;
+            }
         });
         // ローダーによるロード完了ハンドラを設定する。
         loader.on('load', () => {
