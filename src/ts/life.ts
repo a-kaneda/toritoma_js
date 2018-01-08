@@ -50,8 +50,10 @@ class Life {
         this._image.addChildTo(this._base);
 
         // ラベルを作成する。
+        // ':00'の形式で表示すると、なぜかiPadのsafariで見ると十の位の0の右側にごみが表示されるため、
+        // 後ろにブランクを付ける。
         this._label = new phina.display.Label({
-            text: ':00',
+            text: ':00 ',
             fontSize: 20,
             fill: MyColor.FORE_COLOR,
             fontFamily: 'noto',
@@ -84,7 +86,9 @@ class Life {
         }
 
         // ラベルの表示文字列を変更する。
-        this._label.text = ':' + ('00' + this._life).slice(-2);
+        // ':00'の形式で表示すると、なぜかiPadのsafariで見ると十の位の0の右側にごみが表示されるため、
+        // 後ろにブランクを付ける。
+        this._label.text = ':' + ('00' + this._life).slice(-2) + ' ';
     }
 }
 

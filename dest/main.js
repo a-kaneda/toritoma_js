@@ -2818,8 +2818,10 @@ class Life {
         this._image.x = IMAGE_POS_X;
         this._image.addChildTo(this._base);
         // ラベルを作成する。
+        // ':00'の形式で表示すると、なぜかiPadのsafariで見ると十の位の0の右側にごみが表示されるため、
+        // 後ろにブランクを付ける。
         this._label = new phina.display.Label({
-            text: ':00',
+            text: ':00 ',
             fontSize: 20,
             fill: __WEBPACK_IMPORTED_MODULE_0__mycolor_js__["a" /* default */].FORE_COLOR,
             fontFamily: 'noto',
@@ -2846,7 +2848,9 @@ class Life {
             this._life = MAX_LIFE;
         }
         // ラベルの表示文字列を変更する。
-        this._label.text = ':' + ('00' + this._life).slice(-2);
+        // ':00'の形式で表示すると、なぜかiPadのsafariで見ると十の位の0の右側にごみが表示されるため、
+        // 後ろにブランクを付ける。
+        this._label.text = ':' + ('00' + this._life).slice(-2) + ' ';
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Life);
