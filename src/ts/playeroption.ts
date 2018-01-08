@@ -134,6 +134,24 @@ class PlayerOption implements CharacterIF {
     }
 
     /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    public pauseAnimation(): this {
+        this._animation.paused = true;
+        return this;
+    }
+
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    public startAnimation(): this {
+        this._animation.paused = false;
+        return this;
+    }
+
+    /**
      * 指定された座標へ移動する。
      * ただし、すぐに移動するのではなく、OPTION_SPACEの間隔分遅れて移動する。
      * オプションが他に存在する場合は、移動前の座標に対して移動を指示する。

@@ -237,6 +237,24 @@ class Player implements CharacterIF {
     }
 
     /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    public pauseAnimation(): this {
+        this._animation.paused = true;
+        return this;
+    }
+
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    public startAnimation(): this {
+        this._animation.paused = false;
+        return this;
+    }
+
+    /**
      * キーボードの左キー入力による移動処理を行う。
      * @param scene シーン
      */

@@ -27,13 +27,11 @@ class TitleScene {
      * 各種データの初期化と生成を行う。
      * @param phinaScene phina.js上のシーンインスタンス
      */
-    constructor(phinaScene) {
+    constructor(phinaScene, gamepadManager) {
         // phina.jsのシーンインスタンスを設定する。
         this._phinaScene = phinaScene;
-        // ゲームパッドマネージャーを作成する。
-        this._gamepadManager = new phina.input.GamepadManager();
-        // ゲームパッドを取得する。
-        this._gamepad = this._gamepadManager.get(0);
+        // ゲームパッドマネージャーを設定する。
+        this._gamepadManager = gamepadManager;
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // タイトルロゴを作成する。
@@ -108,7 +106,7 @@ class TitleScene {
         this._rootNode.remove();
         switch (sceneName) {
             case 'PlayingScene':
-                this._phinaScene.scene = new PlayinScene(this._phinaScene);
+                this._phinaScene.scene = new PlayinScene(this._phinaScene, this._gamepadManager);
                 break;
             default:
                 break;
@@ -151,7 +149,7 @@ class TitleScene {
             this._isDownInputKeyboard = false;
         }
         // zキーが押されている場合
-        if (key.getKey('z')) {
+        if (key.getKeyDown('z')) {
             // 選択中のボタンを実行する。
             this._execButton();
         }
@@ -165,7 +163,7 @@ class TitleScene {
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
         // アナログスティックの入力を取得する。
-        const stick = this._gamepad.getStickDirection(0);
+        const stick = gamepad.getStickDirection(0);
         // 上キーが押されている場合
         if (stick.y < -0.5) {
             // 前回上キーが押されていなければ処理を行う。。
@@ -195,7 +193,7 @@ class TitleScene {
             this._isDownInputGamepad = false;
         }
         // Aボタンでシールドを使用する。
-        if (gamepad.getKey('a')) {
+        if (gamepad.getKeyDown('a')) {
             // 選択中のボタンを実行する。
             this._execButton();
         }

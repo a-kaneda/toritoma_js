@@ -44,9 +44,11 @@ class ShieldButton {
         this._button.addChildTo(this._base);
         // タッチ開始イベントのハンドラを作成する。
         this._button.on('pointstart', (event) => {
-            this._touch = true;
-            this._offImage.alpha = 0;
-            this._onImage.alpha = 1;
+            if (this._enable) {
+                this._touch = true;
+                this._offImage.alpha = 0;
+                this._onImage.alpha = 1;
+            }
         });
         // タッチ終了イベントのハンドラを作成する。
         this._button.on('pointend', (event) => {
@@ -66,6 +68,16 @@ class ShieldButton {
     /** タッチされているかどうか。 */
     get isTouch() {
         return this._touch;
+    }
+    /** 有効かどうか */
+    set enable(value) {
+        this._enable = value;
+        // 無効にした場合はタッチしていない状態にする。
+        if (!this._enable) {
+            this._touch = false;
+            this._offImage.alpha = 1;
+            this._onImage.alpha = 0;
+        }
     }
 }
 export default ShieldButton;

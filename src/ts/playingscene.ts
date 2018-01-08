@@ -12,6 +12,8 @@ import ShieldButton from './shieldbutton'
 import CharacterIF from './characterif'
 import Point from './point'
 import Scene from './scene'
+import TitleScene from './titlescene'
+import MainScene from './mainscene.d'
 
 // 初期残機
 const INITIAL_LIFE = 2;
@@ -35,6 +37,15 @@ const BOSS_LIFE_GAUGE_POS_X = 360;
 const BOSS_LIFE_GAUGE_POS_Y = 144;
 // 自機弾衝突音発生間隔
 const HIT_PLAYER_SHOT_INTERVAL = 6;
+// ゲームオーバー時の待機時間（msec）
+const GAMEOVER_INTERVAL = 1000;
+
+// シーンの状態
+enum SCENE_STATE {
+    PLAYING,
+    WAIT,
+    GAMEOVER,
+}
 
 /**
  * ゲームの各ステージをプレイするメインのシーン。
@@ -42,11 +53,11 @@ const HIT_PLAYER_SHOT_INTERVAL = 6;
 class PlayingScene implements Scene {
 
     /** phina.jsのシーンインスタンス */
-    private _phinaScene: phina.display.DisplayScene;
+    private _phinaScene: MainScene;
     /** ゲームパッドマネージャー。 */
     private _gamepadManager: phina.input.GamepadManager;
-    /** ゲームパッド。 */
-    private _gamepad: phina.input.Gamepad;
+    /** 全ノードのルート */
+    private _rootNode: phina.display.DisplayElement;
     /** 背景レイヤー。 */
     private _backgroundLayer: phina.display.DisplayElement;
     /** キャラクターレイヤー。 */
@@ -87,50 +98,52 @@ class PlayingScene implements Scene {
     private _isHitPlayerShot: boolean;
     /** 自機弾衝突音発生間隔 */
     private _hitPlayerShotInterval: number;
+    /** シーンの状態 */
+    private _state: SCENE_STATE;
 
     /**
      * コンストラクタ。
      * 各種データの初期化と生成を行う。
      * @param phinaScene phina.js上のシーンインスタンス
      */
-    constructor(phinaScene: phina.display.DisplayScene) {
+    constructor(phinaScene: MainScene, gamepadManager: phina.input.GamepadManager) {
 
         // phina.jsのシーンインスタンスを設定する。
         this._phinaScene = phinaScene;
 
-        // ゲームパッドマネージャーを作成する。
-        this._gamepadManager = new phina.input.GamepadManager();
+        // ゲームパッドマネージャーを設定する。
+        this._gamepadManager = gamepadManager;
 
-        // ゲームパッドを取得する。
-        this._gamepad = this._gamepadManager.get(0);
+        // ルートノードを作成し、シーンに配置する。
+        this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
 
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
 
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,
-                                         ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
+            ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this._backgroundLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._backgroundLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // キャラクターレイヤーを作成する。
-        this._characterLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._characterLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
 
         // キャラクターレイヤーの位置、サイズを設定する。
         this._characterLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,
-                                        ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
+            ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this._characterLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._characterLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // 枠レイヤーを作成する。
-        this._frameLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._frameLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
 
         // 枠レイヤーの位置、サイズを設定する。
         this._frameLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._frameLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // 情報レイヤーを作成する。
-        this._infoLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._infoLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
 
         // ステージの外枠を作成する。
         this._createFrame();
@@ -205,8 +218,8 @@ class PlayingScene implements Scene {
 
         // 自機を作成する。
         this._player = new Player(Math.round(ScreenSize.STAGE_RECT.width / 4),
-                                  Math.round(ScreenSize.STAGE_RECT.height / 2),
-                                  this);
+            Math.round(ScreenSize.STAGE_RECT.height / 2),
+            this);
 
         // タッチ情報を初期化する。
         this._touch = {id: -1, x:0, y:0};
@@ -216,6 +229,9 @@ class PlayingScene implements Scene {
 
         // 自機弾衝突音発生間隔を初期化する。
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
+
+        // 初期状態はプレイ中とする。
+        this._state = SCENE_STATE.PLAYING;
     }
 
     /**
@@ -226,51 +242,16 @@ class PlayingScene implements Scene {
      */
     public update(app: phina.game.GameApp): void {
 
-        // ボタン入力状態を初期化する。
-        this._inputShieldButton = false;
+        // 入力処理を行う。
+        this._input(app);
 
-        // キーボード入力を行う。
-        this._inputKeyboard(app);
+        // プレイ中、待機中の場合
+        if (this._state === SCENE_STATE.PLAYING ||
+            this._state === SCENE_STATE.WAIT) {
 
-        // タッチ入力を行う。
-        this._inputTouch(app);
-
-        // ゲームパッド入力を行う。
-        this._inputGamepad();
-
-        // シールドボタン入力状態に応じて自機の状態を変化させる。
-        if (this._inputShieldButton) {
-            this._player.shield = true;
+            // ステージやキャラクターの状態を更新する。
+            this._updateStageData();
         }
-        else {
-            this._player.shield = false;
-        }
-
-        // ステージの状態を更新する。
-        this._stage.update(this);
-
-        // プレイヤーの状態を更新する。
-        this._player.update(this);
-
-        // 自機弾衝突フラグを初期化する。
-        this._isHitPlayerShot = false;
-
-        // 各キャラクターの状態を更新する。
-        for (let i = 0; i < this._characters.length; i++) {
-            this._characters[i].update(this);
-        }
-
-        // 自機弾が衝突した場合はSEを鳴らす。
-        // 連続で音が鳴らないように音を鳴らしたときは自機音衝突間隔を初期化して、
-        // 規定フレーム分経過するまで次の音が鳴らないようにする。
-        this._hitPlayerShotInterval++;
-        if (this._isHitPlayerShot && this._hitPlayerShotInterval > HIT_PLAYER_SHOT_INTERVAL) {
-            phina.asset.SoundManager.play('hit');
-            this._hitPlayerShotInterval = 0;
-        }
-
-        // 自機復活処理を行う。
-        this._rebirthPlayer();
 
         // チキンゲージ表示を更新する。
         this._chickenGauge.rate = this._player.chickenGauge;
@@ -385,6 +366,21 @@ class PlayingScene implements Scene {
         }
         // 残機が残っていない場合
         else {
+
+            // 状態を待機中に変更する。
+            this._state = SCENE_STATE.WAIT;
+
+            // シールドボタンを無効化する。
+            this._shieldButton.enable = false;
+
+            // BGMを停止する。
+            phina.asset.SoundManager.stopMusic();
+
+            // キャラクターのアニメーションを停止する。
+            this._stopCharacterAnimation();
+
+            // 一定時間後にゲームオーバー状態に遷移する。
+            setTimeout(() => {this._gameOver()}, GAMEOVER_INTERVAL);
         }
     }
 
@@ -402,6 +398,74 @@ class PlayingScene implements Scene {
         else {
             return false;
         }
+    }
+
+    /**
+     * 入力処理を行う。
+     * @param app アプリケーション
+     */
+    private _input(app: phina.game.GameApp): void {
+
+        // 状態に応じて入力処理を振り分ける。
+        switch (this._state) {
+            case SCENE_STATE.PLAYING:
+                this._inputOnPlaying(app);
+                break;
+            case SCENE_STATE.GAMEOVER:
+                this._inputOnGameOver(app);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * プレイ中の入力処理を行う。
+     * @param app アプリケーション
+     */
+    private _inputOnPlaying(app: phina.game.GameApp): void {
+
+        // ボタン入力状態を初期化する。
+        this._inputShieldButton = false;
+
+        // キーボード入力を行う。
+        this._inputKeyboard(app);
+
+        // タッチ入力を行う。
+        this._inputTouch(app);
+
+        // ゲームパッド入力を行う。
+        this._inputGamepad();
+
+        // シールドボタン入力状態に応じて自機の状態を変化させる。
+        if (this._inputShieldButton) {
+            this._player.shield = true;
+        }
+        else {
+            this._player.shield = false;
+        }
+    }
+
+    /**
+     * ゲームオーバー時の入力処理を行う。
+     * @param app アプリケーション
+     */
+    private _inputOnGameOver(app: phina.game.GameApp): void {
+
+        // キーボードを取得する。
+        const key = app.keyboard;
+
+        // ゲームパッドの状態を更新する。
+        this._gamepadManager.update();
+
+        // ゲームパッドを取得する。
+        const gamepad = this._gamepadManager.get();
+
+        // キーボードのzキーか、ゲームパッドのAボタンでタイトル画面に戻る。
+        if (key.getKeyDown('z') || gamepad.getKeyDown('a')) {
+            this._replaceScene();
+        }
+
     }
 
     /**
@@ -492,7 +556,7 @@ class PlayingScene implements Scene {
         const gamepad = this._gamepadManager.get();
 
         // アナログスティックの入力を取得する。
-        const stick = this._gamepad.getStickDirection(0);
+        const stick = gamepad.getStickDirection(0);
 
         // アナログスティックの入力値が閾値を超えている場合は移動する。
         if (stick.length() > 0.5) {
@@ -726,6 +790,101 @@ class PlayingScene implements Scene {
                 character.remove(this);
             }
         }
+    }
+
+    /**
+     * ゲームオーバー処理を行う。
+     */
+    private _gameOver(): void {
+
+        // 状態をゲームオーバーに遷移する。
+        this._state = SCENE_STATE.GAMEOVER;
+
+        // ゲームオーバーのラベルを画面に配置する。
+        const gameOverLabel = new phina.display.Label({
+            text: 'GAME OVER',
+            fontSize: 36,
+            backgroundColor: MyColor.BACK_COLOR,
+            fill: MyColor.FORE_COLOR,
+            fontFamily: 'noto',
+            x: Math.round(this._phinaScene.gridX.center()),
+            y: Math.round(this._phinaScene.gridY.center()),
+            strokeWidth: 0,
+            padding: 0,
+        }).addChildTo(this._infoLayer);
+
+        // 画面全体にタイトルへ戻るボタンを配置する。
+        const backButton = new phina.display.DisplayElement({
+            width: ScreenSize.SCREEN_WIDTH,
+            height: ScreenSize.SCREEN_HEIGHT,
+            x: ScreenSize.SCREEN_WIDTH / 2,
+            y: ScreenSize.SCREEN_HEIGHT / 2,
+        })
+        .addChildTo(this._infoLayer)
+        .setInteractive(true)
+        .on('pointstart', (event: Event) => {
+            this._replaceScene();
+        });
+    }
+
+    /**
+     * ステージやキャラクターの状態を更新する。
+     */
+    private _updateStageData(): void {
+
+        // ステージの状態を更新する。
+        this._stage.update(this);
+
+        // プレイヤーの状態を更新する。
+        this._player.update(this);
+
+        // 自機弾衝突フラグを初期化する。
+        this._isHitPlayerShot = false;
+
+        // 各キャラクターの状態を更新する。
+        for (let i = 0; i < this._characters.length; i++) {
+            this._characters[i].update(this);
+        }
+
+        // 自機弾が衝突した場合はSEを鳴らす。
+        // 連続で音が鳴らないように音を鳴らしたときは自機音衝突間隔を初期化して、
+        // 規定フレーム分経過するまで次の音が鳴らないようにする。
+        this._hitPlayerShotInterval++;
+        if (this._isHitPlayerShot && this._hitPlayerShotInterval > HIT_PLAYER_SHOT_INTERVAL) {
+            phina.asset.SoundManager.play('hit');
+            this._hitPlayerShotInterval = 0;
+        }
+
+        // 自機復活処理を行う。
+        this._rebirthPlayer();
+    }
+
+    /**
+     * キャラクターのアニメーションを停止する。
+     */
+    private _stopCharacterAnimation(): void {
+
+        for (let character of this._characters) {
+            character.pauseAnimation();
+        }
+    }
+
+    /**
+     * キャラクターのアニメーションを開始する。
+     */
+    private _startCharacterAnimation(): void {
+
+        for (let character of this._characters) {
+            character.startAnimation();
+        }
+    }
+
+    /**
+     * タイトルシーンへと切り替える。
+     */
+    private _replaceScene(): void {
+        this._rootNode.remove();
+        this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
     }
 }
 

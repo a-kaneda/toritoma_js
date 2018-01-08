@@ -426,7 +426,7 @@ class ControlSize {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 
 
@@ -1030,6 +1030,22 @@ class Enemy {
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
+    /**
      * 攻撃処理。
      * このキャラクターへの攻撃を処理する。
      * 指定した攻撃力 - 防御力をダメージとしてHPから引く。
@@ -1241,6 +1257,22 @@ class EnemyShot {
         }
     }
     /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
+    /**
      * 削除する。
      * @param scene シーン
      */
@@ -1386,6 +1418,250 @@ class PointDevice {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
+
+
+
+
+// タイトルの位置、x座標
+const TITLE_POS_X = 130;
+// タイトルの位置、y座標
+const TITLE_POS_Y = 150;
+// ボタンの位置、x座標
+const BUTTON_POS_X = 360;
+// ボタンの位置、y座標
+const BUTTON_POS_Y = [80, 160, 240];
+// ボタンの幅
+const BUTTON_WIDTH = 176;
+// ボタンの高さ
+const BUTTON_HEIGHT = 32;
+// カーソルの位置、x座標
+const CURSOR_POS_X = 256;
+// ボタンの数
+const BUTTON_NUM = 3;
+/**
+ * タイトルのシーン
+ */
+class TitleScene {
+    /**
+     * コンストラクタ。
+     * 各種データの初期化と生成を行う。
+     * @param phinaScene phina.js上のシーンインスタンス
+     */
+    constructor(phinaScene, gamepadManager) {
+        // phina.jsのシーンインスタンスを設定する。
+        this._phinaScene = phinaScene;
+        // ゲームパッドマネージャーを設定する。
+        this._gamepadManager = gamepadManager;
+        // ルートノードを作成し、シーンに配置する。
+        this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        // タイトルロゴを作成する。
+        const title = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height)
+            .addChildTo(this._rootNode)
+            .setPosition(TITLE_POS_X, TITLE_POS_Y);
+        title.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height);
+        title.scaleX = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
+        title.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
+        // ボタン配列を作成する。
+        this._buttons = [];
+        // ゲームスタートボタンを作成する。
+        const gameStartButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+            .addChildTo(this._rootNode)
+            .setLabel('GAME START')
+            .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
+            .setHandler(() => { this._replaceScene('PlayingScene'); })
+            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+        this._buttons.push(gameStartButton);
+        // 遊び方説明ボタンを作成する。
+        const howToPlayButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+            .addChildTo(this._rootNode)
+            .setLabel('HOW TO PLAY')
+            .setPosition(BUTTON_POS_X, BUTTON_POS_Y[1])
+            .setHandler(() => { this._replaceScene('HowToPlayScene'); })
+            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+        this._buttons.push(howToPlayButton);
+        // クレジットボタンを作成する。
+        const creditButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+            .addChildTo(this._rootNode)
+            .setLabel('CREDIT')
+            .setPosition(BUTTON_POS_X, BUTTON_POS_Y[2])
+            .setHandler(() => { this._replaceScene('CreditScene'); })
+            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+        this._buttons.push(creditButton);
+        // カーソルを作成する。
+        this._cursor = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.height)
+            .addChildTo(this._rootNode)
+            .setPosition(CURSOR_POS_X, BUTTON_POS_Y[0]);
+        this._cursor.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.height);
+        this._cursor.scaleX = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
+        this._cursor.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
+        // 初期選択ボタンは1個目とする。
+        this._selectButton = 0;
+        // 入力内容を初期化する。
+        this._isUpInputKeyboard = false;
+        this._isDownInputKeyboard = false;
+        this._isUpInputGamepad = false;
+        this._isDownInputGamepad = false;
+        // 初期状態は入力は有効とする。
+        this._disableInput = false;
+    }
+    /**
+     * 更新処理。
+     * キー入力処理を行う。
+     * @param app アプリケーション
+     */
+    update(app) {
+        // 入力が無効になっていない場合
+        if (!this._disableInput) {
+            // キーボードの入力処理を行う。
+            this._inputKeyboard(app);
+            // ゲームパッドの入力処理を行う。。
+            this._inputGamepad();
+        }
+    }
+    /**
+     * PlayingSceneにシーンを遷移する。
+     * @param sceneName シーン名
+     */
+    _replaceScene(sceneName) {
+        this._rootNode.remove();
+        switch (sceneName) {
+            case 'PlayingScene':
+                this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_1__playingscene__["a" /* default */](this._phinaScene, this._gamepadManager);
+                break;
+            default:
+                break;
+        }
+    }
+    /**
+     * キーボードの入力処理を行う。
+     * 上下キーでカーソルを移動し、zキーでボタンを選択する。
+     * @param app アプリケーション
+     */
+    _inputKeyboard(app) {
+        // キーボードを取得する。
+        const key = app.keyboard;
+        // 上キーが押されている場合
+        if (key.getKey('up')) {
+            // 前回上キーが押されていなければ処理を行う。。
+            if (!this._isUpInputKeyboard) {
+                // カーソルを移動する。
+                this._moveCursor(this._selectButton - 1);
+            }
+            // 上キーが押されたことを記憶する。
+            this._isUpInputKeyboard = true;
+        }
+        else {
+            // 上キーが押されていない状態にする。
+            this._isUpInputKeyboard = false;
+        }
+        // 下キーが押されている場合
+        if (key.getKey('down')) {
+            // 前回下キーが押されていなければ処理を行う。。
+            if (!this._isDownInputKeyboard) {
+                // カーソルを移動する。
+                this._moveCursor(this._selectButton + 1);
+            }
+            // 下キーが押されたことを記憶する。
+            this._isDownInputKeyboard = true;
+        }
+        else {
+            // 下キーが押されていない状態にする。
+            this._isDownInputKeyboard = false;
+        }
+        // zキーが押されている場合
+        if (key.getKeyDown('z')) {
+            // 選択中のボタンを実行する。
+            this._execButton();
+        }
+    }
+    /**
+     * ゲームパッドの入力処理を行う。
+     */
+    _inputGamepad() {
+        // ゲームパッドの状態を更新する。
+        this._gamepadManager.update();
+        // ゲームパッドを取得する。
+        const gamepad = this._gamepadManager.get();
+        // アナログスティックの入力を取得する。
+        const stick = gamepad.getStickDirection(0);
+        // 上キーが押されている場合
+        if (stick.y < -0.5) {
+            // 前回上キーが押されていなければ処理を行う。。
+            if (!this._isUpInputGamepad) {
+                // カーソルを移動する。
+                this._moveCursor(this._selectButton - 1);
+            }
+            // 上キーが押されたことを記憶する。
+            this._isUpInputGamepad = true;
+        }
+        else {
+            // 上キーが押されていない状態にする。
+            this._isUpInputGamepad = false;
+        }
+        // 下キーが押されている場合
+        if (stick.y > 0.5) {
+            // 前回下キーが押されていなければ処理を行う。。
+            if (!this._isDownInputGamepad) {
+                // カーソルを移動する。
+                this._moveCursor(this._selectButton + 1);
+            }
+            // 下キーが押されたことを記憶する。
+            this._isDownInputGamepad = true;
+        }
+        else {
+            // 下キーが押されていない状態にする。
+            this._isDownInputGamepad = false;
+        }
+        // Aボタンでシールドを使用する。
+        if (gamepad.getKeyDown('a')) {
+            // 選択中のボタンを実行する。
+            this._execButton();
+        }
+    }
+    /**
+     * カーソルを移動する。
+     * 一番上から上に移動しようとした場合は一番下に移動する。
+     * 一番下から下に移動しようとした場合は一番上に移動する。
+     * @param selectButton 選択するボタンのインデックス
+     */
+    _moveCursor(selectButton) {
+        // 最小値未満の場合は最大値に変える。
+        if (selectButton < 0) {
+            selectButton = BUTTON_NUM - 1;
+        }
+        // 最大値超過の場合は最小値にする。
+        if (selectButton >= BUTTON_NUM) {
+            selectButton = 0;
+        }
+        // メンバ変数の値を変える。
+        this._selectButton = selectButton;
+        // カーソルの位置を変える。
+        this._cursor.y = BUTTON_POS_Y[this._selectButton];
+        // 効果音を鳴らす。
+        phina.asset.SoundManager.play('cursor');
+    }
+    /**
+     * 選択中のボタンを実行する。
+     */
+    _execButton() {
+        // 選択中のボタンを実行する。
+        this._buttons[this._selectButton].select();
+        // 入力を無効化する。
+        this._disableInput = true;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (TitleScene);
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
@@ -1487,12 +1763,28 @@ class PlayerShot {
             return;
         }
     }
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (PlayerShot);
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1673,252 +1965,6 @@ class Stage {
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Stage);
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
-
-
-
-
-// タイトルの位置、x座標
-const TITLE_POS_X = 130;
-// タイトルの位置、y座標
-const TITLE_POS_Y = 150;
-// ボタンの位置、x座標
-const BUTTON_POS_X = 360;
-// ボタンの位置、y座標
-const BUTTON_POS_Y = [80, 160, 240];
-// ボタンの幅
-const BUTTON_WIDTH = 176;
-// ボタンの高さ
-const BUTTON_HEIGHT = 32;
-// カーソルの位置、x座標
-const CURSOR_POS_X = 256;
-// ボタンの数
-const BUTTON_NUM = 3;
-/**
- * タイトルのシーン
- */
-class TitleScene {
-    /**
-     * コンストラクタ。
-     * 各種データの初期化と生成を行う。
-     * @param phinaScene phina.js上のシーンインスタンス
-     */
-    constructor(phinaScene) {
-        // phina.jsのシーンインスタンスを設定する。
-        this._phinaScene = phinaScene;
-        // ゲームパッドマネージャーを作成する。
-        this._gamepadManager = new phina.input.GamepadManager();
-        // ゲームパッドを取得する。
-        this._gamepad = this._gamepadManager.get(0);
-        // ルートノードを作成し、シーンに配置する。
-        this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
-        // タイトルロゴを作成する。
-        const title = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height)
-            .addChildTo(this._rootNode)
-            .setPosition(TITLE_POS_X, TITLE_POS_Y);
-        title.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height);
-        title.scaleX = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
-        title.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
-        // ボタン配列を作成する。
-        this._buttons = [];
-        // ゲームスタートボタンを作成する。
-        const gameStartButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
-            .addChildTo(this._rootNode)
-            .setLabel('GAME START')
-            .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
-            .setHandler(() => { this._replaceScene('PlayingScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
-        this._buttons.push(gameStartButton);
-        // 遊び方説明ボタンを作成する。
-        const howToPlayButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
-            .addChildTo(this._rootNode)
-            .setLabel('HOW TO PLAY')
-            .setPosition(BUTTON_POS_X, BUTTON_POS_Y[1])
-            .setHandler(() => { this._replaceScene('HowToPlayScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
-        this._buttons.push(howToPlayButton);
-        // クレジットボタンを作成する。
-        const creditButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
-            .addChildTo(this._rootNode)
-            .setLabel('CREDIT')
-            .setPosition(BUTTON_POS_X, BUTTON_POS_Y[2])
-            .setHandler(() => { this._replaceScene('CreditScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
-        this._buttons.push(creditButton);
-        // カーソルを作成する。
-        this._cursor = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.height)
-            .addChildTo(this._rootNode)
-            .setPosition(CURSOR_POS_X, BUTTON_POS_Y[0]);
-        this._cursor.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.height);
-        this._cursor.scaleX = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
-        this._cursor.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
-        // 初期選択ボタンは1個目とする。
-        this._selectButton = 0;
-        // 入力内容を初期化する。
-        this._isUpInputKeyboard = false;
-        this._isDownInputKeyboard = false;
-        this._isUpInputGamepad = false;
-        this._isDownInputGamepad = false;
-        // 初期状態は入力は有効とする。
-        this._disableInput = false;
-    }
-    /**
-     * 更新処理。
-     * キー入力処理を行う。
-     * @param app アプリケーション
-     */
-    update(app) {
-        // 入力が無効になっていない場合
-        if (!this._disableInput) {
-            // キーボードの入力処理を行う。
-            this._inputKeyboard(app);
-            // ゲームパッドの入力処理を行う。。
-            this._inputGamepad();
-        }
-    }
-    /**
-     * PlayingSceneにシーンを遷移する。
-     * @param sceneName シーン名
-     */
-    _replaceScene(sceneName) {
-        this._rootNode.remove();
-        switch (sceneName) {
-            case 'PlayingScene':
-                this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_1__playingscene__["a" /* default */](this._phinaScene);
-                break;
-            default:
-                break;
-        }
-    }
-    /**
-     * キーボードの入力処理を行う。
-     * 上下キーでカーソルを移動し、zキーでボタンを選択する。
-     * @param app アプリケーション
-     */
-    _inputKeyboard(app) {
-        // キーボードを取得する。
-        const key = app.keyboard;
-        // 上キーが押されている場合
-        if (key.getKey('up')) {
-            // 前回上キーが押されていなければ処理を行う。。
-            if (!this._isUpInputKeyboard) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton - 1);
-            }
-            // 上キーが押されたことを記憶する。
-            this._isUpInputKeyboard = true;
-        }
-        else {
-            // 上キーが押されていない状態にする。
-            this._isUpInputKeyboard = false;
-        }
-        // 下キーが押されている場合
-        if (key.getKey('down')) {
-            // 前回下キーが押されていなければ処理を行う。。
-            if (!this._isDownInputKeyboard) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton + 1);
-            }
-            // 下キーが押されたことを記憶する。
-            this._isDownInputKeyboard = true;
-        }
-        else {
-            // 下キーが押されていない状態にする。
-            this._isDownInputKeyboard = false;
-        }
-        // zキーが押されている場合
-        if (key.getKey('z')) {
-            // 選択中のボタンを実行する。
-            this._execButton();
-        }
-    }
-    /**
-     * ゲームパッドの入力処理を行う。
-     */
-    _inputGamepad() {
-        // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
-        // ゲームパッドを取得する。
-        const gamepad = this._gamepadManager.get();
-        // アナログスティックの入力を取得する。
-        const stick = this._gamepad.getStickDirection(0);
-        // 上キーが押されている場合
-        if (stick.y < -0.5) {
-            // 前回上キーが押されていなければ処理を行う。。
-            if (!this._isUpInputGamepad) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton - 1);
-            }
-            // 上キーが押されたことを記憶する。
-            this._isUpInputGamepad = true;
-        }
-        else {
-            // 上キーが押されていない状態にする。
-            this._isUpInputGamepad = false;
-        }
-        // 下キーが押されている場合
-        if (stick.y > 0.5) {
-            // 前回下キーが押されていなければ処理を行う。。
-            if (!this._isDownInputGamepad) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton + 1);
-            }
-            // 下キーが押されたことを記憶する。
-            this._isDownInputGamepad = true;
-        }
-        else {
-            // 下キーが押されていない状態にする。
-            this._isDownInputGamepad = false;
-        }
-        // Aボタンでシールドを使用する。
-        if (gamepad.getKey('a')) {
-            // 選択中のボタンを実行する。
-            this._execButton();
-        }
-    }
-    /**
-     * カーソルを移動する。
-     * 一番上から上に移動しようとした場合は一番下に移動する。
-     * 一番下から下に移動しようとした場合は一番上に移動する。
-     * @param selectButton 選択するボタンのインデックス
-     */
-    _moveCursor(selectButton) {
-        // 最小値未満の場合は最大値に変える。
-        if (selectButton < 0) {
-            selectButton = BUTTON_NUM - 1;
-        }
-        // 最大値超過の場合は最小値にする。
-        if (selectButton >= BUTTON_NUM) {
-            selectButton = 0;
-        }
-        // メンバ変数の値を変える。
-        this._selectButton = selectButton;
-        // カーソルの位置を変える。
-        this._cursor.y = BUTTON_POS_Y[this._selectButton];
-        // 効果音を鳴らす。
-        phina.asset.SoundManager.play('cursor');
-    }
-    /**
-     * 選択中のボタンを実行する。
-     */
-    _execButton() {
-        // 選択中のボタンを実行する。
-        this._buttons[this._selectButton].select();
-        // 入力を無効化する。
-        this._disableInput = true;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (TitleScene);
 
 
 /***/ }),
@@ -2653,6 +2699,22 @@ class Explosion {
             this._sprite.remove();
         }
     }
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Explosion);
 
@@ -2799,7 +2861,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(9);
 
 
 
@@ -2915,8 +2977,10 @@ phina.define('MainScene', {
         // BGMとSEの音量を設定する。
         phina.asset.SoundManager.setVolume(0.5);
         phina.asset.SoundManager.setVolumeMusic(0.2);
+        // ゲームパッドマネージャーを作成する。
+        const gamepadManager = new phina.input.GamepadManager();
         // 初期シーンを設定する。
-        this.scene = new __WEBPACK_IMPORTED_MODULE_3__titlescene__["a" /* default */](this);
+        this.scene = new __WEBPACK_IMPORTED_MODULE_3__titlescene__["a" /* default */](this, gamepadManager);
     },
     /**
      * 更新処理。内部のシーン処理の更新処理を実行する。
@@ -2968,7 +3032,7 @@ phina.main(function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(24);
 
@@ -3139,6 +3203,22 @@ class Player {
         this._updateOptionCount(scene);
         // 座標をスプライトに適用する。
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
+    }
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
     }
     /**
      * キーボードの左キー入力による移動処理を行う。
@@ -3413,6 +3493,22 @@ class PlayerDeathEffect {
             this._sprite.remove();
         }
     }
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (PlayerDeathEffect);
 
@@ -3424,7 +3520,7 @@ class PlayerDeathEffect {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(10);
 /** @module playeroption */
 
 
@@ -3515,6 +3611,22 @@ class PlayerOption {
         }
         // 座標をスプライトに適用する。
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
+    }
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
     }
     /**
      * 指定された座標へ移動する。
@@ -3628,12 +3740,14 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(9);
+
 
 
 
@@ -3667,6 +3781,15 @@ const BOSS_LIFE_GAUGE_POS_X = 360;
 const BOSS_LIFE_GAUGE_POS_Y = 144;
 // 自機弾衝突音発生間隔
 const HIT_PLAYER_SHOT_INTERVAL = 6;
+// ゲームオーバー時の待機時間（msec）
+const GAMEOVER_INTERVAL = 1000;
+// シーンの状態
+var SCENE_STATE;
+(function (SCENE_STATE) {
+    SCENE_STATE[SCENE_STATE["PLAYING"] = 0] = "PLAYING";
+    SCENE_STATE[SCENE_STATE["WAIT"] = 1] = "WAIT";
+    SCENE_STATE[SCENE_STATE["GAMEOVER"] = 2] = "GAMEOVER";
+})(SCENE_STATE || (SCENE_STATE = {}));
 /**
  * ゲームの各ステージをプレイするメインのシーン。
  */
@@ -3676,32 +3799,32 @@ class PlayingScene {
      * 各種データの初期化と生成を行う。
      * @param phinaScene phina.js上のシーンインスタンス
      */
-    constructor(phinaScene) {
+    constructor(phinaScene, gamepadManager) {
         // phina.jsのシーンインスタンスを設定する。
         this._phinaScene = phinaScene;
-        // ゲームパッドマネージャーを作成する。
-        this._gamepadManager = new phina.input.GamepadManager();
-        // ゲームパッドを取得する。
-        this._gamepad = this._gamepadManager.get(0);
+        // ゲームパッドマネージャーを設定する。
+        this._gamepadManager = gamepadManager;
+        // ルートノードを作成し、シーンに配置する。
+        this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO);
         this._backgroundLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         this._backgroundLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         // キャラクターレイヤーを作成する。
-        this._characterLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._characterLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
         // キャラクターレイヤーの位置、サイズを設定する。
         this._characterLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO);
         this._characterLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         this._characterLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         // 枠レイヤーを作成する。
-        this._frameLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._frameLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
         // 枠レイヤーの位置、サイズを設定する。
         this._frameLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         this._frameLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         // 情報レイヤーを作成する。
-        this._infoLayer = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        this._infoLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
         // ステージの外枠を作成する。
         this._createFrame();
         // 初期ステージを読み込む。
@@ -3764,6 +3887,8 @@ class PlayingScene {
         this._isHitPlayerShot = false;
         // 自機弾衝突音発生間隔を初期化する。
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
+        // 初期状態はプレイ中とする。
+        this._state = SCENE_STATE.PLAYING;
     }
     /**
      * 更新処理。
@@ -3772,41 +3897,14 @@ class PlayingScene {
      * @param app アプリケーション
      */
     update(app) {
-        // ボタン入力状態を初期化する。
-        this._inputShieldButton = false;
-        // キーボード入力を行う。
-        this._inputKeyboard(app);
-        // タッチ入力を行う。
-        this._inputTouch(app);
-        // ゲームパッド入力を行う。
-        this._inputGamepad();
-        // シールドボタン入力状態に応じて自機の状態を変化させる。
-        if (this._inputShieldButton) {
-            this._player.shield = true;
+        // 入力処理を行う。
+        this._input(app);
+        // プレイ中、待機中の場合
+        if (this._state === SCENE_STATE.PLAYING ||
+            this._state === SCENE_STATE.WAIT) {
+            // ステージやキャラクターの状態を更新する。
+            this._updateStageData();
         }
-        else {
-            this._player.shield = false;
-        }
-        // ステージの状態を更新する。
-        this._stage.update(this);
-        // プレイヤーの状態を更新する。
-        this._player.update(this);
-        // 自機弾衝突フラグを初期化する。
-        this._isHitPlayerShot = false;
-        // 各キャラクターの状態を更新する。
-        for (let i = 0; i < this._characters.length; i++) {
-            this._characters[i].update(this);
-        }
-        // 自機弾が衝突した場合はSEを鳴らす。
-        // 連続で音が鳴らないように音を鳴らしたときは自機音衝突間隔を初期化して、
-        // 規定フレーム分経過するまで次の音が鳴らないようにする。
-        this._hitPlayerShotInterval++;
-        if (this._isHitPlayerShot && this._hitPlayerShotInterval > HIT_PLAYER_SHOT_INTERVAL) {
-            phina.asset.SoundManager.play('hit');
-            this._hitPlayerShotInterval = 0;
-        }
-        // 自機復活処理を行う。
-        this._rebirthPlayer();
         // チキンゲージ表示を更新する。
         this._chickenGauge.rate = this._player.chickenGauge;
         // スコア表示を更新する。
@@ -3900,6 +3998,16 @@ class PlayingScene {
             this._removeEnemyShot();
         }
         else {
+            // 状態を待機中に変更する。
+            this._state = SCENE_STATE.WAIT;
+            // シールドボタンを無効化する。
+            this._shieldButton.enable = false;
+            // BGMを停止する。
+            phina.asset.SoundManager.stopMusic();
+            // キャラクターのアニメーションを停止する。
+            this._stopCharacterAnimation();
+            // 一定時間後にゲームオーバー状態に遷移する。
+            setTimeout(() => { this._gameOver(); }, GAMEOVER_INTERVAL);
         }
     }
     /**
@@ -3914,6 +4022,60 @@ class PlayingScene {
         }
         else {
             return false;
+        }
+    }
+    /**
+     * 入力処理を行う。
+     * @param app アプリケーション
+     */
+    _input(app) {
+        // 状態に応じて入力処理を振り分ける。
+        switch (this._state) {
+            case SCENE_STATE.PLAYING:
+                this._inputOnPlaying(app);
+                break;
+            case SCENE_STATE.GAMEOVER:
+                this._inputOnGameOver(app);
+                break;
+            default:
+                break;
+        }
+    }
+    /**
+     * プレイ中の入力処理を行う。
+     * @param app アプリケーション
+     */
+    _inputOnPlaying(app) {
+        // ボタン入力状態を初期化する。
+        this._inputShieldButton = false;
+        // キーボード入力を行う。
+        this._inputKeyboard(app);
+        // タッチ入力を行う。
+        this._inputTouch(app);
+        // ゲームパッド入力を行う。
+        this._inputGamepad();
+        // シールドボタン入力状態に応じて自機の状態を変化させる。
+        if (this._inputShieldButton) {
+            this._player.shield = true;
+        }
+        else {
+            this._player.shield = false;
+        }
+    }
+    /**
+     * ゲームオーバー時の入力処理を行う。
+     * @param app アプリケーション
+     */
+    _inputOnGameOver(app) {
+        // キーボードを取得する。
+        const key = app.keyboard;
+        // ゲームパッドの状態を更新する。
+        this._gamepadManager.update();
+        // ゲームパッドを取得する。
+        const gamepad = this._gamepadManager.get();
+        // キーボードのzキーか、ゲームパッドのAボタンでタイトル画面に戻る。
+        if (key.getKeyDown('z') || gamepad.getKeyDown('a')) {
+            this._replaceScene();
         }
     }
     /**
@@ -3989,7 +4151,7 @@ class PlayingScene {
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
         // アナログスティックの入力を取得する。
-        const stick = this._gamepad.getStickDirection(0);
+        const stick = gamepad.getStickDirection(0);
         // アナログスティックの入力値が閾値を超えている場合は移動する。
         if (stick.length() > 0.5) {
             this._player.moveGamepad(stick.x, stick.y, this);
@@ -4182,6 +4344,85 @@ class PlayingScene {
                 character.remove(this);
             }
         }
+    }
+    /**
+     * ゲームオーバー処理を行う。
+     */
+    _gameOver() {
+        // 状態をゲームオーバーに遷移する。
+        this._state = SCENE_STATE.GAMEOVER;
+        // ゲームオーバーのラベルを画面に配置する。
+        const gameOverLabel = new phina.display.Label({
+            text: 'GAME OVER',
+            fontSize: 36,
+            backgroundColor: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].BACK_COLOR,
+            fill: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].FORE_COLOR,
+            fontFamily: 'noto',
+            x: Math.round(this._phinaScene.gridX.center()),
+            y: Math.round(this._phinaScene.gridY.center()),
+            strokeWidth: 0,
+            padding: 0,
+        }).addChildTo(this._infoLayer);
+        // 画面全体にタイトルへ戻るボタンを配置する。
+        const backButton = new phina.display.DisplayElement({
+            width: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH,
+            height: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT,
+            x: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH / 2,
+            y: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT / 2,
+        })
+            .addChildTo(this._infoLayer)
+            .setInteractive(true)
+            .on('pointstart', (event) => {
+            this._replaceScene();
+        });
+    }
+    /**
+     * ステージやキャラクターの状態を更新する。
+     */
+    _updateStageData() {
+        // ステージの状態を更新する。
+        this._stage.update(this);
+        // プレイヤーの状態を更新する。
+        this._player.update(this);
+        // 自機弾衝突フラグを初期化する。
+        this._isHitPlayerShot = false;
+        // 各キャラクターの状態を更新する。
+        for (let i = 0; i < this._characters.length; i++) {
+            this._characters[i].update(this);
+        }
+        // 自機弾が衝突した場合はSEを鳴らす。
+        // 連続で音が鳴らないように音を鳴らしたときは自機音衝突間隔を初期化して、
+        // 規定フレーム分経過するまで次の音が鳴らないようにする。
+        this._hitPlayerShotInterval++;
+        if (this._isHitPlayerShot && this._hitPlayerShotInterval > HIT_PLAYER_SHOT_INTERVAL) {
+            phina.asset.SoundManager.play('hit');
+            this._hitPlayerShotInterval = 0;
+        }
+        // 自機復活処理を行う。
+        this._rebirthPlayer();
+    }
+    /**
+     * キャラクターのアニメーションを停止する。
+     */
+    _stopCharacterAnimation() {
+        for (let character of this._characters) {
+            character.pauseAnimation();
+        }
+    }
+    /**
+     * キャラクターのアニメーションを開始する。
+     */
+    _startCharacterAnimation() {
+        for (let character of this._characters) {
+            character.startAnimation();
+        }
+    }
+    /**
+     * タイトルシーンへと切り替える。
+     */
+    _replaceScene() {
+        this._rootNode.remove();
+        this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_11__titlescene__["a" /* default */](this._phinaScene, this._gamepadManager);
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (PlayingScene);
@@ -4476,9 +4717,11 @@ class ShieldButton {
         this._button.addChildTo(this._base);
         // タッチ開始イベントのハンドラを作成する。
         this._button.on('pointstart', (event) => {
-            this._touch = true;
-            this._offImage.alpha = 0;
-            this._onImage.alpha = 1;
+            if (this._enable) {
+                this._touch = true;
+                this._offImage.alpha = 0;
+                this._onImage.alpha = 1;
+            }
         });
         // タッチ終了イベントのハンドラを作成する。
         this._button.on('pointend', (event) => {
@@ -4498,6 +4741,16 @@ class ShieldButton {
     /** タッチされているかどうか。 */
     get isTouch() {
         return this._touch;
+    }
+    /** 有効かどうか */
+    set enable(value) {
+        this._enable = value;
+        // 無効にした場合はタッチしていない状態にする。
+        if (!this._enable) {
+            this._touch = false;
+            this._offImage.alpha = 1;
+            this._onImage.alpha = 0;
+        }
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (ShieldButton);

@@ -120,6 +120,24 @@ abstract class Enemy implements CharacterIF {
         // 座標をスプライトに適用する。
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
+
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    public pauseAnimation(): this {
+        this._animation.paused = true;
+        return this;
+    }
+
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    public startAnimation(): this {
+        this._animation.paused = false;
+        return this;
+    }
     
     /**
      * 攻撃処理。

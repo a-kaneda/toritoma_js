@@ -141,8 +141,11 @@ phina.define('MainScene', {
         phina.asset.SoundManager.setVolume(0.5);
         phina.asset.SoundManager.setVolumeMusic(0.2);
         
+        // ゲームパッドマネージャーを作成する。
+        const gamepadManager = new phina.input.GamepadManager();
+
         // 初期シーンを設定する。
-        this.scene = new TitleScene(this);
+        this.scene = new TitleScene(this, gamepadManager);
     },
 
     /**

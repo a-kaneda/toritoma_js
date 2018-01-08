@@ -76,6 +76,22 @@ class Enemy {
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
+    /**
      * 攻撃処理。
      * このキャラクターへの攻撃を処理する。
      * 指定した攻撃力 - 防御力をダメージとしてHPから引く。

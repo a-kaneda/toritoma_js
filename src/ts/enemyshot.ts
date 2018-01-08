@@ -21,7 +21,7 @@ const REFLECTION_POWER = 5;
 /**
  * 敵が発射する弾。
  */
-class EnemyShot {
+class EnemyShot implements CharacterIF {
 
     /** スプライト */
     private _sprite: phina.display.Sprite;
@@ -191,6 +191,24 @@ class EnemyShot {
         }
     }
 
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    public pauseAnimation(): this {
+        this._animation.paused = true;
+        return this;
+    }
+
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    public startAnimation(): this {
+        this._animation.paused = false;
+        return this;
+    }
+    
     /**
      * 削除する。
      * @param scene シーン

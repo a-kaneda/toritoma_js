@@ -93,6 +93,7 @@ declare module phina {
         }
 
         class FrameAnimation extends phina.accessory.Accessory {
+            paused: boolean;
             finished: boolean;
             constructor(ss: string);
             gotoAndPlay(name: string): this;
@@ -147,6 +148,7 @@ declare module phina {
         class SoundManager {
             static setVolume(volume: number): void;
             static playMusic(name: string, fadeTime?: number, loop?: boolean, when?: number, offset?: number, duration?: number): phina.asset.Sound | boolean;
+            static stopMusic(fadeTime?: number): null;
             static setVolumeMusic(volume: number): SoundManager;
             static play(name: string, when?: number, offset?: number, duration?: number): phina.asset.Sound;
         }
@@ -178,6 +180,7 @@ declare module phina {
 
         class Keyboard extends Input {
             getKey(key: string | number): boolean;
+            getKeyDown(key: string | number): boolean;
         }
 
         class Touch extends Input {
@@ -187,6 +190,7 @@ declare module phina {
         class Gamepad {
             getStickDirection(stickId: number): phina.geom.Vector2;
             getKey(button: number | string): boolean;
+            getKeyDown(button: number | string): boolean;
         }
 
         class GamepadManager {

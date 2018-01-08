@@ -21,6 +21,8 @@ class ShieldButton {
     private _button: phina.display.RectangleShape;
     /** タッチしているかどうか */
     private _touch: boolean;
+    /** 有効かどうか */
+    private _enable: boolean;
 
     /**
      * コンストラクタ。
@@ -77,9 +79,11 @@ class ShieldButton {
 
         // タッチ開始イベントのハンドラを作成する。
         this._button.on('pointstart', (event: Event) => {
-            this._touch = true;
-            this._offImage.alpha = 0;
-            this._onImage.alpha = 1;
+            if (this._enable) {
+                this._touch = true;
+                this._offImage.alpha = 0;
+                this._onImage.alpha = 1;
+            }
         });
 
         // タッチ終了イベントのハンドラを作成する。
@@ -103,6 +107,18 @@ class ShieldButton {
     /** タッチされているかどうか。 */
     public get isTouch(): boolean {
         return this._touch;
+    }
+
+    /** 有効かどうか */
+    public set enable(value: boolean) {
+        this._enable = value;
+
+        // 無効にした場合はタッチしていない状態にする。
+        if (!this._enable) {
+            this._touch = false;
+            this._offImage.alpha = 1;
+            this._onImage.alpha = 0;
+        }
     }
 }
 

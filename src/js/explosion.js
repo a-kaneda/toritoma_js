@@ -49,5 +49,21 @@ class Explosion {
             this._sprite.remove();
         }
     }
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
 }
 export default Explosion;

@@ -16,6 +16,18 @@ interface CharacterIF {
      * @param scene シーン
      */
     update(scene: PlayingScene): void;
+
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation(): this;
+
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation(): this;
 }
 
 export default CharacterIF;

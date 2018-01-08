@@ -74,6 +74,24 @@ class PlayerDeathEffect implements CharacterIF {
             this._sprite.remove();
         }
     }
+
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    public pauseAnimation(): this {
+        this._animation.paused = true;
+        return this;
+    }
+
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    public startAnimation(): this {
+        this._animation.paused = false;
+        return this;
+    }
 }
 
 export default PlayerDeathEffect;
