@@ -10,6 +10,7 @@ import ChickenGauge from './chickengauge';
 import BossLifeGauge from './bosslifegauge';
 import ShieldButton from './shieldbutton';
 import TitleScene from './titlescene';
+import PauseLayer from './pauselayer';
 // 初期残機
 const INITIAL_LIFE = 2;
 // 残機位置x座標(ステージ左端からの位置)
@@ -38,8 +39,9 @@ const GAMEOVER_INTERVAL = 1000;
 var SCENE_STATE;
 (function (SCENE_STATE) {
     SCENE_STATE[SCENE_STATE["PLAYING"] = 0] = "PLAYING";
-    SCENE_STATE[SCENE_STATE["WAIT"] = 1] = "WAIT";
+    SCENE_STATE[SCENE_STATE["WAIT_GAMEOVER"] = 1] = "WAIT_GAMEOVER";
     SCENE_STATE[SCENE_STATE["GAMEOVER"] = 2] = "GAMEOVER";
+    SCENE_STATE[SCENE_STATE["PAUSE"] = 3] = "PAUSE";
 })(SCENE_STATE || (SCENE_STATE = {}));
 /**
  * ゲームの各ステージをプレイするメインのシーン。
@@ -140,6 +142,9 @@ class PlayingScene {
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
         // 初期状態はプレイ中とする。
         this._state = SCENE_STATE.PLAYING;
+        // 一時停止レイヤーを作成する。
+        this._pauseLayer = new PauseLayer()
+            .onResume(() => { this._resume(); });
     }
     /**
      * 更新処理。
@@ -152,7 +157,7 @@ class PlayingScene {
         this._input(app);
         // プレイ中、待機中の場合
         if (this._state === SCENE_STATE.PLAYING ||
-            this._state === SCENE_STATE.WAIT) {
+            this._state === SCENE_STATE.WAIT_GAMEOVER) {
             // ステージやキャラクターの状態を更新する。
             this._updateStageData();
         }
@@ -250,7 +255,7 @@ class PlayingScene {
         }
         else {
             // 状態を待機中に変更する。
-            this._state = SCENE_STATE.WAIT;
+            this._state = SCENE_STATE.WAIT_GAMEOVER;
             // シールドボタンを無効化する。
             this._shieldButton.enable = false;
             // BGMを停止する。
@@ -288,6 +293,9 @@ class PlayingScene {
             case SCENE_STATE.GAMEOVER:
                 this._inputOnGameOver(app);
                 break;
+            case SCENE_STATE.PAUSE:
+                this._pauseLayer.input(app.keyboard, this._gamepadManager.get(0));
+                break;
             default:
                 break;
         }
@@ -297,20 +305,22 @@ class PlayingScene {
      * @param app アプリケーション
      */
     _inputOnPlaying(app) {
-        // ボタン入力状態を初期化する。
-        this._inputShieldButton = false;
         // キーボード入力を行う。
-        this._inputKeyboard(app);
+        const keyboard = this._inputKeyboard(app);
         // タッチ入力を行う。
-        this._inputTouch(app);
+        const touch = this._inputTouch(app);
         // ゲームパッド入力を行う。
-        this._inputGamepad();
+        const gamepad = this._inputGamepad();
         // シールドボタン入力状態に応じて自機の状態を変化させる。
-        if (this._inputShieldButton) {
+        if (keyboard.shield || touch.shield || gamepad.shield) {
             this._player.shield = true;
         }
         else {
             this._player.shield = false;
+        }
+        // 一時停止が入力された場合は一時停止処理を行う。
+        if (keyboard.pause || touch.pause || gamepad.pause) {
+            this._pause();
         }
     }
     /**
@@ -336,6 +346,11 @@ class PlayingScene {
     _inputKeyboard(app) {
         // キーボードを取得する。
         const key = app.keyboard;
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        };
         // カーソルキーの入力によって自機を移動する。
         if (key.getKey('left')) {
             this._player.moveKeyLeft(this);
@@ -351,8 +366,13 @@ class PlayingScene {
         }
         // zキーでシールドを使用する。
         if (key.getKey('z')) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+        // ESCキーで一時停止する。
+        if (key.getKeyDown('escape')) {
+            inputState.pause = true;
+        }
+        return inputState;
     }
     /**
      * タッチの入力処理を行う。
@@ -361,6 +381,11 @@ class PlayingScene {
     _inputTouch(app) {
         const touches = app.pointers;
         let sliding = false;
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        };
         for (let i = 0; i < touches.length; i++) {
             // マウスが接続されていない場合はスライドの処理を行う。
             if (!PointDevice.isMouseUsed) {
@@ -390,13 +415,19 @@ class PlayingScene {
         }
         // シールドボタンがタッチされている場合はシールドを使用する。
         if (this._shieldButton.isTouch) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+        return inputState;
     }
     /**
      * ゲームパッドの入力処理を行う。
      */
     _inputGamepad() {
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        };
         // ゲームパッドの状態を更新する。
         this._gamepadManager.update();
         // ゲームパッドを取得する。
@@ -409,8 +440,13 @@ class PlayingScene {
         }
         // Aボタンでシールドを使用する。
         if (gamepad.getKey('a')) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+        // STARTボタンで一時停止する。
+        if (gamepad.getKeyDown('start')) {
+            inputState.pause = true;
+        }
+        return inputState;
     }
     /**
      * ステージの外側の枠と背景を作成する。
@@ -656,6 +692,7 @@ class PlayingScene {
      * キャラクターのアニメーションを停止する。
      */
     _stopCharacterAnimation() {
+        this._player.pauseAnimation();
         for (let character of this._characters) {
             character.pauseAnimation();
         }
@@ -664,6 +701,7 @@ class PlayingScene {
      * キャラクターのアニメーションを開始する。
      */
     _startCharacterAnimation() {
+        this._player.startAnimation();
         for (let character of this._characters) {
             character.startAnimation();
         }
@@ -674,6 +712,30 @@ class PlayingScene {
     _replaceScene() {
         this._rootNode.remove();
         this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
+    }
+    /**
+     * ゲームを一時停止する。
+     */
+    _pause() {
+        // 状態をポーズに遷移する。
+        this._state = SCENE_STATE.PAUSE;
+        // 効果音を鳴らす。
+        phina.asset.SoundManager.play('pause');
+        // キャラクターのアニメーションを停止する。
+        this._stopCharacterAnimation();
+        // 一時停止レイヤーを画面に配置する。
+        this._pauseLayer.addChildTo(this._rootNode);
+    }
+    /**
+     * ゲームを再開する。
+     */
+    _resume() {
+        // 状態をプレイ中に遷移する。
+        this._state = SCENE_STATE.PLAYING;
+        // キャラクターのアニメーションを再開する。
+        this._startCharacterAnimation();
+        // 一時停止レイヤーを画面から取り除く。
+        this._pauseLayer.remove();
     }
 }
 export default PlayingScene;

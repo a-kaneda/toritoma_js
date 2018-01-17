@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 21);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -426,7 +426,45 @@ class ControlSize {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(11);
+/** @module mycolor */
+// 使用する色、0:薄い、3:濃い
+const COLORS = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
+// 背景色
+const BACK_COLOR = '#9cb389';
+// 前景色
+const FORE_COLOR = '#12241A';
+/**
+ * ゲーム内で使用する色を定義する。
+ */
+class MyColor {
+    /**
+     * 使用する色、0:薄い、3:濃い
+     */
+    static get COLORS() {
+        return COLORS;
+    }
+    /**
+     * 背景色
+     */
+    static get BACK_COLOR() {
+        return BACK_COLOR;
+    }
+    /**
+     * 前景色
+     */
+    static get FORE_COLOR() {
+        return FORE_COLOR;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (MyColor);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 
 
@@ -944,13 +982,13 @@ class Collider {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 /** @module enemy */
 
@@ -1120,13 +1158,13 @@ class Enemy {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(4);
 /** @module enemyshot */
 
 
@@ -1305,44 +1343,6 @@ class EnemyShot {
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/** @module mycolor */
-// 使用する色、0:薄い、3:濃い
-const COLORS = ['#9cb389', '#6e8464', '#40553f', '#12241A'];
-// 背景色
-const BACK_COLOR = '#9cb389';
-// 前景色
-const FORE_COLOR = '#12241A';
-/**
- * ゲーム内で使用する色を定義する。
- */
-class MyColor {
-    /**
-     * 使用する色、0:薄い、3:濃い
-     */
-    static get COLORS() {
-        return COLORS;
-    }
-    /**
-     * 背景色
-     */
-    static get BACK_COLOR() {
-        return BACK_COLOR;
-    }
-    /**
-     * 前景色
-     */
-    static get FORE_COLOR() {
-        return FORE_COLOR;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (MyColor);
-
-
-/***/ }),
 /* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1418,10 +1418,12 @@ class PointDevice {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__cursor__ = __webpack_require__(11);
+
 
 
 
@@ -1442,6 +1444,14 @@ const BUTTON_HEIGHT = 32;
 const CURSOR_POS_X = 256;
 // ボタンの数
 const BUTTON_NUM = 3;
+// ボタンのID
+var BUTTON_ID;
+(function (BUTTON_ID) {
+    BUTTON_ID[BUTTON_ID["GAME_START"] = 0] = "GAME_START";
+    BUTTON_ID[BUTTON_ID["HOW_TO_PLAY"] = 1] = "HOW_TO_PLAY";
+    BUTTON_ID[BUTTON_ID["CREDIT"] = 2] = "CREDIT";
+})(BUTTON_ID || (BUTTON_ID = {}));
+;
 /**
  * タイトルのシーン
  */
@@ -1472,41 +1482,48 @@ class TitleScene {
             .addChildTo(this._rootNode)
             .setLabel('GAME START')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
-            .setHandler(() => { this._replaceScene('PlayingScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+            .onEffect(() => { this._disableInput(); })
+            .onPush(() => { this._replaceScene('PlayingScene'); });
         this._buttons.push(gameStartButton);
         // 遊び方説明ボタンを作成する。
         const howToPlayButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('HOW TO PLAY')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[1])
-            .setHandler(() => { this._replaceScene('HowToPlayScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+            .onEffect(() => { this._disableInput(); })
+            .onPush(() => { this._replaceScene('HowToPlayScene'); });
         this._buttons.push(howToPlayButton);
         // クレジットボタンを作成する。
         const creditButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('CREDIT')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[2])
-            .setHandler(() => { this._replaceScene('CreditScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+            .onEffect(() => { this._disableInput(); })
+            .onPush(() => { this._replaceScene('CreditScene'); });
         this._buttons.push(creditButton);
         // カーソルを作成する。
-        this._cursor = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.height)
-            .addChildTo(this._rootNode)
-            .setPosition(CURSOR_POS_X, BUTTON_POS_Y[0]);
-        this._cursor.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.cursor.height);
-        this._cursor.scaleX = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
-        this._cursor.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
-        // 初期選択ボタンは1個目とする。
-        this._selectButton = 0;
-        // 入力内容を初期化する。
-        this._isUpInputKeyboard = false;
-        this._isDownInputKeyboard = false;
-        this._isUpInputGamepad = false;
-        this._isDownInputGamepad = false;
+        this._cursor = new __WEBPACK_IMPORTED_MODULE_4__cursor__["a" /* default */]()
+            .addChildTo(this._rootNode);
+        // カーソル位置の情報を作成する。
+        for (let i = 0; i < BUTTON_NUM; i++) {
+            // 上に移動するときの位置を決める。ループするようにする。
+            const prevPos = i - 1 >= 0 ? i - 1 : BUTTON_NUM - 1;
+            // 下に移動するときの位置を決める。ループするようにする。
+            const nextPos = i + 1 < BUTTON_NUM ? i + 1 : 0;
+            // カーソル位置を登録する。
+            this._cursor.addPosition(i, {
+                x: CURSOR_POS_X,
+                y: BUTTON_POS_Y[i],
+                left: -1,
+                right: -1,
+                up: prevPos,
+                down: nextPos
+            });
+        }
+        // 初期位置はGAME STARTボタンの位置とする。
+        this._cursor.setPosition(BUTTON_ID.GAME_START);
         // 初期状態は入力は有効とする。
-        this._disableInput = false;
+        this._isDisableInput = false;
     }
     /**
      * 更新処理。
@@ -1515,7 +1532,9 @@ class TitleScene {
      */
     update(app) {
         // 入力が無効になっていない場合
-        if (!this._disableInput) {
+        if (!this._isDisableInput) {
+            // カーソル移動処理を行う。
+            this._cursor.input(app.keyboard, this._gamepadManager.get());
             // キーボードの入力処理を行う。
             this._inputKeyboard(app);
             // ゲームパッドの入力処理を行う。。
@@ -1538,40 +1557,12 @@ class TitleScene {
     }
     /**
      * キーボードの入力処理を行う。
-     * 上下キーでカーソルを移動し、zキーでボタンを選択する。
+     * zキーでボタンを選択する。
      * @param app アプリケーション
      */
     _inputKeyboard(app) {
         // キーボードを取得する。
         const key = app.keyboard;
-        // 上キーが押されている場合
-        if (key.getKey('up')) {
-            // 前回上キーが押されていなければ処理を行う。。
-            if (!this._isUpInputKeyboard) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton - 1);
-            }
-            // 上キーが押されたことを記憶する。
-            this._isUpInputKeyboard = true;
-        }
-        else {
-            // 上キーが押されていない状態にする。
-            this._isUpInputKeyboard = false;
-        }
-        // 下キーが押されている場合
-        if (key.getKey('down')) {
-            // 前回下キーが押されていなければ処理を行う。。
-            if (!this._isDownInputKeyboard) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton + 1);
-            }
-            // 下キーが押されたことを記憶する。
-            this._isDownInputKeyboard = true;
-        }
-        else {
-            // 下キーが押されていない状態にする。
-            this._isDownInputKeyboard = false;
-        }
         // zキーが押されている場合
         if (key.getKeyDown('z')) {
             // 選択中のボタンを実行する。
@@ -1586,72 +1577,31 @@ class TitleScene {
         this._gamepadManager.update();
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
-        // アナログスティックの入力を取得する。
-        const stick = gamepad.getStickDirection(0);
-        // 上キーが押されている場合
-        if (stick.y < -0.5) {
-            // 前回上キーが押されていなければ処理を行う。。
-            if (!this._isUpInputGamepad) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton - 1);
-            }
-            // 上キーが押されたことを記憶する。
-            this._isUpInputGamepad = true;
-        }
-        else {
-            // 上キーが押されていない状態にする。
-            this._isUpInputGamepad = false;
-        }
-        // 下キーが押されている場合
-        if (stick.y > 0.5) {
-            // 前回下キーが押されていなければ処理を行う。。
-            if (!this._isDownInputGamepad) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton + 1);
-            }
-            // 下キーが押されたことを記憶する。
-            this._isDownInputGamepad = true;
-        }
-        else {
-            // 下キーが押されていない状態にする。
-            this._isDownInputGamepad = false;
-        }
-        // Aボタンでシールドを使用する。
+        // Aボタンが押されている場合
         if (gamepad.getKeyDown('a')) {
             // 選択中のボタンを実行する。
             this._execButton();
         }
     }
     /**
-     * カーソルを移動する。
-     * 一番上から上に移動しようとした場合は一番下に移動する。
-     * 一番下から下に移動しようとした場合は一番上に移動する。
-     * @param selectButton 選択するボタンのインデックス
-     */
-    _moveCursor(selectButton) {
-        // 最小値未満の場合は最大値に変える。
-        if (selectButton < 0) {
-            selectButton = BUTTON_NUM - 1;
-        }
-        // 最大値超過の場合は最小値にする。
-        if (selectButton >= BUTTON_NUM) {
-            selectButton = 0;
-        }
-        // メンバ変数の値を変える。
-        this._selectButton = selectButton;
-        // カーソルの位置を変える。
-        this._cursor.y = BUTTON_POS_Y[this._selectButton];
-        // 効果音を鳴らす。
-        phina.asset.SoundManager.play('cursor');
-    }
-    /**
      * 選択中のボタンを実行する。
      */
     _execButton() {
         // 選択中のボタンを実行する。
-        this._buttons[this._selectButton].select();
+        this._buttons[this._cursor.position].select();
+    }
+    /**
+     * 入力を無効化する。
+     */
+    _disableInput() {
         // 入力を無効化する。
-        this._disableInput = true;
+        this._isDisableInput = true;
+        // カーソルを無効化する。。
+        this._cursor.setEnable(false);
+        // ボタンを無効化する。
+        for (let button of this._buttons) {
+            button.setEnable(false);
+        }
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (TitleScene);
@@ -1662,8 +1612,400 @@ class TitleScene {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
+
+
+
+// ボタン選択からハンドラ実行までのインターバル(msec)
+const EXEC_INTERVAL = 500;
+/**
+ * ボタン。
+ */
+class Button {
+    /**
+     * コンストラクタ。
+     * @param width 幅
+     * @param height 高さ
+     */
+    constructor(width, height) {
+        // ベース部分を作成する。
+        this._base = new phina.display.RectangleShape({
+            width: width + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
+            height: height + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
+            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].BACK_COLOR,
+            strokeWidth: 0,
+            padding: 0,
+        });
+        // 枠を作成する。
+        this._createFrames(width, height);
+        // ラベルを作成する。
+        this._label = new phina.display.Label({
+            text: '',
+            fontSize: 24,
+            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].FORE_COLOR,
+            fontFamily: 'noto',
+        }).addChildTo(this._base);
+        // ボタン選択エフェクト開始時のコールバック関数を初期化する。
+        this._onEffect = null;
+        // ボタン選択時のコールバック関数を初期化する。
+        this._onPush = null;
+        // 初期状態は有効とする。
+        this._enable = true;
+        // タッチ操作を有効にする。
+        this._base.setInteractive(true);
+        // タッチ開始イベントのハンドラを作成する。
+        this._base.on('pointstart', (event) => {
+            this.select();
+        });
+    }
+    /**
+     * phina.jsのエレメントに画像を追加する。
+     * @param parent 親ノード
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._base.addChildTo(parent);
+        return this;
+    }
+    /**
+     * 表示位置を設定する。
+     * @param x x座標
+     * @param y y座標
+     * @return 自インスタンス
+     */
+    setPosition(x, y) {
+        this._base.x = x;
+        this._base.y = y;
+        return this;
+    }
+    /**
+     * ボタン選択エフェクト開始時のコールバック関数を設定する。
+     * @param func コールバック関数
+     * @return 自インスタンス
+     */
+    onEffect(func) {
+        this._onEffect = func;
+        return this;
+    }
+    /**
+     * ボタン選択時のコールバック関数を設定する。
+     * @param func コールバック関数
+     * @return 自インスタンス
+     */
+    onPush(func) {
+        this._onPush = func;
+        return this;
+    }
+    /**
+     * ラベルのテキストを設定する。
+     * @param label ラベルのテキスト
+     * @return 自インスタンス
+     */
+    setLabel(label) {
+        this._label.text = label;
+        return this;
+    }
+    /**
+     * 有効か無効かを設定する。
+     * @param value 設定値
+     */
+    setEnable(value) {
+        this._enable = value;
+        return this;
+    }
+    /**
+     * ボタン選択時の処理を行う。
+     * @return 自インスタンス
+     */
+    select() {
+        // 有効なときに処理を行う。
+        if (this._enable) {
+            // エフェクト開始時のコールバック関数を呼び出す。。
+            if (this._onEffect !== null) {
+                this._onEffect();
+            }
+            // 効果音を鳴らす。
+            phina.asset.SoundManager.play('select');
+            // 点滅アニメーションを実行する。
+            // 100ms周期で表示、非表示を切り替える。
+            this._base.tweener.wait(100)
+                .set({ alpha: 0 })
+                .wait(100)
+                .set({ alpha: 1 })
+                .wait(100)
+                .set({ alpha: 0 })
+                .wait(100)
+                .set({ alpha: 1 })
+                .play();
+            // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
+            if (this._onPush !== null) {
+                setTimeout(this._onPush, EXEC_INTERVAL);
+            }
+        }
+        return this;
+    }
+    /**
+     * ボタンの枠の部分を作成する。
+     * @param width 幅
+     * @param height 高さ
+     */
+    _createFrames(width, height) {
+        // フレーム1個分のサイズを取得する。
+        const FrameSize = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
+        for (let x = -width / 2; x <= width / 2; x += FrameSize) {
+            for (let y = -height / 2; y <= height / 2; y += FrameSize) {
+                // 一番上
+                if (y === -height / 2) {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, 'buttonTopLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        this._createFrame(x, y, 'buttonTop');
+                    }
+                    else {
+                        this._createFrame(x, y, 'buttonTopRight');
+                    }
+                }
+                else if (y + FrameSize <= height / 2) {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, 'buttonLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        // 上下左右真ん中部分は画像無し。
+                    }
+                    else {
+                        this._createFrame(x, y, 'buttonRight');
+                    }
+                }
+                else {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, 'buttonBottomLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        this._createFrame(x, y, 'buttonBottom');
+                    }
+                    else {
+                        this._createFrame(x, y, 'buttonBottomRight');
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 枠の画像を読み込み、ベースに配置する。
+     * @param x x座標
+     * @param y y座標
+     * @param type 枠のタイプ
+     */
+    _createFrame(x, y, type) {
+        // 枠の画像を読み込む。
+        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
+        frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
+        frame.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
+        frame.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
+        frame.addChildTo(this._base)
+            .setPosition(x, y);
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Button);
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
+
+
+// 方向を表す文字列
+const DIRECTIONS = ['left', 'right', 'up', 'down'];
+/**
+ * カーソル。
+ */
+class Cursor {
+    /**
+     * コンストラクタ。
+     */
+    constructor() {
+        // 画像を読み込む。
+        this._sprite = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
+        this._sprite.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
+        this._sprite.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        this._sprite.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        // カーソル位置配列を作成する。
+        this._positions = {};
+        // 現在のカーソル位置情報を初期化する。
+        this._currentPosition = 0;
+        // 初期状態は有効とする。
+        this._enable = true;
+        // ゲームパッドの前回入力があったかどうかの情報を初期化する。
+        this._prevGamepadInput = {};
+        for (let direction of DIRECTIONS) {
+            this._prevGamepadInput[direction] = false;
+        }
+    }
+    /** 現在のカーソル位置のID */
+    get position() {
+        return this._currentPosition;
+    }
+    /**
+     * 画像を親ノードに追加する。
+     * @param parent 親ノード]
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._sprite.addChildTo(parent);
+        return this;
+    }
+    /**
+     * カーソル位置情報を追加する。
+     * @param id カーソル位置のID、一意な値を指定する。
+     * @param position カーソル位置情報
+     * @return 自インスタンス
+     */
+    addPosition(id, position) {
+        this._positions[id] = position;
+        return this;
+    }
+    /**
+     * カーソルの位置を設定する。addPositionで登録したカーソル位置へ移動する。
+     * @param id カーソル位置のID
+     * @return 自インスタンス
+     */
+    setPosition(id) {
+        // カーソル位置が登録されている場合
+        if (this._positions[id]) {
+            // 現在のカーソル位置を変更する。
+            this._currentPosition = id;
+            // 画像の表示位置を変更する。
+            this._sprite.x = this._positions[id].x;
+            this._sprite.y = this._positions[id].y;
+        }
+        return this;
+    }
+    /**
+     * 有効か無効かを設定する。
+     * @param value 有効か無効か
+     * @return 自インスタンス
+     */
+    setEnable(value) {
+        this._enable = value;
+        return this;
+    }
+    /**
+     * 入力処理を行う。
+     * @param keyboard キーボード
+     * @param gamepad ゲームパッド
+     */
+    input(keyboard, gamepad) {
+        // 有効な場合は処理を行う。
+        if (this._enable) {
+            // キーボードの入力処理を行う。
+            this._inputKeyboard(keyboard);
+            // ゲームパッドの入力処理を行う。
+            this._inputGamepad(gamepad);
+        }
+        return this;
+    }
+    /**
+     * キーボードの入力処理を行う。
+     * 上下キーでカーソルを移動し、zキーでボタンを選択する。
+     * @param keyboard キーボード
+     */
+    _inputKeyboard(keyboard) {
+        // 各方向の処理を行う。
+        for (let direction of DIRECTIONS) {
+            // 方向キーが押された場合
+            if (keyboard.getKeyDown(direction)) {
+                // カーソル位置を移動する。
+                this._move(direction);
+            }
+        }
+    }
+    /**
+     * ゲームパッドの入力処理を行う。
+     * @param gamepad ゲームパッド
+     */
+    _inputGamepad(gamepad) {
+        // アナログスティックの入力を取得する。
+        const stick = gamepad.getStickDirection(0);
+        // アナログスティックの入力方向を調べる。
+        const input = {
+            'left': false,
+            'right': false,
+            'up': false,
+            'down': false,
+        };
+        // 左方向に入力されている場合
+        if (stick.x < -0.5) {
+            input.left = true;
+        }
+        // 右方向に入力されている場合
+        if (stick.x > 0.5) {
+            input.right = true;
+        }
+        // 上方向に入力されている場合
+        if (stick.y < -0.5) {
+            input.up = true;
+        }
+        // 下方向に入力されている場合
+        if (stick.y > 0.5) {
+            input.down = true;
+        }
+        // 各方向の処理を行う。
+        for (let direction of DIRECTIONS) {
+            // アナログスティックが入力されている場合
+            if (input[direction]) {
+                // 前回入力されていなかった場合
+                if (this._prevGamepadInput[direction]) {
+                    // カーソル位置を移動する。
+                    this._move(direction);
+                }
+                // 前回入力をありにする。
+                this._prevGamepadInput[direction] = true;
+            }
+            else {
+                // 前回入力を無しにする。
+                this._prevGamepadInput[direction] = false;
+            }
+        }
+    }
+    /**
+     * カーソル位置を移動する。
+     * @param direction 移動方向
+     */
+    _move(direction) {
+        // 現在のカーソル位置の情報がある場合は処理を行う。
+        if (this._positions[this._currentPosition]) {
+            // 次のカーソル位置を取得する。
+            const nextPosition = this._positions[this._currentPosition][direction];
+            // 次のカーソル位置の情報がある場合は移動処理を行う。
+            if (this._positions[nextPosition]) {
+                // カーソル位置を移動する。
+                this.setPosition(nextPosition);
+                // 効果音を鳴らす。
+                phina.asset.SoundManager.play('cursor');
+            }
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Cursor);
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /** @module playershot */
 
@@ -1784,17 +2126,17 @@ class PlayerShot {
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(28);
 /** @module stage */
 
 
@@ -1968,13 +2310,13 @@ class Stage {
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(5);
 
 
 
@@ -2189,7 +2531,7 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2244,12 +2586,12 @@ class BossLifeGauge {
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
 
 
 // 状態
@@ -2329,209 +2671,7 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-
-
-
-// ボタン選択からハンドラ実行までのインターバル(msec)
-const EXEC_INTERVAL = 500;
-/**
- * ボタン。
- */
-class Button {
-    /**
-     * コンストラクタ。
-     * @param width 幅
-     * @param height 高さ
-     */
-    constructor(width, height) {
-        // ベース部分を作成する。
-        this._base = new phina.display.RectangleShape({
-            width: width + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
-            height: height + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
-            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].BACK_COLOR,
-            strokeWidth: 0,
-            padding: 0,
-        });
-        // 枠を作成する。
-        this._createFrames(width, height);
-        // ラベルを作成する。
-        this._label = new phina.display.Label({
-            text: '',
-            fontSize: 24,
-            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].FORE_COLOR,
-            fontFamily: 'noto',
-        }).addChildTo(this._base);
-        // イベントハンドラを初期化する。
-        this._handler = null;
-        // 有効無効判定関数を初期化する。
-        this._isDisable = null;
-        // 有効無効設定関数を初期化する。
-        this._setDisable = null;
-        // タッチ操作を有効にする。
-        this._base.setInteractive(true);
-        // タッチ開始イベントのハンドラを作成する。
-        this._base.on('pointstart', (event) => {
-            this.select();
-        });
-    }
-    /**
-     * phina.jsのエレメントに画像を追加する。
-     * @param parent 親ノード
-     * @return 自インスタンス
-     */
-    addChildTo(parent) {
-        this._base.addChildTo(parent);
-        return this;
-    }
-    /**
-     * 表示位置を設定する。
-     * @param x x座標
-     * @param y y座標
-     * @return 自インスタンス
-     */
-    setPosition(x, y) {
-        this._base.x = x;
-        this._base.y = y;
-        return this;
-    }
-    /**
-     * イベントハンドラを設定する。
-     * @param handler イベントハンドラ
-     * @return 自インスタンス
-     */
-    setHandler(handler) {
-        this._handler = handler;
-        return this;
-    }
-    /**
-     * ラベルのテキストを設定する。
-     * @param label ラベルのテキスト
-     * @return 自インスタンス
-     */
-    setLabel(label) {
-        this._label.text = label;
-        return this;
-    }
-    /**
-     * 有効無効に関する関数を設定する。
-     * @param isDiable 有効無効判定関数
-     * @param setDisable 有効無効設定関数
-     */
-    setDisableFunc(isDiable, setDisable) {
-        this._isDisable = isDiable;
-        this._setDisable = setDisable;
-        return this;
-    }
-    /**
-     * ボタン選択時の処理を行う。
-     * @return 自インスタンス
-     */
-    select() {
-        // 無効な状態に設定されている場合は何も処理をしない。
-        if (this._isDisable !== null && this._isDisable()) {
-            return this;
-        }
-        // 実行中は入力を無効化する。
-        if (this._setDisable !== null) {
-            this._setDisable(true);
-        }
-        // 効果音を鳴らす。
-        phina.asset.SoundManager.play('select');
-        // 点滅アニメーションを実行する。
-        // 100ms周期で表示、非表示を切り替える。
-        this._base.tweener.wait(100)
-            .set({ alpha: 0 })
-            .wait(100)
-            .set({ alpha: 1 })
-            .wait(100)
-            .set({ alpha: 0 })
-            .wait(100)
-            .set({ alpha: 1 })
-            .play();
-        // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
-        if (this._handler !== null) {
-            setTimeout(this._handler, EXEC_INTERVAL);
-        }
-        return this;
-    }
-    /**
-     * ボタンの枠の部分を作成する。
-     * @param width 幅
-     * @param height 高さ
-     */
-    _createFrames(width, height) {
-        // フレーム1個分のサイズを取得する。
-        const FrameSize = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
-        for (let x = -width / 2; x <= width / 2; x += FrameSize) {
-            for (let y = -height / 2; y <= height / 2; y += FrameSize) {
-                // 一番上
-                if (y === -height / 2) {
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonTopLeft');
-                    }
-                    else if (x + FrameSize <= width / 2) {
-                        this._createFrame(x, y, 'buttonTop');
-                    }
-                    else {
-                        this._createFrame(x, y, 'buttonTopRight');
-                    }
-                }
-                else if (y + FrameSize <= height / 2) {
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonLeft');
-                    }
-                    else if (x + FrameSize <= width / 2) {
-                        // 上下左右真ん中部分は画像無し。
-                    }
-                    else {
-                        this._createFrame(x, y, 'buttonRight');
-                    }
-                }
-                else {
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonBottomLeft');
-                    }
-                    else if (x + FrameSize <= width / 2) {
-                        this._createFrame(x, y, 'buttonBottom');
-                    }
-                    else {
-                        this._createFrame(x, y, 'buttonBottomRight');
-                    }
-                }
-            }
-        }
-    }
-    /**
-     * 枠の画像を読み込み、ベースに配置する。
-     * @param x x座標
-     * @param y y座標
-     * @param type 枠のタイプ
-     */
-    _createFrame(x, y, type) {
-        // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
-        frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
-        frame.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
-        frame.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
-        frame.addChildTo(this._base)
-            .setPosition(x, y);
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Button);
-
-
-/***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2588,12 +2728,12 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemy_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemy_js__ = __webpack_require__(5);
 /** @module dragonfly */
 
 
@@ -2643,7 +2783,7 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2720,12 +2860,12 @@ class Explosion {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(7);
 
 
@@ -2776,11 +2916,11 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(2);
 /** @module life */
@@ -2857,14 +2997,14 @@ class Life {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(9);
 
 
@@ -2897,6 +3037,7 @@ const ASSETS = {
         'hit': './sound/hit.mp3',
         'bomb_min': './sound/bomb_min.mp3',
         'miss': './sound/miss.mp3',
+        'pause': './sound/pause.mp3',
     },
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',
@@ -3029,16 +3170,199 @@ phina.main(function () {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(11);
+
+
+
+
+// ラベルの位置、x座標
+const LABEL_POS_X = Math.floor(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH * 0.5);
+// ラベルの位置、y座標
+const LABEL_POS_Y = Math.floor(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT * 0.3);
+// ボタンの幅
+const BUTTON_WIDTH = 128;
+// ボタンの高さ
+const BUTTON_HEIGHT = 32;
+// ボタンの位置、x座標
+const BUTTON_POS_X = [
+    Math.floor(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH * 0.3),
+    Math.floor(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH * 0.7),
+];
+// ボタンの位置、y座標
+const BUTTON_POS_Y = Math.floor(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT * 0.6);
+// カーソルの位置、x座標
+const CURSOR_POS_X = [
+    BUTTON_POS_X[0] - BUTTON_WIDTH / 2 - 16,
+    BUTTON_POS_X[1] - BUTTON_WIDTH / 2 - 16,
+];
+// カーソルの位置、y座標
+const CURSOR_POS_Y = BUTTON_POS_Y;
+// ボタンのID
+var BUTTON_ID;
+(function (BUTTON_ID) {
+    BUTTON_ID[BUTTON_ID["RESUME"] = 0] = "RESUME";
+    BUTTON_ID[BUTTON_ID["QUIT"] = 1] = "QUIT";
+})(BUTTON_ID || (BUTTON_ID = {}));
+;
+/**
+ * 一時停止画面。
+ */
+class PauseLayer {
+    /**
+     * コンストラクタ。
+     */
+    constructor() {
+        // ルートノードを作成する。
+        this._rootNode = new phina.display.DisplayElement();
+        // PAUSEラベルを作成する。
+        const pauseLabel = new phina.display.Label({
+            text: 'PAUSE',
+            fontSize: 36,
+            backgroundColor: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].BACK_COLOR,
+            fill: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].FORE_COLOR,
+            fontFamily: 'noto',
+            x: LABEL_POS_X,
+            y: LABEL_POS_Y,
+            strokeWidth: 0,
+            padding: 0,
+        }).addChildTo(this._rootNode);
+        // ボタン配列を作成する。
+        this._buttons = [];
+        // RESUMEボタンを作成する。
+        const resumeButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+            .addChildTo(this._rootNode)
+            .setLabel('RESUME')
+            .setPosition(BUTTON_POS_X[BUTTON_ID.RESUME], BUTTON_POS_Y)
+            .onEffect(() => { this._setEnable(false); })
+            .onPush(() => {
+            if (this._onResumeFunc !== null) {
+                this._onResumeFunc();
+            }
+            this._setEnable(true);
+        });
+        this._buttons.push(resumeButton);
+        // QUITボタンを作成する。
+        const quitButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+            .addChildTo(this._rootNode)
+            .setLabel('QUIT')
+            .setPosition(BUTTON_POS_X[BUTTON_ID.QUIT], BUTTON_POS_Y)
+            .onEffect(() => { this._setEnable(false); })
+            .onPush(() => {
+            if (this._onQuitFunc !== null) {
+                this._onQuitFunc();
+            }
+            this._setEnable(true);
+        });
+        this._buttons.push(quitButton);
+        // カーソルを作成する。
+        this._cursor = new __WEBPACK_IMPORTED_MODULE_3__cursor__["a" /* default */]()
+            .addChildTo(this._rootNode)
+            .addPosition(BUTTON_ID.RESUME, {
+            x: CURSOR_POS_X[BUTTON_ID.RESUME],
+            y: CURSOR_POS_Y,
+            left: -1,
+            right: BUTTON_ID.QUIT,
+            up: -1,
+            down: -1,
+        })
+            .addPosition(BUTTON_ID.QUIT, {
+            x: CURSOR_POS_X[BUTTON_ID.QUIT],
+            y: CURSOR_POS_Y,
+            left: BUTTON_ID.RESUME,
+            right: -1,
+            up: -1,
+            down: -1,
+        })
+            .setPosition(BUTTON_ID.RESUME);
+        // コールバック関数を初期化する。
+        this._onResumeFunc = null;
+        this._onQuitFunc = null;
+        // 初期状態は有効とする。
+        this._enable = true;
+    }
+    /**
+     * phina.jsのエレメントにノードを追加する。
+     * @param parent 親ノード
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._rootNode.addChildTo(parent);
+        return this;
+    }
+    /**
+     * 親ノードから取り除く。
+     * @return 自インスタンス
+     */
+    remove() {
+        this._rootNode.remove();
+        return this;
+    }
+    /**
+     * RESUMEボタン選択時のコールバック関数を設定する。
+     * @param func コールバック関数
+     */
+    onResume(func) {
+        this._onResumeFunc = func;
+        return this;
+    }
+    /**
+     * QUITボタン選択時のコールバック関数を設定する。
+     * @param func コールバック関数
+     */
+    onQuit(func) {
+        this._onQuitFunc = func;
+        return this;
+    }
+    /**
+     * 入力処理を行う。
+     * @param keyboard キーボード
+     * @param gamepad ゲームパッド
+     */
+    input(keyboard, gamepad) {
+        // 入力が有効な場合に処理を行う。
+        if (this._enable) {
+            // カーソルの移動処理を行う。
+            this._cursor.input(keyboard, gamepad);
+            // キーボードのzキーかゲームパッドのAボタンが押された場合は選択中のボタンの処理を行う。
+            if (keyboard.getKeyDown('z') || gamepad.getKeyDown('a')) {
+                this._buttons[this._cursor.position].select();
+            }
+        }
+    }
+    /**
+     * 有効か無効かを設定する。
+     * @param value 設定値
+     */
+    _setEnable(value) {
+        // 有効か無効かを設定する。
+        this._enable = value;
+        // 各ボタンの有効か無効かを設定する。
+        for (let button of this._buttons) {
+            button.setEnable(value);
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (PauseLayer);
+
+
+/***/ }),
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(26);
 
 
 
@@ -3437,7 +3761,7 @@ class Player {
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3518,13 +3842,13 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(12);
 /** @module playeroption */
 
 
@@ -3735,22 +4059,24 @@ class PlayerOption {
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pauselayer__ = __webpack_require__(23);
+
 
 
 
@@ -3791,8 +4117,9 @@ const GAMEOVER_INTERVAL = 1000;
 var SCENE_STATE;
 (function (SCENE_STATE) {
     SCENE_STATE[SCENE_STATE["PLAYING"] = 0] = "PLAYING";
-    SCENE_STATE[SCENE_STATE["WAIT"] = 1] = "WAIT";
+    SCENE_STATE[SCENE_STATE["WAIT_GAMEOVER"] = 1] = "WAIT_GAMEOVER";
     SCENE_STATE[SCENE_STATE["GAMEOVER"] = 2] = "GAMEOVER";
+    SCENE_STATE[SCENE_STATE["PAUSE"] = 3] = "PAUSE";
 })(SCENE_STATE || (SCENE_STATE = {}));
 /**
  * ゲームの各ステージをプレイするメインのシーン。
@@ -3893,6 +4220,9 @@ class PlayingScene {
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
         // 初期状態はプレイ中とする。
         this._state = SCENE_STATE.PLAYING;
+        // 一時停止レイヤーを作成する。
+        this._pauseLayer = new __WEBPACK_IMPORTED_MODULE_12__pauselayer__["a" /* default */]()
+            .onResume(() => { this._resume(); });
     }
     /**
      * 更新処理。
@@ -3905,7 +4235,7 @@ class PlayingScene {
         this._input(app);
         // プレイ中、待機中の場合
         if (this._state === SCENE_STATE.PLAYING ||
-            this._state === SCENE_STATE.WAIT) {
+            this._state === SCENE_STATE.WAIT_GAMEOVER) {
             // ステージやキャラクターの状態を更新する。
             this._updateStageData();
         }
@@ -4003,7 +4333,7 @@ class PlayingScene {
         }
         else {
             // 状態を待機中に変更する。
-            this._state = SCENE_STATE.WAIT;
+            this._state = SCENE_STATE.WAIT_GAMEOVER;
             // シールドボタンを無効化する。
             this._shieldButton.enable = false;
             // BGMを停止する。
@@ -4041,6 +4371,9 @@ class PlayingScene {
             case SCENE_STATE.GAMEOVER:
                 this._inputOnGameOver(app);
                 break;
+            case SCENE_STATE.PAUSE:
+                this._pauseLayer.input(app.keyboard, this._gamepadManager.get(0));
+                break;
             default:
                 break;
         }
@@ -4050,20 +4383,22 @@ class PlayingScene {
      * @param app アプリケーション
      */
     _inputOnPlaying(app) {
-        // ボタン入力状態を初期化する。
-        this._inputShieldButton = false;
         // キーボード入力を行う。
-        this._inputKeyboard(app);
+        const keyboard = this._inputKeyboard(app);
         // タッチ入力を行う。
-        this._inputTouch(app);
+        const touch = this._inputTouch(app);
         // ゲームパッド入力を行う。
-        this._inputGamepad();
+        const gamepad = this._inputGamepad();
         // シールドボタン入力状態に応じて自機の状態を変化させる。
-        if (this._inputShieldButton) {
+        if (keyboard.shield || touch.shield || gamepad.shield) {
             this._player.shield = true;
         }
         else {
             this._player.shield = false;
+        }
+        // 一時停止が入力された場合は一時停止処理を行う。
+        if (keyboard.pause || touch.pause || gamepad.pause) {
+            this._pause();
         }
     }
     /**
@@ -4089,6 +4424,11 @@ class PlayingScene {
     _inputKeyboard(app) {
         // キーボードを取得する。
         const key = app.keyboard;
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        };
         // カーソルキーの入力によって自機を移動する。
         if (key.getKey('left')) {
             this._player.moveKeyLeft(this);
@@ -4104,8 +4444,13 @@ class PlayingScene {
         }
         // zキーでシールドを使用する。
         if (key.getKey('z')) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+        // ESCキーで一時停止する。
+        if (key.getKeyDown('escape')) {
+            inputState.pause = true;
+        }
+        return inputState;
     }
     /**
      * タッチの入力処理を行う。
@@ -4114,6 +4459,11 @@ class PlayingScene {
     _inputTouch(app) {
         const touches = app.pointers;
         let sliding = false;
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        };
         for (let i = 0; i < touches.length; i++) {
             // マウスが接続されていない場合はスライドの処理を行う。
             if (!__WEBPACK_IMPORTED_MODULE_0__pointdevice__["a" /* default */].isMouseUsed) {
@@ -4143,13 +4493,19 @@ class PlayingScene {
         }
         // シールドボタンがタッチされている場合はシールドを使用する。
         if (this._shieldButton.isTouch) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+        return inputState;
     }
     /**
      * ゲームパッドの入力処理を行う。
      */
     _inputGamepad() {
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        };
         // ゲームパッドの状態を更新する。
         this._gamepadManager.update();
         // ゲームパッドを取得する。
@@ -4162,8 +4518,13 @@ class PlayingScene {
         }
         // Aボタンでシールドを使用する。
         if (gamepad.getKey('a')) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+        // STARTボタンで一時停止する。
+        if (gamepad.getKeyDown('start')) {
+            inputState.pause = true;
+        }
+        return inputState;
     }
     /**
      * ステージの外側の枠と背景を作成する。
@@ -4409,6 +4770,7 @@ class PlayingScene {
      * キャラクターのアニメーションを停止する。
      */
     _stopCharacterAnimation() {
+        this._player.pauseAnimation();
         for (let character of this._characters) {
             character.pauseAnimation();
         }
@@ -4417,6 +4779,7 @@ class PlayingScene {
      * キャラクターのアニメーションを開始する。
      */
     _startCharacterAnimation() {
+        this._player.startAnimation();
         for (let character of this._characters) {
             character.startAnimation();
         }
@@ -4428,17 +4791,41 @@ class PlayingScene {
         this._rootNode.remove();
         this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_11__titlescene__["a" /* default */](this._phinaScene, this._gamepadManager);
     }
+    /**
+     * ゲームを一時停止する。
+     */
+    _pause() {
+        // 状態をポーズに遷移する。
+        this._state = SCENE_STATE.PAUSE;
+        // 効果音を鳴らす。
+        phina.asset.SoundManager.play('pause');
+        // キャラクターのアニメーションを停止する。
+        this._stopCharacterAnimation();
+        // 一時停止レイヤーを画面に配置する。
+        this._pauseLayer.addChildTo(this._rootNode);
+    }
+    /**
+     * ゲームを再開する。
+     */
+    _resume() {
+        // 状態をプレイ中に遷移する。
+        this._state = SCENE_STATE.PLAYING;
+        // キャラクターのアニメーションを再開する。
+        this._startCharacterAnimation();
+        // 一時停止レイヤーを画面から取り除く。
+        this._pauseLayer.remove();
+    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (PlayingScene);
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(7);
 
 
@@ -4669,7 +5056,7 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4761,7 +5148,7 @@ class ShieldButton {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

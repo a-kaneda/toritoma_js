@@ -14,6 +14,7 @@ import Point from './point'
 import Scene from './scene'
 import TitleScene from './titlescene'
 import MainScene from './mainscene.d'
+import PauseLayer from './pauselayer'
 
 // 初期残機
 const INITIAL_LIFE = 2;
@@ -42,9 +43,16 @@ const GAMEOVER_INTERVAL = 1000;
 
 // シーンの状態
 enum SCENE_STATE {
-    PLAYING,
-    WAIT,
-    GAMEOVER,
+    PLAYING,        // プレイ中
+    WAIT_GAMEOVER,  // ゲームオーバー待機中
+    GAMEOVER,       // ゲームオーバー
+    PAUSE,          // ポーズ中
+}
+
+// 入力状態
+type INPUT_STATE = {
+    shield: boolean,    // シールドの使用
+    pause: boolean,     // 一時停止
 }
 
 /**
@@ -92,14 +100,14 @@ class PlayingScene implements Scene {
     private _player: Player;
     /** タッチ情報。 */
     private _touch: {id: number, x: number, y:number};
-    /** シールドボタン入力状態 */
-    private _inputShieldButton: boolean;
     /** 自機弾衝突フラグ */
     private _isHitPlayerShot: boolean;
     /** 自機弾衝突音発生間隔 */
     private _hitPlayerShotInterval: number;
     /** シーンの状態 */
     private _state: SCENE_STATE;
+    /** 一時停止時のレイヤー */
+    private _pauseLayer: PauseLayer;
 
     /**
      * コンストラクタ。
@@ -232,6 +240,10 @@ class PlayingScene implements Scene {
 
         // 初期状態はプレイ中とする。
         this._state = SCENE_STATE.PLAYING;
+
+        // 一時停止レイヤーを作成する。
+        this._pauseLayer = new PauseLayer()
+        .onResume(() => {this._resume()});
     }
 
     /**
@@ -247,7 +259,7 @@ class PlayingScene implements Scene {
 
         // プレイ中、待機中の場合
         if (this._state === SCENE_STATE.PLAYING ||
-            this._state === SCENE_STATE.WAIT) {
+            this._state === SCENE_STATE.WAIT_GAMEOVER) {
 
             // ステージやキャラクターの状態を更新する。
             this._updateStageData();
@@ -368,7 +380,7 @@ class PlayingScene implements Scene {
         else {
 
             // 状態を待機中に変更する。
-            this._state = SCENE_STATE.WAIT;
+            this._state = SCENE_STATE.WAIT_GAMEOVER;
 
             // シールドボタンを無効化する。
             this._shieldButton.enable = false;
@@ -414,6 +426,9 @@ class PlayingScene implements Scene {
             case SCENE_STATE.GAMEOVER:
                 this._inputOnGameOver(app);
                 break;
+            case SCENE_STATE.PAUSE:
+                this._pauseLayer.input(app.keyboard, this._gamepadManager.get(0));
+                break;
             default:
                 break;
         }
@@ -425,24 +440,26 @@ class PlayingScene implements Scene {
      */
     private _inputOnPlaying(app: phina.game.GameApp): void {
 
-        // ボタン入力状態を初期化する。
-        this._inputShieldButton = false;
-
         // キーボード入力を行う。
-        this._inputKeyboard(app);
+        const keyboard = this._inputKeyboard(app);
 
         // タッチ入力を行う。
-        this._inputTouch(app);
+        const touch = this._inputTouch(app);
 
         // ゲームパッド入力を行う。
-        this._inputGamepad();
+        const gamepad = this._inputGamepad();
 
         // シールドボタン入力状態に応じて自機の状態を変化させる。
-        if (this._inputShieldButton) {
+        if (keyboard.shield || touch.shield || gamepad.shield) {
             this._player.shield = true;
         }
         else {
             this._player.shield = false;
+        }
+
+        // 一時停止が入力された場合は一時停止処理を行う。
+        if (keyboard.pause || touch.pause || gamepad.pause) {
+            this._pause();
         }
     }
 
@@ -472,10 +489,16 @@ class PlayingScene implements Scene {
      * キーボードの入力処理を行う。
      * @param app アプリケーション
      */
-    private _inputKeyboard(app: phina.game.GameApp): void {
+    private _inputKeyboard(app: phina.game.GameApp): INPUT_STATE {
 
         // キーボードを取得する。
         const key = app.keyboard;
+
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        }
 
         // カーソルキーの入力によって自機を移動する。
         if (key.getKey('left')) {
@@ -493,18 +516,31 @@ class PlayingScene implements Scene {
 
         // zキーでシールドを使用する。
         if (key.getKey('z')) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+
+        // ESCキーで一時停止する。
+        if (key.getKeyDown('escape')) {
+            inputState.pause = true;            
+        }
+
+        return inputState;
     }
 
     /**
      * タッチの入力処理を行う。
      * @param app アプリケーション
      */
-    private _inputTouch(app: phina.game.GameApp): void {
+    private _inputTouch(app: phina.game.GameApp): INPUT_STATE {
 
         const touches = app.pointers;
         let sliding = false;
+
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        }
 
         for (let i = 0; i < touches.length; i++) {
 
@@ -540,14 +576,22 @@ class PlayingScene implements Scene {
 
         // シールドボタンがタッチされている場合はシールドを使用する。
         if (this._shieldButton.isTouch) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+
+        return inputState;
     }
 
     /**
      * ゲームパッドの入力処理を行う。
      */
-    private _inputGamepad(): void {
+    private _inputGamepad(): INPUT_STATE {
+
+        // 入力状態を初期化する。
+        let inputState = {
+            shield: false,
+            pause: false,
+        }
 
         // ゲームパッドの状態を更新する。
         this._gamepadManager.update();
@@ -565,8 +609,15 @@ class PlayingScene implements Scene {
 
         // Aボタンでシールドを使用する。
         if (gamepad.getKey('a')) {
-            this._inputShieldButton = true;
+            inputState.shield = true;
         }
+
+        // STARTボタンで一時停止する。
+        if (gamepad.getKeyDown('start')) {
+            inputState.pause = true;
+        }
+
+        return inputState;
     }
 
     /**
@@ -864,6 +915,8 @@ class PlayingScene implements Scene {
      */
     private _stopCharacterAnimation(): void {
 
+        this._player.pauseAnimation();
+
         for (let character of this._characters) {
             character.pauseAnimation();
         }
@@ -874,6 +927,8 @@ class PlayingScene implements Scene {
      */
     private _startCharacterAnimation(): void {
 
+        this._player.startAnimation();
+        
         for (let character of this._characters) {
             character.startAnimation();
         }
@@ -885,6 +940,39 @@ class PlayingScene implements Scene {
     private _replaceScene(): void {
         this._rootNode.remove();
         this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
+    }
+
+    /**
+     * ゲームを一時停止する。
+     */
+    private _pause(): void {
+
+        // 状態をポーズに遷移する。
+        this._state = SCENE_STATE.PAUSE;
+
+        // 効果音を鳴らす。
+        phina.asset.SoundManager.play('pause');
+
+        // キャラクターのアニメーションを停止する。
+        this._stopCharacterAnimation();
+
+        // 一時停止レイヤーを画面に配置する。
+        this._pauseLayer.addChildTo(this._rootNode);
+    }
+
+    /**
+     * ゲームを再開する。
+     */
+    private _resume(): void {
+
+        // 状態をプレイ中に遷移する。
+        this._state = SCENE_STATE.PLAYING;
+
+        // キャラクターのアニメーションを再開する。
+        this._startCharacterAnimation();
+
+        // 一時停止レイヤーを画面から取り除く。
+        this._pauseLayer.remove();
     }
 }
 

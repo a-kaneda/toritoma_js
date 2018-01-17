@@ -30,12 +30,12 @@ class Button {
             fill: MyColor.FORE_COLOR,
             fontFamily: 'noto',
         }).addChildTo(this._base);
-        // イベントハンドラを初期化する。
-        this._handler = null;
-        // 有効無効判定関数を初期化する。
-        this._isDisable = null;
-        // 有効無効設定関数を初期化する。
-        this._setDisable = null;
+        // ボタン選択エフェクト開始時のコールバック関数を初期化する。
+        this._onEffect = null;
+        // ボタン選択時のコールバック関数を初期化する。
+        this._onPush = null;
+        // 初期状態は有効とする。
+        this._enable = true;
         // タッチ操作を有効にする。
         this._base.setInteractive(true);
         // タッチ開始イベントのハンドラを作成する。
@@ -64,12 +64,21 @@ class Button {
         return this;
     }
     /**
-     * イベントハンドラを設定する。
-     * @param handler イベントハンドラ
+     * ボタン選択エフェクト開始時のコールバック関数を設定する。
+     * @param func コールバック関数
      * @return 自インスタンス
      */
-    setHandler(handler) {
-        this._handler = handler;
+    onEffect(func) {
+        this._onEffect = func;
+        return this;
+    }
+    /**
+     * ボタン選択時のコールバック関数を設定する。
+     * @param func コールバック関数
+     * @return 自インスタンス
+     */
+    onPush(func) {
+        this._onPush = func;
         return this;
     }
     /**
@@ -82,13 +91,11 @@ class Button {
         return this;
     }
     /**
-     * 有効無効に関する関数を設定する。
-     * @param isDiable 有効無効判定関数
-     * @param setDisable 有効無効設定関数
+     * 有効か無効かを設定する。
+     * @param value 設定値
      */
-    setDisableFunc(isDiable, setDisable) {
-        this._isDisable = isDiable;
-        this._setDisable = setDisable;
+    setEnable(value) {
+        this._enable = value;
         return this;
     }
     /**
@@ -96,30 +103,29 @@ class Button {
      * @return 自インスタンス
      */
     select() {
-        // 無効な状態に設定されている場合は何も処理をしない。
-        if (this._isDisable !== null && this._isDisable()) {
-            return this;
-        }
-        // 実行中は入力を無効化する。
-        if (this._setDisable !== null) {
-            this._setDisable(true);
-        }
-        // 効果音を鳴らす。
-        phina.asset.SoundManager.play('select');
-        // 点滅アニメーションを実行する。
-        // 100ms周期で表示、非表示を切り替える。
-        this._base.tweener.wait(100)
-            .set({ alpha: 0 })
-            .wait(100)
-            .set({ alpha: 1 })
-            .wait(100)
-            .set({ alpha: 0 })
-            .wait(100)
-            .set({ alpha: 1 })
-            .play();
-        // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
-        if (this._handler !== null) {
-            setTimeout(this._handler, EXEC_INTERVAL);
+        // 有効なときに処理を行う。
+        if (this._enable) {
+            // エフェクト開始時のコールバック関数を呼び出す。。
+            if (this._onEffect !== null) {
+                this._onEffect();
+            }
+            // 効果音を鳴らす。
+            phina.asset.SoundManager.play('select');
+            // 点滅アニメーションを実行する。
+            // 100ms周期で表示、非表示を切り替える。
+            this._base.tweener.wait(100)
+                .set({ alpha: 0 })
+                .wait(100)
+                .set({ alpha: 1 })
+                .wait(100)
+                .set({ alpha: 0 })
+                .wait(100)
+                .set({ alpha: 1 })
+                .play();
+            // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
+            if (this._onPush !== null) {
+                setTimeout(this._onPush, EXEC_INTERVAL);
+            }
         }
         return this;
     }

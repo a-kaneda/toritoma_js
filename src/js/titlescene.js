@@ -2,6 +2,7 @@ import Button from './button';
 import PlayinScene from './playingscene';
 import ControlSize from './controlsize';
 import ScreenSize from './screensize';
+import Cursor from './cursor';
 // タイトルの位置、x座標
 const TITLE_POS_X = 130;
 // タイトルの位置、y座標
@@ -18,6 +19,14 @@ const BUTTON_HEIGHT = 32;
 const CURSOR_POS_X = 256;
 // ボタンの数
 const BUTTON_NUM = 3;
+// ボタンのID
+var BUTTON_ID;
+(function (BUTTON_ID) {
+    BUTTON_ID[BUTTON_ID["GAME_START"] = 0] = "GAME_START";
+    BUTTON_ID[BUTTON_ID["HOW_TO_PLAY"] = 1] = "HOW_TO_PLAY";
+    BUTTON_ID[BUTTON_ID["CREDIT"] = 2] = "CREDIT";
+})(BUTTON_ID || (BUTTON_ID = {}));
+;
 /**
  * タイトルのシーン
  */
@@ -48,41 +57,48 @@ class TitleScene {
             .addChildTo(this._rootNode)
             .setLabel('GAME START')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
-            .setHandler(() => { this._replaceScene('PlayingScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+            .onEffect(() => { this._disableInput(); })
+            .onPush(() => { this._replaceScene('PlayingScene'); });
         this._buttons.push(gameStartButton);
         // 遊び方説明ボタンを作成する。
         const howToPlayButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('HOW TO PLAY')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[1])
-            .setHandler(() => { this._replaceScene('HowToPlayScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+            .onEffect(() => { this._disableInput(); })
+            .onPush(() => { this._replaceScene('HowToPlayScene'); });
         this._buttons.push(howToPlayButton);
         // クレジットボタンを作成する。
         const creditButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('CREDIT')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[2])
-            .setHandler(() => { this._replaceScene('CreditScene'); })
-            .setDisableFunc(() => { return this._disableInput; }, (value) => { this._disableInput = value; });
+            .onEffect(() => { this._disableInput(); })
+            .onPush(() => { this._replaceScene('CreditScene'); });
         this._buttons.push(creditButton);
         // カーソルを作成する。
-        this._cursor = new phina.display.Sprite('control', ControlSize.cs.cursor.width, ControlSize.cs.cursor.height)
-            .addChildTo(this._rootNode)
-            .setPosition(CURSOR_POS_X, BUTTON_POS_Y[0]);
-        this._cursor.srcRect.set(ControlSize.cs.cursor.x, ControlSize.cs.cursor.y, ControlSize.cs.cursor.width, ControlSize.cs.cursor.height);
-        this._cursor.scaleX = ScreenSize.ZOOM_RATIO;
-        this._cursor.scaleY = ScreenSize.ZOOM_RATIO;
-        // 初期選択ボタンは1個目とする。
-        this._selectButton = 0;
-        // 入力内容を初期化する。
-        this._isUpInputKeyboard = false;
-        this._isDownInputKeyboard = false;
-        this._isUpInputGamepad = false;
-        this._isDownInputGamepad = false;
+        this._cursor = new Cursor()
+            .addChildTo(this._rootNode);
+        // カーソル位置の情報を作成する。
+        for (let i = 0; i < BUTTON_NUM; i++) {
+            // 上に移動するときの位置を決める。ループするようにする。
+            const prevPos = i - 1 >= 0 ? i - 1 : BUTTON_NUM - 1;
+            // 下に移動するときの位置を決める。ループするようにする。
+            const nextPos = i + 1 < BUTTON_NUM ? i + 1 : 0;
+            // カーソル位置を登録する。
+            this._cursor.addPosition(i, {
+                x: CURSOR_POS_X,
+                y: BUTTON_POS_Y[i],
+                left: -1,
+                right: -1,
+                up: prevPos,
+                down: nextPos
+            });
+        }
+        // 初期位置はGAME STARTボタンの位置とする。
+        this._cursor.setPosition(BUTTON_ID.GAME_START);
         // 初期状態は入力は有効とする。
-        this._disableInput = false;
+        this._isDisableInput = false;
     }
     /**
      * 更新処理。
@@ -91,7 +107,9 @@ class TitleScene {
      */
     update(app) {
         // 入力が無効になっていない場合
-        if (!this._disableInput) {
+        if (!this._isDisableInput) {
+            // カーソル移動処理を行う。
+            this._cursor.input(app.keyboard, this._gamepadManager.get());
             // キーボードの入力処理を行う。
             this._inputKeyboard(app);
             // ゲームパッドの入力処理を行う。。
@@ -114,40 +132,12 @@ class TitleScene {
     }
     /**
      * キーボードの入力処理を行う。
-     * 上下キーでカーソルを移動し、zキーでボタンを選択する。
+     * zキーでボタンを選択する。
      * @param app アプリケーション
      */
     _inputKeyboard(app) {
         // キーボードを取得する。
         const key = app.keyboard;
-        // 上キーが押されている場合
-        if (key.getKey('up')) {
-            // 前回上キーが押されていなければ処理を行う。。
-            if (!this._isUpInputKeyboard) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton - 1);
-            }
-            // 上キーが押されたことを記憶する。
-            this._isUpInputKeyboard = true;
-        }
-        else {
-            // 上キーが押されていない状態にする。
-            this._isUpInputKeyboard = false;
-        }
-        // 下キーが押されている場合
-        if (key.getKey('down')) {
-            // 前回下キーが押されていなければ処理を行う。。
-            if (!this._isDownInputKeyboard) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton + 1);
-            }
-            // 下キーが押されたことを記憶する。
-            this._isDownInputKeyboard = true;
-        }
-        else {
-            // 下キーが押されていない状態にする。
-            this._isDownInputKeyboard = false;
-        }
         // zキーが押されている場合
         if (key.getKeyDown('z')) {
             // 選択中のボタンを実行する。
@@ -162,72 +152,31 @@ class TitleScene {
         this._gamepadManager.update();
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
-        // アナログスティックの入力を取得する。
-        const stick = gamepad.getStickDirection(0);
-        // 上キーが押されている場合
-        if (stick.y < -0.5) {
-            // 前回上キーが押されていなければ処理を行う。。
-            if (!this._isUpInputGamepad) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton - 1);
-            }
-            // 上キーが押されたことを記憶する。
-            this._isUpInputGamepad = true;
-        }
-        else {
-            // 上キーが押されていない状態にする。
-            this._isUpInputGamepad = false;
-        }
-        // 下キーが押されている場合
-        if (stick.y > 0.5) {
-            // 前回下キーが押されていなければ処理を行う。。
-            if (!this._isDownInputGamepad) {
-                // カーソルを移動する。
-                this._moveCursor(this._selectButton + 1);
-            }
-            // 下キーが押されたことを記憶する。
-            this._isDownInputGamepad = true;
-        }
-        else {
-            // 下キーが押されていない状態にする。
-            this._isDownInputGamepad = false;
-        }
-        // Aボタンでシールドを使用する。
+        // Aボタンが押されている場合
         if (gamepad.getKeyDown('a')) {
             // 選択中のボタンを実行する。
             this._execButton();
         }
     }
     /**
-     * カーソルを移動する。
-     * 一番上から上に移動しようとした場合は一番下に移動する。
-     * 一番下から下に移動しようとした場合は一番上に移動する。
-     * @param selectButton 選択するボタンのインデックス
-     */
-    _moveCursor(selectButton) {
-        // 最小値未満の場合は最大値に変える。
-        if (selectButton < 0) {
-            selectButton = BUTTON_NUM - 1;
-        }
-        // 最大値超過の場合は最小値にする。
-        if (selectButton >= BUTTON_NUM) {
-            selectButton = 0;
-        }
-        // メンバ変数の値を変える。
-        this._selectButton = selectButton;
-        // カーソルの位置を変える。
-        this._cursor.y = BUTTON_POS_Y[this._selectButton];
-        // 効果音を鳴らす。
-        phina.asset.SoundManager.play('cursor');
-    }
-    /**
      * 選択中のボタンを実行する。
      */
     _execButton() {
         // 選択中のボタンを実行する。
-        this._buttons[this._selectButton].select();
+        this._buttons[this._cursor.position].select();
+    }
+    /**
+     * 入力を無効化する。
+     */
+    _disableInput() {
         // 入力を無効化する。
-        this._disableInput = true;
+        this._isDisableInput = true;
+        // カーソルを無効化する。。
+        this._cursor.setEnable(false);
+        // ボタンを無効化する。
+        for (let button of this._buttons) {
+            button.setEnable(false);
+        }
     }
 }
 export default TitleScene;

@@ -29,6 +29,7 @@ const ASSETS = {
         'hit': './sound/hit.mp3',
         'bomb_min': './sound/bomb_min.mp3',
         'miss': './sound/miss.mp3',
+        'pause': './sound/pause.mp3',
     },
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',
