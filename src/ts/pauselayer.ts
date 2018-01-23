@@ -1,4 +1,4 @@
-import Button from './button'
+import LabelButton from './labelbutton'
 import MyColor from './mycolor'
 import ScreenSize from './screensize'
 import ControlSize from './controlsize'
@@ -46,7 +46,7 @@ class PauseLayer {
     /** 操作を受け付けるかどうか */
     private _enable: boolean;
     /** ボタン */
-    private _buttons: Button[];
+    private _buttons: LabelButton[];
     /** カーソル */
     private _cursor: Cursor;
 
@@ -75,7 +75,7 @@ class PauseLayer {
         this._buttons = [];
 
         // RESUMEボタンを作成する。
-        const resumeButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
+        const resumeButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
         .addChildTo(this._rootNode)
         .setLabel('RESUME')
         .setPosition(BUTTON_POS_X[BUTTON_ID.RESUME], BUTTON_POS_Y)
@@ -89,7 +89,7 @@ class PauseLayer {
         this._buttons.push(resumeButton);
 
         // QUITボタンを作成する。
-        const quitButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
+        const quitButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
         .addChildTo(this._rootNode)
         .setLabel('QUIT')
         .setPosition(BUTTON_POS_X[BUTTON_ID.QUIT], BUTTON_POS_Y)

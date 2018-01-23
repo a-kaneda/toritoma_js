@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ 	return __webpack_require__(__webpack_require__.s = 23);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -350,6 +350,12 @@ const cs = {
         y: 0,
         width: 8,
         height: 8,
+    },
+    pauseButton: {
+        x: 208,
+        y: 16,
+        width: 16,
+        height: 16,
     },
     cursor: {
         x: 224,
@@ -1418,11 +1424,11 @@ class PointDevice {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__cursor__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__cursor__ = __webpack_require__(10);
 
 
 
@@ -1478,7 +1484,7 @@ class TitleScene {
         // ボタン配列を作成する。
         this._buttons = [];
         // ゲームスタートボタンを作成する。
-        const gameStartButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+        const gameStartButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('GAME START')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
@@ -1486,7 +1492,7 @@ class TitleScene {
             .onPush(() => { this._replaceScene('PlayingScene'); });
         this._buttons.push(gameStartButton);
         // 遊び方説明ボタンを作成する。
-        const howToPlayButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+        const howToPlayButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('HOW TO PLAY')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[1])
@@ -1494,7 +1500,7 @@ class TitleScene {
             .onPush(() => { this._replaceScene('HowToPlayScene'); });
         this._buttons.push(howToPlayButton);
         // クレジットボタンを作成する。
-        const creditButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+        const creditButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('CREDIT')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[2])
@@ -1612,6 +1618,190 @@ class TitleScene {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
+
+
+// 方向を表す文字列
+const DIRECTIONS = ['left', 'right', 'up', 'down'];
+/**
+ * カーソル。
+ */
+class Cursor {
+    /**
+     * コンストラクタ。
+     */
+    constructor() {
+        // 画像を読み込む。
+        this._sprite = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
+        this._sprite.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
+        this._sprite.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        this._sprite.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        // カーソル位置配列を作成する。
+        this._positions = {};
+        // 現在のカーソル位置情報を初期化する。
+        this._currentPosition = 0;
+        // 初期状態は有効とする。
+        this._enable = true;
+        // ゲームパッドの前回入力があったかどうかの情報を初期化する。
+        this._prevGamepadInput = {};
+        for (let direction of DIRECTIONS) {
+            this._prevGamepadInput[direction] = false;
+        }
+    }
+    /** 現在のカーソル位置のID */
+    get position() {
+        return this._currentPosition;
+    }
+    /**
+     * 画像を親ノードに追加する。
+     * @param parent 親ノード]
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._sprite.addChildTo(parent);
+        return this;
+    }
+    /**
+     * カーソル位置情報を追加する。
+     * @param id カーソル位置のID、一意な値を指定する。
+     * @param position カーソル位置情報
+     * @return 自インスタンス
+     */
+    addPosition(id, position) {
+        this._positions[id] = position;
+        return this;
+    }
+    /**
+     * カーソルの位置を設定する。addPositionで登録したカーソル位置へ移動する。
+     * @param id カーソル位置のID
+     * @return 自インスタンス
+     */
+    setPosition(id) {
+        // カーソル位置が登録されている場合
+        if (this._positions[id]) {
+            // 現在のカーソル位置を変更する。
+            this._currentPosition = id;
+            // 画像の表示位置を変更する。
+            this._sprite.x = this._positions[id].x;
+            this._sprite.y = this._positions[id].y;
+        }
+        return this;
+    }
+    /**
+     * 有効か無効かを設定する。
+     * @param value 有効か無効か
+     * @return 自インスタンス
+     */
+    setEnable(value) {
+        this._enable = value;
+        return this;
+    }
+    /**
+     * 入力処理を行う。
+     * @param keyboard キーボード
+     * @param gamepad ゲームパッド
+     */
+    input(keyboard, gamepad) {
+        // 有効な場合は処理を行う。
+        if (this._enable) {
+            // キーボードの入力処理を行う。
+            this._inputKeyboard(keyboard);
+            // ゲームパッドの入力処理を行う。
+            this._inputGamepad(gamepad);
+        }
+        return this;
+    }
+    /**
+     * キーボードの入力処理を行う。
+     * 上下キーでカーソルを移動し、zキーでボタンを選択する。
+     * @param keyboard キーボード
+     */
+    _inputKeyboard(keyboard) {
+        // 各方向の処理を行う。
+        for (let direction of DIRECTIONS) {
+            // 方向キーが押された場合
+            if (keyboard.getKeyDown(direction)) {
+                // カーソル位置を移動する。
+                this._move(direction);
+            }
+        }
+    }
+    /**
+     * ゲームパッドの入力処理を行う。
+     * @param gamepad ゲームパッド
+     */
+    _inputGamepad(gamepad) {
+        // アナログスティックの入力を取得する。
+        const stick = gamepad.getStickDirection(0);
+        // アナログスティックの入力方向を調べる。
+        const input = {
+            'left': false,
+            'right': false,
+            'up': false,
+            'down': false,
+        };
+        // 左方向に入力されている場合
+        if (stick.x < -0.5) {
+            input.left = true;
+        }
+        // 右方向に入力されている場合
+        if (stick.x > 0.5) {
+            input.right = true;
+        }
+        // 上方向に入力されている場合
+        if (stick.y < -0.5) {
+            input.up = true;
+        }
+        // 下方向に入力されている場合
+        if (stick.y > 0.5) {
+            input.down = true;
+        }
+        // 各方向の処理を行う。
+        for (let direction of DIRECTIONS) {
+            // アナログスティックが入力されている場合
+            if (input[direction]) {
+                // 前回入力されていなかった場合
+                if (this._prevGamepadInput[direction]) {
+                    // カーソル位置を移動する。
+                    this._move(direction);
+                }
+                // 前回入力をありにする。
+                this._prevGamepadInput[direction] = true;
+            }
+            else {
+                // 前回入力を無しにする。
+                this._prevGamepadInput[direction] = false;
+            }
+        }
+    }
+    /**
+     * カーソル位置を移動する。
+     * @param direction 移動方向
+     */
+    _move(direction) {
+        // 現在のカーソル位置の情報がある場合は処理を行う。
+        if (this._positions[this._currentPosition]) {
+            // 次のカーソル位置を取得する。
+            const nextPosition = this._positions[this._currentPosition][direction];
+            // 次のカーソル位置の情報がある場合は移動処理を行う。
+            if (this._positions[nextPosition]) {
+                // カーソル位置を移動する。
+                this.setPosition(nextPosition);
+                // 効果音を鳴らす。
+                phina.asset.SoundManager.play('cursor');
+            }
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Cursor);
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
@@ -1621,9 +1811,9 @@ class TitleScene {
 // ボタン選択からハンドラ実行までのインターバル(msec)
 const EXEC_INTERVAL = 500;
 /**
- * ボタン。
+ * ラベルを使用したボタン。
  */
-class Button {
+class LabelButton {
     /**
      * コンストラクタ。
      * @param width 幅
@@ -1812,191 +2002,7 @@ class Button {
             .setPosition(x, y);
     }
 }
-/* harmony default export */ __webpack_exports__["a"] = (Button);
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
-
-
-// 方向を表す文字列
-const DIRECTIONS = ['left', 'right', 'up', 'down'];
-/**
- * カーソル。
- */
-class Cursor {
-    /**
-     * コンストラクタ。
-     */
-    constructor() {
-        // 画像を読み込む。
-        this._sprite = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
-        this._sprite.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
-        this._sprite.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
-        this._sprite.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
-        // カーソル位置配列を作成する。
-        this._positions = {};
-        // 現在のカーソル位置情報を初期化する。
-        this._currentPosition = 0;
-        // 初期状態は有効とする。
-        this._enable = true;
-        // ゲームパッドの前回入力があったかどうかの情報を初期化する。
-        this._prevGamepadInput = {};
-        for (let direction of DIRECTIONS) {
-            this._prevGamepadInput[direction] = false;
-        }
-    }
-    /** 現在のカーソル位置のID */
-    get position() {
-        return this._currentPosition;
-    }
-    /**
-     * 画像を親ノードに追加する。
-     * @param parent 親ノード]
-     * @return 自インスタンス
-     */
-    addChildTo(parent) {
-        this._sprite.addChildTo(parent);
-        return this;
-    }
-    /**
-     * カーソル位置情報を追加する。
-     * @param id カーソル位置のID、一意な値を指定する。
-     * @param position カーソル位置情報
-     * @return 自インスタンス
-     */
-    addPosition(id, position) {
-        this._positions[id] = position;
-        return this;
-    }
-    /**
-     * カーソルの位置を設定する。addPositionで登録したカーソル位置へ移動する。
-     * @param id カーソル位置のID
-     * @return 自インスタンス
-     */
-    setPosition(id) {
-        // カーソル位置が登録されている場合
-        if (this._positions[id]) {
-            // 現在のカーソル位置を変更する。
-            this._currentPosition = id;
-            // 画像の表示位置を変更する。
-            this._sprite.x = this._positions[id].x;
-            this._sprite.y = this._positions[id].y;
-        }
-        return this;
-    }
-    /**
-     * 有効か無効かを設定する。
-     * @param value 有効か無効か
-     * @return 自インスタンス
-     */
-    setEnable(value) {
-        this._enable = value;
-        return this;
-    }
-    /**
-     * 入力処理を行う。
-     * @param keyboard キーボード
-     * @param gamepad ゲームパッド
-     */
-    input(keyboard, gamepad) {
-        // 有効な場合は処理を行う。
-        if (this._enable) {
-            // キーボードの入力処理を行う。
-            this._inputKeyboard(keyboard);
-            // ゲームパッドの入力処理を行う。
-            this._inputGamepad(gamepad);
-        }
-        return this;
-    }
-    /**
-     * キーボードの入力処理を行う。
-     * 上下キーでカーソルを移動し、zキーでボタンを選択する。
-     * @param keyboard キーボード
-     */
-    _inputKeyboard(keyboard) {
-        // 各方向の処理を行う。
-        for (let direction of DIRECTIONS) {
-            // 方向キーが押された場合
-            if (keyboard.getKeyDown(direction)) {
-                // カーソル位置を移動する。
-                this._move(direction);
-            }
-        }
-    }
-    /**
-     * ゲームパッドの入力処理を行う。
-     * @param gamepad ゲームパッド
-     */
-    _inputGamepad(gamepad) {
-        // アナログスティックの入力を取得する。
-        const stick = gamepad.getStickDirection(0);
-        // アナログスティックの入力方向を調べる。
-        const input = {
-            'left': false,
-            'right': false,
-            'up': false,
-            'down': false,
-        };
-        // 左方向に入力されている場合
-        if (stick.x < -0.5) {
-            input.left = true;
-        }
-        // 右方向に入力されている場合
-        if (stick.x > 0.5) {
-            input.right = true;
-        }
-        // 上方向に入力されている場合
-        if (stick.y < -0.5) {
-            input.up = true;
-        }
-        // 下方向に入力されている場合
-        if (stick.y > 0.5) {
-            input.down = true;
-        }
-        // 各方向の処理を行う。
-        for (let direction of DIRECTIONS) {
-            // アナログスティックが入力されている場合
-            if (input[direction]) {
-                // 前回入力されていなかった場合
-                if (this._prevGamepadInput[direction]) {
-                    // カーソル位置を移動する。
-                    this._move(direction);
-                }
-                // 前回入力をありにする。
-                this._prevGamepadInput[direction] = true;
-            }
-            else {
-                // 前回入力を無しにする。
-                this._prevGamepadInput[direction] = false;
-            }
-        }
-    }
-    /**
-     * カーソル位置を移動する。
-     * @param direction 移動方向
-     */
-    _move(direction) {
-        // 現在のカーソル位置の情報がある場合は処理を行う。
-        if (this._positions[this._currentPosition]) {
-            // 次のカーソル位置を取得する。
-            const nextPosition = this._positions[this._currentPosition][direction];
-            // 次のカーソル位置の情報がある場合は移動処理を行う。
-            if (this._positions[nextPosition]) {
-                // カーソル位置を移動する。
-                this.setPosition(nextPosition);
-                // 効果音を鳴らす。
-                phina.asset.SoundManager.play('cursor');
-            }
-        }
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Cursor);
+/* harmony default export */ __webpack_exports__["a"] = (LabelButton);
 
 
 /***/ }),
@@ -2131,12 +2137,12 @@ class PlayerShot {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(29);
 /** @module stage */
 
 
@@ -2864,6 +2870,98 @@ class Explosion {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
+
+
+/**
+ * 画像を使用したボタン。
+ * control.pngの中の画像を指定する。
+ * ControlSizeの中にサイズ情報を入れておく必要がある。
+ */
+class ImageBUtton {
+    /**
+     * コンストラクタ。
+     * 画像の読み込みとボタン部分を作成する。
+     * @param name コントロール名
+     */
+    constructor(name) {
+        // ベース部分を作成する。
+        this._base = new phina.display.DisplayElement();
+        // 画像を読み込む。
+        this._image = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].height)
+            .addChildTo(this._base);
+        this._image.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].x, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].y, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].height);
+        this._image.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
+        this._image.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
+        // ボタン部分を作成する。
+        // タップをやりやすくするため、画像より大きめにサイズを取る。
+        this._button = new phina.display.RectangleShape({
+            width: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].width * 1.5),
+            height: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].height * 1.5),
+        })
+            .addChildTo(this._base);
+        // ボタン部分を非表示にする。
+        this._button.alpha = 0;
+        // タッチ操作を有効にする。
+        this._button.setInteractive(true);
+        // ベース部分に追加する。
+        this._button.addChildTo(this._base);
+        // タッチ開始イベントのハンドラを作成する。
+        this._button.on('pointstart', (event) => {
+            if (this._enable && this._onPush !== null) {
+                this._onPush();
+            }
+        });
+        // コールバック関数を初期化する。
+        this._onPush = null;
+    }
+    /**
+     * phina.jsのエレメントに画像を追加する。
+     * @param parent 親ノード
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._base.addChildTo(parent);
+        return this;
+    }
+    /**
+     * 表示位置を設定する。
+     * @param x x座標
+     * @param y y座標
+     * @return 自インスタンス
+     */
+    setPosition(x, y) {
+        this._base.x = x;
+        this._base.y = y;
+        return this;
+    }
+    /**
+     * ボタン選択時のコールバック関数を設定する。
+     * @param func コールバック関数
+     * @return 自インスタンス
+     */
+    onPush(func) {
+        this._onPush = func;
+        return this;
+    }
+    /**
+     * 有効か無効かを設定する。
+     * @param value 設定値
+     */
+    setEnable(value) {
+        this._enable = value;
+        return this;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (ImageBUtton);
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(7);
@@ -2916,7 +3014,7 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2997,7 +3095,7 @@ class Life {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3170,14 +3268,14 @@ phina.main(function () {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__button__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(10);
 
 
 
@@ -3236,7 +3334,7 @@ class PauseLayer {
         // ボタン配列を作成する。
         this._buttons = [];
         // RESUMEボタンを作成する。
-        const resumeButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+        const resumeButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('RESUME')
             .setPosition(BUTTON_POS_X[BUTTON_ID.RESUME], BUTTON_POS_Y)
@@ -3249,7 +3347,7 @@ class PauseLayer {
         });
         this._buttons.push(resumeButton);
         // QUITボタンを作成する。
-        const quitButton = new __WEBPACK_IMPORTED_MODULE_0__button__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+        const quitButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('QUIT')
             .setPosition(BUTTON_POS_X[BUTTON_ID.QUIT], BUTTON_POS_Y)
@@ -3353,7 +3451,7 @@ class PauseLayer {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3361,8 +3459,8 @@ class PauseLayer {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(27);
 
 
 
@@ -3761,7 +3859,7 @@ class Player {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3842,7 +3940,7 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4059,7 +4157,7 @@ class PlayerOption {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4069,13 +4167,15 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pauselayer__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pauselayer__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(20);
+
 
 
 
@@ -4105,6 +4205,10 @@ const CHICKEN_GAUGE_POS_Y = 12;
 const SHIELD_BUTTON_POS_X = 50;
 // シールドボタン位置y座標(画面下からの位置)
 const SHIELD_BUTTON_POS_Y = 50;
+// 一時停止ボタン位置x座標(画面右からの位置)
+const PUASE_BUTTON_POS_X = 28;
+// 一時停止ボタン位置y座標(画面上からの位置)
+const PAUSE_BUTTON_POS_Y = 28;
 // ボスHPゲージ位置x座標(ステージ左端からの位置)
 const BOSS_LIFE_GAUGE_POS_X = 360;
 // ボスHPゲージ位置x座標(画面上からの位置)
@@ -4192,6 +4296,11 @@ class PlayingScene {
         this._shieldButton.sprite.addChildTo(this._infoLayer);
         this._shieldButton.sprite.x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
         this._shieldButton.sprite.y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
+        // 一時停止ボタンを作成する。
+        this._pauseButton = new __WEBPACK_IMPORTED_MODULE_13__imagebutton__["a" /* default */]('pauseButton')
+            .setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - PUASE_BUTTON_POS_X, PAUSE_BUTTON_POS_Y)
+            .onPush(() => { this._pause(); })
+            .addChildTo(this._infoLayer);
         // チキンゲージを作成する。
         this._chickenGauge = new __WEBPACK_IMPORTED_MODULE_8__chickengauge__["a" /* default */]();
         // チキンゲージの位置を設定する。
@@ -4218,11 +4327,11 @@ class PlayingScene {
         this._isHitPlayerShot = false;
         // 自機弾衝突音発生間隔を初期化する。
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
-        // 初期状態はプレイ中とする。
-        this._state = SCENE_STATE.PLAYING;
         // 一時停止レイヤーを作成する。
         this._pauseLayer = new __WEBPACK_IMPORTED_MODULE_12__pauselayer__["a" /* default */]()
             .onResume(() => { this._resume(); });
+        // 初期状態はプレイ中とする。
+        this._changeState(SCENE_STATE.PLAYING);
     }
     /**
      * 更新処理。
@@ -4333,13 +4442,9 @@ class PlayingScene {
         }
         else {
             // 状態を待機中に変更する。
-            this._state = SCENE_STATE.WAIT_GAMEOVER;
-            // シールドボタンを無効化する。
-            this._shieldButton.enable = false;
+            this._changeState(SCENE_STATE.WAIT_GAMEOVER);
             // BGMを停止する。
             phina.asset.SoundManager.stopMusic();
-            // キャラクターのアニメーションを停止する。
-            this._stopCharacterAnimation();
             // 一定時間後にゲームオーバー状態に遷移する。
             setTimeout(() => { this._gameOver(); }, GAMEOVER_INTERVAL);
         }
@@ -4715,7 +4820,7 @@ class PlayingScene {
      */
     _gameOver() {
         // 状態をゲームオーバーに遷移する。
-        this._state = SCENE_STATE.GAMEOVER;
+        this._changeState(SCENE_STATE.GAMEOVER);
         // ゲームオーバーのラベルを画面に配置する。
         const gameOverLabel = new phina.display.Label({
             text: 'GAME OVER',
@@ -4795,32 +4900,60 @@ class PlayingScene {
      * ゲームを一時停止する。
      */
     _pause() {
-        // 状態をポーズに遷移する。
-        this._state = SCENE_STATE.PAUSE;
         // 効果音を鳴らす。
         phina.asset.SoundManager.play('pause');
-        // キャラクターのアニメーションを停止する。
-        this._stopCharacterAnimation();
-        // 一時停止レイヤーを画面に配置する。
-        this._pauseLayer.addChildTo(this._rootNode);
+        // 状態をポーズに遷移する。
+        this._changeState(SCENE_STATE.PAUSE);
     }
     /**
      * ゲームを再開する。
      */
     _resume() {
         // 状態をプレイ中に遷移する。
-        this._state = SCENE_STATE.PLAYING;
-        // キャラクターのアニメーションを再開する。
-        this._startCharacterAnimation();
-        // 一時停止レイヤーを画面から取り除く。
-        this._pauseLayer.remove();
+        this._changeState(SCENE_STATE.PLAYING);
+    }
+    /**
+     * 状態を遷移し、コントロールの有効無効を切り替える。。
+     * @param state 遷移先の状態
+     */
+    _changeState(state) {
+        // プレイ中かゲームオーバー待機中の場合は各キャラクターのアニメーションを行う。
+        if (state === SCENE_STATE.PLAYING || state === SCENE_STATE.WAIT_GAMEOVER) {
+            this._startCharacterAnimation();
+        }
+        else {
+            this._stopCharacterAnimation();
+        }
+        // 一時停止中の場合は一時停止レイヤーを画面に配置する。
+        if (state === SCENE_STATE.PAUSE) {
+            this._pauseLayer.addChildTo(this._rootNode);
+        }
+        else {
+            this._pauseLayer.remove();
+        }
+        // プレイ中の場合は一時停止ボタンを有効にする。
+        if (state === SCENE_STATE.PLAYING) {
+            this._pauseButton.setEnable(true);
+        }
+        else {
+            this._pauseButton.setEnable(false);
+        }
+        // プレイ中の場合はシールドボタンを有効にする。
+        if (state === SCENE_STATE.PLAYING) {
+            this._shieldButton.enable = true;
+        }
+        else {
+            this._shieldButton.enable = false;
+        }
+        // メンバ変数を変更する。
+        this._state = state;
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (PlayingScene);
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5056,7 +5189,7 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5148,7 +5281,7 @@ class ShieldButton {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

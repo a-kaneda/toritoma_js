@@ -1,4 +1,4 @@
-import Button from './button';
+import LabelButton from './labelbutton';
 import PlayinScene from './playingscene';
 import ControlSize from './controlsize';
 import ScreenSize from './screensize';
@@ -53,7 +53,7 @@ class TitleScene {
         // ボタン配列を作成する。
         this._buttons = [];
         // ゲームスタートボタンを作成する。
-        const gameStartButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
+        const gameStartButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('GAME START')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[0])
@@ -61,7 +61,7 @@ class TitleScene {
             .onPush(() => { this._replaceScene('PlayingScene'); });
         this._buttons.push(gameStartButton);
         // 遊び方説明ボタンを作成する。
-        const howToPlayButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
+        const howToPlayButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('HOW TO PLAY')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[1])
@@ -69,7 +69,7 @@ class TitleScene {
             .onPush(() => { this._replaceScene('HowToPlayScene'); });
         this._buttons.push(howToPlayButton);
         // クレジットボタンを作成する。
-        const creditButton = new Button(BUTTON_WIDTH, BUTTON_HEIGHT)
+        const creditButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
             .setLabel('CREDIT')
             .setPosition(BUTTON_POS_X, BUTTON_POS_Y[2])

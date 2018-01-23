@@ -6,9 +6,9 @@ import ScreenSize from './screensize'
 const EXEC_INTERVAL = 500;
 
 /**
- * ボタン。
+ * ラベルを使用したボタン。
  */
-class Button {
+class LabelButton {
 
     /** ベース部分 */
     private _base : phina.display.DisplayElement;
@@ -254,4 +254,4 @@ class Button {
     }
 }
 
-export default Button;
+export default LabelButton;

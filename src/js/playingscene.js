@@ -11,6 +11,7 @@ import BossLifeGauge from './bosslifegauge';
 import ShieldButton from './shieldbutton';
 import TitleScene from './titlescene';
 import PauseLayer from './pauselayer';
+import ImageButton from './imagebutton';
 // 初期残機
 const INITIAL_LIFE = 2;
 // 残機位置x座標(ステージ左端からの位置)
@@ -27,6 +28,10 @@ const CHICKEN_GAUGE_POS_Y = 12;
 const SHIELD_BUTTON_POS_X = 50;
 // シールドボタン位置y座標(画面下からの位置)
 const SHIELD_BUTTON_POS_Y = 50;
+// 一時停止ボタン位置x座標(画面右からの位置)
+const PUASE_BUTTON_POS_X = 28;
+// 一時停止ボタン位置y座標(画面上からの位置)
+const PAUSE_BUTTON_POS_Y = 28;
 // ボスHPゲージ位置x座標(ステージ左端からの位置)
 const BOSS_LIFE_GAUGE_POS_X = 360;
 // ボスHPゲージ位置x座標(画面上からの位置)
@@ -114,6 +119,11 @@ class PlayingScene {
         this._shieldButton.sprite.addChildTo(this._infoLayer);
         this._shieldButton.sprite.x = ScreenSize.SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
         this._shieldButton.sprite.y = ScreenSize.SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
+        // 一時停止ボタンを作成する。
+        this._pauseButton = new ImageButton('pauseButton')
+            .setPosition(ScreenSize.SCREEN_WIDTH - PUASE_BUTTON_POS_X, PAUSE_BUTTON_POS_Y)
+            .onPush(() => { this._pause(); })
+            .addChildTo(this._infoLayer);
         // チキンゲージを作成する。
         this._chickenGauge = new ChickenGauge();
         // チキンゲージの位置を設定する。
@@ -140,11 +150,11 @@ class PlayingScene {
         this._isHitPlayerShot = false;
         // 自機弾衝突音発生間隔を初期化する。
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
-        // 初期状態はプレイ中とする。
-        this._state = SCENE_STATE.PLAYING;
         // 一時停止レイヤーを作成する。
         this._pauseLayer = new PauseLayer()
             .onResume(() => { this._resume(); });
+        // 初期状態はプレイ中とする。
+        this._changeState(SCENE_STATE.PLAYING);
     }
     /**
      * 更新処理。
@@ -255,13 +265,9 @@ class PlayingScene {
         }
         else {
             // 状態を待機中に変更する。
-            this._state = SCENE_STATE.WAIT_GAMEOVER;
-            // シールドボタンを無効化する。
-            this._shieldButton.enable = false;
+            this._changeState(SCENE_STATE.WAIT_GAMEOVER);
             // BGMを停止する。
             phina.asset.SoundManager.stopMusic();
-            // キャラクターのアニメーションを停止する。
-            this._stopCharacterAnimation();
             // 一定時間後にゲームオーバー状態に遷移する。
             setTimeout(() => { this._gameOver(); }, GAMEOVER_INTERVAL);
         }
@@ -637,7 +643,7 @@ class PlayingScene {
      */
     _gameOver() {
         // 状態をゲームオーバーに遷移する。
-        this._state = SCENE_STATE.GAMEOVER;
+        this._changeState(SCENE_STATE.GAMEOVER);
         // ゲームオーバーのラベルを画面に配置する。
         const gameOverLabel = new phina.display.Label({
             text: 'GAME OVER',
@@ -717,25 +723,53 @@ class PlayingScene {
      * ゲームを一時停止する。
      */
     _pause() {
-        // 状態をポーズに遷移する。
-        this._state = SCENE_STATE.PAUSE;
         // 効果音を鳴らす。
         phina.asset.SoundManager.play('pause');
-        // キャラクターのアニメーションを停止する。
-        this._stopCharacterAnimation();
-        // 一時停止レイヤーを画面に配置する。
-        this._pauseLayer.addChildTo(this._rootNode);
+        // 状態をポーズに遷移する。
+        this._changeState(SCENE_STATE.PAUSE);
     }
     /**
      * ゲームを再開する。
      */
     _resume() {
         // 状態をプレイ中に遷移する。
-        this._state = SCENE_STATE.PLAYING;
-        // キャラクターのアニメーションを再開する。
-        this._startCharacterAnimation();
-        // 一時停止レイヤーを画面から取り除く。
-        this._pauseLayer.remove();
+        this._changeState(SCENE_STATE.PLAYING);
+    }
+    /**
+     * 状態を遷移し、コントロールの有効無効を切り替える。。
+     * @param state 遷移先の状態
+     */
+    _changeState(state) {
+        // プレイ中かゲームオーバー待機中の場合は各キャラクターのアニメーションを行う。
+        if (state === SCENE_STATE.PLAYING || state === SCENE_STATE.WAIT_GAMEOVER) {
+            this._startCharacterAnimation();
+        }
+        else {
+            this._stopCharacterAnimation();
+        }
+        // 一時停止中の場合は一時停止レイヤーを画面に配置する。
+        if (state === SCENE_STATE.PAUSE) {
+            this._pauseLayer.addChildTo(this._rootNode);
+        }
+        else {
+            this._pauseLayer.remove();
+        }
+        // プレイ中の場合は一時停止ボタンを有効にする。
+        if (state === SCENE_STATE.PLAYING) {
+            this._pauseButton.setEnable(true);
+        }
+        else {
+            this._pauseButton.setEnable(false);
+        }
+        // プレイ中の場合はシールドボタンを有効にする。
+        if (state === SCENE_STATE.PLAYING) {
+            this._shieldButton.enable = true;
+        }
+        else {
+            this._shieldButton.enable = false;
+        }
+        // メンバ変数を変更する。
+        this._state = state;
     }
 }
 export default PlayingScene;

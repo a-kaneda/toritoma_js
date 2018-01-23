@@ -104,6 +104,12 @@ const cs = {
         width: 8,
         height: 8,
     },
+    pauseButton: {
+        x: 208,
+        y: 16,
+        width: 16,
+        height: 16,
+    },
     cursor: {
         x: 224,
         y: 15,
