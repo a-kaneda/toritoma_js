@@ -957,7 +957,14 @@ class PlayingScene implements Scene {
      * タイトルシーンへと切り替える。
      */
     private _replaceScene(): void {
+
+        // BGMを停止する。
+        phina.asset.SoundManager.stopMusic();
+
+        // 全要素を取り除く。
         this._rootNode.remove();
+
+        // タイトルシーンへ遷移する。
         this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
     }
 
@@ -969,6 +976,9 @@ class PlayingScene implements Scene {
         // 効果音を鳴らす。
         phina.asset.SoundManager.play('pause');
 
+        // BGMを一時停止する。
+        phina.asset.SoundManager.pauseMusic();
+
         // 状態をポーズに遷移する。
         this._changeState(SCENE_STATE.PAUSE);
     }
@@ -977,6 +987,9 @@ class PlayingScene implements Scene {
      * ゲームを再開する。
      */
     private _resume(): void {
+
+        // BGMを再開する。
+        phina.asset.SoundManager.resumeMusic();
 
         // 状態をプレイ中に遷移する。
         this._changeState(SCENE_STATE.PLAYING);

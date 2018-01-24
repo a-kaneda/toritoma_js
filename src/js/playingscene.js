@@ -725,7 +725,11 @@ class PlayingScene {
      * タイトルシーンへと切り替える。
      */
     _replaceScene() {
+        // BGMを停止する。
+        phina.asset.SoundManager.stopMusic();
+        // 全要素を取り除く。
         this._rootNode.remove();
+        // タイトルシーンへ遷移する。
         this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
     }
     /**
@@ -734,6 +738,8 @@ class PlayingScene {
     _pause() {
         // 効果音を鳴らす。
         phina.asset.SoundManager.play('pause');
+        // BGMを一時停止する。
+        phina.asset.SoundManager.pauseMusic();
         // 状態をポーズに遷移する。
         this._changeState(SCENE_STATE.PAUSE);
     }
@@ -741,6 +747,8 @@ class PlayingScene {
      * ゲームを再開する。
      */
     _resume() {
+        // BGMを再開する。
+        phina.asset.SoundManager.resumeMusic();
         // 状態をプレイ中に遷移する。
         this._changeState(SCENE_STATE.PLAYING);
     }
