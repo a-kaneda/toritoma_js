@@ -10,7 +10,7 @@ import ChickenGauge from './chickengauge';
 import BossLifeGauge from './bosslifegauge';
 import ShieldButton from './shieldbutton';
 import TitleScene from './titlescene';
-import PauseLayer from './pauselayer';
+import MenuLayer from './menulayer';
 import ImageButton from './imagebutton';
 // 初期残機
 const INITIAL_LIFE = 2;
@@ -47,6 +47,7 @@ var SCENE_STATE;
     SCENE_STATE[SCENE_STATE["WAIT_GAMEOVER"] = 1] = "WAIT_GAMEOVER";
     SCENE_STATE[SCENE_STATE["GAMEOVER"] = 2] = "GAMEOVER";
     SCENE_STATE[SCENE_STATE["PAUSE"] = 3] = "PAUSE";
+    SCENE_STATE[SCENE_STATE["QUIT_MENU"] = 4] = "QUIT_MENU";
 })(SCENE_STATE || (SCENE_STATE = {}));
 /**
  * ゲームの各ステージをプレイするメインのシーン。
@@ -151,8 +152,13 @@ class PlayingScene {
         // 自機弾衝突音発生間隔を初期化する。
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
         // 一時停止レイヤーを作成する。
-        this._pauseLayer = new PauseLayer()
-            .onResume(() => { this._resume(); });
+        this._pauseLayer = new MenuLayer('PAUSE', 'RESUME', 'QUIT')
+            .onLeftButton(() => { this._resume(); })
+            .onRightButton(() => { this._viewQuitMenu(); });
+        // 終了メニュー時のレイヤーを作成する。
+        this._quitLayer = new MenuLayer('QUIT GAME?', 'YES', 'NO')
+            .onLeftButton(() => { this._replaceScene(); })
+            .onRightButton(() => { this._viewPauseMenu(); });
         // 初期状態はプレイ中とする。
         this._changeState(SCENE_STATE.PLAYING);
     }
@@ -301,6 +307,9 @@ class PlayingScene {
                 break;
             case SCENE_STATE.PAUSE:
                 this._pauseLayer.input(app.keyboard, this._gamepadManager.get(0));
+                break;
+            case SCENE_STATE.QUIT_MENU:
+                this._quitLayer.input(app.keyboard, this._gamepadManager.get(0));
                 break;
             default:
                 break;
@@ -736,6 +745,20 @@ class PlayingScene {
         this._changeState(SCENE_STATE.PLAYING);
     }
     /**
+     * ゲーム終了メニューを表示する。
+     */
+    _viewQuitMenu() {
+        // 状態を終了メニューに遷移する。
+        this._changeState(SCENE_STATE.QUIT_MENU);
+    }
+    /**
+     * 一時停止メニューを表示する。
+     */
+    _viewPauseMenu() {
+        // 状態をポーズに遷移する。
+        this._changeState(SCENE_STATE.PAUSE);
+    }
+    /**
      * 状態を遷移し、コントロールの有効無効を切り替える。。
      * @param state 遷移先の状態
      */
@@ -753,6 +776,13 @@ class PlayingScene {
         }
         else {
             this._pauseLayer.remove();
+        }
+        // 終了メニューの場合は終了メニューを画面に配置する。
+        if (state === SCENE_STATE.QUIT_MENU) {
+            this._quitLayer.addChildTo(this._rootNode);
+        }
+        else {
+            this._quitLayer.remove();
         }
         // プレイ中の場合は一時停止ボタンを有効にする。
         if (state === SCENE_STATE.PLAYING) {

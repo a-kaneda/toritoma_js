@@ -28,21 +28,22 @@ const CURSOR_POS_X = [
 const CURSOR_POS_Y = BUTTON_POS_Y;
 // ボタンのID
 enum BUTTON_ID {
-    RESUME = 0,
-    QUIT,
+    LEFT = 0,
+    RIGHT,
 };
 
 /**
- * 一時停止画面。
+ * メニュー画面。
+ * タイトルとボタンが2つある。
  */
-class PauseLayer {
+class MenuLayer {
 
     /** ルートノード */
     private _rootNode: phina.display.DisplayElement;
-    /** RESUMEボタン選択時の動作 */
-    private _onResumeFunc: (() => void) | null;
-    /** QUITボタン選択時の動作 */
-    private _onQuitFunc: (() => void) | null;
+    /** 左のボタン選択時の動作 */
+    private _onLeftButtonFunc: (() => void) | null;
+    /** 右のボタン選択時の動作 */
+    private _onRightButtonFunc: (() => void) | null;
     /** 操作を受け付けるかどうか */
     private _enable: boolean;
     /** ボタン */
@@ -52,15 +53,18 @@ class PauseLayer {
 
     /**
      * コンストラクタ。
+     * @param title タイトルの文字列
+     * @param left 左側のボタンのラベル
+     * @param right 右側のボタンのラベル
      */
-    constructor() {
+    constructor(title: string, left: string, right: string) {
 
         // ルートノードを作成する。
         this._rootNode = new phina.display.DisplayElement();
 
-        // PAUSEラベルを作成する。
-        const pauseLabel = new phina.display.Label({
-            text: 'PAUSE',
+        // タイトルのラベルを作成する。
+        const titleLabel = new phina.display.Label({
+            text: title,
             fontSize: 36,
             backgroundColor: MyColor.BACK_COLOR,
             fill: MyColor.FORE_COLOR,
@@ -74,29 +78,29 @@ class PauseLayer {
         // ボタン配列を作成する。
         this._buttons = [];
 
-        // RESUMEボタンを作成する。
+        // 左のボタンを作成する。
         const resumeButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
         .addChildTo(this._rootNode)
-        .setLabel('RESUME')
-        .setPosition(BUTTON_POS_X[BUTTON_ID.RESUME], BUTTON_POS_Y)
+        .setLabel(left)
+        .setPosition(BUTTON_POS_X[BUTTON_ID.LEFT], BUTTON_POS_Y)
         .onEffect(() => {this._setEnable(false)})
         .onPush(() => {
-            if (this._onResumeFunc !== null) {
-                this._onResumeFunc();
+            if (this._onLeftButtonFunc !== null) {
+                this._onLeftButtonFunc();
             }
             this._setEnable(true);
         });
         this._buttons.push(resumeButton);
 
-        // QUITボタンを作成する。
+        // 右のボタンを作成する。
         const quitButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
         .addChildTo(this._rootNode)
-        .setLabel('QUIT')
-        .setPosition(BUTTON_POS_X[BUTTON_ID.QUIT], BUTTON_POS_Y)
+        .setLabel(right)
+        .setPosition(BUTTON_POS_X[BUTTON_ID.RIGHT], BUTTON_POS_Y)
         .onEffect(() => {this._setEnable(false)})
         .onPush(() => {
-            if (this._onQuitFunc !== null) {
-                this._onQuitFunc();
+            if (this._onRightButtonFunc !== null) {
+                this._onRightButtonFunc();
             }
             this._setEnable(true);
         });
@@ -105,27 +109,27 @@ class PauseLayer {
         // カーソルを作成する。
         this._cursor = new Cursor()
         .addChildTo(this._rootNode)
-        .addPosition(BUTTON_ID.RESUME, {
-            x: CURSOR_POS_X[BUTTON_ID.RESUME], 
+        .addPosition(BUTTON_ID.LEFT, {
+            x: CURSOR_POS_X[BUTTON_ID.LEFT], 
             y: CURSOR_POS_Y,
             left: -1,
-            right: BUTTON_ID.QUIT,
+            right: BUTTON_ID.RIGHT,
             up: -1,
             down: -1,
         })
-        .addPosition(BUTTON_ID.QUIT, {
-            x: CURSOR_POS_X[BUTTON_ID.QUIT], 
+        .addPosition(BUTTON_ID.RIGHT, {
+            x: CURSOR_POS_X[BUTTON_ID.RIGHT], 
             y: CURSOR_POS_Y,
-            left: BUTTON_ID.RESUME,
+            left: BUTTON_ID.LEFT,
             right: -1,
             up: -1,
             down: -1,
         })
-        .setPosition(BUTTON_ID.RESUME);
+        .setPosition(BUTTON_ID.LEFT);
 
         // コールバック関数を初期化する。
-        this._onResumeFunc = null;
-        this._onQuitFunc = null;
+        this._onLeftButtonFunc = null;
+        this._onRightButtonFunc = null;
 
         // 初期状態は有効とする。
         this._enable = true;
@@ -151,20 +155,20 @@ class PauseLayer {
     }
     
     /**
-     * RESUMEボタン選択時のコールバック関数を設定する。
+     * 左のボタン選択時のコールバック関数を設定する。
      * @param func コールバック関数
      */
-    public onResume(func: () => void): this {
-        this._onResumeFunc = func;
+    public onLeftButton(func: () => void): this {
+        this._onLeftButtonFunc = func;
         return this;
     }
 
     /**
-     * QUITボタン選択時のコールバック関数を設定する。
+     * 右のボタン選択時のコールバック関数を設定する。
      * @param func コールバック関数
      */
-    public onQuit(func: () => void): this {
-        this._onQuitFunc = func;
+    public onRightButton(func: () => void): this {
+        this._onRightButtonFunc = func;
         return this;
     }
 
@@ -205,4 +209,4 @@ class PauseLayer {
     }
 }
 
- export default PauseLayer;
+ export default MenuLayer;

@@ -14,7 +14,7 @@ import Point from './point'
 import Scene from './scene'
 import TitleScene from './titlescene'
 import MainScene from './mainscene.d'
-import PauseLayer from './pauselayer'
+import MenuLayer from './menulayer'
 import ImageButton from './imagebutton'
 
 // 初期残機
@@ -52,6 +52,7 @@ enum SCENE_STATE {
     WAIT_GAMEOVER,  // ゲームオーバー待機中
     GAMEOVER,       // ゲームオーバー
     PAUSE,          // ポーズ中
+    QUIT_MENU,      // ゲーム終了メニュー
 }
 
 // 入力状態
@@ -114,7 +115,9 @@ class PlayingScene implements Scene {
     /** シーンの状態 */
     private _state: SCENE_STATE;
     /** 一時停止時のレイヤー */
-    private _pauseLayer: PauseLayer;
+    private _pauseLayer: MenuLayer;
+    /** 終了メニュー時のレイヤー */
+    private _quitLayer: MenuLayer;
 
     /**
      * コンストラクタ。
@@ -252,8 +255,14 @@ class PlayingScene implements Scene {
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
 
         // 一時停止レイヤーを作成する。
-        this._pauseLayer = new PauseLayer()
-        .onResume(() => {this._resume()});
+        this._pauseLayer = new MenuLayer('PAUSE', 'RESUME', 'QUIT')
+        .onLeftButton(() => {this._resume()})
+        .onRightButton(() => {this._viewQuitMenu()});
+
+        // 終了メニュー時のレイヤーを作成する。
+        this._quitLayer = new MenuLayer('QUIT GAME?', 'YES', 'NO')
+        .onLeftButton(() => {this._replaceScene()})
+        .onRightButton(() => {this._viewPauseMenu()});
 
         // 初期状態はプレイ中とする。
         this._changeState(SCENE_STATE.PLAYING);
@@ -435,6 +444,9 @@ class PlayingScene implements Scene {
                 break;
             case SCENE_STATE.PAUSE:
                 this._pauseLayer.input(app.keyboard, this._gamepadManager.get(0));
+                break;
+            case SCENE_STATE.QUIT_MENU:
+                this._quitLayer.input(app.keyboard, this._gamepadManager.get(0));
                 break;
             default:
                 break;
@@ -971,6 +983,24 @@ class PlayingScene implements Scene {
     }
 
     /**
+     * ゲーム終了メニューを表示する。
+     */
+    private _viewQuitMenu(): void {
+
+        // 状態を終了メニューに遷移する。
+        this._changeState(SCENE_STATE.QUIT_MENU);
+    }
+
+    /**
+     * 一時停止メニューを表示する。
+     */
+    private _viewPauseMenu(): void {
+
+        // 状態をポーズに遷移する。
+        this._changeState(SCENE_STATE.PAUSE);
+    }
+
+    /**
      * 状態を遷移し、コントロールの有効無効を切り替える。。
      * @param state 遷移先の状態
      */
@@ -990,6 +1020,14 @@ class PlayingScene implements Scene {
         }
         else {
             this._pauseLayer.remove();
+        }
+
+        // 終了メニューの場合は終了メニューを画面に配置する。
+        if (state === SCENE_STATE.QUIT_MENU) {
+            this._quitLayer.addChildTo(this._rootNode);
+        }
+        else {
+            this._quitLayer.remove();
         }
 
         // プレイ中の場合は一時停止ボタンを有効にする。

@@ -3305,23 +3305,27 @@ const CURSOR_POS_Y = BUTTON_POS_Y;
 // ボタンのID
 var BUTTON_ID;
 (function (BUTTON_ID) {
-    BUTTON_ID[BUTTON_ID["RESUME"] = 0] = "RESUME";
-    BUTTON_ID[BUTTON_ID["QUIT"] = 1] = "QUIT";
+    BUTTON_ID[BUTTON_ID["LEFT"] = 0] = "LEFT";
+    BUTTON_ID[BUTTON_ID["RIGHT"] = 1] = "RIGHT";
 })(BUTTON_ID || (BUTTON_ID = {}));
 ;
 /**
- * 一時停止画面。
+ * メニュー画面。
+ * タイトルとボタンが2つある。
  */
-class PauseLayer {
+class MenuLayer {
     /**
      * コンストラクタ。
+     * @param title タイトルの文字列
+     * @param left 左側のボタンのラベル
+     * @param right 右側のボタンのラベル
      */
-    constructor() {
+    constructor(title, left, right) {
         // ルートノードを作成する。
         this._rootNode = new phina.display.DisplayElement();
-        // PAUSEラベルを作成する。
-        const pauseLabel = new phina.display.Label({
-            text: 'PAUSE',
+        // タイトルのラベルを作成する。
+        const titleLabel = new phina.display.Label({
+            text: title,
             fontSize: 36,
             backgroundColor: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].BACK_COLOR,
             fill: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].FORE_COLOR,
@@ -3333,28 +3337,28 @@ class PauseLayer {
         }).addChildTo(this._rootNode);
         // ボタン配列を作成する。
         this._buttons = [];
-        // RESUMEボタンを作成する。
+        // 左のボタンを作成する。
         const resumeButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
-            .setLabel('RESUME')
-            .setPosition(BUTTON_POS_X[BUTTON_ID.RESUME], BUTTON_POS_Y)
+            .setLabel(left)
+            .setPosition(BUTTON_POS_X[BUTTON_ID.LEFT], BUTTON_POS_Y)
             .onEffect(() => { this._setEnable(false); })
             .onPush(() => {
-            if (this._onResumeFunc !== null) {
-                this._onResumeFunc();
+            if (this._onLeftButtonFunc !== null) {
+                this._onLeftButtonFunc();
             }
             this._setEnable(true);
         });
         this._buttons.push(resumeButton);
-        // QUITボタンを作成する。
+        // 右のボタンを作成する。
         const quitButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
             .addChildTo(this._rootNode)
-            .setLabel('QUIT')
-            .setPosition(BUTTON_POS_X[BUTTON_ID.QUIT], BUTTON_POS_Y)
+            .setLabel(right)
+            .setPosition(BUTTON_POS_X[BUTTON_ID.RIGHT], BUTTON_POS_Y)
             .onEffect(() => { this._setEnable(false); })
             .onPush(() => {
-            if (this._onQuitFunc !== null) {
-                this._onQuitFunc();
+            if (this._onRightButtonFunc !== null) {
+                this._onRightButtonFunc();
             }
             this._setEnable(true);
         });
@@ -3362,26 +3366,26 @@ class PauseLayer {
         // カーソルを作成する。
         this._cursor = new __WEBPACK_IMPORTED_MODULE_3__cursor__["a" /* default */]()
             .addChildTo(this._rootNode)
-            .addPosition(BUTTON_ID.RESUME, {
-            x: CURSOR_POS_X[BUTTON_ID.RESUME],
+            .addPosition(BUTTON_ID.LEFT, {
+            x: CURSOR_POS_X[BUTTON_ID.LEFT],
             y: CURSOR_POS_Y,
             left: -1,
-            right: BUTTON_ID.QUIT,
+            right: BUTTON_ID.RIGHT,
             up: -1,
             down: -1,
         })
-            .addPosition(BUTTON_ID.QUIT, {
-            x: CURSOR_POS_X[BUTTON_ID.QUIT],
+            .addPosition(BUTTON_ID.RIGHT, {
+            x: CURSOR_POS_X[BUTTON_ID.RIGHT],
             y: CURSOR_POS_Y,
-            left: BUTTON_ID.RESUME,
+            left: BUTTON_ID.LEFT,
             right: -1,
             up: -1,
             down: -1,
         })
-            .setPosition(BUTTON_ID.RESUME);
+            .setPosition(BUTTON_ID.LEFT);
         // コールバック関数を初期化する。
-        this._onResumeFunc = null;
-        this._onQuitFunc = null;
+        this._onLeftButtonFunc = null;
+        this._onRightButtonFunc = null;
         // 初期状態は有効とする。
         this._enable = true;
     }
@@ -3403,19 +3407,19 @@ class PauseLayer {
         return this;
     }
     /**
-     * RESUMEボタン選択時のコールバック関数を設定する。
+     * 左のボタン選択時のコールバック関数を設定する。
      * @param func コールバック関数
      */
-    onResume(func) {
-        this._onResumeFunc = func;
+    onLeftButton(func) {
+        this._onLeftButtonFunc = func;
         return this;
     }
     /**
-     * QUITボタン選択時のコールバック関数を設定する。
+     * 右のボタン選択時のコールバック関数を設定する。
      * @param func コールバック関数
      */
-    onQuit(func) {
-        this._onQuitFunc = func;
+    onRightButton(func) {
+        this._onRightButtonFunc = func;
         return this;
     }
     /**
@@ -3447,7 +3451,7 @@ class PauseLayer {
         }
     }
 }
-/* harmony default export */ __webpack_exports__["a"] = (PauseLayer);
+/* harmony default export */ __webpack_exports__["a"] = (MenuLayer);
 
 
 /***/ }),
@@ -4173,7 +4177,7 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pauselayer__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(20);
 
 
@@ -4224,6 +4228,7 @@ var SCENE_STATE;
     SCENE_STATE[SCENE_STATE["WAIT_GAMEOVER"] = 1] = "WAIT_GAMEOVER";
     SCENE_STATE[SCENE_STATE["GAMEOVER"] = 2] = "GAMEOVER";
     SCENE_STATE[SCENE_STATE["PAUSE"] = 3] = "PAUSE";
+    SCENE_STATE[SCENE_STATE["QUIT_MENU"] = 4] = "QUIT_MENU";
 })(SCENE_STATE || (SCENE_STATE = {}));
 /**
  * ゲームの各ステージをプレイするメインのシーン。
@@ -4328,8 +4333,13 @@ class PlayingScene {
         // 自機弾衝突音発生間隔を初期化する。
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
         // 一時停止レイヤーを作成する。
-        this._pauseLayer = new __WEBPACK_IMPORTED_MODULE_12__pauselayer__["a" /* default */]()
-            .onResume(() => { this._resume(); });
+        this._pauseLayer = new __WEBPACK_IMPORTED_MODULE_12__menulayer__["a" /* default */]('PAUSE', 'RESUME', 'QUIT')
+            .onLeftButton(() => { this._resume(); })
+            .onRightButton(() => { this._viewQuitMenu(); });
+        // 終了メニュー時のレイヤーを作成する。
+        this._quitLayer = new __WEBPACK_IMPORTED_MODULE_12__menulayer__["a" /* default */]('QUIT GAME?', 'YES', 'NO')
+            .onLeftButton(() => { this._replaceScene(); })
+            .onRightButton(() => { this._viewPauseMenu(); });
         // 初期状態はプレイ中とする。
         this._changeState(SCENE_STATE.PLAYING);
     }
@@ -4478,6 +4488,9 @@ class PlayingScene {
                 break;
             case SCENE_STATE.PAUSE:
                 this._pauseLayer.input(app.keyboard, this._gamepadManager.get(0));
+                break;
+            case SCENE_STATE.QUIT_MENU:
+                this._quitLayer.input(app.keyboard, this._gamepadManager.get(0));
                 break;
             default:
                 break;
@@ -4913,6 +4926,20 @@ class PlayingScene {
         this._changeState(SCENE_STATE.PLAYING);
     }
     /**
+     * ゲーム終了メニューを表示する。
+     */
+    _viewQuitMenu() {
+        // 状態を終了メニューに遷移する。
+        this._changeState(SCENE_STATE.QUIT_MENU);
+    }
+    /**
+     * 一時停止メニューを表示する。
+     */
+    _viewPauseMenu() {
+        // 状態をポーズに遷移する。
+        this._changeState(SCENE_STATE.PAUSE);
+    }
+    /**
      * 状態を遷移し、コントロールの有効無効を切り替える。。
      * @param state 遷移先の状態
      */
@@ -4930,6 +4957,13 @@ class PlayingScene {
         }
         else {
             this._pauseLayer.remove();
+        }
+        // 終了メニューの場合は終了メニューを画面に配置する。
+        if (state === SCENE_STATE.QUIT_MENU) {
+            this._quitLayer.addChildTo(this._rootNode);
+        }
+        else {
+            this._quitLayer.remove();
         }
         // プレイ中の場合は一時停止ボタンを有効にする。
         if (state === SCENE_STATE.PLAYING) {
