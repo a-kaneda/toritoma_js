@@ -26,11 +26,13 @@ class Cursor {
     constructor() {
 
         // 画像を読み込む。
-        this._sprite = new phina.display.Sprite('control', ControlSize.cs.cursor.width, ControlSize.cs.cursor.height)
-        this._sprite.srcRect.set(ControlSize.cs.cursor.x,
-            ControlSize.cs.cursor.y,
-            ControlSize.cs.cursor.width,
-            ControlSize.cs.cursor.height);
+        this._sprite = new phina.display.Sprite('control', 
+            ControlSize.cursor.width, 
+            ControlSize.cursor.height)
+        this._sprite.srcRect.set(ControlSize.cursor.x,
+            ControlSize.cursor.y,
+            ControlSize.cursor.width,
+            ControlSize.cursor.height);
         this._sprite.scaleX = ScreenSize.ZOOM_RATIO;
         this._sprite.scaleY = ScreenSize.ZOOM_RATIO;
 
@@ -190,7 +192,7 @@ class Cursor {
             if (input[direction]) {
 
                 // 前回入力されていなかった場合
-                if (this._prevGamepadInput[direction]) {
+                if (!this._prevGamepadInput[direction]) {
 
                     // カーソル位置を移動する。
                     this._move(direction);

@@ -1,7 +1,7 @@
 /**
  * コントロールサイズ
  */
-const cs = {
+var ControlSize = {
     title: {
         x: 0,
         y: 0,
@@ -164,17 +164,23 @@ const cs = {
         width: 8,
         height: 8,
     },
+    prevButton: {
+        x: 176,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    nextButton: {
+        x: 192,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    backButton: {
+        x: 208,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
 };
-/**
- * control.png内のコントロールの位置とサイズを定義する。
- */
-class ControlSize {
-    /**
-     * control.png内のコントロールの位置とサイズ。
-     */
-    static get cs() {
-        return cs;
-    }
-}
-;
 export default ControlSize;

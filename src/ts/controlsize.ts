@@ -4,7 +4,7 @@ import Rect from './rect'
 /**
  * コントロールサイズ
  */
-const cs: {[key: string]: Rect} = {
+var ControlSize: {[key: string]: Rect} =  {
     title: {
         x: 0,
         y: 0,
@@ -167,19 +167,24 @@ const cs: {[key: string]: Rect} = {
         width: 8,
         height: 8,
     },
-};
-
-/**
- * control.png内のコントロールの位置とサイズを定義する。
- */
-class ControlSize {
-
-    /**
-     * control.png内のコントロールの位置とサイズ。
-     */
-    static get cs(): {[key: string]: Rect} {
-        return cs;
-    }
+    prevButton: {
+        x: 176,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    nextButton: {
+        x: 192,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    backButton: {
+        x: 208,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
 };
 
 export default ControlSize;

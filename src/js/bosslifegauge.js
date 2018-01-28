@@ -11,20 +11,20 @@ class BossLifeGauge {
         // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
         // 空ゲージの画像を読み込む。
-        this._emptyImage = new phina.display.Sprite('control', ControlSize.cs.bossLifeGaugeEmpty.width, ControlSize.cs.bossLifeGaugeEmpty.height);
-        this._emptyImage.srcRect.set(ControlSize.cs.bossLifeGaugeEmpty.x, ControlSize.cs.bossLifeGaugeEmpty.y, ControlSize.cs.bossLifeGaugeEmpty.width, ControlSize.cs.bossLifeGaugeEmpty.height);
+        this._emptyImage = new phina.display.Sprite('control', ControlSize.bossLifeGaugeEmpty.width, ControlSize.bossLifeGaugeEmpty.height);
+        this._emptyImage.srcRect.set(ControlSize.bossLifeGaugeEmpty.x, ControlSize.bossLifeGaugeEmpty.y, ControlSize.bossLifeGaugeEmpty.width, ControlSize.bossLifeGaugeEmpty.height);
         this._emptyImage.scaleX = ScreenSize.ZOOM_RATIO;
         this._emptyImage.scaleY = ScreenSize.ZOOM_RATIO;
         this._emptyImage.addChildTo(this._base);
         // 満ゲージの画像を読み込む。
-        this._fullImage = new phina.display.Sprite('control', ControlSize.cs.bossLifeGaugeFull.width, ControlSize.cs.bossLifeGaugeFull.height);
-        this._fullImage.srcRect.set(ControlSize.cs.bossLifeGaugeFull.x, ControlSize.cs.bossLifeGaugeFull.y, ControlSize.cs.bossLifeGaugeFull.width, ControlSize.cs.bossLifeGaugeFull.height);
+        this._fullImage = new phina.display.Sprite('control', ControlSize.bossLifeGaugeFull.width, ControlSize.bossLifeGaugeFull.height);
+        this._fullImage.srcRect.set(ControlSize.bossLifeGaugeFull.x, ControlSize.bossLifeGaugeFull.y, ControlSize.bossLifeGaugeFull.width, ControlSize.bossLifeGaugeFull.height);
         this._fullImage.scaleX = ScreenSize.ZOOM_RATIO;
         this._fullImage.scaleY = ScreenSize.ZOOM_RATIO;
         this._fullImage.addChildTo(this._base);
         // 上端を基準にゲージを増減させるため、原点位置を下端に変更する。
         this._fullImage.setOrigin(0.5, 1);
-        this._fullImage.y = ControlSize.cs.bossLifeGaugeFull.height;
+        this._fullImage.y = ControlSize.bossLifeGaugeFull.height;
     }
     /**
      * ゲージのたまっている比率に応じたスプライト。
@@ -38,9 +38,9 @@ class BossLifeGauge {
      */
     set rate(value) {
         // 画像の高さを指定された比率に設定する。
-        this._fullImage.height = Math.round(ControlSize.cs.bossLifeGaugeFull.height * value);
-        this._fullImage.srcRect.height = Math.round(ControlSize.cs.bossLifeGaugeFull.height * value);
-        this._fullImage.srcRect.y = ControlSize.cs.bossLifeGaugeFull.y + ControlSize.cs.bossLifeGaugeFull.height - this._fullImage.srcRect.height;
+        this._fullImage.height = Math.round(ControlSize.bossLifeGaugeFull.height * value);
+        this._fullImage.srcRect.height = Math.round(ControlSize.bossLifeGaugeFull.height * value);
+        this._fullImage.srcRect.y = ControlSize.bossLifeGaugeFull.y + ControlSize.bossLifeGaugeFull.height - this._fullImage.srcRect.height;
     }
 }
 export default BossLifeGauge;

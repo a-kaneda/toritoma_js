@@ -15,8 +15,8 @@ class LabelButton {
     constructor(width, height) {
         // ベース部分を作成する。
         this._base = new phina.display.RectangleShape({
-            width: width + ControlSize.cs.buttonTopLeft.width * ScreenSize.ZOOM_RATIO,
-            height: height + ControlSize.cs.buttonTopLeft.height * ScreenSize.ZOOM_RATIO,
+            width: width + ControlSize.buttonTopLeft.width * ScreenSize.ZOOM_RATIO,
+            height: height + ControlSize.buttonTopLeft.height * ScreenSize.ZOOM_RATIO,
             fill: MyColor.BACK_COLOR,
             strokeWidth: 0,
             padding: 0,
@@ -136,7 +136,7 @@ class LabelButton {
      */
     _createFrames(width, height) {
         // フレーム1個分のサイズを取得する。
-        const FrameSize = ControlSize.cs.buttonTopLeft.width * ScreenSize.ZOOM_RATIO;
+        const FrameSize = ControlSize.buttonTopLeft.width * ScreenSize.ZOOM_RATIO;
         for (let x = -width / 2; x <= width / 2; x += FrameSize) {
             for (let y = -height / 2; y <= height / 2; y += FrameSize) {
                 // 一番上
@@ -187,8 +187,8 @@ class LabelButton {
      */
     _createFrame(x, y, type) {
         // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control', ControlSize.cs[type].width, ControlSize.cs[type].height);
-        frame.srcRect.set(ControlSize.cs[type].x, ControlSize.cs[type].y, ControlSize.cs[type].width, ControlSize.cs[type].height);
+        const frame = new phina.display.Sprite('control', ControlSize[type].width, ControlSize[type].height);
+        frame.srcRect.set(ControlSize[type].x, ControlSize[type].y, ControlSize[type].width, ControlSize[type].height);
         frame.scaleX = ScreenSize.ZOOM_RATIO;
         frame.scaleY = ScreenSize.ZOOM_RATIO;
         frame.addChildTo(this._base)

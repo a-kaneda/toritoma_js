@@ -15,17 +15,17 @@ class ShieldButton {
         // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
         // タッチしていない状態の画像を読み込む。
-        this._offImage = new phina.display.Sprite('control', ControlSize.cs.shieldButtonOff.width, ControlSize.cs.shieldButtonOff.height);
+        this._offImage = new phina.display.Sprite('control', ControlSize.shieldButtonOff.width, ControlSize.shieldButtonOff.height);
         // タッチしていない状態のサイズを設定する。
-        this._offImage.srcRect.set(ControlSize.cs.shieldButtonOff.x, ControlSize.cs.shieldButtonOff.y, ControlSize.cs.shieldButtonOff.width, ControlSize.cs.shieldButtonOff.height);
+        this._offImage.srcRect.set(ControlSize.shieldButtonOff.x, ControlSize.shieldButtonOff.y, ControlSize.shieldButtonOff.width, ControlSize.shieldButtonOff.height);
         this._offImage.scaleX = ScreenSize.ZOOM_RATIO;
         this._offImage.scaleY = ScreenSize.ZOOM_RATIO;
         // ベース部分に追加する。
         this._offImage.addChildTo(this._base);
         // タッチしている状態の画像を読み込む。
-        this._onImage = new phina.display.Sprite('control', ControlSize.cs.shieldButtonOn.width, ControlSize.cs.shieldButtonOn.height);
+        this._onImage = new phina.display.Sprite('control', ControlSize.shieldButtonOn.width, ControlSize.shieldButtonOn.height);
         // タッチしている状態のサイズを設定する。
-        this._onImage.srcRect.set(ControlSize.cs.shieldButtonOn.x, ControlSize.cs.shieldButtonOn.y, ControlSize.cs.shieldButtonOn.width, ControlSize.cs.shieldButtonOn.height);
+        this._onImage.srcRect.set(ControlSize.shieldButtonOn.x, ControlSize.shieldButtonOn.y, ControlSize.shieldButtonOn.width, ControlSize.shieldButtonOn.height);
         this._onImage.scaleX = ScreenSize.ZOOM_RATIO;
         this._onImage.scaleY = ScreenSize.ZOOM_RATIO;
         // ベース部分に追加する。

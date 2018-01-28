@@ -22,28 +22,32 @@ class ChickenGauge {
         this._base = new phina.display.DisplayElement();
 
         // 空ゲージの画像を読み込む。
-        this._emptyImage = new phina.display.Sprite('control', ControlSize.cs.chickenGaugeEmpty.width, ControlSize.cs.chickenGaugeEmpty.height);
-        this._emptyImage.srcRect.set(ControlSize.cs.chickenGaugeEmpty.x,
-                                    ControlSize.cs.chickenGaugeEmpty.y,
-                                    ControlSize.cs.chickenGaugeEmpty.width,
-                                    ControlSize.cs.chickenGaugeEmpty.height);
+        this._emptyImage = new phina.display.Sprite('control', 
+            ControlSize.chickenGaugeEmpty.width, 
+            ControlSize.chickenGaugeEmpty.height);
+        this._emptyImage.srcRect.set(ControlSize.chickenGaugeEmpty.x,
+            ControlSize.chickenGaugeEmpty.y,
+            ControlSize.chickenGaugeEmpty.width,
+            ControlSize.chickenGaugeEmpty.height);
         this._emptyImage.scaleX = ScreenSize.ZOOM_RATIO;
         this._emptyImage.scaleY = ScreenSize.ZOOM_RATIO;
         this._emptyImage.addChildTo(this._base);
 
         // 満ゲージの画像を読み込む。
-        this._fullImage = new phina.display.Sprite('control', ControlSize.cs.chickenGaugeFull.width, ControlSize.cs.chickenGaugeFull.height);
-        this._fullImage.srcRect.set(ControlSize.cs.chickenGaugeFull.x,
-                                   ControlSize.cs.chickenGaugeFull.y,
-                                   ControlSize.cs.chickenGaugeFull.width,
-                                   ControlSize.cs.chickenGaugeFull.height);
+        this._fullImage = new phina.display.Sprite('control', 
+            ControlSize.chickenGaugeFull.width, 
+            ControlSize.chickenGaugeFull.height);
+        this._fullImage.srcRect.set(ControlSize.chickenGaugeFull.x,
+            ControlSize.chickenGaugeFull.y,
+            ControlSize.chickenGaugeFull.width,
+            ControlSize.chickenGaugeFull.height);
         this._fullImage.scaleX = ScreenSize.ZOOM_RATIO;
         this._fullImage.scaleY = ScreenSize.ZOOM_RATIO;
         this._fullImage.addChildTo(this._base);
 
         // 左端を基準にゲージを増減させるため、原点位置を左端に変更する。
         this._fullImage.setOrigin(0, 0.5);
-        this._fullImage.x = -ControlSize.cs.chickenGaugeFull.width;
+        this._fullImage.x = -ControlSize.chickenGaugeFull.width;
 
         // ゲージの初期値は0とする。
         this._fullImage.width = 0;
@@ -64,8 +68,8 @@ class ChickenGauge {
     public set rate(value: number) {
 
         // 画像の幅を指定された比率に設定する。
-        this._fullImage.width = Math.round(ControlSize.cs.chickenGaugeFull.width * value);
-        this._fullImage.srcRect.width = Math.round(ControlSize.cs.chickenGaugeFull.width * value);
+        this._fullImage.width = Math.round(ControlSize.chickenGaugeFull.width * value);
+        this._fullImage.srcRect.width = Math.round(ControlSize.chickenGaugeFull.width * value);
     }
 }
 

@@ -44,10 +44,10 @@ class TitleScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // タイトルロゴを作成する。
-        const title = new phina.display.Sprite('control', ControlSize.cs.title.width, ControlSize.cs.title.height)
+        const title = new phina.display.Sprite('control', ControlSize.title.width, ControlSize.title.height)
             .addChildTo(this._rootNode)
             .setPosition(TITLE_POS_X, TITLE_POS_Y);
-        title.srcRect.set(ControlSize.cs.title.x, ControlSize.cs.title.y, ControlSize.cs.title.width, ControlSize.cs.title.height);
+        title.srcRect.set(ControlSize.title.x, ControlSize.title.y, ControlSize.title.width, ControlSize.title.height);
         title.scaleX = ScreenSize.ZOOM_RATIO;
         title.scaleY = ScreenSize.ZOOM_RATIO;
         // ボタン配列を作成する。

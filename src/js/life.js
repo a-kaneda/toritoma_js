@@ -25,9 +25,9 @@ class Life {
             strokeWidth: 0,
         });
         // スプライト画像を読み込む。
-        this._image = new phina.display.Sprite('control', ControlSize.cs.life.width, ControlSize.cs.life.height);
+        this._image = new phina.display.Sprite('control', ControlSize.life.width, ControlSize.life.height);
         // 画像のサイズと位置を設定する。
-        this._image.srcRect.set(ControlSize.cs.life.x, ControlSize.cs.life.y, ControlSize.cs.life.width, ControlSize.cs.life.height);
+        this._image.srcRect.set(ControlSize.life.x, ControlSize.life.y, ControlSize.life.width, ControlSize.life.height);
         this._image.scaleX = ScreenSize.ZOOM_RATIO;
         this._image.scaleY = ScreenSize.ZOOM_RATIO;
         this._image.x = IMAGE_POS_X;

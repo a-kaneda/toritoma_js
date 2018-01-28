@@ -276,6 +276,9 @@ class PlayingScene implements Scene {
      */
     public update(app: phina.game.GameApp): void {
 
+        // ゲームパッドの状態を更新する。
+        this._gamepadManager.update();
+
         // 入力処理を行う。
         this._input(app);
 
@@ -491,9 +494,6 @@ class PlayingScene implements Scene {
         // キーボードを取得する。
         const key = app.keyboard;
 
-        // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
-
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
 
@@ -612,9 +612,6 @@ class PlayingScene implements Scene {
             pause: false,
         }
 
-        // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
-
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
 
@@ -664,24 +661,29 @@ class PlayingScene implements Scene {
             let height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
             // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
-            if (width % ControlSize.cs.frameBack.width > 0) {
-                x -= ControlSize.cs.frameBack.width - width % ControlSize.cs.frameBack.width;
-                width += ControlSize.cs.frameBack.width - width % ControlSize.cs.frameBack.width;
+            if (width % ControlSize.frameBack.width > 0) {
+                x -= ControlSize.frameBack.width - width % ControlSize.frameBack.width;
+                width += ControlSize.frameBack.width - width % ControlSize.frameBack.width;
             }
 
             // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-            if (ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height > 0) {
-                y -= ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
-                height += ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
+            if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height > 0) {
+                y -= ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
+                height += ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
             }
 
             // 背景を並べる。
-            for (let i = 0; i < width; i += ControlSize.cs.frameBack.width) {
-                for (let j = 0; j < height; j += ControlSize.cs.frameBack.height) {
-                    const back = new phina.display.Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+            for (let i = 0; i < width; i += ControlSize.frameBack.width) {
+                for (let j = 0; j < height; j += ControlSize.frameBack.height) {
+                    const back = new phina.display.Sprite('control', 
+                        ControlSize.frameBack.width, 
+                        ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
-                    back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.srcRect.set(ControlSize.frameBack.x, 
+                        ControlSize.frameBack.y, 
+                        ControlSize.frameBack.width, 
+                        ControlSize.frameBack.height);
                     back.addChildTo(this._frameLayer);
                 }
             }
@@ -695,18 +697,23 @@ class PlayingScene implements Scene {
             let height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO;
 
             // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-            if (ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height > 0) {
-                y -= ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
-                height += ControlSize.cs.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.cs.frameBack.height;
+            if (ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height > 0) {
+                y -= ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
+                height += ControlSize.frameBack.height - ScreenSize.STAGE_RECT.height % ControlSize.frameBack.height;
             }
 
             // 背景を並べる。
-            for (let i = 0; i < width; i += ControlSize.cs.frameBack.width) {
-                for (let j = 0; j < height; j += ControlSize.cs.frameBack.height) {
-                    const back = new phina.display.Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+            for (let i = 0; i < width; i += ControlSize.frameBack.width) {
+                for (let j = 0; j < height; j += ControlSize.frameBack.height) {
+                    const back = new phina.display.Sprite('control', 
+                        ControlSize.frameBack.width, 
+                        ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
-                    back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+                    back.srcRect.set(ControlSize.frameBack.x, 
+                        ControlSize.frameBack.y, 
+                        ControlSize.frameBack.width, 
+                        ControlSize.frameBack.height);
                     back.addChildTo(this._frameLayer);
                 }
             }
@@ -720,10 +727,15 @@ class PlayingScene implements Scene {
             const height = ScreenSize.SCREEN_HEIGHT / ScreenSize.ZOOM_RATIO - ScreenSize.STAGE_RECT.height;
 
             // 背景を並べる。
-            for (let i = 0; i < width; i += ControlSize.cs.frameBack.width) {
-                for (let j = 0; j < height; j += ControlSize.cs.frameBack.height) {
-                    const back = new phina.display.Sprite('control', ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
-                    back.srcRect.set(ControlSize.cs.frameBack.x, ControlSize.cs.frameBack.y, ControlSize.cs.frameBack.width, ControlSize.cs.frameBack.height);
+            for (let i = 0; i < width; i += ControlSize.frameBack.width) {
+                for (let j = 0; j < height; j += ControlSize.frameBack.height) {
+                    const back = new phina.display.Sprite('control', 
+                        ControlSize.frameBack.width, 
+                        ControlSize.frameBack.height);
+                    back.srcRect.set(ControlSize.frameBack.x, 
+                        ControlSize.frameBack.y, 
+                        ControlSize.frameBack.width, 
+                        ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
                     back.addChildTo(this._frameLayer);
@@ -739,13 +751,18 @@ class PlayingScene implements Scene {
 
         {
             // 左側の枠の位置を計算する。
-            const x = ScreenSize.STAGE_RECT.x - ControlSize.cs.frameLeft.width;
+            const x = ScreenSize.STAGE_RECT.x - ControlSize.frameLeft.width;
             const height = ScreenSize.STAGE_RECT.height;
 
             // 枠を並べる。
-            for (let i = 0; i < height; i += ControlSize.cs.frameLeft.height) {
-                const bar = new phina.display.Sprite('control', ControlSize.cs.frameLeft.width, ControlSize.cs.frameLeft.height);
-                bar.srcRect.set(ControlSize.cs.frameLeft.x, ControlSize.cs.frameLeft.y, ControlSize.cs.frameLeft.width, ControlSize.cs.frameLeft.height);
+            for (let i = 0; i < height; i += ControlSize.frameLeft.height) {
+                const bar = new phina.display.Sprite('control', 
+                    ControlSize.frameLeft.width, 
+                    ControlSize.frameLeft.height);
+                bar.srcRect.set(ControlSize.frameLeft.x, 
+                    ControlSize.frameLeft.y, 
+                    ControlSize.frameLeft.width, 
+                    ControlSize.frameLeft.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
                 bar.addChildTo(this._frameLayer);
@@ -758,9 +775,14 @@ class PlayingScene implements Scene {
             const height = ScreenSize.STAGE_RECT.height;
 
             // 枠を並べる。
-            for (let i = 0; i < height; i += ControlSize.cs.frameRight.height) {
-                const bar = new phina.display.Sprite('control', ControlSize.cs.frameRight.width, ControlSize.cs.frameRight.height);
-                bar.srcRect.set(ControlSize.cs.frameRight.x, ControlSize.cs.frameRight.y, ControlSize.cs.frameRight.width, ControlSize.cs.frameRight.height);
+            for (let i = 0; i < height; i += ControlSize.frameRight.height) {
+                const bar = new phina.display.Sprite('control', 
+                    ControlSize.frameRight.width, 
+                    ControlSize.frameRight.height);
+                bar.srcRect.set(ControlSize.frameRight.x, 
+                    ControlSize.frameRight.y, 
+                    ControlSize.frameRight.width, 
+                    ControlSize.frameRight.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
                 bar.addChildTo(this._frameLayer);
@@ -774,9 +796,14 @@ class PlayingScene implements Scene {
             const width = ScreenSize.STAGE_RECT.width;
 
             // 枠を並べる。
-            for (let i = 0; i < width; i += ControlSize.cs.frameBottom.width) {
-                const bar = new phina.display.Sprite('control', ControlSize.cs.frameBottom.width, ControlSize.cs.frameBottom.height);
-                bar.srcRect.set(ControlSize.cs.frameBottom.x, ControlSize.cs.frameBottom.y, ControlSize.cs.frameBottom.width, ControlSize.cs.frameBottom.height);
+            for (let i = 0; i < width; i += ControlSize.frameBottom.width) {
+                const bar = new phina.display.Sprite('control', 
+                    ControlSize.frameBottom.width, 
+                    ControlSize.frameBottom.height);
+                bar.srcRect.set(ControlSize.frameBottom.x, 
+                    ControlSize.frameBottom.y, 
+                    ControlSize.frameBottom.width, 
+                    ControlSize.frameBottom.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x + i, y);
                 bar.addChildTo(this._frameLayer);
@@ -785,15 +812,17 @@ class PlayingScene implements Scene {
 
         {
             // 左下の枠の位置を計算する。
-            const x = ScreenSize.STAGE_RECT.x - ControlSize.cs.frameBottomLeft.width;
+            const x = ScreenSize.STAGE_RECT.x - ControlSize.frameBottomLeft.width;
             const y = ScreenSize.STAGE_RECT.height;
 
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', ControlSize.cs.frameBottomLeft.width, ControlSize.cs.frameBottomLeft.height);
-            bar.srcRect.set(ControlSize.cs.frameBottomLeft.x,
-                ControlSize.cs.frameBottomLeft.y,
-                ControlSize.cs.frameBottomLeft.width,
-                ControlSize.cs.frameBottomLeft.height);
+            const bar = new phina.display.Sprite('control', 
+                ControlSize.frameBottomLeft.width, 
+                ControlSize.frameBottomLeft.height);
+            bar.srcRect.set(ControlSize.frameBottomLeft.x,
+                ControlSize.frameBottomLeft.y,
+                ControlSize.frameBottomLeft.width,
+                ControlSize.frameBottomLeft.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);
             bar.addChildTo(this._frameLayer);
@@ -805,11 +834,13 @@ class PlayingScene implements Scene {
             const y = ScreenSize.STAGE_RECT.height;
 
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', ControlSize.cs.frameBottomRight.width, ControlSize.cs.frameBottomRight.height);
-            bar.srcRect.set(ControlSize.cs.frameBottomRight.x,
-                ControlSize.cs.frameBottomRight.y,
-                ControlSize.cs.frameBottomRight.width,
-                ControlSize.cs.frameBottomRight.height);
+            const bar = new phina.display.Sprite('control', 
+                ControlSize.frameBottomRight.width, 
+                ControlSize.frameBottomRight.height);
+            bar.srcRect.set(ControlSize.frameBottomRight.x,
+                ControlSize.frameBottomRight.y,
+                ControlSize.frameBottomRight.width,
+                ControlSize.frameBottomRight.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);
             bar.addChildTo(this._frameLayer);

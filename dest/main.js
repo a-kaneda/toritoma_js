@@ -248,7 +248,7 @@ class Character {
 /**
  * コントロールサイズ
  */
-const cs = {
+var ControlSize = {
     title: {
         x: 0,
         y: 0,
@@ -411,19 +411,25 @@ const cs = {
         width: 8,
         height: 8,
     },
+    prevButton: {
+        x: 176,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    nextButton: {
+        x: 192,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    backButton: {
+        x: 208,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
 };
-/**
- * control.png内のコントロールの位置とサイズを定義する。
- */
-class ControlSize {
-    /**
-     * control.png内のコントロールの位置とサイズ。
-     */
-    static get cs() {
-        return cs;
-    }
-}
-;
 /* harmony default export */ __webpack_exports__["a"] = (ControlSize);
 
 
@@ -1475,10 +1481,10 @@ class TitleScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // タイトルロゴを作成する。
-        const title = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height)
+        const title = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].title.height)
             .addChildTo(this._rootNode)
             .setPosition(TITLE_POS_X, TITLE_POS_Y);
-        title.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].cs.title.height);
+        title.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].title.x, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].title.y, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_2__controlsize__["a" /* default */].title.height);
         title.scaleX = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
         title.scaleY = __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].ZOOM_RATIO;
         // ボタン配列を作成する。
@@ -1633,8 +1639,8 @@ class Cursor {
      */
     constructor() {
         // 画像を読み込む。
-        this._sprite = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
-        this._sprite.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.cursor.height);
+        this._sprite = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cursor.height);
+        this._sprite.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cursor.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cursor.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cursor.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cursor.height);
         this._sprite.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         this._sprite.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         // カーソル位置配列を作成する。
@@ -1762,7 +1768,7 @@ class Cursor {
             // アナログスティックが入力されている場合
             if (input[direction]) {
                 // 前回入力されていなかった場合
-                if (this._prevGamepadInput[direction]) {
+                if (!this._prevGamepadInput[direction]) {
                     // カーソル位置を移動する。
                     this._move(direction);
                 }
@@ -1822,8 +1828,8 @@ class LabelButton {
     constructor(width, height) {
         // ベース部分を作成する。
         this._base = new phina.display.RectangleShape({
-            width: width + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
-            height: height + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
+            width: width + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
+            height: height + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
             fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].BACK_COLOR,
             strokeWidth: 0,
             padding: 0,
@@ -1943,7 +1949,7 @@ class LabelButton {
      */
     _createFrames(width, height) {
         // フレーム1個分のサイズを取得する。
-        const FrameSize = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
+        const FrameSize = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         for (let x = -width / 2; x <= width / 2; x += FrameSize) {
             for (let y = -height / 2; y <= height / 2; y += FrameSize) {
                 // 一番上
@@ -1994,8 +2000,8 @@ class LabelButton {
      */
     _createFrame(x, y, type) {
         // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
-        frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs[type].height);
+        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].height);
+        frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].height);
         frame.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         frame.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         frame.addChildTo(this._base)
@@ -2556,20 +2562,20 @@ class BossLifeGauge {
         // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
         // 空ゲージの画像を読み込む。
-        this._emptyImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.height);
-        this._emptyImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeEmpty.height);
+        this._emptyImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeEmpty.height);
+        this._emptyImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeEmpty.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeEmpty.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeEmpty.height);
         this._emptyImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         this._emptyImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         this._emptyImage.addChildTo(this._base);
         // 満ゲージの画像を読み込む。
-        this._fullImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height);
-        this._fullImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height);
+        this._fullImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.height);
+        this._fullImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.height);
         this._fullImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         this._fullImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
         this._fullImage.addChildTo(this._base);
         // 上端を基準にゲージを増減させるため、原点位置を下端に変更する。
         this._fullImage.setOrigin(0.5, 1);
-        this._fullImage.y = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height;
+        this._fullImage.y = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.height;
     }
     /**
      * ゲージのたまっている比率に応じたスプライト。
@@ -2583,9 +2589,9 @@ class BossLifeGauge {
      */
     set rate(value) {
         // 画像の高さを指定された比率に設定する。
-        this._fullImage.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height * value);
-        this._fullImage.srcRect.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height * value);
-        this._fullImage.srcRect.y = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.y + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].cs.bossLifeGaugeFull.height - this._fullImage.srcRect.height;
+        this._fullImage.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.height * value);
+        this._fullImage.srcRect.height = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.height * value);
+        this._fullImage.srcRect.y = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.y + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].bossLifeGaugeFull.height - this._fullImage.srcRect.height;
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (BossLifeGauge);
@@ -2696,20 +2702,20 @@ class ChickenGauge {
         // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
         // 空ゲージの画像を読み込む。
-        this._emptyImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeEmpty.height);
-        this._emptyImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeEmpty.x, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeEmpty.y, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeEmpty.height);
+        this._emptyImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeEmpty.height);
+        this._emptyImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeEmpty.x, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeEmpty.y, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeEmpty.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeEmpty.height);
         this._emptyImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._emptyImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._emptyImage.addChildTo(this._base);
         // 満ゲージの画像を読み込む。
-        this._fullImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.height);
-        this._fullImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.x, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.y, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.height);
+        this._fullImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.height);
+        this._fullImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.x, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.y, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.width, __WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.height);
         this._fullImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._fullImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._fullImage.addChildTo(this._base);
         // 左端を基準にゲージを増減させるため、原点位置を左端に変更する。
         this._fullImage.setOrigin(0, 0.5);
-        this._fullImage.x = -__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.width;
+        this._fullImage.x = -__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.width;
         // ゲージの初期値は0とする。
         this._fullImage.width = 0;
         this._fullImage.srcRect.width = 0;
@@ -2726,8 +2732,8 @@ class ChickenGauge {
      */
     set rate(value) {
         // 画像の幅を指定された比率に設定する。
-        this._fullImage.width = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.width * value);
-        this._fullImage.srcRect.width = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].cs.chickenGaugeFull.width * value);
+        this._fullImage.width = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.width * value);
+        this._fullImage.srcRect.width = Math.round(__WEBPACK_IMPORTED_MODULE_1__controlsize_js__["a" /* default */].chickenGaugeFull.width * value);
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (ChickenGauge);
@@ -2889,16 +2895,16 @@ class ImageBUtton {
         // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
         // 画像を読み込む。
-        this._image = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].height)
+        this._image = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].height)
             .addChildTo(this._base);
-        this._image.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].x, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].y, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].height);
+        this._image.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].x, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].y, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].height);
         this._image.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
         this._image.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
         // ボタン部分を作成する。
         // タップをやりやすくするため、画像より大きめにサイズを取る。
         this._button = new phina.display.RectangleShape({
-            width: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].width * 1.5),
-            height: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */].cs[name].height * 1.5),
+            width: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].width * 1.5),
+            height: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].height * 1.5),
         })
             .addChildTo(this._base);
         // ボタン部分を非表示にする。
@@ -3048,9 +3054,9 @@ class Life {
             strokeWidth: 0,
         });
         // スプライト画像を読み込む。
-        this._image = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.width, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.height);
+        this._image = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].life.width, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].life.height);
         // 画像のサイズと位置を設定する。
-        this._image.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.x, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.y, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.width, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].cs.life.height);
+        this._image.srcRect.set(__WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].life.x, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].life.y, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].life.width, __WEBPACK_IMPORTED_MODULE_2__controlsize_js__["a" /* default */].life.height);
         this._image.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._image.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._image.x = IMAGE_POS_X;
@@ -4350,6 +4356,8 @@ class PlayingScene {
      * @param app アプリケーション
      */
     update(app) {
+        // ゲームパッドの状態を更新する。
+        this._gamepadManager.update();
         // 入力処理を行う。
         this._input(app);
         // プレイ中、待機中の場合
@@ -4526,8 +4534,6 @@ class PlayingScene {
     _inputOnGameOver(app) {
         // キーボードを取得する。
         const key = app.keyboard;
-        // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
         // キーボードのzキーか、ゲームパッドのAボタンでタイトル画面に戻る。
@@ -4624,8 +4630,6 @@ class PlayingScene {
             shield: false,
             pause: false,
         };
-        // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
         // ゲームパッドを取得する。
         const gamepad = this._gamepadManager.get();
         // アナログスティックの入力を取得する。
@@ -4664,22 +4668,22 @@ class PlayingScene {
             let width = Math.ceil((__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH / __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width) / 2);
             let height = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT / __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
             // 右端揃えにするため、ブロックのはみ出している分だけ左にずらす
-            if (width % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width > 0) {
-                x -= __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width - width % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width;
-                width += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width - width % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width;
+            if (width % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width > 0) {
+                x -= __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width - width % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width;
+                width += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width - width % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width;
             }
             // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-            if (__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height > 0) {
-                y -= __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height;
-                height += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height;
+            if (__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height > 0) {
+                y -= __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height;
+                height += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height;
             }
             // 背景を並べる。
-            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width) {
-                for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height) {
-                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height);
+            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width) {
+                for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height) {
+                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
-                    back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height);
+                    back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.addChildTo(this._frameLayer);
                 }
             }
@@ -4691,17 +4695,17 @@ class PlayingScene {
             const width = Math.ceil((__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH / __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width) / 2);
             let height = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT / __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
             // ステージの下端に揃えるため、ブロックのはみ出している分だけ上にずらす
-            if (__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height > 0) {
-                y -= __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height;
-                height += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height;
+            if (__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height > 0) {
+                y -= __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height;
+                height += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height % __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height;
             }
             // 背景を並べる。
-            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width) {
-                for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height) {
-                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height);
+            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width) {
+                for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height) {
+                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
-                    back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height);
+                    back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.addChildTo(this._frameLayer);
                 }
             }
@@ -4713,10 +4717,10 @@ class PlayingScene {
             const width = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width;
             const height = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT / __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO - __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 背景を並べる。
-            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width) {
-                for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height) {
-                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height);
-                    back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBack.height);
+            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width) {
+                for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height) {
+                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
+                    back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
                     back.addChildTo(this._frameLayer);
@@ -4730,12 +4734,12 @@ class PlayingScene {
     _createFrameBar() {
         {
             // 左側の枠の位置を計算する。
-            const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x - __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.width;
+            const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x - __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.width;
             const height = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
-            for (let i = 0; i < height; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.height) {
-                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.height);
-                bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameLeft.height);
+            for (let i = 0; i < height; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.height) {
+                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.height);
+                bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
                 bar.addChildTo(this._frameLayer);
@@ -4746,9 +4750,9 @@ class PlayingScene {
             const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x + __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width;
             const height = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
-            for (let i = 0; i < height; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameRight.height) {
-                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameRight.height);
-                bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameRight.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameRight.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameRight.height);
+            for (let i = 0; i < height; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.height) {
+                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.height);
+                bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
                 bar.addChildTo(this._frameLayer);
@@ -4760,9 +4764,9 @@ class PlayingScene {
             const y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             const width = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width;
             // 枠を並べる。
-            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottom.width) {
-                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottom.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottom.height);
-                bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottom.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottom.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottom.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottom.height);
+            for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.width) {
+                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.height);
+                bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x + i, y);
                 bar.addChildTo(this._frameLayer);
@@ -4770,11 +4774,11 @@ class PlayingScene {
         }
         {
             // 左下の枠の位置を計算する。
-            const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x - __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomLeft.width;
+            const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x - __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.width;
             const y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomLeft.height);
-            bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomLeft.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomLeft.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomLeft.height);
+            const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.height);
+            bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);
             bar.addChildTo(this._frameLayer);
@@ -4784,8 +4788,8 @@ class PlayingScene {
             const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x + __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width;
             const y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomRight.height);
-            bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomRight.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomRight.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].cs.frameBottomRight.height);
+            const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.height);
+            bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);
             bar.addChildTo(this._frameLayer);
@@ -5254,17 +5258,17 @@ class ShieldButton {
         // ベース部分を作成する。
         this._base = new phina.display.DisplayElement();
         // タッチしていない状態の画像を読み込む。
-        this._offImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.height);
+        this._offImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOff.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOff.height);
         // タッチしていない状態のサイズを設定する。
-        this._offImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.x, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.y, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOff.height);
+        this._offImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOff.x, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOff.y, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOff.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOff.height);
         this._offImage.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._offImage.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         // ベース部分に追加する。
         this._offImage.addChildTo(this._base);
         // タッチしている状態の画像を読み込む。
-        this._onImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.height);
+        this._onImage = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOn.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOn.height);
         // タッチしている状態のサイズを設定する。
-        this._onImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.x, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.y, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].cs.shieldButtonOn.height);
+        this._onImage.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOn.x, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOn.y, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOn.width, __WEBPACK_IMPORTED_MODULE_0__controlsize_js__["a" /* default */].shieldButtonOn.height);
         this._onImage.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         this._onImage.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize_js__["a" /* default */].ZOOM_RATIO;
         // ベース部分に追加する。

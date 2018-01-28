@@ -31,21 +31,21 @@ class ImageBUtton {
 
         // 画像を読み込む。
         this._image = new phina.display.Sprite('control', 
-            ControlSize.cs[name].width, 
-            ControlSize.cs[name].height)
+            ControlSize[name].width, 
+            ControlSize[name].height)
         .addChildTo(this._base);
-        this._image.srcRect.set(ControlSize.cs[name].x,
-            ControlSize.cs[name].y,
-            ControlSize.cs[name].width,
-            ControlSize.cs[name].height);
+        this._image.srcRect.set(ControlSize[name].x,
+            ControlSize[name].y,
+            ControlSize[name].width,
+            ControlSize[name].height);
         this._image.scaleX = ScreenSize.ZOOM_RATIO;
         this._image.scaleY = ScreenSize.ZOOM_RATIO;
     
         // ボタン部分を作成する。
         // タップをやりやすくするため、画像より大きめにサイズを取る。
         this._button = new phina.display.RectangleShape({
-            width: Math.ceil(ControlSize.cs[name].width * 1.5),
-            height: Math.ceil(ControlSize.cs[name].height * 1.5),
+            width: Math.ceil(ControlSize[name].width * 1.5),
+            height: Math.ceil(ControlSize[name].height * 1.5),
         })
         .addChildTo(this._base);
 
