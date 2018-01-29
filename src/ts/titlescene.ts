@@ -1,7 +1,8 @@
 import Scene from './scene'
 import LabelButton from './labelbutton'
-import MainScene from './mainscene.d'
+import MainScene from './mainscene'
 import PlayinScene from './playingscene'
+import HowToPlayScene from './howtoplayscene'
 import ControlSize from './controlsize'
 import ScreenSize from './screensize'
 import Cursor from './cursor'
@@ -51,6 +52,7 @@ class TitleScene implements Scene {
      * コンストラクタ。
      * 各種データの初期化と生成を行う。
      * @param phinaScene phina.js上のシーンインスタンス
+     * @param gamepadManager ゲームパッド管理クラス
      */
     constructor(phinaScene: MainScene, gamepadManager: phina.input.GamepadManager) {
 
@@ -167,6 +169,9 @@ class TitleScene implements Scene {
         switch (sceneName) {
             case 'PlayingScene':
                 this._phinaScene.scene = new PlayinScene(this._phinaScene, this._gamepadManager);
+                break;
+            case 'HowToPlayScene':
+                this._phinaScene.scene = new HowToPlayScene(this._phinaScene, this._gamepadManager);
                 break;
             default:
                 break;

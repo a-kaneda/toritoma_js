@@ -65,6 +65,9 @@ class ImageBUtton {
             }
         });
 
+        // 初期状態は有効とする。
+        this._enable = true;
+
         // コールバック関数を初期化する。
         this._onPush = null;
     }
@@ -107,6 +110,16 @@ class ImageBUtton {
      */
     public setEnable(value: boolean): this {
         this._enable = value;
+        return this;
+    }
+
+    /**
+     * ボタン選択時の処理を行う。
+     */
+    public push(): this{
+        if (this._onPush !== null) {
+            this._onPush();
+        }
         return this;
     }
 }

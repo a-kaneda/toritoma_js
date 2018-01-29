@@ -39,6 +39,8 @@ class ImageBUtton {
                 this._onPush();
             }
         });
+        // 初期状態は有効とする。
+        this._enable = true;
         // コールバック関数を初期化する。
         this._onPush = null;
     }
