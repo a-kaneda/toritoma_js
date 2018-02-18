@@ -2,6 +2,7 @@ import PageLayer from './pagelayer'
 import Scene from './scene'
 import MainScene from './mainscene'
 import TitleScene from './titlescene'
+import HowToPlayPage from './howtoplaypage'
 
 /**
  * 遊び方説明シーン。
@@ -40,6 +41,11 @@ class HowToPlayScene implements Scene {
             this._rootNode.remove();
             this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
         });
+
+        // 各ページを作成する。
+        for (let i = 0; i < HowToPlayPage.PAGE_COUNT; i++) {
+            this._pageLayer.addPage(new HowToPlayPage(i));
+        }
     }
 
     /**

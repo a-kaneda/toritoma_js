@@ -50,7 +50,7 @@ var ControlSize = {
         width: 16,
         height: 16,
     },
-    frameLeftTop: {
+    frameTopLeft: {
         x: 224,
         y: 0,
         width: 4,
@@ -62,7 +62,7 @@ var ControlSize = {
         width: 4,
         height: 4,
     },
-    frameRightTop: {
+    frameTopRight: {
         x: 232,
         y: 0,
         width: 4,

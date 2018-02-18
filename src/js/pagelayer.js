@@ -35,7 +35,12 @@ class PageLayer {
         // 次ページボタンを作成する。
         this._nextButton = new ImageButton('nextButton')
             .setPosition(NEXT_BUTTON_POS_X, NEXT_BUTTON_POS_Y)
+            .onPush(() => { this._goToNextPage(); })
             .addChildTo(this._rootNode);
+        // ページ配列を作成する。
+        this._pages = [];
+        // ページ番号を初期化する。
+        this._currentPageNum = 0;
     }
     /**
      * phina.jsのエレメントにノードを追加する。
@@ -55,6 +60,19 @@ class PageLayer {
         return this;
     }
     /**
+     * ページを追加する。
+     * @param page ページ
+     */
+    addPage(page) {
+        // メンバ変数に格納する。
+        this._pages.push(page);
+        // 1個目の場合は画面に配置する。
+        if (this._pages.length === 1) {
+            this._pages[0].addChildTo(this._rootNode);
+        }
+        return this;
+    }
+    /**
      * 戻るボタン選択時のコールバック関数を設定する。
      * @param func コールバック関数
      */
@@ -67,6 +85,26 @@ class PageLayer {
             func();
         });
         return this;
+    }
+    /**
+     * 入力処理を行う。
+     * @param keyboard キーボード
+     * @param gamepad ゲームパッド
+     */
+    input(keyboard, gamepad) {
+        // キーボードのESCキーかゲームパッドのBボタンが押された場合は戻るボタンの処理を行う。
+        if (keyboard.getKeyDown('escape') || gamepad.getKeyDown('b')) {
+            this._backButton.push();
+        }
+        else if (keyboard.getKeyDown('left') || gamepad.getKeyDown('left')) {
+            this._goToPrevPage();
+        }
+        else if (keyboard.getKeyDown('right') || gamepad.getKeyDown('right')) {
+            this._goToNextPage();
+        }
+        else {
+            // その他のキー入力は処理しない。
+        }
     }
     /**
      * 前ページへ移動する。

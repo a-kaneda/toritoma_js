@@ -2,6 +2,7 @@ import PointDevice from './pointdevice'
 import ScreenSize from './screensize'
 import MyColor from './mycolor'
 import TitleScene from './titlescene'
+import LabelAreaExDummy from './labelareaex'
 
 declare global {
     interface Window {
@@ -10,6 +11,9 @@ declare global {
     }
 }
 window.debug = {};
+
+// LabelAreaExが取り込まれるようにダミー変数を使用する。
+LabelAreaExDummy;
 
 // マウスが接続されているかどうかを調べる。
 PointDevice.checkDeviceType();
@@ -24,6 +28,7 @@ const ASSETS = {
         'image_8x8': './images/image_8x8.png',
         'image_16x16': './images/image_16x16.png',
         'image_64x64': './images/image_64x64.png',
+        'howtoimage': './images/howtoimage.png',
     },
     spritesheet: {
         'image_8x8_ss': './images/image_8x8_ss.json',

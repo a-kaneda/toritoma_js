@@ -50,7 +50,7 @@ declare module phina {
         }
 
         class PlainElement extends phina.display.DisplayElement {
-
+            canvas: phina.graphics.Canvas;
         }
 
         class Shape extends phina.display.PlainElement {
@@ -68,6 +68,7 @@ declare module phina {
 
         class Label extends phina.display.Shape {
             text: string;
+            font: string;
         }
 
         class DisplayScene extends phina.app.Scene {
@@ -217,6 +218,21 @@ declare module phina {
 
         class GameApp extends phina.display.CanvasApp {
             constructor(params?: any);
+        }
+    }
+
+    module ui {
+
+        class LabelArea extends phina.display.Label {
+            constructor(options?: any);
+            init(options?: any): void;
+            getTextWidthCache(): {[key: string]: number};
+            text: string;
+            _text: string;
+        }
+
+        class LabelAreaEx extends phina.ui.LabelArea {
+            
         }
     }
 }

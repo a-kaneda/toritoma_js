@@ -4,7 +4,7 @@ const ZOOM_RATIO = 2;
 // スクリーンの幅
 const SCREEN_WIDTH = 240 * ZOOM_RATIO;
 // スクリーンの高さ
-const SCREEN_HEIGHT = 160 * ZOOM_RATIO;
+const SCREEN_HEIGHT = 180 * ZOOM_RATIO;
 // ゲーム画面のサイズ
 const STAGE_RECT = {
     x: 24,

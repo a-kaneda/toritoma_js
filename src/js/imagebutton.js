@@ -23,8 +23,8 @@ class ImageBUtton {
         // ボタン部分を作成する。
         // タップをやりやすくするため、画像より大きめにサイズを取る。
         this._button = new phina.display.RectangleShape({
-            width: Math.ceil(ControlSize[name].width * 1.5),
-            height: Math.ceil(ControlSize[name].height * 1.5),
+            width: Math.ceil(ControlSize[name].width * ScreenSize.ZOOM_RATIO * 2),
+            height: Math.ceil(ControlSize[name].height * ScreenSize.ZOOM_RATIO * 2),
         })
             .addChildTo(this._base);
         // ボタン部分を非表示にする。
@@ -79,6 +79,15 @@ class ImageBUtton {
      */
     setEnable(value) {
         this._enable = value;
+        return this;
+    }
+    /**
+     * ボタン選択時の処理を行う。
+     */
+    push() {
+        if (this._onPush !== null) {
+            this._onPush();
+        }
         return this;
     }
 }

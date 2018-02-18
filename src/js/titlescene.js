@@ -7,17 +7,7 @@ import Cursor from './cursor';
 // タイトルの位置、x座標
 const TITLE_POS_X = 130;
 // タイトルの位置、y座標
-const TITLE_POS_Y = 150;
-// ボタンの位置、x座標
-const BUTTON_POS_X = 360;
-// ボタンの位置、y座標
-const BUTTON_POS_Y = [80, 160, 240];
-// ボタンの幅
-const BUTTON_WIDTH = 176;
-// ボタンの高さ
-const BUTTON_HEIGHT = 32;
-// カーソルの位置、x座標
-const CURSOR_POS_X = 256;
+const TITLE_POS_Y = ScreenSize.SCREEN_HEIGHT / 2;
 // ボタンの数
 const BUTTON_NUM = 3;
 // ボタンのID
@@ -28,6 +18,20 @@ var BUTTON_ID;
     BUTTON_ID[BUTTON_ID["CREDIT"] = 2] = "CREDIT";
 })(BUTTON_ID || (BUTTON_ID = {}));
 ;
+// ボタンの位置、x座標
+const BUTTON_POS_X = 360;
+// ボタンの位置、y座標
+const BUTTON_POS_Y = [
+    Math.round(ScreenSize.SCREEN_HEIGHT / (BUTTON_NUM + 1)),
+    Math.round((ScreenSize.SCREEN_HEIGHT * 2) / (BUTTON_NUM + 1)),
+    Math.round((ScreenSize.SCREEN_HEIGHT * 3) / (BUTTON_NUM + 1))
+];
+// ボタンの幅
+const BUTTON_WIDTH = 176;
+// ボタンの高さ
+const BUTTON_HEIGHT = 32;
+// カーソルの位置、x座標
+const CURSOR_POS_X = 256;
 /**
  * タイトルのシーン
  */

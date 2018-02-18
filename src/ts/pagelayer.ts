@@ -55,7 +55,14 @@ class PageLayer {
         // 次ページボタンを作成する。
         this._nextButton = new ImageButton('nextButton')
         .setPosition(NEXT_BUTTON_POS_X, NEXT_BUTTON_POS_Y)
+        .onPush(() => {this._goToNextPage()})
         .addChildTo(this._rootNode);
+
+        // ページ配列を作成する。
+        this._pages = [];
+
+        // ページ番号を初期化する。
+        this._currentPageNum = 0;
     }
 
     /**
@@ -74,6 +81,23 @@ class PageLayer {
      */
     public remove(): this {
         this._rootNode.remove();
+        return this;
+    }
+
+    /**
+     * ページを追加する。
+     * @param page ページ
+     */
+    public addPage(page: DisplayElement): this {
+
+        // メンバ変数に格納する。
+        this._pages.push(page);
+
+        // 1個目の場合は画面に配置する。
+        if (this._pages.length === 1) {
+            this._pages[0].addChildTo(this._rootNode);
+        }
+
         return this;
     }
 

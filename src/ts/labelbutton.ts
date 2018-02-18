@@ -1,6 +1,7 @@
 import MyColor from './mycolor'
 import ControlSize from './controlsize'
 import ScreenSize from './screensize'
+import Frame from './frame'
 
 // ボタン選択からハンドラ実行までのインターバル(msec)
 const EXEC_INTERVAL = 500;
@@ -38,7 +39,8 @@ class LabelButton {
         });
 
         // 枠を作成する。
-        this._createFrames(width, height);
+        const frame = new Frame('button', width, height)
+        .addChildTo(this._base);
 
         // ラベルを作成する。
         this._label = new phina.display.Label({
@@ -163,94 +165,6 @@ class LabelButton {
         }
 
         return this;
-    }
-
-    /**
-     * ボタンの枠の部分を作成する。
-     * @param width 幅
-     * @param height 高さ
-     */
-    private _createFrames(width: number, height: number): void {
-
-        // フレーム1個分のサイズを取得する。
-        const FrameSize = ControlSize.buttonTopLeft.width * ScreenSize.ZOOM_RATIO;
-
-        for (let x = -width / 2; x <= width / 2; x += FrameSize) {
-
-            for (let y = -height / 2; y <= height / 2; y += FrameSize) {
-
-                // 一番上
-                if (y === -height / 2) {
-
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonTopLeft');
-                    }
-                    // 左右真ん中
-                    else if (x + FrameSize <= width / 2) {
-                        this._createFrame(x, y, 'buttonTop');
-                    }
-                    // 一番右
-                    else {
-                        this._createFrame(x, y, 'buttonTopRight');
-                    }
-                }
-                // 上下真ん中
-                else if (y + FrameSize <= height / 2) {
-
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonLeft');
-                    }
-                    // 左右真ん中
-                    else if (x + FrameSize <= width / 2) {
-                        // 上下左右真ん中部分は画像無し。
-                    }
-                    // 一番右
-                    else {
-                        this._createFrame(x, y, 'buttonRight');
-                    }
-                }
-                // 一番下
-                else {
-
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonBottomLeft');
-                    }
-                    // 左右真ん中
-                    else if (x + FrameSize <= width / 2) {
-                        this._createFrame(x, y, 'buttonBottom');
-                    }
-                    // 一番右
-                    else {
-                        this._createFrame(x, y, 'buttonBottomRight');
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 枠の画像を読み込み、ベースに配置する。
-     * @param x x座標
-     * @param y y座標
-     * @param type 枠のタイプ
-     */
-    private _createFrame(x: number, y: number, type: string): void {
-
-        // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control',
-            ControlSize[type].width,
-            ControlSize[type].height);
-        frame.srcRect.set(ControlSize[type].x,
-            ControlSize[type].y,
-            ControlSize[type].width,
-            ControlSize[type].height);
-        frame.scaleX = ScreenSize.ZOOM_RATIO;
-        frame.scaleY = ScreenSize.ZOOM_RATIO;
-        frame.addChildTo(this._base)
-        .setPosition(x, y);
     }
 }
 

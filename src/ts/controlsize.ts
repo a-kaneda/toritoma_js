@@ -53,7 +53,7 @@ var ControlSize: {[key: string]: Rect} =  {
         width: 16,
         height: 16,
     },
-    frameLeftTop: {
+    frameTopLeft: {
         x: 224,
         y: 0,
         width: 4,
@@ -65,7 +65,7 @@ var ControlSize: {[key: string]: Rect} =  {
         width: 4,
         height: 4,
     },
-    frameRightTop: {
+    frameTopRight: {
         x: 232,
         y: 0,
         width: 4,

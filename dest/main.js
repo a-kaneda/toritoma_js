@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 24);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -77,7 +77,7 @@ const ZOOM_RATIO = 2;
 // スクリーンの幅
 const SCREEN_WIDTH = 240 * ZOOM_RATIO;
 // スクリーンの高さ
-const SCREEN_HEIGHT = 160 * ZOOM_RATIO;
+const SCREEN_HEIGHT = 180 * ZOOM_RATIO;
 // ゲーム画面のサイズ
 const STAGE_RECT = {
     x: 24,
@@ -112,6 +112,199 @@ class ScreenSize {
 
 /***/ }),
 /* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * コントロールサイズ
+ */
+var ControlSize = {
+    title: {
+        x: 0,
+        y: 0,
+        width: 128,
+        height: 112,
+    },
+    chickenGaugeEmpty: {
+        x: 0,
+        y: 112,
+        width: 128,
+        height: 8,
+    },
+    chickenGaugeFull: {
+        x: 0,
+        y: 120,
+        width: 128,
+        height: 8,
+    },
+    bossLifeGaugeEmpty: {
+        x: 128,
+        y: 0,
+        width: 8,
+        height: 96,
+    },
+    bossLifeGaugeFull: {
+        x: 136,
+        y: 0,
+        width: 8,
+        height: 96,
+    },
+    shieldButtonOff: {
+        x: 144,
+        y: 0,
+        width: 32,
+        height: 32,
+    },
+    shieldButtonOn: {
+        x: 176,
+        y: 0,
+        width: 32,
+        height: 32,
+    },
+    frameBack: {
+        x: 208,
+        y: 0,
+        width: 16,
+        height: 16,
+    },
+    frameTopLeft: {
+        x: 224,
+        y: 0,
+        width: 4,
+        height: 4,
+    },
+    frameTop: {
+        x: 228,
+        y: 0,
+        width: 4,
+        height: 4,
+    },
+    frameTopRight: {
+        x: 232,
+        y: 0,
+        width: 4,
+        height: 4,
+    },
+    frameLeft: {
+        x: 224,
+        y: 4,
+        width: 4,
+        height: 4,
+    },
+    frameRight: {
+        x: 232,
+        y: 4,
+        width: 4,
+        height: 4,
+    },
+    frameBottomLeft: {
+        x: 224,
+        y: 8,
+        width: 4,
+        height: 4,
+    },
+    frameBottom: {
+        x: 228,
+        y: 8,
+        width: 4,
+        height: 4,
+    },
+    frameBottomRight: {
+        x: 232,
+        y: 8,
+        width: 4,
+        height: 4,
+    },
+    life: {
+        x: 240,
+        y: 0,
+        width: 8,
+        height: 8,
+    },
+    pauseButton: {
+        x: 208,
+        y: 16,
+        width: 16,
+        height: 16,
+    },
+    cursor: {
+        x: 224,
+        y: 15,
+        width: 22,
+        height: 17,
+    },
+    buttonTopLeft: {
+        x: 144,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonTop: {
+        x: 152,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonTopRight: {
+        x: 160,
+        y: 32,
+        width: 8,
+        height: 8,
+    },
+    buttonLeft: {
+        x: 144,
+        y: 40,
+        width: 8,
+        height: 8,
+    },
+    buttonRight: {
+        x: 160,
+        y: 40,
+        width: 8,
+        height: 8,
+    },
+    buttonBottomLeft: {
+        x: 144,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
+    buttonBottom: {
+        x: 152,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
+    buttonBottomRight: {
+        x: 160,
+        y: 48,
+        width: 8,
+        height: 8,
+    },
+    prevButton: {
+        x: 176,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    nextButton: {
+        x: 192,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+    backButton: {
+        x: 208,
+        y: 32,
+        width: 16,
+        height: 16,
+    },
+};
+/* harmony default export */ __webpack_exports__["a"] = (ControlSize);
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -241,199 +434,6 @@ class Character {
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/**
- * コントロールサイズ
- */
-var ControlSize = {
-    title: {
-        x: 0,
-        y: 0,
-        width: 128,
-        height: 112,
-    },
-    chickenGaugeEmpty: {
-        x: 0,
-        y: 112,
-        width: 128,
-        height: 8,
-    },
-    chickenGaugeFull: {
-        x: 0,
-        y: 120,
-        width: 128,
-        height: 8,
-    },
-    bossLifeGaugeEmpty: {
-        x: 128,
-        y: 0,
-        width: 8,
-        height: 96,
-    },
-    bossLifeGaugeFull: {
-        x: 136,
-        y: 0,
-        width: 8,
-        height: 96,
-    },
-    shieldButtonOff: {
-        x: 144,
-        y: 0,
-        width: 32,
-        height: 32,
-    },
-    shieldButtonOn: {
-        x: 176,
-        y: 0,
-        width: 32,
-        height: 32,
-    },
-    frameBack: {
-        x: 208,
-        y: 0,
-        width: 16,
-        height: 16,
-    },
-    frameLeftTop: {
-        x: 224,
-        y: 0,
-        width: 4,
-        height: 4,
-    },
-    frameTop: {
-        x: 228,
-        y: 0,
-        width: 4,
-        height: 4,
-    },
-    frameRightTop: {
-        x: 232,
-        y: 0,
-        width: 4,
-        height: 4,
-    },
-    frameLeft: {
-        x: 224,
-        y: 4,
-        width: 4,
-        height: 4,
-    },
-    frameRight: {
-        x: 232,
-        y: 4,
-        width: 4,
-        height: 4,
-    },
-    frameBottomLeft: {
-        x: 224,
-        y: 8,
-        width: 4,
-        height: 4,
-    },
-    frameBottom: {
-        x: 228,
-        y: 8,
-        width: 4,
-        height: 4,
-    },
-    frameBottomRight: {
-        x: 232,
-        y: 8,
-        width: 4,
-        height: 4,
-    },
-    life: {
-        x: 240,
-        y: 0,
-        width: 8,
-        height: 8,
-    },
-    pauseButton: {
-        x: 208,
-        y: 16,
-        width: 16,
-        height: 16,
-    },
-    cursor: {
-        x: 224,
-        y: 15,
-        width: 22,
-        height: 17,
-    },
-    buttonTopLeft: {
-        x: 144,
-        y: 32,
-        width: 8,
-        height: 8,
-    },
-    buttonTop: {
-        x: 152,
-        y: 32,
-        width: 8,
-        height: 8,
-    },
-    buttonTopRight: {
-        x: 160,
-        y: 32,
-        width: 8,
-        height: 8,
-    },
-    buttonLeft: {
-        x: 144,
-        y: 40,
-        width: 8,
-        height: 8,
-    },
-    buttonRight: {
-        x: 160,
-        y: 40,
-        width: 8,
-        height: 8,
-    },
-    buttonBottomLeft: {
-        x: 144,
-        y: 48,
-        width: 8,
-        height: 8,
-    },
-    buttonBottom: {
-        x: 152,
-        y: 48,
-        width: 8,
-        height: 8,
-    },
-    buttonBottomRight: {
-        x: 160,
-        y: 48,
-        width: 8,
-        height: 8,
-    },
-    prevButton: {
-        x: 176,
-        y: 32,
-        width: 16,
-        height: 16,
-    },
-    nextButton: {
-        x: 192,
-        y: 32,
-        width: 16,
-        height: 16,
-    },
-    backButton: {
-        x: 208,
-        y: 32,
-        width: 16,
-        height: 16,
-    },
-};
-/* harmony default export */ __webpack_exports__["a"] = (ControlSize);
-
-
-/***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -476,7 +476,7 @@ class MyColor {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 
 
@@ -999,8 +999,8 @@ class Collider {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 /** @module enemy */
 
@@ -1175,7 +1175,7 @@ class Enemy {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(4);
 /** @module enemyshot */
 
@@ -1359,10 +1359,10 @@ class EnemyShot {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__cursor__ = __webpack_require__(10);
 
@@ -1374,17 +1374,7 @@ class EnemyShot {
 // タイトルの位置、x座標
 const TITLE_POS_X = 130;
 // タイトルの位置、y座標
-const TITLE_POS_Y = 150;
-// ボタンの位置、x座標
-const BUTTON_POS_X = 360;
-// ボタンの位置、y座標
-const BUTTON_POS_Y = [80, 160, 240];
-// ボタンの幅
-const BUTTON_WIDTH = 176;
-// ボタンの高さ
-const BUTTON_HEIGHT = 32;
-// カーソルの位置、x座標
-const CURSOR_POS_X = 256;
+const TITLE_POS_Y = __WEBPACK_IMPORTED_MODULE_4__screensize__["a" /* default */].SCREEN_HEIGHT / 2;
 // ボタンの数
 const BUTTON_NUM = 3;
 // ボタンのID
@@ -1395,6 +1385,20 @@ var BUTTON_ID;
     BUTTON_ID[BUTTON_ID["CREDIT"] = 2] = "CREDIT";
 })(BUTTON_ID || (BUTTON_ID = {}));
 ;
+// ボタンの位置、x座標
+const BUTTON_POS_X = 360;
+// ボタンの位置、y座標
+const BUTTON_POS_Y = [
+    Math.round(__WEBPACK_IMPORTED_MODULE_4__screensize__["a" /* default */].SCREEN_HEIGHT / (BUTTON_NUM + 1)),
+    Math.round((__WEBPACK_IMPORTED_MODULE_4__screensize__["a" /* default */].SCREEN_HEIGHT * 2) / (BUTTON_NUM + 1)),
+    Math.round((__WEBPACK_IMPORTED_MODULE_4__screensize__["a" /* default */].SCREEN_HEIGHT * 3) / (BUTTON_NUM + 1))
+];
+// ボタンの幅
+const BUTTON_WIDTH = 176;
+// ボタンの高さ
+const BUTTON_HEIGHT = 32;
+// カーソルの位置、x座標
+const CURSOR_POS_X = 256;
 /**
  * タイトルのシーン
  */
@@ -1631,7 +1635,7 @@ class PointDevice {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(1);
 
 
 // 方向を表す文字列
@@ -1814,7 +1818,123 @@ class Cursor {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
+
+
+/**
+ * 枠を作成する。
+ */
+class Frame {
+    /**
+     * コンストラクタ。
+     * @param imageName 画像名の先頭文字列
+     * @param width 幅
+     * @param height 高さ
+     */
+    constructor(imageName, width, height) {
+        // ベース部分を作成する。
+        this._base = new phina.display.DisplayElement();
+        // 画像名を設定する。
+        this._imageName = imageName;
+        // 枠を作成する。
+        this._createFrames(width, height);
+    }
+    /**
+     * phina.jsのエレメントに画像を追加する。
+     * @param parent 親ノード
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._base.addChildTo(parent);
+        return this;
+    }
+    /**
+     * 表示位置を設定する。
+     * @param x x座標
+     * @param y y座標
+     * @return 自インスタンス
+     */
+    setPosition(x, y) {
+        this._base.x = x;
+        this._base.y = y;
+        return this;
+    }
+    /**
+     * ボタンの枠の部分を作成する。
+     * @param width 幅
+     * @param height 高さ
+     */
+    _createFrames(width, height) {
+        // フレーム1個分のサイズを取得する。
+        const FrameSize = __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][this._imageName + 'TopLeft'].width * __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
+        for (let x = -width / 2; x <= width / 2; x += FrameSize) {
+            for (let y = -height / 2; y <= height / 2; y += FrameSize) {
+                // 一番上
+                if (y === -height / 2) {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, this._imageName + 'TopLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        this._createFrame(x, y, this._imageName + 'Top');
+                    }
+                    else {
+                        this._createFrame(x, y, this._imageName + 'TopRight');
+                    }
+                }
+                else if (y + FrameSize <= height / 2) {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, this._imageName + 'Left');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        // 上下左右真ん中部分は画像無し。
+                    }
+                    else {
+                        this._createFrame(x, y, this._imageName + 'Right');
+                    }
+                }
+                else {
+                    // 一番左
+                    if (x === -width / 2) {
+                        this._createFrame(x, y, this._imageName + 'BottomLeft');
+                    }
+                    else if (x + FrameSize <= width / 2) {
+                        this._createFrame(x, y, this._imageName + 'Bottom');
+                    }
+                    else {
+                        this._createFrame(x, y, this._imageName + 'BottomRight');
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 枠の画像を読み込み、ベースに配置する。
+     * @param x x座標
+     * @param y y座標
+     * @param type 枠のタイプ
+     */
+    _createFrame(x, y, type) {
+        // 枠の画像を読み込む。
+        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].height);
+        frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].x, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].y, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].height);
+        frame.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
+        frame.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
+        frame.addChildTo(this._base)
+            .setPosition(x, y);
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Frame);
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 
 
@@ -1841,8 +1961,8 @@ class ImageBUtton {
         // ボタン部分を作成する。
         // タップをやりやすくするため、画像より大きめにサイズを取る。
         this._button = new phina.display.RectangleShape({
-            width: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].width * 1.5),
-            height: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].height * 1.5),
+            width: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].width * __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO * 2),
+            height: Math.ceil(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][name].height * __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO * 2),
         })
             .addChildTo(this._base);
         // ボタン部分を非表示にする。
@@ -1899,18 +2019,29 @@ class ImageBUtton {
         this._enable = value;
         return this;
     }
+    /**
+     * ボタン選択時の処理を行う。
+     */
+    push() {
+        if (this._onPush !== null) {
+            this._onPush();
+        }
+        return this;
+    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (ImageBUtton);
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frame__ = __webpack_require__(11);
+
 
 
 
@@ -1935,7 +2066,8 @@ class LabelButton {
             padding: 0,
         });
         // 枠を作成する。
-        this._createFrames(width, height);
+        const frame = new __WEBPACK_IMPORTED_MODULE_3__frame__["a" /* default */]('button', width, height)
+            .addChildTo(this._base);
         // ラベルを作成する。
         this._label = new phina.display.Label({
             text: '',
@@ -2042,81 +2174,16 @@ class LabelButton {
         }
         return this;
     }
-    /**
-     * ボタンの枠の部分を作成する。
-     * @param width 幅
-     * @param height 高さ
-     */
-    _createFrames(width, height) {
-        // フレーム1個分のサイズを取得する。
-        const FrameSize = __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
-        for (let x = -width / 2; x <= width / 2; x += FrameSize) {
-            for (let y = -height / 2; y <= height / 2; y += FrameSize) {
-                // 一番上
-                if (y === -height / 2) {
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonTopLeft');
-                    }
-                    else if (x + FrameSize <= width / 2) {
-                        this._createFrame(x, y, 'buttonTop');
-                    }
-                    else {
-                        this._createFrame(x, y, 'buttonTopRight');
-                    }
-                }
-                else if (y + FrameSize <= height / 2) {
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonLeft');
-                    }
-                    else if (x + FrameSize <= width / 2) {
-                        // 上下左右真ん中部分は画像無し。
-                    }
-                    else {
-                        this._createFrame(x, y, 'buttonRight');
-                    }
-                }
-                else {
-                    // 一番左
-                    if (x === -width / 2) {
-                        this._createFrame(x, y, 'buttonBottomLeft');
-                    }
-                    else if (x + FrameSize <= width / 2) {
-                        this._createFrame(x, y, 'buttonBottom');
-                    }
-                    else {
-                        this._createFrame(x, y, 'buttonBottomRight');
-                    }
-                }
-            }
-        }
-    }
-    /**
-     * 枠の画像を読み込み、ベースに配置する。
-     * @param x x座標
-     * @param y y座標
-     * @param type 枠のタイプ
-     */
-    _createFrame(x, y, type) {
-        // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].height);
-        frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].x, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].y, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */][type].height);
-        frame.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
-        frame.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
-        frame.addChildTo(this._base)
-            .setPosition(x, y);
-    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (LabelButton);
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /** @module playershot */
@@ -2238,17 +2305,17 @@ class PlayerShot {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(35);
 /** @module stage */
 
 
@@ -2422,7 +2489,102 @@ class Stage {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * LabelArea拡張クラス。
+ * 単語の途中で改行を行わないようにするオプションkeepWordを追加。
+ */
+phina.define('phina.ui.LabelAreaEx', {
+    superClass: 'phina.ui.LabelArea',
+    // 単語の途中で改行を行わないようにするかどうか
+    _keepWord: false,
+    /**
+     * コンストラクタ。
+     * @param options オプション
+     */
+    init: function (options) {
+        this.superInit(options);
+        // オプションにkeepWordが指定されている場合はメンバ変数に設定する。
+        // デフォルトは無効とする。
+        if (typeof (options) === 'object' && options.keepWord !== undefined) {
+            this._keepWord = options.keepWord;
+        }
+        else {
+            this._keepWord = false;
+        }
+    },
+    /**
+     * 描画エリアから文字列がはみ出る場合に強制的に改行する。
+     * @param lines 元々の文字列
+     * @return 改行した文字列
+     */
+    spliceLines: function (lines) {
+        const rowWidth = this.width;
+        const context = this.canvas.context;
+        context.font = this.font;
+        let cache = this.getTextWidthCache();
+        // update cache
+        const textChars = this._text.split('');
+        textChars.forEach(function (ch) {
+            if (!cache[ch]) {
+                cache[ch] = context.measureText(ch).width;
+            }
+        });
+        const keepWord = this._keepWord;
+        let localLines = [];
+        lines.forEach(function (line) {
+            let str = '';
+            let totalWidth = 0;
+            let word = '';
+            let wordWidth = 0;
+            // はみ出ていたら強制的に改行する
+            let lineChars = line.split('');
+            lineChars.forEach(function (ch) {
+                let w = cache[ch];
+                // はみ出す場合
+                if ((totalWidth + w) > rowWidth) {
+                    localLines.push(str);
+                    str = '';
+                    // 次の行の長さを今までの単語の長さから開始する。
+                    totalWidth = wordWidth;
+                }
+                // 単語の途中での改行が禁止されている場合
+                if (keepWord) {
+                    // ブランク以外の場合は単語が続いているものとして単語に追加する。
+                    if (ch !== ' ') {
+                        word += ch;
+                        wordWidth += w;
+                    }
+                    else {
+                        str += word;
+                        str += ch;
+                        word = '';
+                        wordWidth = 0;
+                    }
+                    // はみ出すかどうかの判定のためにトータルの長さは常に計算する。
+                    totalWidth += w;
+                }
+                else {
+                    str += ch;
+                    totalWidth += w;
+                }
+            });
+            // 残りを push する
+            localLines.push(str + word);
+        });
+        return localLines;
+    },
+});
+// exportするものがないのでダミー変数をexportする。
+var LabelAreaExDummy = 0;
+/* harmony default export */ __webpack_exports__["a"] = (LabelAreaExDummy);
+
+
+/***/ }),
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2643,12 +2805,12 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(1);
 
 
 /**
@@ -2698,7 +2860,7 @@ class BossLifeGauge {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2783,12 +2945,12 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(1);
 
 
 /**
@@ -2840,7 +3002,7 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2895,11 +3057,11 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(2);
 
 /**
  * 爆発アニメーションを行う。
@@ -2972,12 +3134,109 @@ class Explosion {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(11);
+
+
+
+// 画像の幅
+const IMAGE_WIDTH = 128;
+// 画像の高さ
+const IMAGE_HEIGHT = 64;
+// 画像の位置x座標
+const IMAGE_POS_X = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].SCREEN_WIDTH / 2;
+// 画像の位置y座標
+const IMAGE_POS_Y = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].SCREEN_HEIGHT - 200;
+// テキストの幅
+const TEXT_WIDTH = 200;
+// テキストの高さ
+const TEXT_HEIGHT = 80;
+// テキストの位置x座標
+const TEXT_POS_X = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].SCREEN_WIDTH / 2;
+// テキストの位置y座標
+const TEXT_POS_Y = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].SCREEN_HEIGHT - 85;
+// テキストの枠の余白
+const FRAME_MARGIN = 16;
+// ページ数
+const PAGE_COUNT = 6;
+/**
+ * 遊び方説明画面のページ。
+ */
+class HowToPlayPage {
+    /**
+     * ページ数
+     */
+    static get PAGE_COUNT() {
+        return PAGE_COUNT;
+    }
+    /**
+     * コンストラクタ。
+     * @param page ページ番号(0始まり)
+     */
+    constructor(page) {
+        // ルートノードを作成する。
+        this._rootNode = new phina.display.DisplayElement();
+        // 説明画像を読み込む。
+        const howToImage = new phina.display.Sprite('howtoimage', IMAGE_WIDTH, IMAGE_HEIGHT);
+        howToImage.srcRect.set(0, page * IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_HEIGHT);
+        howToImage.scaleX = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        howToImage.scaleY = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].ZOOM_RATIO;
+        howToImage.addChildTo(this._rootNode)
+            .setPosition(IMAGE_POS_X, IMAGE_POS_Y);
+        // テキスト部分を作成する。
+        const textBox = new phina.ui.LabelAreaEx({
+            text: '',
+            width: TEXT_WIDTH,
+            height: TEXT_HEIGHT,
+            fontSize: 16,
+            keepWord: true,
+        })
+            .addChildTo(this._rootNode)
+            .setPosition(TEXT_POS_X, TEXT_POS_Y);
+        // リソーステキストを取得し、テキスト部分に設定する。
+        const textKey = 'HowToPlay_' + (page + 1).toString();
+        const text = __WEBPACK_IMPORTED_MODULE_1__localizer__["a" /* default */].getString(textKey);
+        textBox.text = text;
+        // テキストの枠を作成する。
+        const frame = new __WEBPACK_IMPORTED_MODULE_2__frame__["a" /* default */]('frame', TEXT_WIDTH + FRAME_MARGIN, TEXT_HEIGHT + FRAME_MARGIN)
+            .setPosition(TEXT_POS_X, TEXT_POS_Y)
+            .addChildTo(this._rootNode);
+    }
+    /**
+     * phina.jsのエレメントにノードを追加する。
+     * @param parent 親ノード
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._rootNode.addChildTo(parent);
+        return this;
+    }
+    /**
+     * 親ノードから取り除く。
+     * @return 自インスタンス
+     */
+    remove() {
+        this._rootNode.remove();
+        return this;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (HowToPlayPage);
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(23);
+
 
 
 /**
@@ -2997,12 +3256,16 @@ class HowToPlayScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // ページレイヤーを作成する。
-        const pageLayer = new __WEBPACK_IMPORTED_MODULE_0__pagelayer__["a" /* default */]()
+        this._pageLayer = new __WEBPACK_IMPORTED_MODULE_0__pagelayer__["a" /* default */]()
             .addChildTo(this._rootNode)
             .onBackButton(() => {
             this._rootNode.remove();
             this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_1__titlescene__["a" /* default */](this._phinaScene, this._gamepadManager);
         });
+        // 各ページを作成する。
+        for (let i = 0; i < __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__["a" /* default */].PAGE_COUNT; i++) {
+            this._pageLayer.addPage(new __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__["a" /* default */](i));
+        }
     }
     /**
      * 更新処理。
@@ -3011,13 +3274,19 @@ class HowToPlayScene {
     update(app) {
         // ゲームパッドの状態を更新する。
         this._gamepadManager.update();
+        // キーボードを取得する。
+        const keyboard = app.keyboard;
+        // ゲームパッドを取得する。
+        const gamepad = this._gamepadManager.get(0);
+        // レイヤーの入力処理を行う。
+        this._pageLayer.input(keyboard, gamepad);
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (HowToPlayScene);
 
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3073,13 +3342,13 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(1);
 /** @module life */
 
 
@@ -3154,7 +3423,61 @@ class Life {
 
 
 /***/ }),
-/* 24 */
+/* 27 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(37);
+
+/**
+ * ローカライズを行うクラス。
+ */
+class Localizer {
+    /**
+     * 文字列が言語設定に対応したものかどうかを調べる。
+     * @param obj 文字列
+     */
+    static isLaungageType(obj) {
+        switch (obj) {
+            case 'en':
+            case 'jp':
+            case 'zh':
+            case 'ko':
+                return true;
+            default:
+                return false;
+        }
+    }
+    /**
+     * 言語設定
+     */
+    static get langauge() {
+        // デフォルトは英語とする。
+        let language = 'en';
+        // localStorageに言語設定が保存されている場合はlocalStorageの値を使用する。
+        if (localStorage.language && Localizer.isLaungageType(localStorage.language)) {
+            language = localStorage.language;
+        }
+        else {
+            // TODO: localStorageに言語設定が保存されていない場合は
+            // ブラウザ設定、端末設定から言語設定を取得する。
+        }
+        // 言語設定を返す。
+        return language;
+    }
+    /**
+     * StringResourceに登録された文字列を取得する。
+     * @param key 文字列のキー
+     */
+    static getString(key) {
+        return __WEBPACK_IMPORTED_MODULE_0__stringresource__["a" /* default */][Localizer.langauge][key];
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Localizer);
+
+
+/***/ }),
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3163,11 +3486,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(16);
+
 
 
 
 
 window.debug = {};
+// LabelAreaExが取り込まれるようにダミー変数を使用する。
+__WEBPACK_IMPORTED_MODULE_4__labelareaex__["a" /* default */];
 // マウスが接続されているかどうかを調べる。
 __WEBPACK_IMPORTED_MODULE_0__pointdevice__["a" /* default */].checkDeviceType();
 /**
@@ -3180,6 +3507,7 @@ const ASSETS = {
         'image_8x8': './images/image_8x8.png',
         'image_16x16': './images/image_16x16.png',
         'image_64x64': './images/image_64x64.png',
+        'howtoimage': './images/howtoimage.png',
     },
     spritesheet: {
         'image_8x8_ss': './images/image_8x8_ss.json',
@@ -3327,11 +3655,11 @@ phina.main(function () {
 
 
 /***/ }),
-/* 25 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(10);
@@ -3514,11 +3842,11 @@ class MenuLayer {
 
 
 /***/ }),
-/* 26 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 
 
@@ -3557,7 +3885,12 @@ class PageLayer {
         // 次ページボタンを作成する。
         this._nextButton = new __WEBPACK_IMPORTED_MODULE_0__imagebutton__["a" /* default */]('nextButton')
             .setPosition(NEXT_BUTTON_POS_X, NEXT_BUTTON_POS_Y)
+            .onPush(() => { this._goToNextPage(); })
             .addChildTo(this._rootNode);
+        // ページ配列を作成する。
+        this._pages = [];
+        // ページ番号を初期化する。
+        this._currentPageNum = 0;
     }
     /**
      * phina.jsのエレメントにノードを追加する。
@@ -3577,6 +3910,19 @@ class PageLayer {
         return this;
     }
     /**
+     * ページを追加する。
+     * @param page ページ
+     */
+    addPage(page) {
+        // メンバ変数に格納する。
+        this._pages.push(page);
+        // 1個目の場合は画面に配置する。
+        if (this._pages.length === 1) {
+            this._pages[0].addChildTo(this._rootNode);
+        }
+        return this;
+    }
+    /**
      * 戻るボタン選択時のコールバック関数を設定する。
      * @param func コールバック関数
      */
@@ -3589,6 +3935,26 @@ class PageLayer {
             func();
         });
         return this;
+    }
+    /**
+     * 入力処理を行う。
+     * @param keyboard キーボード
+     * @param gamepad ゲームパッド
+     */
+    input(keyboard, gamepad) {
+        // キーボードのESCキーかゲームパッドのBボタンが押された場合は戻るボタンの処理を行う。
+        if (keyboard.getKeyDown('escape') || gamepad.getKeyDown('b')) {
+            this._backButton.push();
+        }
+        else if (keyboard.getKeyDown('left') || gamepad.getKeyDown('left')) {
+            this._goToPrevPage();
+        }
+        else if (keyboard.getKeyDown('right') || gamepad.getKeyDown('right')) {
+            this._goToNextPage();
+        }
+        else {
+            // その他のキー入力は処理しない。
+        }
     }
     /**
      * 前ページへ移動する。
@@ -3629,16 +3995,16 @@ class PageLayer {
 
 
 /***/ }),
-/* 27 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(33);
 
 
 
@@ -4037,11 +4403,11 @@ class Player {
 
 
 /***/ }),
-/* 28 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(2);
 /** @module playerdeatheffect */
 
 /**
@@ -4118,13 +4484,13 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 29 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(14);
 /** @module playeroption */
 
 
@@ -4335,24 +4701,24 @@ class PlayerOption {
 
 
 /***/ }),
-/* 30 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(12);
 
 
 
@@ -5167,7 +5533,7 @@ class PlayingScene {
 
 
 /***/ }),
-/* 31 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5403,11 +5769,11 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 
 
 /***/ }),
-/* 32 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize_js__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 /** @module shieldbutton */
 
@@ -5495,7 +5861,137 @@ class ShieldButton {
 
 
 /***/ }),
-/* 33 */
+/* 37 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var StringResource = {
+    en: {
+        "HowToPlay_1": "Sliding finger across the screen moves your character.",
+        "HowToPlay_2": "Automatically shot is fired.",
+        "HowToPlay_3": "Getting near an enemy shot increase the Chicken gauge.",
+        "HowToPlay_4": "When the Chicken gauge is charged, chicks come to help.",
+        "HowToPlay_5": "When push the Shield button, chicks wear an egg and reflect enemy shot.",
+        "HowToPlay_6": "While push the Shield button, the Chiken gauge is decreased.",
+        "HowToPlay_Controller_1": "Using the left analog stick moves your character.",
+        "HowToPlay_Controller_2": "Automatically shot is fired.",
+        "HowToPlay_Controller_3": "Getting near an enemy shot increase the Chicken gauge.",
+        "HowToPlay_Controller_4": "When the Chicken gauge is charged, chicks come to help.",
+        "HowToPlay_Controller_5": "When push A button, chicks wear an egg and reflect enemy shot.",
+        "HowToPlay_Controller_6": "While push A button, the Chiken gauge is decreased.",
+        "Tweet1stLoop": "Toritoma, Go on to stage %d. Earned %d points the score. #toritoma",
+        "Tweet2ndLoop": "Toritoma, Go on to stage %d in %d%s lap. Earned %d points the score. #toritoma",
+        "CreditName_1": "Production\n    Kaneda",
+        "CreditName_2": "BGM\n    Maou Damashii",
+        "CreditName_3": "Jingle\n    YouFulca",
+        "CreditName_4": "Sound Effect\n    Skipmore",
+        "CreditName_5": "Font\n    Misaki Font",
+        "CreditName_6": "Font\n    Noto Fonts",
+        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditLink_2": "http://maoudamashii.jokersounds.com/",
+        "CreditLink_3": "http://wingless-seraph.net/",
+        "CreditLink_4": "http://www.skipmore.com/app/",
+        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_6": "https://www.google.com/get/noto/",
+        "StoreMessage": "・Remove ads.\n・Unlock 2nd lap after the game clear.",
+        "StorePurchased": "PURCHASED",
+    },
+    jp: {
+        "HowToPlay_1": "画面をスライドすると自機が移動します。",
+        "HowToPlay_2": "自動的にショットが発射されます。",
+        "HowToPlay_3": "敵の弾に近づくとチキンゲージが溜まります。",
+        "HowToPlay_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
+        "HowToPlay_5": "シールドボタンを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
+        "HowToPlay_6": "シールドボタンを押している間はチキンゲージが減っていきます。",
+        "HowToPlay_Controller_1": "左スティックを傾けると自機が移動します。",
+        "HowToPlay_Controller_2": "自動的にショットが発射されます。",
+        "HowToPlay_Controller_3": "敵の弾に近づくとチキンゲージが溜まります。",
+        "HowToPlay_Controller_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
+        "HowToPlay_Controller_5": "Aボタンを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
+        "HowToPlay_Controller_6": "Aボタンを押している間はチキンゲージが減っていきます。",
+        "Tweet1stLoop": "とりとま、ステージ%dまで進めてスコアを%d点獲得しました。 #toritoma",
+        "Tweet2ndLoop": "とりとま、%d周目ステージ%dまで進めてスコアを%d点獲得しました。 #toritoma",
+        "CreditName_1": "製作\n    金田",
+        "CreditName_2": "BGM\n    魔王魂",
+        "CreditName_3": "ジングル\n    ユーフルカ",
+        "CreditName_4": "効果音\n    スキップモア",
+        "CreditName_5": "フォント\n    美咲フォント",
+        "CreditName_6": "フォント\n    Noto Fonts",
+        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditLink_2": "http://maoudamashii.jokersounds.com/",
+        "CreditLink_3": "http://wingless-seraph.net/",
+        "CreditLink_4": "http://www.skipmore.com/app/",
+        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_6": "https://www.google.com/get/noto/",
+        "StoreMessage": "・広告の削除\n・2周目モードの解除",
+        "StorePurchased": "購入済み",
+    },
+    zh: {
+        "HowToPlay_1": "滑动指头在画面上就你的角色动。",
+        "HowToPlay_2": "子弹自动被开。",
+        "HowToPlay_3": "擦敌的子弹就鸡计堆积。",
+        "HowToPlay_4": "当鸡计堆积，雏鸡来帮助。",
+        "HowToPlay_5": "当按盾钮，雏鸡戴蛋壳，弹回敌的子弹。",
+        "HowToPlay_6": "当按盾钮，鸡计减少。",
+        "HowToPlay_Controller_1": "推左摇杆就你的角色动。",
+        "HowToPlay_Controller_2": "子弹自动被开。",
+        "HowToPlay_Controller_3": "擦敌的子弹就鸡计堆积。",
+        "HowToPlay_Controller_4": "当鸡计堆积，雏鸡来帮助。",
+        "HowToPlay_Controller_5": "当按A钮，雏鸡戴蛋壳，弹回敌的子弹。",
+        "HowToPlay_Controller_6": "当按A钮，鸡计减少。",
+        "Tweet1stLoop": "鸡射，到达第%d阶段。获得%d分。 #toritoma",
+        "Tweet2ndLoop": "鸡射，到达第%d循环的第%d阶段。获得%d分。 #toritoma",
+        "CreditName_1": "制作\n    金田",
+        "CreditName_2": "背景音乐\n    魔王魂",
+        "CreditName_3": "静乐县\n    YouFulca",
+        "CreditName_4": "音效\n    Skipmore",
+        "CreditName_5": "字体\n    美咲字体",
+        "CreditName_6": "字体\n    Noto Fonts",
+        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditLink_2": "http://maoudamashii.jokersounds.com/",
+        "CreditLink_3": "http://wingless-seraph.net/",
+        "CreditLink_4": "http://www.skipmore.com/app/",
+        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_6": "https://www.google.com/get/noto/",
+        "StoreMessage": "・排除广告。\n・解锁过关后的第二循环。",
+        "StorePurchased": "购买了",
+    },
+    ko: {
+        "HowToPlay_1": "화면을 슬라이드하면 자신의 캐릭터가 이동합니다.",
+        "HowToPlay_2": "자동으로 샷이 발사됩니다.",
+        "HowToPlay_3": "적의 총알에 가까워지면 치킨 게이지가 쌓입니다.",
+        "HowToPlay_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
+        "HowToPlay_5": "방패 버튼을 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
+        "HowToPlay_6": "방패 버튼을 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
+        "HowToPlay_Controller_1": "왼쪽 스틱을 기울이면 자신의 캐릭터가 이동합니다.",
+        "HowToPlay_Controller_2": "자동으로 샷이 발사됩니다.",
+        "HowToPlay_Controller_3": "적의 총알에 가까워지면 치킨 게이지가 쌓입니다.",
+        "HowToPlay_Controller_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
+        "HowToPlay_Controller_5": "A 버튼을 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
+        "HowToPlay_Controller_6": "A 버튼을 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
+        "Tweet1stLoop": "토리토마, %d 단계까지 진행하고 점수를 %d 점 획득했습니다. #toritoma",
+        "Tweet2ndLoop": "토리토마, %d 회차 %d 단계까지 진행하고 점수를 %d 점 획득했습니다. #toritoma",
+        "CreditName_1": "제작\n    카네다",
+        "CreditName_2": "BGM\n    마왕 영혼",
+        "CreditName_3": "징글\n    유후루카",
+        "CreditName_4": "효과음\n    스킵 모어",
+        "CreditName_5": "글꼴\n    미사키 글꼴",
+        "CreditName_6": "글꼴\n    Noto Fonts",
+        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditLink_2": "http://maoudamashii.jokersounds.com/",
+        "CreditLink_3": "http://wingless-seraph.net/",
+        "CreditLink_4": "http://www.skipmore.com/app/",
+        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_6": "https://www.google.com/get/noto/",
+        "StoreMessage": "・광고 삭제\n・2 회차 모드 해제",
+        "StorePurchased": "구입 완료",
+    },
+};
+/* harmony default export */ __webpack_exports__["a"] = (StringResource);
+
+
+/***/ }),
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
