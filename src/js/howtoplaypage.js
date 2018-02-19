@@ -1,6 +1,7 @@
 import ScreenSize from './screensize';
 import Localizer from './localizer';
 import Frame from './frame';
+import MyColor from './mycolor';
 // 画像の幅
 const IMAGE_WIDTH = 128;
 // 画像の高さ
@@ -8,7 +9,7 @@ const IMAGE_HEIGHT = 64;
 // 画像の位置x座標
 const IMAGE_POS_X = ScreenSize.SCREEN_WIDTH / 2;
 // 画像の位置y座標
-const IMAGE_POS_Y = ScreenSize.SCREEN_HEIGHT - 200;
+const IMAGE_POS_Y = ScreenSize.SCREEN_HEIGHT - 230;
 // テキストの幅
 const TEXT_WIDTH = 200;
 // テキストの高さ
@@ -21,6 +22,10 @@ const TEXT_POS_Y = ScreenSize.SCREEN_HEIGHT - 85;
 const FRAME_MARGIN = 16;
 // ページ数
 const PAGE_COUNT = 6;
+// ページラベルの位置x座標
+const PAGE_LABEL_POS_X = ScreenSize.SCREEN_WIDTH / 2;
+// ページラベルの位置y座標
+const PAGE_LABEL_POS_Y = ScreenSize.SCREEN_HEIGHT - 20;
 /**
  * 遊び方説明画面のページ。
  */
@@ -45,12 +50,18 @@ class HowToPlayPage {
         howToImage.scaleY = ScreenSize.ZOOM_RATIO;
         howToImage.addChildTo(this._rootNode)
             .setPosition(IMAGE_POS_X, IMAGE_POS_Y);
+        if (window.debug.howToImage === undefined) {
+            window.debug.howToImage = [];
+        }
+        window.debug.howToImage[page] = howToImage;
         // テキスト部分を作成する。
         const textBox = new phina.ui.LabelAreaEx({
             text: '',
             width: TEXT_WIDTH,
             height: TEXT_HEIGHT,
             fontSize: 16,
+            fill: MyColor.FORE_COLOR,
+            fontFamily: 'noto',
             keepWord: true,
         })
             .addChildTo(this._rootNode)
@@ -63,6 +74,17 @@ class HowToPlayPage {
         const frame = new Frame('frame', TEXT_WIDTH + FRAME_MARGIN, TEXT_HEIGHT + FRAME_MARGIN)
             .setPosition(TEXT_POS_X, TEXT_POS_Y)
             .addChildTo(this._rootNode);
+        // ページ番号ラベルのテキストを作成する。
+        const pageLabelText = (page + 1).toString() + ' / ' + PAGE_COUNT;
+        // ページ番号ラベルを作成する。
+        const pageLabel = new phina.display.Label({
+            text: pageLabelText,
+            fontSize: 16,
+            fill: MyColor.FORE_COLOR,
+            fontFamily: 'noto',
+        })
+            .addChildTo(this._rootNode)
+            .setPosition(PAGE_LABEL_POS_X, PAGE_LABEL_POS_Y);
     }
     /**
      * phina.jsのエレメントにノードを追加する。
