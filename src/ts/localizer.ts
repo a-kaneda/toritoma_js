@@ -1,7 +1,7 @@
 import StringResource from './stringresource'
 
 // 言語設定種別
-type LanguageType = 'en' | 'jp' | 'zh' | 'ko';
+type LanguageType = 'en' | 'ja' | 'zh' | 'ko';
 
 /**
  * ローカライズを行うクラス。
@@ -16,7 +16,7 @@ class Localizer {
 
         switch (obj) {
             case 'en':
-            case 'jp':
+            case 'ja':
             case 'zh':
             case 'ko':
                 return true;
@@ -38,12 +38,32 @@ class Localizer {
             language = localStorage.language;
         }
         else {
-            // TODO: localStorageに言語設定が保存されていない場合は
-            // ブラウザ設定、端末設定から言語設定を取得する。
+            // localStorageに言語設定が保存されていない場合は
+            // ブラウザ設定から言語設定を取得する。
+            if (window.navigator.language) {
+                let languageSetting = window.navigator.language.slice(0, 2);
+                if (Localizer.isLaungageType(languageSetting)) {
+                    language = languageSetting;
+                }
+            }
         }
 
         // 言語設定を返す。
         return language;
+    }
+
+    /**
+     * 単語の途中で改行をしないようにするかどうか。
+     */
+    static get isKeepWord(): boolean {
+
+        // 英語の場合は単語を保持する。
+        if (Localizer.langauge === 'en') {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**

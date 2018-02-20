@@ -3206,7 +3206,7 @@ class HowToPlayPage {
             fontSize: 16,
             fill: __WEBPACK_IMPORTED_MODULE_3__mycolor__["a" /* default */].FORE_COLOR,
             fontFamily: 'noto',
-            keepWord: true,
+            keepWord: __WEBPACK_IMPORTED_MODULE_1__localizer__["a" /* default */].isKeepWord,
         })
             .addChildTo(this._rootNode)
             .setPosition(TEXT_POS_X, TEXT_POS_Y);
@@ -3463,7 +3463,7 @@ class Localizer {
     static isLaungageType(obj) {
         switch (obj) {
             case 'en':
-            case 'jp':
+            case 'ja':
             case 'zh':
             case 'ko':
                 return true;
@@ -3482,11 +3482,29 @@ class Localizer {
             language = localStorage.language;
         }
         else {
-            // TODO: localStorageに言語設定が保存されていない場合は
-            // ブラウザ設定、端末設定から言語設定を取得する。
+            // localStorageに言語設定が保存されていない場合は
+            // ブラウザ設定から言語設定を取得する。
+            if (window.navigator.language) {
+                let languageSetting = window.navigator.language.slice(0, 2);
+                if (Localizer.isLaungageType(languageSetting)) {
+                    language = languageSetting;
+                }
+            }
         }
         // 言語設定を返す。
         return language;
+    }
+    /**
+     * 単語の途中で改行をしないようにするかどうか。
+     */
+    static get isKeepWord() {
+        // 英語の場合は単語を保持する。
+        if (Localizer.langauge === 'en') {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     /**
      * StringResourceに登録された文字列を取得する。
@@ -5919,7 +5937,7 @@ var StringResource = {
         "StoreMessage": "・Remove ads.\n・Unlock 2nd lap after the game clear.",
         "StorePurchased": "PURCHASED",
     },
-    jp: {
+    ja: {
         "HowToPlay_1": "画面をスライドすると自機が移動します。",
         "HowToPlay_2": "自動的にショットが発射されます。",
         "HowToPlay_3": "敵の弾に近づくとチキンゲージが溜まります。",

@@ -29,7 +29,7 @@ var StringResource = {
         "StoreMessage": "・Remove ads.\n・Unlock 2nd lap after the game clear.",
         "StorePurchased": "PURCHASED",
     },
-    jp: {
+    ja: {
         "HowToPlay_1": "画面をスライドすると自機が移動します。",
         "HowToPlay_2": "自動的にショットが発射されます。",
         "HowToPlay_3": "敵の弾に近づくとチキンゲージが溜まります。",

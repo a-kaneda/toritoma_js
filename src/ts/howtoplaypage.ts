@@ -78,7 +78,7 @@ class HowToPlayPage implements DisplayElement {
             fontSize: 16,
             fill: MyColor.FORE_COLOR,
             fontFamily: 'noto',
-            keepWord: true,
+            keepWord: Localizer.isKeepWord,
         })
         .addChildTo(this._rootNode)
         .setPosition(TEXT_POS_X, TEXT_POS_Y);
