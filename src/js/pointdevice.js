@@ -11,12 +11,14 @@ class PointDevice {
         // touchstartイベントの場合はマウス不使用とする。
         if (event.type === 'touchstart') {
             PointDevice._isMouseUsed = false;
+            PointDevice._isTouchUsed = true;
         }
         else {
             PointDevice._isMouseUsed = true;
+            PointDevice._isTouchUsed = false;
         }
-        document.removeEventListener('touchstart', PointDevice.detectDeviceType);
-        document.removeEventListener('mousemove', PointDevice.detectDeviceType);
+        document.removeEventListener('touchstart', PointDevice.detectDeviceType, true);
+        document.removeEventListener('mousemove', PointDevice.detectDeviceType, true);
     }
     /**
      * デバイスの種類を調べるため、タッチ開始、マウス移動の
@@ -24,12 +26,17 @@ class PointDevice {
      */
     static checkDeviceType() {
         PointDevice._isMouseUsed = false;
-        document.addEventListener('touchstart', PointDevice.detectDeviceType);
-        document.addEventListener('mousemove', PointDevice.detectDeviceType);
+        PointDevice._isTouchUsed = false;
+        document.addEventListener('touchstart', PointDevice.detectDeviceType, true);
+        document.addEventListener('mousemove', PointDevice.detectDeviceType, true);
     }
     /** マウスが接続されているかどうか。 */
     static get isMouseUsed() {
-        return this._isMouseUsed;
+        return PointDevice._isMouseUsed;
+    }
+    /** タッチデバイスがあるかどうか */
+    static get isTouchUsed() {
+        return PointDevice._isTouchUsed;
     }
 }
 export default PointDevice;

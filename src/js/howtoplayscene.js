@@ -26,7 +26,7 @@ class HowToPlayScene {
         });
         // 各ページを作成する。
         for (let i = 0; i < HowToPlayPage.PAGE_COUNT; i++) {
-            this._pageLayer.addPage(new HowToPlayPage(i));
+            this._pageLayer.addPage(new HowToPlayPage(i, this._gamepadManager));
         }
     }
     /**

@@ -198,6 +198,8 @@ declare module phina {
 
         class GamepadManager {
             constructor();
+            gamepads: {[key: number]: phina.input.Gamepad[]};
+            isConnected(index: number): boolean;
             get(index?: number): phina.input.Gamepad;
             update(): void; 
         }

@@ -1359,6 +1359,55 @@ class EnemyShot {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/**
+ * ポイントデバイスがマウスかタッチパネルかを調べる。
+ */
+class PointDevice {
+    /**
+     * マウス移動とタッチ操作の際に呼ばれ、
+     * タッチ操作でない場合はマウス接続されていると判断する。
+     * @param event イベント
+     */
+    static detectDeviceType(event) {
+        // touchstartイベントの場合はマウス不使用とする。
+        if (event.type === 'touchstart') {
+            PointDevice._isMouseUsed = false;
+            PointDevice._isTouchUsed = true;
+        }
+        else {
+            PointDevice._isMouseUsed = true;
+            PointDevice._isTouchUsed = false;
+        }
+        document.removeEventListener('touchstart', PointDevice.detectDeviceType, true);
+        document.removeEventListener('mousemove', PointDevice.detectDeviceType, true);
+    }
+    /**
+     * デバイスの種類を調べるため、タッチ開始、マウス移動の
+     * イベントにチェック用関数を登録する。
+     */
+    static checkDeviceType() {
+        PointDevice._isMouseUsed = false;
+        PointDevice._isTouchUsed = false;
+        document.addEventListener('touchstart', PointDevice.detectDeviceType, true);
+        document.addEventListener('mousemove', PointDevice.detectDeviceType, true);
+    }
+    /** マウスが接続されているかどうか。 */
+    static get isMouseUsed() {
+        return PointDevice._isMouseUsed;
+    }
+    /** タッチデバイスがあるかどうか */
+    static get isTouchUsed() {
+        return PointDevice._isTouchUsed;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (PointDevice);
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(24);
@@ -1559,7 +1608,7 @@ class TitleScene {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1585,48 +1634,6 @@ class Util {
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Util);
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/**
- * ポイントデバイスがマウスかタッチパネルかを調べる。
- */
-class PointDevice {
-    /**
-     * マウス移動とタッチ操作の際に呼ばれ、
-     * タッチ操作でない場合はマウス接続されていると判断する。
-     * @param event イベント
-     */
-    static detectDeviceType(event) {
-        // touchstartイベントの場合はマウス不使用とする。
-        if (event.type === 'touchstart') {
-            PointDevice._isMouseUsed = false;
-        }
-        else {
-            PointDevice._isMouseUsed = true;
-        }
-        document.removeEventListener('touchstart', PointDevice.detectDeviceType);
-        document.removeEventListener('mousemove', PointDevice.detectDeviceType);
-    }
-    /**
-     * デバイスの種類を調べるため、タッチ開始、マウス移動の
-     * イベントにチェック用関数を登録する。
-     */
-    static checkDeviceType() {
-        PointDevice._isMouseUsed = false;
-        document.addEventListener('touchstart', PointDevice.detectDeviceType);
-        document.addEventListener('mousemove', PointDevice.detectDeviceType);
-    }
-    /** マウスが接続されているかどうか。 */
-    static get isMouseUsed() {
-        return this._isMouseUsed;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (PointDevice);
 
 
 /***/ }),
@@ -2588,7 +2595,7 @@ var LabelAreaExDummy = 0;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(5);
 
@@ -3142,6 +3149,8 @@ class Explosion {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mycolor__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pointdevice__ = __webpack_require__(7);
+
 
 
 
@@ -3182,9 +3191,10 @@ class HowToPlayPage {
     }
     /**
      * コンストラクタ。
+     * @param gamepadManager ゲームパッド管理
      * @param page ページ番号(0始まり)
      */
-    constructor(page) {
+    constructor(page, gamepadManager) {
         // ルートノードを作成する。
         this._rootNode = new phina.display.DisplayElement();
         // 説明画像を読み込む。
@@ -3211,7 +3221,7 @@ class HowToPlayPage {
             .addChildTo(this._rootNode)
             .setPosition(TEXT_POS_X, TEXT_POS_Y);
         // リソーステキストを取得し、テキスト部分に設定する。
-        const textKey = 'HowToPlay_' + (page + 1).toString();
+        const textKey = 'HowToPlay_' + this._checkInputDevice(gamepadManager) + '_' + (page + 1).toString();
         const text = __WEBPACK_IMPORTED_MODULE_1__localizer__["a" /* default */].getString(textKey);
         textBox.text = text;
         // テキストの枠を作成する。
@@ -3247,6 +3257,27 @@ class HowToPlayPage {
         this._rootNode.remove();
         return this;
     }
+    /**
+     * 入力デバイスを調べる。
+     * ゲームパッドがつながっている場合は'gamepad'、
+     * タッチデバイスの場合は'touch'、
+     * いずれでもない場合は'keyboard'、
+     * を返す。
+     * @param gamepadManager ゲームパッド管理
+     * @return 入力デバイス
+     */
+    _checkInputDevice(gamepadManager) {
+        // ゲームパッドがつながっている場合
+        if (gamepadManager.isConnected(0)) {
+            return 'gamepad';
+        }
+        else if (__WEBPACK_IMPORTED_MODULE_4__pointdevice__["a" /* default */].isTouchUsed) {
+            return 'touch';
+        }
+        else {
+            return 'keyboard';
+        }
+    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (HowToPlayPage);
 
@@ -3257,7 +3288,7 @@ class HowToPlayPage {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(23);
 
 
@@ -3287,7 +3318,7 @@ class HowToPlayScene {
         });
         // 各ページを作成する。
         for (let i = 0; i < __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__["a" /* default */].PAGE_COUNT; i++) {
-            this._pageLayer.addPage(new __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__["a" /* default */](i));
+            this._pageLayer.addPage(new __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__["a" /* default */](i, this._gamepadManager));
         }
     }
     /**
@@ -3315,7 +3346,7 @@ class HowToPlayScene {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(9);
 
 
 
@@ -3523,10 +3554,10 @@ class Localizer {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(16);
 
 
@@ -4746,7 +4777,7 @@ class PlayerOption {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(1);
@@ -4757,7 +4788,7 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(12);
 
@@ -5580,7 +5611,7 @@ class PlayingScene {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(9);
 
 
 
@@ -5908,18 +5939,24 @@ class ShieldButton {
 "use strict";
 var StringResource = {
     en: {
-        "HowToPlay_1": "Sliding finger across the screen moves your character.",
-        "HowToPlay_2": "Automatically shot is fired.",
-        "HowToPlay_3": "Getting near an enemy shot increase the Chicken gauge.",
-        "HowToPlay_4": "When the Chicken gauge is charged, chicks come to help.",
-        "HowToPlay_5": "When push the Shield button, chicks wear an egg and reflect enemy shot.",
-        "HowToPlay_6": "While push the Shield button, the Chiken gauge is decreased.",
-        "HowToPlay_Controller_1": "Using the left analog stick moves your character.",
-        "HowToPlay_Controller_2": "Automatically shot is fired.",
-        "HowToPlay_Controller_3": "Getting near an enemy shot increase the Chicken gauge.",
-        "HowToPlay_Controller_4": "When the Chicken gauge is charged, chicks come to help.",
-        "HowToPlay_Controller_5": "When push A button, chicks wear an egg and reflect enemy shot.",
-        "HowToPlay_Controller_6": "While push A button, the Chiken gauge is decreased.",
+        "HowToPlay_touch_1": "Sliding finger across the screen moves your character.",
+        "HowToPlay_touch_2": "Automatically shot is fired.",
+        "HowToPlay_touch_3": "Getting near an enemy shot increase the Chicken gauge.",
+        "HowToPlay_touch_4": "When the Chicken gauge is charged, chicks come to help.",
+        "HowToPlay_touch_5": "When push the Shield button, chicks wear an egg and reflect enemy shot.",
+        "HowToPlay_touch_6": "While push the Shield button, the Chiken gauge is decreased.",
+        "HowToPlay_gamepad_1": "Using the left analog stick moves your character.",
+        "HowToPlay_gamepad_2": "Automatically shot is fired.",
+        "HowToPlay_gamepad_3": "Getting near an enemy shot increase the Chicken gauge.",
+        "HowToPlay_gamepad_4": "When the Chicken gauge is charged, chicks come to help.",
+        "HowToPlay_gamepad_5": "When push A button, chicks wear an egg and reflect enemy shot.",
+        "HowToPlay_gamepad_6": "While push A button, the Chiken gauge is decreased.",
+        "HowToPlay_keyboard_1": "Pressing cursor keys moves your character.",
+        "HowToPlay_keyboard_2": "Automatically shot is fired.",
+        "HowToPlay_keyboard_3": "Getting near an enemy shot increase the Chicken gauge.",
+        "HowToPlay_keyboard_4": "When the Chicken gauge is charged, chicks come to help.",
+        "HowToPlay_keyboard_5": "When press Z key, chicks wear an egg and reflect enemy shot.",
+        "HowToPlay_keyboard_6": "While press Z key, the Chiken gauge is decreased.",
         "Tweet1stLoop": "Toritoma, Go on to stage %d. Earned %d points the score. #toritoma",
         "Tweet2ndLoop": "Toritoma, Go on to stage %d in %d%s lap. Earned %d points the score. #toritoma",
         "CreditName_1": "Production\n    Kaneda",
@@ -5938,18 +5975,24 @@ var StringResource = {
         "StorePurchased": "PURCHASED",
     },
     ja: {
-        "HowToPlay_1": "画面をスライドすると自機が移動します。",
-        "HowToPlay_2": "自動的にショットが発射されます。",
-        "HowToPlay_3": "敵の弾に近づくとチキンゲージが溜まります。",
-        "HowToPlay_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
-        "HowToPlay_5": "シールドボタンを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
-        "HowToPlay_6": "シールドボタンを押している間はチキンゲージが減っていきます。",
-        "HowToPlay_Controller_1": "左スティックを傾けると自機が移動します。",
-        "HowToPlay_Controller_2": "自動的にショットが発射されます。",
-        "HowToPlay_Controller_3": "敵の弾に近づくとチキンゲージが溜まります。",
-        "HowToPlay_Controller_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
-        "HowToPlay_Controller_5": "Aボタンを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
-        "HowToPlay_Controller_6": "Aボタンを押している間はチキンゲージが減っていきます。",
+        "HowToPlay_touch_1": "画面をスライドすると自機が移動します。",
+        "HowToPlay_touch_2": "自動的にショットが発射されます。",
+        "HowToPlay_touch_3": "敵の弾に近づくとチキンゲージが溜まります。",
+        "HowToPlay_touch_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
+        "HowToPlay_touch_5": "シールドボタンを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
+        "HowToPlay_touch_6": "シールドボタンを押している間はチキンゲージが減っていきます。",
+        "HowToPlay_gamepad_1": "左スティックを傾けると自機が移動します。",
+        "HowToPlay_gamepad_2": "自動的にショットが発射されます。",
+        "HowToPlay_gamepad_3": "敵の弾に近づくとチキンゲージが溜まります。",
+        "HowToPlay_gamepad_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
+        "HowToPlay_gamepad_5": "Aボタンを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
+        "HowToPlay_gamepad_6": "Aボタンを押している間はチキンゲージが減っていきます。",
+        "HowToPlay_keyboard_1": "カーソルキーで自機が移動します。",
+        "HowToPlay_keyboard_2": "自動的にショットが発射されます。",
+        "HowToPlay_keyboard_3": "敵の弾に近づくとチキンゲージが溜まります。",
+        "HowToPlay_keyboard_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
+        "HowToPlay_keyboard_5": "Zキーを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
+        "HowToPlay_keyboard_6": "Zキーを押している間はチキンゲージが減っていきます。",
         "Tweet1stLoop": "とりとま、ステージ%dまで進めてスコアを%d点獲得しました。 #toritoma",
         "Tweet2ndLoop": "とりとま、%d周目ステージ%dまで進めてスコアを%d点獲得しました。 #toritoma",
         "CreditName_1": "製作\n    金田",
@@ -5968,18 +6011,24 @@ var StringResource = {
         "StorePurchased": "購入済み",
     },
     zh: {
-        "HowToPlay_1": "滑动指头在画面上就你的角色动。",
-        "HowToPlay_2": "子弹自动被开。",
-        "HowToPlay_3": "擦敌的子弹就鸡计堆积。",
-        "HowToPlay_4": "当鸡计堆积，雏鸡来帮助。",
-        "HowToPlay_5": "当按盾钮，雏鸡戴蛋壳，弹回敌的子弹。",
-        "HowToPlay_6": "当按盾钮，鸡计减少。",
-        "HowToPlay_Controller_1": "推左摇杆就你的角色动。",
-        "HowToPlay_Controller_2": "子弹自动被开。",
-        "HowToPlay_Controller_3": "擦敌的子弹就鸡计堆积。",
-        "HowToPlay_Controller_4": "当鸡计堆积，雏鸡来帮助。",
-        "HowToPlay_Controller_5": "当按A钮，雏鸡戴蛋壳，弹回敌的子弹。",
-        "HowToPlay_Controller_6": "当按A钮，鸡计减少。",
+        "HowToPlay_touch_1": "滑动指头在画面上就你的角色动。",
+        "HowToPlay_touch_2": "子弹自动被开。",
+        "HowToPlay_touch_3": "擦敌的子弹就鸡计堆积。",
+        "HowToPlay_touch_4": "当鸡计堆积，雏鸡来帮助。",
+        "HowToPlay_touch_5": "当按盾钮，雏鸡戴蛋壳，弹回敌的子弹。",
+        "HowToPlay_touch_6": "当按盾钮，鸡计减少。",
+        "HowToPlay_gamepad_1": "推左摇杆就你的角色动。",
+        "HowToPlay_gamepad_2": "子弹自动被开。",
+        "HowToPlay_gamepad_3": "擦敌的子弹就鸡计堆积。",
+        "HowToPlay_gamepad_4": "当鸡计堆积，雏鸡来帮助。",
+        "HowToPlay_gamepad_5": "当按A钮，雏鸡戴蛋壳，弹回敌的子弹。",
+        "HowToPlay_gamepad_6": "当按A钮，鸡计减少。",
+        "HowToPlay_keyboard_1": "按光标键就你的角色动。",
+        "HowToPlay_keyboard_2": "子弹自动被开。",
+        "HowToPlay_keyboard_3": "擦敌的子弹就鸡计堆积。",
+        "HowToPlay_keyboard_4": "当鸡计堆积，雏鸡来帮助。",
+        "HowToPlay_keyboard_5": "当按下Z键时，雏鸡戴蛋壳，弹回敌的子弹。",
+        "HowToPlay_keyboard_6": "当按下Z键时，鸡计减少。",
         "Tweet1stLoop": "鸡射，到达第%d阶段。获得%d分。 #toritoma",
         "Tweet2ndLoop": "鸡射，到达第%d循环的第%d阶段。获得%d分。 #toritoma",
         "CreditName_1": "制作\n    金田",
@@ -5998,18 +6047,24 @@ var StringResource = {
         "StorePurchased": "购买了",
     },
     ko: {
-        "HowToPlay_1": "화면을 슬라이드하면 자신의 캐릭터가 이동합니다.",
-        "HowToPlay_2": "자동으로 샷이 발사됩니다.",
-        "HowToPlay_3": "적의 총알에 가까워지면 치킨 게이지가 쌓입니다.",
-        "HowToPlay_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
-        "HowToPlay_5": "방패 버튼을 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
-        "HowToPlay_6": "방패 버튼을 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
-        "HowToPlay_Controller_1": "왼쪽 스틱을 기울이면 자신의 캐릭터가 이동합니다.",
-        "HowToPlay_Controller_2": "자동으로 샷이 발사됩니다.",
-        "HowToPlay_Controller_3": "적의 총알에 가까워지면 치킨 게이지가 쌓입니다.",
-        "HowToPlay_Controller_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
-        "HowToPlay_Controller_5": "A 버튼을 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
-        "HowToPlay_Controller_6": "A 버튼을 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
+        "HowToPlay_touch_1": "화면을 슬라이드하면 자신의 캐릭터가 이동합니다.",
+        "HowToPlay_touch_2": "자동으로 샷이 발사됩니다.",
+        "HowToPlay_touch_3": "적의 총알에 가까워지면 치킨 게이지가 쌓입니다.",
+        "HowToPlay_touch_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
+        "HowToPlay_touch_5": "방패 버튼을 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
+        "HowToPlay_touch_6": "방패 버튼을 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
+        "HowToPlay_gamepad_1": "왼쪽 스틱을 기울이면 자신의 캐릭터가 이동합니다.",
+        "HowToPlay_gamepad_2": "자동으로 샷이 발사됩니다.",
+        "HowToPlay_gamepad_3": "적의 총알에 가까워지면 치킨 게이지가 쌓입니다.",
+        "HowToPlay_gamepad_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
+        "HowToPlay_gamepad_5": "A 버튼을 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
+        "HowToPlay_gamepad_6": "A 버튼을 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
+        "HowToPlay_keyboard_1": "커서 키로 자신의 캐릭터가 이동합니다.",
+        "HowToPlay_keyboard_2": "자동으로 샷이 발사됩니다.",
+        "HowToPlay_keyboard_3": "적의 총알에 가까워지면 치킨 게이지가 쌓입니다.",
+        "HowToPlay_keyboard_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
+        "HowToPlay_keyboard_5": "Z 키를 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
+        "HowToPlay_keyboard_6": "Z 키를 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
         "Tweet1stLoop": "토리토마, %d 단계까지 진행하고 점수를 %d 점 획득했습니다. #toritoma",
         "Tweet2ndLoop": "토리토마, %d 회차 %d 단계까지 진행하고 점수를 %d 점 획득했습니다. #toritoma",
         "CreditName_1": "제작\n    카네다",

@@ -2,6 +2,7 @@ import ScreenSize from './screensize'
 import Localizer from './localizer'
 import Frame from './frame'
 import MyColor from './mycolor'
+import PointDevice from './pointdevice'
 
 // 画像の幅
 const IMAGE_WIDTH = 128;
@@ -45,9 +46,10 @@ class HowToPlayPage implements DisplayElement {
     
     /**
      * コンストラクタ。
+     * @param gamepadManager ゲームパッド管理
      * @param page ページ番号(0始まり)
      */
-    constructor(page: number) {
+    constructor(page: number, gamepadManager: phina.input.GamepadManager) {
 
         // ルートノードを作成する。
         this._rootNode = new phina.display.DisplayElement();
@@ -84,7 +86,7 @@ class HowToPlayPage implements DisplayElement {
         .setPosition(TEXT_POS_X, TEXT_POS_Y);
 
         // リソーステキストを取得し、テキスト部分に設定する。
-        const textKey = 'HowToPlay_' + (page + 1).toString();
+        const textKey = 'HowToPlay_' + this._checkInputDevice(gamepadManager) + '_' + (page + 1).toString();
         const text = Localizer.getString(textKey);
         textBox.text = text;
 
@@ -124,6 +126,31 @@ class HowToPlayPage implements DisplayElement {
     public remove(): this {
         this._rootNode.remove();
         return this;
+    }
+
+    /**
+     * 入力デバイスを調べる。
+     * ゲームパッドがつながっている場合は'gamepad'、
+     * タッチデバイスの場合は'touch'、
+     * いずれでもない場合は'keyboard'、
+     * を返す。
+     * @param gamepadManager ゲームパッド管理
+     * @return 入力デバイス
+     */
+    private _checkInputDevice(gamepadManager: phina.input.GamepadManager): string {
+
+        // ゲームパッドがつながっている場合
+        if (gamepadManager.isConnected(0)) {
+            return 'gamepad';
+        }
+        // タッチデバイスがつながっている場合
+        else if (PointDevice.isTouchUsed) {
+            return 'touch'
+        }
+        // どちらもない場合はキーボードとする。
+        else {
+            return 'keyboard';
+        }
     }
 }
 
