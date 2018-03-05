@@ -1,6 +1,7 @@
 import LabelButton from './labelbutton';
 import PlayinScene from './playingscene';
 import HowToPlayScene from './howtoplayscene';
+import CreditScene from './creditscene';
 import ControlSize from './controlsize';
 import ScreenSize from './screensize';
 import Cursor from './cursor';
@@ -134,6 +135,9 @@ class TitleScene {
                 break;
             case 'HowToPlayScene':
                 this._phinaScene.scene = new HowToPlayScene(this._phinaScene, this._gamepadManager);
+                break;
+            case 'CreditScene':
+                this._phinaScene.scene = new CreditScene(this._phinaScene, this._gamepadManager);
                 break;
             default:
                 break;
