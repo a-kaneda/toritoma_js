@@ -476,7 +476,7 @@ class MyColor {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 
 
@@ -1000,7 +1000,7 @@ class Collider {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 /** @module enemy */
 
@@ -1359,13 +1359,13 @@ class EnemyShot {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(23);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cursor__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cursor__ = __webpack_require__(11);
 
 
 
@@ -1617,6 +1617,163 @@ class PointDevice {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frame__ = __webpack_require__(12);
+
+
+
+
+// ボタン選択からハンドラ実行までのインターバル(msec)
+const EXEC_INTERVAL = 500;
+/**
+ * ラベルを使用したボタン。
+ */
+class LabelButton {
+    /**
+     * コンストラクタ。
+     * @param width 幅
+     * @param height 高さ
+     */
+    constructor(width, height) {
+        // ベース部分を作成する。
+        this._base = new phina.display.RectangleShape({
+            width: width + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
+            height: height + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
+            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].BACK_COLOR,
+            strokeWidth: 0,
+            padding: 0,
+        });
+        // 枠を作成する。
+        const frame = new __WEBPACK_IMPORTED_MODULE_3__frame__["a" /* default */]('button', width, height)
+            .addChildTo(this._base);
+        // ラベルを作成する。
+        this._label = new phina.display.Label({
+            text: '',
+            fontSize: 24,
+            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].FORE_COLOR,
+            fontFamily: 'noto',
+        }).addChildTo(this._base);
+        // ボタン選択エフェクト開始時のコールバック関数を初期化する。
+        this._onEffect = null;
+        // ボタン選択時のコールバック関数を初期化する。
+        this._onPush = null;
+        // 初期状態は有効とする。
+        this._enable = true;
+        // タッチ操作を有効にする。
+        this._base.setInteractive(true);
+        // タッチ開始イベントのハンドラを作成する。
+        this._base.on('pointstart', (event) => {
+            this.select();
+        });
+    }
+    /**
+     * phina.jsのエレメントに画像を追加する。
+     * @param parent 親ノード
+     * @return 自インスタンス
+     */
+    addChildTo(parent) {
+        this._base.addChildTo(parent);
+        return this;
+    }
+    /**
+     * 表示位置を設定する。
+     * @param x x座標
+     * @param y y座標
+     * @return 自インスタンス
+     */
+    setPosition(x, y) {
+        this._base.x = x;
+        this._base.y = y;
+        return this;
+    }
+    /**
+     * ボタン選択エフェクト開始時のコールバック関数を設定する。
+     * @param func コールバック関数
+     * @return 自インスタンス
+     */
+    onEffect(func) {
+        this._onEffect = func;
+        return this;
+    }
+    /**
+     * ボタン選択時のコールバック関数を設定する。
+     * @param func コールバック関数
+     * @return 自インスタンス
+     */
+    onPush(func) {
+        this._onPush = func;
+        return this;
+    }
+    /**
+     * クリック時のイベントリスナーを設定する。
+     * ユーザー操作からの処理でなければリンクを開く際に
+     * ブラウザがブロックしてしまうことに対する対策。
+     * @param func イベントリスナー
+     * @return 自インスタンス
+     */
+    onClick(func) {
+        this._base.onclick = func;
+        return this;
+    }
+    /**
+     * ラベルのテキストを設定する。
+     * @param label ラベルのテキスト
+     * @return 自インスタンス
+     */
+    setLabel(label) {
+        this._label.text = label;
+        return this;
+    }
+    /**
+     * 有効か無効かを設定する。
+     * @param value 設定値
+     */
+    setEnable(value) {
+        this._enable = value;
+        return this;
+    }
+    /**
+     * ボタン選択時の処理を行う。
+     * @return 自インスタンス
+     */
+    select() {
+        // 有効なときに処理を行う。
+        if (this._enable) {
+            // エフェクト開始時のコールバック関数を呼び出す。。
+            if (this._onEffect !== null) {
+                this._onEffect();
+            }
+            // 効果音を鳴らす。
+            phina.asset.SoundManager.play('select');
+            // 点滅アニメーションを実行する。
+            // 100ms周期で表示、非表示を切り替える。
+            this._base.tweener.wait(100)
+                .set({ alpha: 0 })
+                .wait(100)
+                .set({ alpha: 1 })
+                .wait(100)
+                .set({ alpha: 0 })
+                .wait(100)
+                .set({ alpha: 1 })
+                .play();
+            // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
+            if (this._onPush !== null) {
+                setTimeout(this._onPush, EXEC_INTERVAL);
+            }
+        }
+        return this;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (LabelButton);
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /** @module util */
 /**
  * アプリ全体で使用する関数群を定義する。
@@ -1642,7 +1799,7 @@ class Util {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1826,7 +1983,7 @@ class Cursor {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1942,7 +2099,7 @@ class Frame {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2045,157 +2202,83 @@ class ImageBUtton {
 
 
 /***/ }),
-/* 13 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frame__ = __webpack_require__(11);
-
-
-
-
-// ボタン選択からハンドラ実行までのインターバル(msec)
-const EXEC_INTERVAL = 500;
-/**
- * ラベルを使用したボタン。
- */
-class LabelButton {
-    /**
-     * コンストラクタ。
-     * @param width 幅
-     * @param height 高さ
-     */
-    constructor(width, height) {
-        // ベース部分を作成する。
-        this._base = new phina.display.RectangleShape({
-            width: width + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.width * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
-            height: height + __WEBPACK_IMPORTED_MODULE_1__controlsize__["a" /* default */].buttonTopLeft.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO,
-            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].BACK_COLOR,
-            strokeWidth: 0,
-            padding: 0,
-        });
-        // 枠を作成する。
-        const frame = new __WEBPACK_IMPORTED_MODULE_3__frame__["a" /* default */]('button', width, height)
-            .addChildTo(this._base);
-        // ラベルを作成する。
-        this._label = new phina.display.Label({
-            text: '',
-            fontSize: 24,
-            fill: __WEBPACK_IMPORTED_MODULE_0__mycolor__["a" /* default */].FORE_COLOR,
-            fontFamily: 'noto',
-        }).addChildTo(this._base);
-        // ボタン選択エフェクト開始時のコールバック関数を初期化する。
-        this._onEffect = null;
-        // ボタン選択時のコールバック関数を初期化する。
-        this._onPush = null;
-        // 初期状態は有効とする。
-        this._enable = true;
-        // タッチ操作を有効にする。
-        this._base.setInteractive(true);
-        // タッチ開始イベントのハンドラを作成する。
-        this._base.on('pointstart', (event) => {
-            this.select();
-        });
-    }
-    /**
-     * phina.jsのエレメントに画像を追加する。
-     * @param parent 親ノード
-     * @return 自インスタンス
-     */
-    addChildTo(parent) {
-        this._base.addChildTo(parent);
-        return this;
-    }
-    /**
-     * 表示位置を設定する。
-     * @param x x座標
-     * @param y y座標
-     * @return 自インスタンス
-     */
-    setPosition(x, y) {
-        this._base.x = x;
-        this._base.y = y;
-        return this;
-    }
-    /**
-     * ボタン選択エフェクト開始時のコールバック関数を設定する。
-     * @param func コールバック関数
-     * @return 自インスタンス
-     */
-    onEffect(func) {
-        this._onEffect = func;
-        return this;
-    }
-    /**
-     * ボタン選択時のコールバック関数を設定する。
-     * @param func コールバック関数
-     * @return 自インスタンス
-     */
-    onPush(func) {
-        this._onPush = func;
-        return this;
-    }
-    /**
-     * ラベルのテキストを設定する。
-     * @param label ラベルのテキスト
-     * @return 自インスタンス
-     */
-    setLabel(label) {
-        this._label.text = label;
-        return this;
-    }
-    /**
-     * 有効か無効かを設定する。
-     * @param value 設定値
-     */
-    setEnable(value) {
-        this._enable = value;
-        return this;
-    }
-    /**
-     * ボタン選択時の処理を行う。
-     * @return 自インスタンス
-     */
-    select() {
-        // 有効なときに処理を行う。
-        if (this._enable) {
-            // エフェクト開始時のコールバック関数を呼び出す。。
-            if (this._onEffect !== null) {
-                this._onEffect();
-            }
-            // 効果音を鳴らす。
-            phina.asset.SoundManager.play('select');
-            // 点滅アニメーションを実行する。
-            // 100ms周期で表示、非表示を切り替える。
-            this._base.tweener.wait(100)
-                .set({ alpha: 0 })
-                .wait(100)
-                .set({ alpha: 1 })
-                .wait(100)
-                .set({ alpha: 0 })
-                .wait(100)
-                .set({ alpha: 1 })
-                .play();
-            // イベントハンドラが設定されている場合は一定時間後にハンドラを実行する。
-            if (this._onPush !== null) {
-                setTimeout(this._onPush, EXEC_INTERVAL);
-            }
-        }
-        return this;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (LabelButton);
-
-
-/***/ }),
 /* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(38);
+
+/**
+ * ローカライズを行うクラス。
+ */
+class Localizer {
+    /**
+     * 文字列が言語設定に対応したものかどうかを調べる。
+     * @param obj 文字列
+     */
+    static isLaungageType(obj) {
+        switch (obj) {
+            case 'en':
+            case 'ja':
+            case 'zh':
+            case 'ko':
+                return true;
+            default:
+                return false;
+        }
+    }
+    /**
+     * 言語設定
+     */
+    static get langauge() {
+        // デフォルトは英語とする。
+        let language = 'en';
+        // localStorageに言語設定が保存されている場合はlocalStorageの値を使用する。
+        if (localStorage.language && Localizer.isLaungageType(localStorage.language)) {
+            language = localStorage.language;
+        }
+        else {
+            // localStorageに言語設定が保存されていない場合は
+            // ブラウザ設定から言語設定を取得する。
+            if (window.navigator.language) {
+                let languageSetting = window.navigator.language.slice(0, 2);
+                if (Localizer.isLaungageType(languageSetting)) {
+                    language = languageSetting;
+                }
+            }
+        }
+        // 言語設定を返す。
+        return language;
+    }
+    /**
+     * 単語の途中で改行をしないようにするかどうか。
+     */
+    static get isKeepWord() {
+        // 英語の場合は単語を保持する。
+        if (Localizer.langauge === 'en') {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /**
+     * StringResourceに登録された文字列を取得する。
+     * @param key 文字列のキー
+     */
+    static getString(key) {
+        return __WEBPACK_IMPORTED_MODULE_0__stringresource__["a" /* default */][Localizer.langauge][key];
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Localizer);
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 
 
@@ -2344,7 +2427,7 @@ class PageLayer {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2470,16 +2553,16 @@ class PlayerShot {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(28);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(36);
 /** @module stage */
 
@@ -2654,7 +2737,7 @@ class Stage {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2749,11 +2832,11 @@ var LabelAreaExDummy = 0;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(5);
 
@@ -2970,7 +3053,7 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3025,7 +3108,7 @@ class BossLifeGauge {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3110,7 +3193,7 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3167,14 +3250,50 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pagelayer__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pagelayer__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__localizer__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__labelbutton__ = __webpack_require__(9);
 
 
+
+
+
+
+// テキストの幅
+const TEXT_WIDTH = 200;
+// テキストの高さ
+const TEXT_HEIGHT = 80;
+// テキストの位置x座標
+const TEXT_POS_X = Math.round(__WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].SCREEN_WIDTH * 0.35);
+// テキストの位置y座標
+const TEXT_POS_Y = [
+    Math.round(__WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].SCREEN_HEIGHT * 0.3),
+    Math.round(__WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].SCREEN_HEIGHT * 0.55),
+    Math.round(__WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].SCREEN_HEIGHT * 0.8),
+];
+// ボタンの位置、x座標
+const BUTTON_POS_X = Math.round(__WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].SCREEN_WIDTH * 0.7);
+// ボタンの位置、y座標
+const BUTTON_POS_Y = [
+    TEXT_POS_Y[0],
+    TEXT_POS_Y[1],
+    TEXT_POS_Y[2],
+];
+// ボタンの幅
+const BUTTON_WIDTH = 112;
+// ボタンの高さ
+const BUTTON_HEIGHT = 32;
+// 1ページの項目数
+const PAGE_ITEM_NUM = 3;
+// ページ数
+const PAGE_NUM = 2;
 /**
  * クレジットを表示するシーン。
  */
@@ -3198,6 +3317,44 @@ class CreditScene {
             this._rootNode.remove();
             this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_0__titlescene__["a" /* default */](this._phinaScene, this._gamepadManager);
         });
+        // 各ページを作成する。
+        for (let i = 0; i < PAGE_NUM; i++) {
+            // ページを作成する。
+            const page = new phina.display.DisplayElement();
+            // 各項目を作成する。
+            for (let j = 0; j < PAGE_ITEM_NUM; j++) {
+                // テキスト部分を作成する。
+                const textBox = new phina.ui.LabelAreaEx({
+                    text: '',
+                    width: TEXT_WIDTH,
+                    height: TEXT_HEIGHT,
+                    fontSize: 24,
+                    fill: __WEBPACK_IMPORTED_MODULE_2__mycolor__["a" /* default */].FORE_COLOR,
+                    fontFamily: 'noto',
+                    keepWord: false,
+                })
+                    .setPosition(TEXT_POS_X, TEXT_POS_Y[j])
+                    .addChildTo(page);
+                // リソーステキストを取得し、テキスト部分に設定する。
+                const textKey = 'CreditName_' + (i * PAGE_ITEM_NUM + j + 1);
+                const text = __WEBPACK_IMPORTED_MODULE_4__localizer__["a" /* default */].getString(textKey);
+                textBox.text = text;
+                // リンクボタンを作成する。
+                const linkButton = new __WEBPACK_IMPORTED_MODULE_5__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+                    .setLabel('WEB SITE')
+                    .onClick((event) => {
+                    // リンクURLを取得し、リンク先を開く。
+                    const urlKey = 'CreditLink_' + (i * PAGE_ITEM_NUM + j + 1);
+                    const url = __WEBPACK_IMPORTED_MODULE_4__localizer__["a" /* default */].getString(urlKey);
+                    window.open(url);
+                })
+                    .setEnable(false)
+                    .setPosition(BUTTON_POS_X, BUTTON_POS_Y[j])
+                    .addChildTo(page);
+            }
+            // ページを追加する。
+            this._pageLayer.addPage(page);
+        }
     }
     /**
      * 更新処理。
@@ -3218,7 +3375,7 @@ class CreditScene {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3273,7 +3430,7 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3350,13 +3507,13 @@ class Explosion {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pointdevice__ = __webpack_require__(8);
 
@@ -3492,13 +3649,13 @@ class HowToPlayPage {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(26);
 
 
 
@@ -3549,13 +3706,13 @@ class HowToPlayScene {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(10);
 
 
 
@@ -3605,7 +3762,7 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3686,78 +3843,6 @@ class Life {
 
 
 /***/ }),
-/* 29 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(38);
-
-/**
- * ローカライズを行うクラス。
- */
-class Localizer {
-    /**
-     * 文字列が言語設定に対応したものかどうかを調べる。
-     * @param obj 文字列
-     */
-    static isLaungageType(obj) {
-        switch (obj) {
-            case 'en':
-            case 'ja':
-            case 'zh':
-            case 'ko':
-                return true;
-            default:
-                return false;
-        }
-    }
-    /**
-     * 言語設定
-     */
-    static get langauge() {
-        // デフォルトは英語とする。
-        let language = 'en';
-        // localStorageに言語設定が保存されている場合はlocalStorageの値を使用する。
-        if (localStorage.language && Localizer.isLaungageType(localStorage.language)) {
-            language = localStorage.language;
-        }
-        else {
-            // localStorageに言語設定が保存されていない場合は
-            // ブラウザ設定から言語設定を取得する。
-            if (window.navigator.language) {
-                let languageSetting = window.navigator.language.slice(0, 2);
-                if (Localizer.isLaungageType(languageSetting)) {
-                    language = languageSetting;
-                }
-            }
-        }
-        // 言語設定を返す。
-        return language;
-    }
-    /**
-     * 単語の途中で改行をしないようにするかどうか。
-     */
-    static get isKeepWord() {
-        // 英語の場合は単語を保持する。
-        if (Localizer.langauge === 'en') {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    /**
-     * StringResourceに登録された文字列を取得する。
-     * @param key 文字列のキー
-     */
-    static getString(key) {
-        return __WEBPACK_IMPORTED_MODULE_0__stringresource__["a" /* default */][Localizer.langauge][key];
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Localizer);
-
-
-/***/ }),
 /* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -3767,7 +3852,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(18);
 
 
 
@@ -3940,10 +4025,10 @@ phina.main(function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(11);
 
 
 
@@ -4130,7 +4215,7 @@ class MenuLayer {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(34);
 
@@ -4618,7 +4703,7 @@ class PlayerDeathEffect {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(16);
 /** @module playeroption */
 
 
@@ -4838,15 +4923,15 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(13);
 
 
 
@@ -5667,7 +5752,7 @@ class PlayingScene {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(10);
 
 
 
@@ -6013,22 +6098,18 @@ var StringResource = {
         "HowToPlay_keyboard_4": "When the Chicken gauge is charged, chicks come to help.",
         "HowToPlay_keyboard_5": "When press Z key, chicks wear an egg and reflect enemy shot.",
         "HowToPlay_keyboard_6": "While press Z key, the Chiken gauge is decreased.",
-        "Tweet1stLoop": "Toritoma, Go on to stage %d. Earned %d points the score. #toritoma",
-        "Tweet2ndLoop": "Toritoma, Go on to stage %d in %d%s lap. Earned %d points the score. #toritoma",
         "CreditName_1": "Production\n    Kaneda",
         "CreditName_2": "BGM\n    Maou Damashii",
         "CreditName_3": "Jingle\n    YouFulca",
         "CreditName_4": "Sound Effect\n    Skipmore",
-        "CreditName_5": "Font\n    Misaki Font",
+        "CreditName_5": "Game Engine\n    phina.js",
         "CreditName_6": "Font\n    Noto Fonts",
-        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditLink_1": "http://www.monochromesoft.com/dokuwiki/start",
         "CreditLink_2": "http://maoudamashii.jokersounds.com/",
         "CreditLink_3": "http://wingless-seraph.net/",
         "CreditLink_4": "http://www.skipmore.com/app/",
-        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_5": "http://phinajs.com/",
         "CreditLink_6": "https://www.google.com/get/noto/",
-        "StoreMessage": "・Remove ads.\n・Unlock 2nd lap after the game clear.",
-        "StorePurchased": "PURCHASED",
     },
     ja: {
         "HowToPlay_touch_1": "画面をスライドすると自機が移動します。",
@@ -6049,22 +6130,18 @@ var StringResource = {
         "HowToPlay_keyboard_4": "チキンゲージが溜まるとヒヨコが助けにきます。",
         "HowToPlay_keyboard_5": "Zキーを押すとヒヨコが卵をかぶって敵の弾を跳ね返します。",
         "HowToPlay_keyboard_6": "Zキーを押している間はチキンゲージが減っていきます。",
-        "Tweet1stLoop": "とりとま、ステージ%dまで進めてスコアを%d点獲得しました。 #toritoma",
-        "Tweet2ndLoop": "とりとま、%d周目ステージ%dまで進めてスコアを%d点獲得しました。 #toritoma",
-        "CreditName_1": "製作\n    金田",
-        "CreditName_2": "BGM\n    魔王魂",
-        "CreditName_3": "ジングル\n    ユーフルカ",
-        "CreditName_4": "効果音\n    スキップモア",
-        "CreditName_5": "フォント\n    美咲フォント",
-        "CreditName_6": "フォント\n    Noto Fonts",
-        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditName_1": "Production\n    Kaneda",
+        "CreditName_2": "BGM\n    Maou Damashii",
+        "CreditName_3": "Jingle\n    YouFulca",
+        "CreditName_4": "Sound Effect\n    Skipmore",
+        "CreditName_5": "Game Engine\n    phina.js",
+        "CreditName_6": "Font\n    Noto Fonts",
+        "CreditLink_1": "http://www.monochromesoft.com/dokuwiki/start",
         "CreditLink_2": "http://maoudamashii.jokersounds.com/",
         "CreditLink_3": "http://wingless-seraph.net/",
         "CreditLink_4": "http://www.skipmore.com/app/",
-        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_5": "http://phinajs.com/",
         "CreditLink_6": "https://www.google.com/get/noto/",
-        "StoreMessage": "・広告の削除\n・2周目モードの解除",
-        "StorePurchased": "購入済み",
     },
     zh: {
         "HowToPlay_touch_1": "滑动指头在画面上就你的角色动。",
@@ -6085,22 +6162,18 @@ var StringResource = {
         "HowToPlay_keyboard_4": "当鸡计堆积，雏鸡来帮助。",
         "HowToPlay_keyboard_5": "当按下Z键时，雏鸡戴蛋壳，弹回敌的子弹。",
         "HowToPlay_keyboard_6": "当按下Z键时，鸡计减少。",
-        "Tweet1stLoop": "鸡射，到达第%d阶段。获得%d分。 #toritoma",
-        "Tweet2ndLoop": "鸡射，到达第%d循环的第%d阶段。获得%d分。 #toritoma",
-        "CreditName_1": "制作\n    金田",
-        "CreditName_2": "背景音乐\n    魔王魂",
-        "CreditName_3": "静乐县\n    YouFulca",
-        "CreditName_4": "音效\n    Skipmore",
-        "CreditName_5": "字体\n    美咲字体",
-        "CreditName_6": "字体\n    Noto Fonts",
-        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditName_1": "Production\n    Kaneda",
+        "CreditName_2": "BGM\n    Maou Damashii",
+        "CreditName_3": "Jingle\n    YouFulca",
+        "CreditName_4": "Sound Effect\n    Skipmore",
+        "CreditName_5": "Game Engine\n    phina.js",
+        "CreditName_6": "Font\n    Noto Fonts",
+        "CreditLink_1": "http://www.monochromesoft.com/dokuwiki/start",
         "CreditLink_2": "http://maoudamashii.jokersounds.com/",
         "CreditLink_3": "http://wingless-seraph.net/",
         "CreditLink_4": "http://www.skipmore.com/app/",
-        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_5": "http://phinajs.com/",
         "CreditLink_6": "https://www.google.com/get/noto/",
-        "StoreMessage": "・排除广告。\n・解锁过关后的第二循环。",
-        "StorePurchased": "购买了",
     },
     ko: {
         "HowToPlay_touch_1": "화면을 슬라이드하면 자신의 캐릭터가 이동합니다.",
@@ -6121,22 +6194,18 @@ var StringResource = {
         "HowToPlay_keyboard_4": "치킨 게이지가 쌓이면 병아리가 도와주러 합니다.",
         "HowToPlay_keyboard_5": "Z 키를 누르면 병아리가 달걀을 쓰고 적의 총알을 반사합니다.",
         "HowToPlay_keyboard_6": "Z 키를 누르고있는 동안은 치킨 게이지가 줄어 듭니다.",
-        "Tweet1stLoop": "토리토마, %d 단계까지 진행하고 점수를 %d 점 획득했습니다. #toritoma",
-        "Tweet2ndLoop": "토리토마, %d 회차 %d 단계까지 진행하고 점수를 %d 점 획득했습니다. #toritoma",
-        "CreditName_1": "제작\n    카네다",
-        "CreditName_2": "BGM\n    마왕 영혼",
-        "CreditName_3": "징글\n    유후루카",
-        "CreditName_4": "효과음\n    스킵 모어",
-        "CreditName_5": "글꼴\n    미사키 글꼴",
-        "CreditName_6": "글꼴\n    Noto Fonts",
-        "CreditLink_1": "http://blog.monochrome-soft.com/",
+        "CreditName_1": "Production\n    Kaneda",
+        "CreditName_2": "BGM\n    Maou Damashii",
+        "CreditName_3": "Jingle\n    YouFulca",
+        "CreditName_4": "Sound Effect\n    Skipmore",
+        "CreditName_5": "Game Engine\n    phina.js",
+        "CreditName_6": "Font\n    Noto Fonts",
+        "CreditLink_1": "http://www.monochromesoft.com/dokuwiki/start",
         "CreditLink_2": "http://maoudamashii.jokersounds.com/",
         "CreditLink_3": "http://wingless-seraph.net/",
         "CreditLink_4": "http://www.skipmore.com/app/",
-        "CreditLink_5": "http://www.geocities.jp/littlimi/misaki.htm",
+        "CreditLink_5": "http://phinajs.com/",
         "CreditLink_6": "https://www.google.com/get/noto/",
-        "StoreMessage": "・광고 삭제\n・2 회차 모드 해제",
-        "StorePurchased": "구입 완료",
     },
 };
 /* harmony default export */ __webpack_exports__["a"] = (StringResource);

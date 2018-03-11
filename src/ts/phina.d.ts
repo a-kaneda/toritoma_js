@@ -208,6 +208,7 @@ declare module phina {
     module util {
 
         class EventDispatcher {
+            onclick: (event: any) => void;
             on(type: string, listener: (event: any) => void): this;
         }
 

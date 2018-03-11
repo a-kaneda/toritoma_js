@@ -111,6 +111,18 @@ class LabelButton {
     }
 
     /**
+     * クリック時のイベントリスナーを設定する。
+     * ユーザー操作からの処理でなければリンクを開く際に
+     * ブラウザがブロックしてしまうことに対する対策。
+     * @param func イベントリスナー
+     * @return 自インスタンス
+     */
+    public onClick(func: (event: any) => void): this {
+        this._base.onclick = func;
+        return this;
+    }
+
+    /**
      * ラベルのテキストを設定する。
      * @param label ラベルのテキスト
      * @return 自インスタンス
