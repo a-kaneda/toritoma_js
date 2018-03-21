@@ -200,33 +200,37 @@ class Player implements CharacterIF {
             }
         } 
 
-        // 通常状態、無敵状態の場合
-        if (this._status === STATUS.NORMAL || this._status === STATUS.INVINCIBLE) {
+        // シーンの状態がプレイ中の場合のみ、自機発射や当たり判定等の処理を行う。
+        if (scene.isPlaying) {
 
-            // 自機弾発射間隔が経過した場合は自機弾を発射する。
-            this._shotInterval++;
-            if (this._shotInterval >= SHOT_INTERVAL && !this._noShot) {
-                scene.addCharacter(new PlayerShot(this._hitArea.x, this._hitArea.y, false, scene));
-                this._shotInterval = 0;
-            }
+            // 通常状態、無敵状態の場合
+            if (this._status === STATUS.NORMAL || this._status === STATUS.INVINCIBLE) {
 
-            // 敵弾とのかすり判定を行う。
-            this._checkGraze(scene);
+                // 自機弾発射間隔が経過した場合は自機弾を発射する。
+                this._shotInterval++;
+                if (this._shotInterval >= SHOT_INTERVAL && !this._noShot) {
+                    scene.addCharacter(new PlayerShot(this._hitArea.x, this._hitArea.y, false, scene));
+                    this._shotInterval = 0;
+                }
 
-            // シールド使用時はチキンゲージを消費する。
-            if (this._shield) {
-                this._chickenGauge -= CONSUMPTION_GAUGE;
-                if (this._chickenGauge < 0) {
-                    this._chickenGauge = 0;
+                // 敵弾とのかすり判定を行う。
+                this._checkGraze(scene);
+
+                // シールド使用時はチキンゲージを消費する。
+                if (this._shield) {
+                    this._chickenGauge -= CONSUMPTION_GAUGE;
+                    if (this._chickenGauge < 0) {
+                        this._chickenGauge = 0;
+                    }
                 }
             }
-        }
 
-        // 通常状態の場合
-        if (this._status === STATUS.NORMAL) {
+            // 通常状態の場合
+            if (this._status === STATUS.NORMAL) {
 
-            // 敵キャラとの当たり判定処理を行う。
-            this._checkHitChacater(scene);
+                // 敵キャラとの当たり判定処理を行う。
+                this._checkHitChacater(scene);
+            }
         }
 
         // オプション個数を更新する。

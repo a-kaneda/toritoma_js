@@ -73,18 +73,21 @@ class PlayerOption {
      * @param scene シーン
      */
     update(scene) {
-        // 弾発射間隔経過しているときは自機弾を発射する
-        this._shotInterval++;
-        if (this._shotInterval >= SHOT_INTERVAL && !this._noShot) {
-            // 敵弾が無効化されていない場合は自機弾を生成する。
-            if (!scene.isDisableEnemyShot()) {
-                scene.addCharacter(new PlayerShot(this._hitArea.x, this._hitArea.y, true, scene));
-                this._shotInterval = 0;
+        // シーンの状態がプレイ中の場合のみ、自機発射や当たり判定等の処理を行う。
+        if (scene.isPlaying) {
+            // 弾発射間隔経過しているときは自機弾を発射する
+            this._shotInterval++;
+            if (this._shotInterval >= SHOT_INTERVAL && !this._noShot) {
+                // 敵弾が無効化されていない場合は自機弾を生成する。
+                if (!scene.isDisableEnemyShot()) {
+                    scene.addCharacter(new PlayerShot(this._hitArea.x, this._hitArea.y, true, scene));
+                    this._shotInterval = 0;
+                }
             }
-        }
-        // シールド使用時は当たり判定処理を行う。
-        if (this._shield) {
-            this._checkHitChacater(scene);
+            // シールド使用時は当たり判定処理を行う。
+            if (this._shield) {
+                this._checkHitChacater(scene);
+            }
         }
         // 座標をスプライトに適用する。
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));

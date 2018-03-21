@@ -105,6 +105,29 @@ class Stage {
     }
 
     /**
+     * レイヤーからステージの画像を取り除く。
+     */
+    public remove(): this {
+
+        // 背景画像を取り除く。
+        if (this._background) {
+            this._background.remove();
+        }
+
+        // 前景画像を取り除く。
+        if (this._foreground) {
+            this._foreground.remove();
+        }
+
+        // 障害物を取り除く。
+        if (this._block) {
+            this._block.remove();
+        }
+        
+        return this;
+    }
+
+    /**
      * ステージの状態を更新する。
      * @param scene シーン
      */

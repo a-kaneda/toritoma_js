@@ -45,6 +45,12 @@ const BOSS_LIFE_GAUGE_POS_Y = 144;
 const HIT_PLAYER_SHOT_INTERVAL = 6;
 // ゲームオーバー時の待機時間（msec）
 const GAMEOVER_INTERVAL = 1000;
+// 初期ステージ番号
+const INITIAL_STAGE = 1;
+// ステージ数
+const STAGE_COUNT = 1;
+// ステージクリア後の待機フレーム数
+const STAGE_CLEAR_WAIT = 540;
 
 // シーンの状態
 enum SCENE_STATE {
@@ -53,6 +59,7 @@ enum SCENE_STATE {
     GAMEOVER,       // ゲームオーバー
     PAUSE,          // ポーズ中
     QUIT_MENU,      // ゲーム終了メニュー
+    STAGE_CLEAR,    // ステージクリア
 }
 
 // 入力状態
@@ -82,6 +89,8 @@ class PlayingScene implements Scene {
     private _infoLayer: phina.display.DisplayElement;
     /** ステージ */
     private _stage: Stage;
+    /** ステージ番号 */
+    private _stageNumber: number;
     /** スコアラベルの背景部分。 */
     private _scoreLabelBase: phina.display.RectangleShape;
     /** スコアラベル。 */
@@ -118,6 +127,12 @@ class PlayingScene implements Scene {
     private _pauseLayer: MenuLayer;
     /** 終了メニュー時のレイヤー */
     private _quitLayer: MenuLayer;
+    /** ステージクリアしているかどうか */
+    private _isStageCleared: boolean;
+    /** ステージクリア待機フレーム数 */
+    private _stageClearWait: number;
+    /** ステージクリア時のラベル */
+    private _stageClearLabel: phina.display.Label;
 
     /**
      * コンストラクタ。
@@ -165,9 +180,6 @@ class PlayingScene implements Scene {
 
         // ステージの外枠を作成する。
         this._createFrame();
-
-        // 初期ステージを読み込む。
-        this._stage = new Stage('stage1', this._backgroundLayer);
 
         // スコアラベルの背景部分を作成する。
         this._scoreLabelBase = new phina.display.RectangleShape({
@@ -231,9 +243,6 @@ class PlayingScene implements Scene {
         this._bossLifeGauge.sprite.x = ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO + BOSS_LIFE_GAUGE_POS_X;
         this._bossLifeGauge.sprite.y = BOSS_LIFE_GAUGE_POS_Y;
 
-        // 初期状態はボスHPゲージは非表示とする。
-        this._bossLifeGauge.sprite.alpha = 0;
-
         // 復活待機フレーム数を初期化する。
         this._rebirthWait = 0;
 
@@ -264,6 +273,22 @@ class PlayingScene implements Scene {
         .onLeftButton(() => {this._replaceScene()})
         .onRightButton(() => {this._viewPauseMenu()});
 
+        // ステージクリア時のラベルを作成する。
+        this._stageClearLabel = new phina.display.Label({
+            text: 'STAGE CLEAR',
+            fontSize: 36,
+            backgroundColor: MyColor.BACK_COLOR,
+            fill: MyColor.FORE_COLOR,
+            fontFamily: 'noto',
+            x: Math.round(this._phinaScene.gridX.center()),
+            y: Math.round(this._phinaScene.gridY.center()),
+            strokeWidth: 0,
+            padding: 0,
+        });
+
+        // 初期ステージを読み込む。
+        this._setStage(INITIAL_STAGE);
+
         // 初期状態はプレイ中とする。
         this._changeState(SCENE_STATE.PLAYING);
     }
@@ -279,12 +304,26 @@ class PlayingScene implements Scene {
         // ゲームパッドの状態を更新する。
         this._gamepadManager.update();
 
+        // プレイ中でステージクリアフラグがたっている場合は状態を遷移する。
+        if (this._state === SCENE_STATE.PLAYING && this._isStageCleared) {
+            
+            // ステージクリアのジングルを再生する。
+            phina.asset.SoundManager.playMusic('clear', 0, false);
+
+            // ステージクリア後待機時間を設定する。
+            this._stageClearWait = STAGE_CLEAR_WAIT;
+
+            // 状態をステージクリアに遷移する。
+            this._changeState(SCENE_STATE.STAGE_CLEAR);
+        }
+        
         // 入力処理を行う。
         this._input(app);
 
-        // プレイ中、待機中の場合
+        // プレイ中、待機中、ステージクリアの場合
         if (this._state === SCENE_STATE.PLAYING ||
-            this._state === SCENE_STATE.WAIT_GAMEOVER) {
+            this._state === SCENE_STATE.WAIT_GAMEOVER ||
+            this._state === SCENE_STATE.STAGE_CLEAR) {
 
             // ステージやキャラクターの状態を更新する。
             this._updateStageData();
@@ -295,6 +334,37 @@ class PlayingScene implements Scene {
 
         // スコア表示を更新する。
         this._scoreLabel.text = 'SCORE: ' + ('000000' + this._score).slice(-6);
+
+        // ステージクリア状態の場合
+        if (this._state === SCENE_STATE.STAGE_CLEAR) {
+
+            // 自機が死んでいない場合
+            if (this._rebirthWait <= 0) {
+
+                // ステージクリア後待機時間をカウントする。
+                this._stageClearWait--;
+
+                // ステージクリア後待機時間を経過した場合は次のステージへ移行する。
+                if (this._stageClearWait <= 0) {
+
+                    // 最終ステージでない場合
+                    if (this._stageNumber < STAGE_COUNT) {
+
+                        // ステージを一つ進める。
+                        this._setStage(this._stageNumber + 1);
+                    }
+                    // 最終ステージの場合
+                    else {
+                        
+                        // 1ステージに戻る。
+                        this._setStage(1);
+                    }
+                    
+                    // プレイ中状態に遷移する。
+                    this._changeState(SCENE_STATE.PLAYING);
+                }
+            }
+        }
     }
 
     /**
@@ -349,7 +419,7 @@ class PlayingScene implements Scene {
     }
 
     /** ステージのスクロールスピード */
-    get scrollSpeed(): number {
+    public get scrollSpeed(): number {
         return this._stage.speed;
     }
 
@@ -379,6 +449,17 @@ class PlayingScene implements Scene {
 
         // ゲージを設定する。
         this._bossLifeGauge.rate = value;
+    }
+
+    /** プレイ中状態かどうか。 */
+    public get isPlaying(): boolean {
+
+        if (this._state === SCENE_STATE.PLAYING) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -432,6 +513,15 @@ class PlayingScene implements Scene {
     }
 
     /**
+     * ステージクリア時の処理を行う。
+     */
+    public stageClear(): void {
+
+        // ステージクリアフラグを立てる。
+        this._isStageCleared = true;
+    }
+
+    /**
      * 入力処理を行う。
      * @param app アプリケーション
      */
@@ -440,6 +530,7 @@ class PlayingScene implements Scene {
         // 状態に応じて入力処理を振り分ける。
         switch (this._state) {
             case SCENE_STATE.PLAYING:
+            case SCENE_STATE.STAGE_CLEAR:
                 this._inputOnPlaying(app);
                 break;
             case SCENE_STATE.GAMEOVER:
@@ -471,17 +562,26 @@ class PlayingScene implements Scene {
         // ゲームパッド入力を行う。
         const gamepad = this._inputGamepad();
 
-        // シールドボタン入力状態に応じて自機の状態を変化させる。
-        if (keyboard.shield || touch.shield || gamepad.shield) {
-            this._player.shield = true;
+        // プレイ中の場合はシールドと一時停止の処理を行う。
+        // その他の状態のときはキャラクターの移動のみ許可する。
+        if (this._state === SCENE_STATE.PLAYING) {
+
+            // シールドボタン入力状態に応じて自機の状態を変化させる。
+            if (keyboard.shield || touch.shield || gamepad.shield) {
+
+                this._player.shield = true;
+            }
+            else {
+                this._player.shield = false;
+            }
+
+            // 一時停止が入力された場合は一時停止処理を行う。
+            if (keyboard.pause || touch.pause || gamepad.pause) {
+                this._pause();
+            }
         }
         else {
-            this._player.shield = false;
-        }
-
-        // 一時停止が入力された場合は一時停止処理を行う。
-        if (keyboard.pause || touch.pause || gamepad.pause) {
-            this._pause();
+            this._player.shield = false;            
         }
     }
 
@@ -1050,8 +1150,11 @@ class PlayingScene implements Scene {
      */
     private _changeState(state: SCENE_STATE): void {
 
-        // プレイ中かゲームオーバー待機中の場合は各キャラクターのアニメーションを行う。
-        if (state === SCENE_STATE.PLAYING || state === SCENE_STATE.WAIT_GAMEOVER) {
+        // 状態に応じてキャラクターのアニメーションを行うかどうかを切り替える。
+        if (state === SCENE_STATE.PLAYING || 
+            state === SCENE_STATE.WAIT_GAMEOVER ||
+            state === SCENE_STATE.STAGE_CLEAR) {
+
             this._startCharacterAnimation();
         }
         else {
@@ -1090,8 +1193,43 @@ class PlayingScene implements Scene {
             this._shieldButton.enable = false;
         }
 
+        // ステージクリアの場合はラベルを表示する。
+        if (state === SCENE_STATE.STAGE_CLEAR) {
+            this._stageClearLabel.addChildTo(this._infoLayer);
+        }
+        else {
+            this._stageClearLabel.remove();
+        }
+
         // メンバ変数を変更する。
         this._state = state;
+    }
+
+    /**
+     * ステージ情報を読み込む。
+     * @param stageNumber ステージ番号
+     */
+    private _setStage(stageNumber: number): void {
+
+        // ステージ番号を変更する。
+        this._stageNumber = stageNumber;
+
+        // 現在のステージを画面から取り除く。
+        if (this._stage) {
+            this._stage.remove();
+        }
+
+        // 初期ステージを読み込む。
+        this._stage = new Stage('stage' + this._stageNumber, this._backgroundLayer);
+
+        // ステージクリアフラグを初期化する。
+        this._isStageCleared = false;
+
+        // ステージクリア後待機フレーム数を初期化する。
+        this._stageClearWait = 0;
+
+        // ボスHPゲージを非表示にする。
+        this._bossLifeGauge.sprite.alpha = 0;
     }
 }
 

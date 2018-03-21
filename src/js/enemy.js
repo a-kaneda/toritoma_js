@@ -156,6 +156,8 @@ class Enemy {
         if (this._deathInterval > STATE_INTERVAL) {
             // スコアを加算する。
             scene.addScore(this._score);
+            // ステージクリア処理を行う。
+            scene.stageClear();
             // 自分自身を削除する。
             scene.removeCharacter(this);
             this._sprite.remove();
