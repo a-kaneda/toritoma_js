@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 31);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -476,7 +476,7 @@ class MyColor {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 
 
@@ -1000,7 +1000,7 @@ class Collider {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 /** @module enemy */
 
@@ -1362,9 +1362,9 @@ class EnemyShot {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cursor__ = __webpack_require__(11);
@@ -1622,7 +1622,7 @@ class PointDevice {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frame__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frame__ = __webpack_require__(13);
 
 
 
@@ -1807,6 +1807,8 @@ class Util {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dpad__ = __webpack_require__(12);
+
 
 
 // 方向を表す文字列
@@ -1830,11 +1832,8 @@ class Cursor {
         this._currentPosition = 0;
         // 初期状態は有効とする。
         this._enable = true;
-        // ゲームパッドの前回入力があったかどうかの情報を初期化する。
-        this._prevGamepadInput = {};
-        for (let direction of DIRECTIONS) {
-            this._prevGamepadInput[direction] = false;
-        }
+        // 方向キー管理クラスを作成する。
+        this._dpad = new __WEBPACK_IMPORTED_MODULE_2__dpad__["a" /* default */]().onKeyDown((direction) => { this._move(direction); });
     }
     /** 現在のカーソル位置のID */
     get position() {
@@ -1895,7 +1894,7 @@ class Cursor {
             // キーボードの入力処理を行う。
             this._inputKeyboard(keyboard);
             // ゲームパッドの入力処理を行う。
-            this._inputGamepad(gamepad);
+            this._dpad.input(gamepad);
         }
         return this;
     }
@@ -1911,54 +1910,6 @@ class Cursor {
             if (keyboard.getKeyDown(direction)) {
                 // カーソル位置を移動する。
                 this._move(direction);
-            }
-        }
-    }
-    /**
-     * ゲームパッドの入力処理を行う。
-     * @param gamepad ゲームパッド
-     */
-    _inputGamepad(gamepad) {
-        // アナログスティックの入力を取得する。
-        const stick = gamepad.getStickDirection(0);
-        // アナログスティックの入力方向を調べる。
-        const input = {
-            'left': false,
-            'right': false,
-            'up': false,
-            'down': false,
-        };
-        // 左方向に入力されている場合
-        if (stick.x < -0.5) {
-            input.left = true;
-        }
-        // 右方向に入力されている場合
-        if (stick.x > 0.5) {
-            input.right = true;
-        }
-        // 上方向に入力されている場合
-        if (stick.y < -0.5) {
-            input.up = true;
-        }
-        // 下方向に入力されている場合
-        if (stick.y > 0.5) {
-            input.down = true;
-        }
-        // 各方向の処理を行う。
-        for (let direction of DIRECTIONS) {
-            // アナログスティックが入力されている場合
-            if (input[direction]) {
-                // 前回入力されていなかった場合
-                if (!this._prevGamepadInput[direction]) {
-                    // カーソル位置を移動する。
-                    this._move(direction);
-                }
-                // 前回入力をありにする。
-                this._prevGamepadInput[direction] = true;
-            }
-            else {
-                // 前回入力を無しにする。
-                this._prevGamepadInput[direction] = false;
             }
         }
     }
@@ -1986,6 +1937,90 @@ class Cursor {
 
 /***/ }),
 /* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// 方向を表す文字列
+const DIRECTIONS = ['left', 'right', 'up', 'down'];
+/**
+ * 方向キー入力を処理する。
+ * アナログスティックが入力されたタイミングでonKeyDownに設定された関数を実行する。
+ * 押しっぱなしの場合には処理はされない。
+ */
+class DPad {
+    /**
+     * コンストラクタ。
+     */
+    constructor() {
+        // ゲームパッドの前回入力があったかどうかの情報を初期化する。
+        this._prevInput = {};
+        for (let direction of DIRECTIONS) {
+            this._prevInput[direction] = false;
+        }
+    }
+    /**
+     * カーソルキー入力時のコールバック関数を設定する。
+     * @param func コールバック関数
+     */
+    onKeyDown(func) {
+        this._onKeyDown = func;
+        return this;
+    }
+    /**
+     * ゲームパッドの入力処理を行う。
+     * @param gamepad ゲームパッド
+     */
+    input(gamepad) {
+        // アナログスティックの入力を取得する。
+        const stick = gamepad.getStickDirection(0);
+        // アナログスティックの入力方向を調べる。
+        const input = {
+            'left': false,
+            'right': false,
+            'up': false,
+            'down': false,
+        };
+        // 左方向に入力されている場合
+        if (stick.x < -0.5 || gamepad.getKey('left')) {
+            input.left = true;
+        }
+        // 右方向に入力されている場合
+        if (stick.x > 0.5 || gamepad.getKey('right')) {
+            input.right = true;
+        }
+        // 上方向に入力されている場合
+        if (stick.y < -0.5 || gamepad.getKey('up')) {
+            input.up = true;
+        }
+        // 下方向に入力されている場合
+        if (stick.y > 0.5 || gamepad.getKey('down')) {
+            input.down = true;
+        }
+        // 各方向の処理を行う。
+        for (let direction of DIRECTIONS) {
+            // 方向キーが入力されている場合
+            if (input[direction]) {
+                // 前回入力されていなかった場合
+                if (!this._prevInput[direction] && this._onKeyDown) {
+                    // カーソルキー入力時のコールバック関数を呼び出す。
+                    this._onKeyDown(direction);
+                }
+                // 前回入力をありにする。
+                this._prevInput[direction] = true;
+            }
+            else {
+                // 前回入力を無しにする。
+                this._prevInput[direction] = false;
+            }
+        }
+        return this;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (DPad);
+
+
+/***/ }),
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2101,7 +2136,7 @@ class Frame {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2204,11 +2239,11 @@ class ImageBUtton {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(39);
 
 /**
  * ローカライズを行うクラス。
@@ -2276,12 +2311,14 @@ class Localizer {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dpad__ = __webpack_require__(12);
+
 
 
 // 戻るボタンの位置x座標(画面左からの位置)
@@ -2325,6 +2362,8 @@ class PageLayer {
         this._pages = [];
         // ページ番号を初期化する。
         this._currentPageNum = 0;
+        // 方向キー管理クラスを作成する。
+        this._dpad = new __WEBPACK_IMPORTED_MODULE_2__dpad__["a" /* default */]().onKeyDown((direction) => { this._onCursorKey(direction); });
     }
     /**
      * phina.jsのエレメントにノードを追加する。
@@ -2380,14 +2419,34 @@ class PageLayer {
         if (keyboard.getKeyDown('escape') || gamepad.getKeyDown('b')) {
             this._backButton.push();
         }
-        else if (keyboard.getKeyDown('left') || gamepad.getKeyDown('left')) {
+        else if (keyboard.getKeyDown('left')) {
             this._goToPrevPage();
         }
-        else if (keyboard.getKeyDown('right') || gamepad.getKeyDown('right')) {
+        else if (keyboard.getKeyDown('right')) {
             this._goToNextPage();
         }
         else {
             // その他のキー入力は処理しない。
+        }
+        // ゲームパッドのカーソルキーの入力処理を行う。
+        this._dpad.input(gamepad);
+    }
+    /**
+     * カーソルキー入力時の処理。
+     * @param direction 方向
+     */
+    _onCursorKey(direction) {
+        // 左キーが押された場合は前ページへ移動し、
+        // 右キーが押された場合は次ページへ移動する。
+        switch (direction) {
+            case 'left':
+                this._goToPrevPage();
+                break;
+            case 'right':
+                this._goToNextPage();
+                break;
+            default:
+                break;
         }
     }
     /**
@@ -2429,7 +2488,7 @@ class PageLayer {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2555,17 +2614,17 @@ class PlayerShot {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rhinocerosbeetle__ = __webpack_require__(37);
 /** @module stage */
 
 
@@ -2757,7 +2816,7 @@ class Stage {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2852,7 +2911,7 @@ var LabelAreaExDummy = 0;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3073,7 +3132,7 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3128,7 +3187,7 @@ class BossLifeGauge {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3213,7 +3272,7 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3270,15 +3329,15 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pagelayer__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pagelayer__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__localizer__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__localizer__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__labelbutton__ = __webpack_require__(9);
 
 
@@ -3395,7 +3454,7 @@ class CreditScene {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3450,7 +3509,7 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3527,13 +3586,13 @@ class Explosion {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pointdevice__ = __webpack_require__(8);
 
@@ -3669,13 +3728,13 @@ class HowToPlayPage {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(27);
 
 
 
@@ -3726,7 +3785,7 @@ class HowToPlayScene {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3782,7 +3841,7 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3863,7 +3922,7 @@ class Life {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3872,7 +3931,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(19);
 
 
 
@@ -4048,7 +4107,7 @@ phina.main(function () {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4235,16 +4294,16 @@ class MenuLayer {
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(35);
 
 
 
@@ -4646,7 +4705,7 @@ class Player {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4727,13 +4786,13 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(17);
 /** @module playeroption */
 
 
@@ -4947,7 +5006,7 @@ class PlayerOption {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4956,15 +5015,15 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(14);
 
 
 
@@ -5881,7 +5940,7 @@ class PlayingScene {
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6117,7 +6176,7 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6209,7 +6268,7 @@ class ShieldButton {
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6347,7 +6406,7 @@ var StringResource = {
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

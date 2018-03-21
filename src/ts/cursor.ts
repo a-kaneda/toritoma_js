@@ -1,5 +1,6 @@
 import ScreenSize from './screensize'
 import ControlSize from './controlsize'
+import DPad from './dpad'
 
 // 方向を表す文字列
 const DIRECTIONS: Direction[] = ['left', 'right', 'up', 'down'];
@@ -17,8 +18,8 @@ class Cursor {
     private _currentPosition: number;
     /** 有効か無効か */
     private _enable: boolean;
-    /** ゲームパッドの前回入力があったかどうか */
-    private _prevGamepadInput: {[direction: string]: boolean};
+    /** 方向キー管理 */
+    private _dpad: DPad;
 
     /**
      * コンストラクタ。
@@ -45,11 +46,8 @@ class Cursor {
         // 初期状態は有効とする。
         this._enable = true;
 
-        // ゲームパッドの前回入力があったかどうかの情報を初期化する。
-        this._prevGamepadInput = {};
-        for (let direction of DIRECTIONS) {
-            this._prevGamepadInput[direction] = false;
-        }
+        // 方向キー管理クラスを作成する。
+        this._dpad = new DPad().onKeyDown((direction: Direction) => {this._move(direction);});
     }
 
     /** 現在のカーソル位置のID */
@@ -123,7 +121,7 @@ class Cursor {
             this._inputKeyboard(keyboard);
 
             // ゲームパッドの入力処理を行う。
-            this._inputGamepad(gamepad);
+            this._dpad.input(gamepad);
         }
 
         return this;
@@ -149,71 +147,10 @@ class Cursor {
     }
 
     /**
-     * ゲームパッドの入力処理を行う。
-     * @param gamepad ゲームパッド
-     */
-    private _inputGamepad(gamepad: phina.input.Gamepad): void {
-
-        // アナログスティックの入力を取得する。
-        const stick = gamepad.getStickDirection(0);
-
-        // アナログスティックの入力方向を調べる。
-        const input = {
-            'left': false,
-            'right': false,
-            'up': false,
-            'down': false,
-        };
-
-        // 左方向に入力されている場合
-        if (stick.x < -0.5) {
-            input.left = true;
-        }
-
-        // 右方向に入力されている場合
-        if (stick.x > 0.5) {
-            input.right = true;
-        }
-
-        // 上方向に入力されている場合
-        if (stick.y < -0.5) {
-            input.up = true;
-        }
-
-        // 下方向に入力されている場合
-        if (stick.y > 0.5) {
-            input.down = true;
-        }
-
-        // 各方向の処理を行う。
-        for (let direction of DIRECTIONS) {
-
-            // アナログスティックが入力されている場合
-            if (input[direction]) {
-
-                // 前回入力されていなかった場合
-                if (!this._prevGamepadInput[direction]) {
-
-                    // カーソル位置を移動する。
-                    this._move(direction);
-                }
-
-                // 前回入力をありにする。
-                this._prevGamepadInput[direction] = true;
-            }
-            else {
-
-                // 前回入力を無しにする。
-                this._prevGamepadInput[direction] = false;
-            }
-        }
-    }
-
-    /**
      * カーソル位置を移動する。
      * @param direction 移動方向
      */
-    private _move(direction: 'left' | 'right' | 'up' | 'down'): void {
+    private _move(direction: Direction): void {
 
         // 現在のカーソル位置の情報がある場合は処理を行う。
         if (this._positions[this._currentPosition]) {

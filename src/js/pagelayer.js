@@ -1,5 +1,6 @@
 import ImageButton from './imagebutton';
 import ScreenSize from './screensize';
+import DPad from './dpad';
 // 戻るボタンの位置x座標(画面左からの位置)
 const BACK_BUTTON_POS_X = ScreenSize.SCREEN_WIDTH - 28;
 // 戻るボタンの位置y座標(画面上からの位置)
@@ -41,6 +42,8 @@ class PageLayer {
         this._pages = [];
         // ページ番号を初期化する。
         this._currentPageNum = 0;
+        // 方向キー管理クラスを作成する。
+        this._dpad = new DPad().onKeyDown((direction) => { this._onCursorKey(direction); });
     }
     /**
      * phina.jsのエレメントにノードを追加する。
@@ -96,14 +99,34 @@ class PageLayer {
         if (keyboard.getKeyDown('escape') || gamepad.getKeyDown('b')) {
             this._backButton.push();
         }
-        else if (keyboard.getKeyDown('left') || gamepad.getKeyDown('left')) {
+        else if (keyboard.getKeyDown('left')) {
             this._goToPrevPage();
         }
-        else if (keyboard.getKeyDown('right') || gamepad.getKeyDown('right')) {
+        else if (keyboard.getKeyDown('right')) {
             this._goToNextPage();
         }
         else {
             // その他のキー入力は処理しない。
+        }
+        // ゲームパッドのカーソルキーの入力処理を行う。
+        this._dpad.input(gamepad);
+    }
+    /**
+     * カーソルキー入力時の処理。
+     * @param direction 方向
+     */
+    _onCursorKey(direction) {
+        // 左キーが押された場合は前ページへ移動し、
+        // 右キーが押された場合は次ページへ移動する。
+        switch (direction) {
+            case 'left':
+                this._goToPrevPage();
+                break;
+            case 'right':
+                this._goToNextPage();
+                break;
+            default:
+                break;
         }
     }
     /**
