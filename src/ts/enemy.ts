@@ -23,9 +23,9 @@ abstract class Enemy implements CharacterIF {
     /** スコア */
     protected _score: number;
     /** アニメーション */
-    private _animation: phina.accessory.FrameAnimation;
+    protected _animation: phina.accessory.FrameAnimation;
     /** 防御力 */
-    private _defense: number;
+    protected _defense: number;
     /** 死亡エフェクト */
     private _death: DeathEffect;
     /** 死亡エフェクト間隔 */

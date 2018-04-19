@@ -8,6 +8,7 @@ import Ant from './ant'
 import Butterfly from './butterfly'
 import Ladybug from './ladybug'
 import RhinocerosBeetle from './rhinocerosbeetle'
+import Mantis from './mantis'
 
 // タイルのサイズ
 const TILE_SIZE = 16;
@@ -237,7 +238,11 @@ class Stage {
             case 'rhinocerosbeetle':
                 scene.addCharacter(new RhinocerosBeetle(x, y, scene));
                 break;
+            case 'mantis':
+                scene.addCharacter(new Mantis(x, y, scene));
+                break;
             default:
+                console.log(`Error: Unknwon enemy type: ${type}`);
                 break;
         }
     }

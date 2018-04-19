@@ -68,7 +68,7 @@ class Butterfly extends Enemy {
         // 弾発射間隔経過しているときは左方向へ3-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
-            EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 3, Math.PI / 8.0, SHOT_SPEED, false, scene);
+            EnemyShot.fireNWay(this._hitArea, Math.PI, 3, Math.PI / 8.0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
     }

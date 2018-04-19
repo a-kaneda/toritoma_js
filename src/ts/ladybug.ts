@@ -50,8 +50,7 @@ class Ladybug extends Enemy {
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
             // 自機へ向けて弾を発射する。
-            EnemyShot.fireNWay(this._hitArea.x,
-                               this._hitArea.y, 
+            EnemyShot.fireNWay(this._hitArea,
                                Util.calcAngle(this._hitArea, scene.playerPosition), 
                                1, 
                                0, 

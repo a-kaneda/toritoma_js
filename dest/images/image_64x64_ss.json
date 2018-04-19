@@ -2,14 +2,29 @@
     "frame": {
         "width": 64,
         "height": 64,
-        "cols": 2,
-        "rows": 1
+        "cols": 3,
+        "rows": 2
     },
     "animations": {
         "rhinocerosbeetle": {
             "frames": [0, 1],
             "next": "rhinocerosbeetle",
             "frequency": 3
+        },
+        "mantis": {
+            "frames": [3],
+            "next": "mantis",
+            "frequency": 12
+        },
+        "mantis_uphand_1": {
+            "frames": [4],
+            "next": "mantis_uphand_1",
+            "frequency": 12            
+        },
+        "mantis_uphand_2": {
+            "frames": [5],
+            "next": "mantis_uphand_2",
+            "frequency": 12            
         }
     }
 }

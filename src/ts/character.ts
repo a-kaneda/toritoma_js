@@ -99,6 +99,16 @@ const enemy: { [key: string]: EnemyParam} = {
         score: 3000,
         death: DeathEffect.BOSS,
     },
+    // カマキリ
+    mantis: {
+        size: 64,
+        width: 64,
+        height: 64,
+        hp: 1300,
+        defense: 3,
+        score: 3000,
+        death: DeathEffect.BOSS,
+    },
 };
 
 /**

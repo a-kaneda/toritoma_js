@@ -51,7 +51,7 @@ class Dragonfly extends Enemy {
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
-            EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 1, 0, SHOT_SPEED, false, scene);
+            EnemyShot.fireNWay(this._hitArea,  Math.PI, 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
     }

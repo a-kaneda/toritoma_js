@@ -184,24 +184,29 @@ class RhinocerosBeetle extends Enemy {
                 if (this._shotInterval[0] >= LEFT_SHOT_INTERVAL) {
 
                     // 3箇所から同時に弾を発射する
-                    EnemyShot.fireNWay(this._hitArea.x,
-                        this._hitArea.y, 
+                    EnemyShot.fireNWay(this._hitArea, 
                         Math.PI, 
                         1, 
                         0, 
                         LEFT_SHOT_SPEED, 
                         false, 
                         scene);
-                    EnemyShot.fireNWay(this._hitArea.x,
-                        this._hitArea.y - LEFT_SHOT_POSITION, 
+                    EnemyShot.fireNWay(
+                        {
+                            x: this._hitArea.x,
+                            y: this._hitArea.y - LEFT_SHOT_POSITION,
+                        }, 
                         Math.PI, 
                         1, 
                         0, 
                         LEFT_SHOT_SPEED, 
                         false, 
                         scene);
-                    EnemyShot.fireNWay(this._hitArea.x,
-                        this._hitArea.y + LEFT_SHOT_POSITION, 
+                    EnemyShot.fireNWay(
+                        {
+                            x: this._hitArea.x,
+                            y: this._hitArea.y + LEFT_SHOT_POSITION,
+                        }, 
                         Math.PI, 
                         1, 
                         0, 
@@ -216,8 +221,7 @@ class RhinocerosBeetle extends Enemy {
                 // 1-way弾の弾発射間隔が経過している場合は弾を発射する。
                 this._shotInterval[1]++;
                 if (this._shotInterval[1] >= LEFT_SHOT_1WAY_INTERVAL) {
-                    EnemyShot.fireNWay(this._hitArea.x,
-                        this._hitArea.y, 
+                    EnemyShot.fireNWay(this._hitArea, 
                         Util.calcAngle(this._hitArea, scene.playerPosition), 
                         1, 
                         0, 
@@ -251,8 +255,7 @@ class RhinocerosBeetle extends Enemy {
                     // n-way弾の発射間隔が経過している場合は弾を発射する。
                     this._shotInterval[1]++;
                     if (this._shotInterval[1] >= NWAY_SHOT_INTERVAL) {
-                        EnemyShot.fireNWay(this._hitArea.x,
-                            this._hitArea.y, 
+                        EnemyShot.fireNWay(this._hitArea, 
                             Util.calcAngle(this._hitArea, scene.playerPosition), 
                             NWAY_COUNT, 
                             NWAY_ANGLE, 
@@ -290,8 +293,7 @@ class RhinocerosBeetle extends Enemy {
                 // 全方位弾の発射間隔が経過している場合は弾を発射する
                 this._shotInterval[0]++;
                 if (this._shotInterval[0] >= ALL_DIRECTION_INTERVAL) {
-                    EnemyShot.fireNWay(this._hitArea.x,
-                        this._hitArea.y, 
+                    EnemyShot.fireNWay(this._hitArea, 
                         Math.PI, 
                         ALL_DIRECTION_COUNT, 
                         ALL_DIRECTION_ANGLE, 

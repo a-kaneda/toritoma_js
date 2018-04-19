@@ -46,9 +46,9 @@ const HIT_PLAYER_SHOT_INTERVAL = 6;
 // ゲームオーバー時の待機時間（msec）
 const GAMEOVER_INTERVAL = 1000;
 // 初期ステージ番号
-const INITIAL_STAGE = 1;
+const INITIAL_STAGE = 2;
 // ステージ数
-const STAGE_COUNT = 1;
+const STAGE_COUNT = 2;
 // ステージクリア後の待機フレーム数
 const STAGE_CLEAR_WAIT = 540;
 

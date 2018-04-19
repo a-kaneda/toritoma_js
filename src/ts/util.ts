@@ -29,6 +29,34 @@ class Util {
 
         return ret;
     }
+
+    /**
+     * N-Way弾の各弾の進行角度を計算する。
+     * @param center 中心角度
+     * @param count 弾数
+     * @param interval 弾の間の角度
+     * @return 各弾の角度
+     */
+    public static calcNWayAngle(center: number, count: number, interval: number): number[] {
+
+        // 戻り値を用意する。
+        let angles: number[] = [];
+
+        // 最小値の角度を計算する。
+        const minAngle = center - (interval * (count - 1)) / 2.0;
+        
+        // 各弾の発射角度を計算する。
+        for (let i = 0; i < count; i++) {
+            
+            // 弾の角度を計算する
+            const angle = minAngle + i * interval;
+            
+            // 戻り値に追加する。
+            angles.push(angle);
+        }
+
+        return angles;
+    }
 }
 
 export default Util;

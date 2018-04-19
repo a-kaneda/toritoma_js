@@ -143,16 +143,22 @@ class RhinocerosBeetle extends Enemy {
                 this._shotInterval[0]++;
                 if (this._shotInterval[0] >= LEFT_SHOT_INTERVAL) {
                     // 3箇所から同時に弾を発射する
-                    EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, 1, 0, LEFT_SHOT_SPEED, false, scene);
-                    EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y - LEFT_SHOT_POSITION, Math.PI, 1, 0, LEFT_SHOT_SPEED, false, scene);
-                    EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y + LEFT_SHOT_POSITION, Math.PI, 1, 0, LEFT_SHOT_SPEED, false, scene);
+                    EnemyShot.fireNWay(this._hitArea, Math.PI, 1, 0, LEFT_SHOT_SPEED, false, scene);
+                    EnemyShot.fireNWay({
+                        x: this._hitArea.x,
+                        y: this._hitArea.y - LEFT_SHOT_POSITION,
+                    }, Math.PI, 1, 0, LEFT_SHOT_SPEED, false, scene);
+                    EnemyShot.fireNWay({
+                        x: this._hitArea.x,
+                        y: this._hitArea.y + LEFT_SHOT_POSITION,
+                    }, Math.PI, 1, 0, LEFT_SHOT_SPEED, false, scene);
                     // 弾発射間隔を初期化する。
                     this._shotInterval[0] = 0;
                 }
                 // 1-way弾の弾発射間隔が経過している場合は弾を発射する。
                 this._shotInterval[1]++;
                 if (this._shotInterval[1] >= LEFT_SHOT_1WAY_INTERVAL) {
-                    EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Util.calcAngle(this._hitArea, scene.playerPosition), 1, 0, LEFT_SHOT_1WAY_SPEED, false, scene);
+                    EnemyShot.fireNWay(this._hitArea, Util.calcAngle(this._hitArea, scene.playerPosition), 1, 0, LEFT_SHOT_1WAY_SPEED, false, scene);
                     this._shotInterval[1] = 0;
                 }
                 // 状態遷移間隔が経過している場合は、自機へ向けてn-way弾発射へ遷移する。
@@ -173,7 +179,7 @@ class RhinocerosBeetle extends Enemy {
                     // n-way弾の発射間隔が経過している場合は弾を発射する。
                     this._shotInterval[1]++;
                     if (this._shotInterval[1] >= NWAY_SHOT_INTERVAL) {
-                        EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Util.calcAngle(this._hitArea, scene.playerPosition), NWAY_COUNT, NWAY_ANGLE, NWAY_SPEED, false, scene);
+                        EnemyShot.fireNWay(this._hitArea, Util.calcAngle(this._hitArea, scene.playerPosition), NWAY_COUNT, NWAY_ANGLE, NWAY_SPEED, false, scene);
                         this._shotInterval[1] = 0;
                     }
                     // n-way弾発射時間が経過している場合は発射間隔を初期化して、次のグループ弾発射間隔まで待機する。
@@ -197,7 +203,7 @@ class RhinocerosBeetle extends Enemy {
                 // 全方位弾の発射間隔が経過している場合は弾を発射する
                 this._shotInterval[0]++;
                 if (this._shotInterval[0] >= ALL_DIRECTION_INTERVAL) {
-                    EnemyShot.fireNWay(this._hitArea.x, this._hitArea.y, Math.PI, ALL_DIRECTION_COUNT, ALL_DIRECTION_ANGLE, ALL_DIRECTION_SPEED, false, scene);
+                    EnemyShot.fireNWay(this._hitArea, Math.PI, ALL_DIRECTION_COUNT, ALL_DIRECTION_ANGLE, ALL_DIRECTION_SPEED, false, scene);
                     this._shotInterval[0] = 0;
                 }
                 // 状態遷移間隔が経過している場合は、左方向へ弾発射へ遷移する。
