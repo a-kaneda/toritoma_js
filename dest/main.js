@@ -5440,12 +5440,16 @@ const BOSS_LIFE_GAUGE_POS_Y = 144;
 const HIT_PLAYER_SHOT_INTERVAL = 6;
 // ゲームオーバー時の待機時間（msec）
 const GAMEOVER_INTERVAL = 1000;
+// ゲームオーバーラベルの配置位置y座標
+const GAMEOVER_LABEL_POS_Y = Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO / 2);
 // 初期ステージ番号
-const INITIAL_STAGE = 2;
+const INITIAL_STAGE = 1;
 // ステージ数
 const STAGE_COUNT = 2;
 // ステージクリア後の待機フレーム数
 const STAGE_CLEAR_WAIT = 540;
+// ステージクリアラベルの配置位置y座標
+const STAGE_CLEAR_LABEL_POS_Y = Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO / 2);
 // シーンの状態
 var SCENE_STATE;
 (function (SCENE_STATE) {
@@ -5570,7 +5574,7 @@ class PlayingScene {
             fill: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].FORE_COLOR,
             fontFamily: 'noto',
             x: Math.round(this._phinaScene.gridX.center()),
-            y: Math.round(this._phinaScene.gridY.center()),
+            y: STAGE_CLEAR_LABEL_POS_Y,
             strokeWidth: 0,
             padding: 0,
         });
@@ -6132,7 +6136,7 @@ class PlayingScene {
             fill: __WEBPACK_IMPORTED_MODULE_1__mycolor__["a" /* default */].FORE_COLOR,
             fontFamily: 'noto',
             x: Math.round(this._phinaScene.gridX.center()),
-            y: Math.round(this._phinaScene.gridY.center()),
+            y: GAMEOVER_LABEL_POS_Y,
             strokeWidth: 0,
             padding: 0,
         }).addChildTo(this._infoLayer);
