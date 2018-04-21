@@ -2359,7 +2359,7 @@ class ImageBUtton {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(41);
 
 /**
  * ローカライズを行うクラス。
@@ -2735,7 +2735,7 @@ class PlayerShot {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(22);
@@ -4023,6 +4023,10 @@ class Life {
      */
     get sprite() {
         return this._base;
+    }
+    /** 残機 */
+    get life() {
+        return this._life;
     }
     /**
      * 残機。ラベルの文字列も連動して変化する。
@@ -5389,15 +5393,15 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__stage__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__player__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__life__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chickengauge__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__shieldbutton__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__menulayer__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__imagebutton__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__player__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__life__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chickengauge__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__titlescene__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__imagebutton__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(40);
 
 
 
@@ -5516,42 +5520,44 @@ class PlayingScene {
         // スコアを初期化する。
         this._score = 0;
         // 残機表示を作成する。
-        this._lifeLabel = new __WEBPACK_IMPORTED_MODULE_7__life__["a" /* default */]();
+        this._lifeLabel = new __WEBPACK_IMPORTED_MODULE_6__life__["a" /* default */]();
         // 残機表示の位置を設定する。
         this._lifeLabel.sprite.addChildTo(this._infoLayer);
         this._lifeLabel.sprite.x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO + LIFE_POS_X;
         this._lifeLabel.sprite.y = LIFE_POS_Y;
         // 残機を初期化する。
-        this._setLife(INITIAL_LIFE);
+        this._lifeLabel.life = INITIAL_LIFE;
         // シールドボタンを作成する。
-        this._shieldButton = new __WEBPACK_IMPORTED_MODULE_10__shieldbutton__["a" /* default */]();
+        this._shieldButton = new __WEBPACK_IMPORTED_MODULE_9__shieldbutton__["a" /* default */]();
         // シールドボタンの位置を設定する。
         this._shieldButton.sprite.addChildTo(this._infoLayer);
         this._shieldButton.sprite.x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
         this._shieldButton.sprite.y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
         // 一時停止ボタンを作成する。
-        this._pauseButton = new __WEBPACK_IMPORTED_MODULE_13__imagebutton__["a" /* default */]('pauseButton')
+        this._pauseButton = new __WEBPACK_IMPORTED_MODULE_12__imagebutton__["a" /* default */]('pauseButton')
             .setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - PUASE_BUTTON_POS_X, PAUSE_BUTTON_POS_Y)
             .onPush(() => { this._pause(); })
             .addChildTo(this._infoLayer);
         // チキンゲージを作成する。
-        this._chickenGauge = new __WEBPACK_IMPORTED_MODULE_8__chickengauge__["a" /* default */]();
+        this._chickenGauge = new __WEBPACK_IMPORTED_MODULE_7__chickengauge__["a" /* default */]();
         // チキンゲージの位置を設定する。
         this._chickenGauge.sprite.addChildTo(this._infoLayer);
         this._chickenGauge.sprite.x = Math.round(this._phinaScene.gridX.center());
         this._chickenGauge.sprite.y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT - CHICKEN_GAUGE_POS_Y;
         // ボスHPゲージを作成する。
-        this._bossLifeGauge = new __WEBPACK_IMPORTED_MODULE_9__bosslifegauge__["a" /* default */]();
+        this._bossLifeGauge = new __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__["a" /* default */]();
         // ボスHPゲージの位置を設定する。
         this._bossLifeGauge.sprite.addChildTo(this._infoLayer);
         this._bossLifeGauge.sprite.x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO + BOSS_LIFE_GAUGE_POS_X;
         this._bossLifeGauge.sprite.y = BOSS_LIFE_GAUGE_POS_Y;
+        // ボスHPゲージは初期状態は非表示にする。
+        this._bossLifeGauge.sprite.alpha = 0;
         // 復活待機フレーム数を初期化する。
         this._rebirthWait = 0;
         // キャラクター管理配列を作成する。
         this._characters = [];
         // 自機を作成する。
-        this._player = new __WEBPACK_IMPORTED_MODULE_6__player__["a" /* default */](Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width / 4), Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height / 2), this);
+        this._player = new __WEBPACK_IMPORTED_MODULE_5__player__["a" /* default */](Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width / 4), Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height / 2), this);
         // タッチ情報を初期化する。
         this._touch = { id: -1, x: 0, y: 0 };
         // 自機弾衝突フラグを初期化する。
@@ -5559,11 +5565,11 @@ class PlayingScene {
         // 自機弾衝突音発生間隔を初期化する。
         this._hitPlayerShotInterval = HIT_PLAYER_SHOT_INTERVAL;
         // 一時停止レイヤーを作成する。
-        this._pauseLayer = new __WEBPACK_IMPORTED_MODULE_12__menulayer__["a" /* default */]('PAUSE', 'RESUME', 'QUIT')
+        this._pauseLayer = new __WEBPACK_IMPORTED_MODULE_11__menulayer__["a" /* default */]('PAUSE', 'RESUME', 'QUIT')
             .onLeftButton(() => { this._resume(); })
             .onRightButton(() => { this._viewQuitMenu(); });
         // 終了メニュー時のレイヤーを作成する。
-        this._quitLayer = new __WEBPACK_IMPORTED_MODULE_12__menulayer__["a" /* default */]('QUIT GAME?', 'YES', 'NO')
+        this._quitLayer = new __WEBPACK_IMPORTED_MODULE_11__menulayer__["a" /* default */]('QUIT GAME?', 'YES', 'NO')
             .onLeftButton(() => { this._replaceScene(); })
             .onRightButton(() => { this._viewPauseMenu(); });
         // ステージクリア時のラベルを作成する。
@@ -5580,12 +5586,13 @@ class PlayingScene {
         });
         // 初期ステージを読み込む。
         if (localStorage.initialStage) {
-            this._setStage(parseInt(localStorage.initialStage, 10));
+            this._stageStatus = new __WEBPACK_IMPORTED_MODULE_13__stagestatus__["a" /* default */](parseInt(localStorage.initialStage, 10), this._backgroundLayer);
         }
         else {
-            this._setStage(INITIAL_STAGE);
+            this._stageStatus = new __WEBPACK_IMPORTED_MODULE_13__stagestatus__["a" /* default */](INITIAL_STAGE, this._backgroundLayer);
         }
         // 初期状態はプレイ中とする。
+        this._state = SCENE_STATE.PLAYING;
         this._changeState(SCENE_STATE.PLAYING);
     }
     /**
@@ -5598,11 +5605,9 @@ class PlayingScene {
         // ゲームパッドの状態を更新する。
         this._gamepadManager.update();
         // プレイ中でステージクリアフラグがたっている場合は状態を遷移する。
-        if (this._state === SCENE_STATE.PLAYING && this._isStageCleared) {
+        if (this._state === SCENE_STATE.PLAYING && this._stageStatus.isStageCleared) {
             // ステージクリアのジングルを再生する。
             phina.asset.SoundManager.playMusic('clear', 0, false);
-            // ステージクリア後待機時間を設定する。
-            this._stageClearWait = STAGE_CLEAR_WAIT;
             // 状態をステージクリアに遷移する。
             this._changeState(SCENE_STATE.STAGE_CLEAR);
         }
@@ -5623,14 +5628,12 @@ class PlayingScene {
         if (this._state === SCENE_STATE.STAGE_CLEAR) {
             // 自機が死んでいない場合
             if (this._rebirthWait <= 0) {
-                // ステージクリア後待機時間をカウントする。
-                this._stageClearWait--;
                 // ステージクリア後待機時間を経過した場合は次のステージへ移行する。
-                if (this._stageClearWait <= 0) {
+                if (this._stageStatus.isOverStageClearWait) {
                     // 最終ステージでない場合
-                    if (this._stageNumber < STAGE_COUNT) {
+                    if (this._stageStatus.stageNumber < STAGE_COUNT) {
                         // ステージを一つ進める。
-                        this._setStage(this._stageNumber + 1);
+                        this._setStage(this._stageStatus.stageNumber + 1);
                     }
                     else {
                         // 1ステージに戻る。
@@ -5678,18 +5681,18 @@ class PlayingScene {
      * @return ブロックマップ
      */
     getBlockMap() {
-        return this._stage.blockMap;
+        return this._stageStatus.blockMap;
     }
     /**
      * ステージが左方向に何ドット移動しているかを取得する。
      * @return ステージ位置
      */
     getStagePosition() {
-        return -this._stage.x;
+        return this._stageStatus.position;
     }
     /** ステージのスクロールスピード */
     get scrollSpeed() {
-        return this._stage.speed;
+        return this._stageStatus.scrollSpeed;
     }
     /** キャラクター管理配列 */
     get characters() {
@@ -5729,9 +5732,9 @@ class PlayingScene {
      */
     miss() {
         // 残機が残っている場合
-        if (this._life > 0) {
+        if (this._lifeLabel.life > 0) {
             // 残機を一つ減らす。
-            this._setLife(this._life - 1);
+            this._lifeLabel.life = this._lifeLabel.life - 1;
             // 復活待機フレーム数を設定する。
             // この時間が経過したときに自機を復活する。
             this._rebirthWait = REBIRTH_WAIT;
@@ -5765,8 +5768,8 @@ class PlayingScene {
      * ステージクリア時の処理を行う。
      */
     stageClear() {
-        // ステージクリアフラグを立てる。
-        this._isStageCleared = true;
+        // ステージ状態をクリア状態にする。
+        this._stageStatus.stageClear();
     }
     /**
      * 入力処理を行う。
@@ -6091,14 +6094,6 @@ class PlayingScene {
         }
     }
     /**
-     * 残機を変更し、残機ラベルを更新する。
-     * @param life 残機
-     */
-    _setLife(life) {
-        this._life = life;
-        this._lifeLabel.life = this._life;
-    }
-    /**
      * 自機復活処理。
      * 復活待機フレーム数をカウントし、
      * 待機フレーム数を経過したタイミングで自機を復活する。
@@ -6163,7 +6158,7 @@ class PlayingScene {
      */
     _updateStageData() {
         // ステージの状態を更新する。
-        this._stage.update(this);
+        this._stageStatus.update(this);
         // プレイヤーの状態を更新する。
         this._player.update(this);
         // 自機弾衝突フラグを初期化する。
@@ -6210,7 +6205,7 @@ class PlayingScene {
         // 全要素を取り除く。
         this._rootNode.remove();
         // タイトルシーンへ遷移する。
-        this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_11__titlescene__["a" /* default */](this._phinaScene, this._gamepadManager);
+        this._phinaScene.scene = new __WEBPACK_IMPORTED_MODULE_10__titlescene__["a" /* default */](this._phinaScene, this._gamepadManager);
     }
     /**
      * ゲームを一時停止する。
@@ -6303,18 +6298,10 @@ class PlayingScene {
      * @param stageNumber ステージ番号
      */
     _setStage(stageNumber) {
-        // ステージ番号を変更する。
-        this._stageNumber = stageNumber;
         // 現在のステージを画面から取り除く。
-        if (this._stage) {
-            this._stage.remove();
-        }
-        // 初期ステージを読み込む。
-        this._stage = new __WEBPACK_IMPORTED_MODULE_5__stage__["a" /* default */]('stage' + this._stageNumber, this._backgroundLayer);
-        // ステージクリアフラグを初期化する。
-        this._isStageCleared = false;
-        // ステージクリア後待機フレーム数を初期化する。
-        this._stageClearWait = 0;
+        this._stageStatus.remove();
+        // ステージ情報を作成する。
+        this._stageStatus = new __WEBPACK_IMPORTED_MODULE_13__stagestatus__["a" /* default */](stageNumber, this._backgroundLayer);
         // ボスHPゲージを非表示にする。
         this._bossLifeGauge.sprite.alpha = 0;
     }
@@ -6661,6 +6648,96 @@ class ShieldButton {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage__ = __webpack_require__(18);
+
+// ステージクリア後の待機フレーム数
+const STAGE_CLEAR_WAIT = 540;
+/**
+ * ステージの状態を管理する。
+ */
+class StageStatus {
+    /**
+     * コンストラクタ。
+     * @param stage ステージ番号
+     * @param backgroundLayer 背景レイヤー
+     */
+    constructor(stage, backgroundLayer) {
+        // ステージ番号を変更する。
+        this._stageNumber = stage;
+        // 初期ステージを読み込む。
+        this._stage = new __WEBPACK_IMPORTED_MODULE_0__stage__["a" /* default */]('stage' + this._stageNumber, backgroundLayer);
+        // ステージクリアフラグを初期化する。
+        this._isStageCleared = false;
+        // ステージクリア後待機フレーム数を初期化する。
+        this._stageClearWait = 0;
+    }
+    /** ステージ番号 */
+    get stageNumber() {
+        return this._stageNumber;
+    }
+    /** 障害物マップ */
+    get blockMap() {
+        return this._stage.blockMap;
+    }
+    /** ステージが左方向に何ドット移動しているか */
+    get position() {
+        return -this._stage.x;
+    }
+    /** ステージのスクロールスピード */
+    get scrollSpeed() {
+        return this._stage.speed;
+    }
+    /** ステージクリアしているかどうか */
+    get isStageCleared() {
+        return this._isStageCleared;
+    }
+    /** ステージクリア後待機時間が経過しているかどうか */
+    get isOverStageClearWait() {
+        if (this._stageClearWait > STAGE_CLEAR_WAIT) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /**
+     * ステージを画面から取り除く。
+     */
+    remove() {
+        this._stage.remove();
+        return this;
+    }
+    /**
+     * ステージ状態を更新する。
+     * @param scene シーン
+     */
+    update(scene) {
+        // ステージの更新する。
+        this._stage.update(scene);
+        // ステージクリア中は待機時間をカウントする。
+        if (this._isStageCleared) {
+            this._stageClearWait++;
+        }
+        return this;
+    }
+    /**
+     * ステージクリア処理。
+     * ステージクリアフラグを立て、待機時間を初期化する。
+     */
+    stageClear() {
+        this._isStageCleared = true;
+        this._stageClearWait = 0;
+        return this;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (StageStatus);
+
+
+/***/ }),
+/* 41 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 var StringResource = {
     en: {
         "HowToPlay_touch_1": "Sliding finger across the screen moves your character.",
@@ -6795,7 +6872,7 @@ var StringResource = {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

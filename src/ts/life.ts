@@ -77,6 +77,11 @@ class Life {
         return this._base;
     }
 
+    /** 残機 */
+    public get life(): number {
+        return this._life;
+    }
+
     /**
      * 残機。ラベルの文字列も連動して変化する。
      */

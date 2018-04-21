@@ -52,6 +52,10 @@ class Life {
     get sprite() {
         return this._base;
     }
+    /** 残機 */
+    get life() {
+        return this._life;
+    }
     /**
      * 残機。ラベルの文字列も連動して変化する。
      */
