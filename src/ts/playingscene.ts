@@ -291,7 +291,12 @@ class PlayingScene implements Scene {
         });
 
         // 初期ステージを読み込む。
-        this._setStage(INITIAL_STAGE);
+        if (localStorage.initialStage) {
+            this._setStage(parseInt(localStorage.initialStage, 10));
+        }
+        else {
+            this._setStage(INITIAL_STAGE);
+        }
 
         // 初期状態はプレイ中とする。
         this._changeState(SCENE_STATE.PLAYING);
