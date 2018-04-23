@@ -9,7 +9,7 @@ const DIRECTIONS: Direction[] = ['left', 'right', 'up', 'down'];
 class DPad {
 
     /** カーソルキー入力時のコールバック関数 */
-    private _onKeyDown: (direction: Direction) => void;
+    private _onKeyDown: ((direction: Direction) => void) | null;
     /** 前回入力があったかどうか */
     private _prevInput: {[direction: string]: boolean};
     
@@ -23,6 +23,9 @@ class DPad {
         for (let direction of DIRECTIONS) {
             this._prevInput[direction] = false;
         }
+
+        // コールバック関数を初期化する。
+        this._onKeyDown = null;
     }
 
     /**

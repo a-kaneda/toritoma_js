@@ -15,6 +15,8 @@ class DPad {
         for (let direction of DIRECTIONS) {
             this._prevInput[direction] = false;
         }
+        // コールバック関数を初期化する。
+        this._onKeyDown = null;
     }
     /**
      * カーソルキー入力時のコールバック関数を設定する。
