@@ -3221,24 +3221,25 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
         }
         // 左右の段差が移動可能な段差を超えている場合
         if (Math.abs(leftBlockPos - rightBlockPos) > MOVABLE_STEP) {
-            // 進行方向と反対の障害物に合わせる。
-            if (this._state === STATE.LEFT_MOVE) {
+            // 左右それぞれの移動後の位置を計算する。
+            let moveLeftPosY = 0;
+            let moveRightPosY = 0;
+            if (this._isUpsideDown) {
+                moveRightPosY = rightBlock.y + rightBlock.width / 2 + this._hitArea.height / 2;
+                moveLeftPosY = leftBlock.y + leftBlock.width / 2 + this._hitArea.height / 2;
+            }
+            else {
+                moveRightPosY = rightBlock.y - rightBlock.width / 2 - this._hitArea.height / 2;
+                moveLeftPosY = leftBlock.y - leftBlock.width / 2 - this._hitArea.height / 2;
+            }
+            // 現在の位置からy方向に近いほうに合わせる。
+            if (Math.abs(this._hitArea.y - moveRightPosY) < Math.abs(this._hitArea.y - moveLeftPosY)) {
                 this._hitArea.x = rightBlock.x - rightBlock.width / 2 + this._hitArea.width / 2;
-                if (this._isUpsideDown) {
-                    this._hitArea.y = rightBlock.y + rightBlock.width / 2 + this._hitArea.height / 2;
-                }
-                else {
-                    this._hitArea.y = rightBlock.y - rightBlock.width / 2 - this._hitArea.height / 2;
-                }
+                this._hitArea.y = moveRightPosY;
             }
             else {
                 this._hitArea.x = leftBlock.x - leftBlock.width / 2 + this._hitArea.width / 2;
-                if (this._isUpsideDown) {
-                    this._hitArea.y = leftBlock.y + leftBlock.width / 2 + this._hitArea.height / 2;
-                }
-                else {
-                    this._hitArea.y = leftBlock.y - leftBlock.width / 2 - this._hitArea.height / 2;
-                }
+                this._hitArea.y = moveLeftPosY;
             }
         }
         else {
