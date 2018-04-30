@@ -218,10 +218,7 @@ class Player implements CharacterIF {
 
                 // シールド使用時はチキンゲージを消費する。
                 if (this._shield) {
-                    this._chickenGauge -= CONSUMPTION_GAUGE;
-                    if (this._chickenGauge < 0) {
-                        this._chickenGauge = 0;
-                    }
+                    this.addChickenGauge(-CONSUMPTION_GAUGE);
                 }
             }
 
@@ -350,6 +347,28 @@ class Player implements CharacterIF {
             .set({ alpha: 1 })
             .setLoop(true)
             .play();
+    }
+
+    /**
+     * チキンゲージを増加する。
+     * @param increase 増加量（マイナスの場合、減少）
+     * @return 自インスタンス
+     */
+    public addChickenGauge(increase: number): this {
+        
+        this._chickenGauge += increase;
+        
+        // 下限値を下回った場合は下限値にする。
+        if (this._chickenGauge < 0) {
+            this._chickenGauge = 0;
+        }
+
+        // 上限値を超えた場合は上限値にする。
+        if (this._chickenGauge > 1) {
+            this._chickenGauge = 1;
+        }
+
+        return this;
     }
 
     /**
@@ -486,12 +505,7 @@ class Player implements CharacterIF {
             if (Character.isEnemyShot(character)) {
                 
                 // チキンゲージを増加させる。
-                this._chickenGauge += character.graze();
-
-                // 上限値を超えた場合は上限値に補正する。
-                if (this._chickenGauge > 1) {
-                    this._chickenGauge = 1;
-                }
+                this.addChickenGauge(character.graze());
             }
         }
     }

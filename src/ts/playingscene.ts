@@ -403,6 +403,14 @@ class PlayingScene implements Scene {
     }
 
     /**
+     * 
+     * @param increase 
+     */
+    public addChickenGauge(increase: number): void {
+        this._player.addChickenGauge(increase);
+    }
+
+    /**
      * ブロックマップを取得する。
      * @return ブロックマップ
      */

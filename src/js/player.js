@@ -153,10 +153,7 @@ class Player {
                 this._checkGraze(scene);
                 // シールド使用時はチキンゲージを消費する。
                 if (this._shield) {
-                    this._chickenGauge -= CONSUMPTION_GAUGE;
-                    if (this._chickenGauge < 0) {
-                        this._chickenGauge = 0;
-                    }
+                    this.addChickenGauge(-CONSUMPTION_GAUGE);
                 }
             }
             // 通常状態の場合
@@ -255,6 +252,23 @@ class Player {
             .set({ alpha: 1 })
             .setLoop(true)
             .play();
+    }
+    /**
+     * チキンゲージを増加する。
+     * @param increase 増加量（マイナスの場合、減少）
+     * @return 自インスタンス
+     */
+    addChickenGauge(increase) {
+        this._chickenGauge += increase;
+        // 下限値を下回った場合は下限値にする。
+        if (this._chickenGauge < 0) {
+            this._chickenGauge = 0;
+        }
+        // 上限値を超えた場合は上限値にする。
+        if (this._chickenGauge > 1) {
+            this._chickenGauge = 1;
+        }
+        return this;
     }
     /**
      * 座標を変更し、各種当たり判定処理を行う。
@@ -359,11 +373,7 @@ class Player {
         for (let character of hitCharacters) {
             if (Character.isEnemyShot(character)) {
                 // チキンゲージを増加させる。
-                this._chickenGauge += character.graze();
-                // 上限値を超えた場合は上限値に補正する。
-                if (this._chickenGauge > 1) {
-                    this._chickenGauge = 1;
-                }
+                this.addChickenGauge(character.graze());
             }
         }
     }

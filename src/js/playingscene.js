@@ -273,6 +273,13 @@ class PlayingScene {
         this._score += score;
     }
     /**
+     *
+     * @param increase
+     */
+    addChickenGauge(increase) {
+        this._player.addChickenGauge(increase);
+    }
+    /**
      * ブロックマップを取得する。
      * @return ブロックマップ
      */

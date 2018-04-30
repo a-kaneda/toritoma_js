@@ -496,6 +496,8 @@ class MyColor {
 
 
 
+// 敵撃破時のチキンゲージ増加量
+const INCREMENT_CHICKEN_GAUGE = 0.005;
 /**
  * 敵キャラクター。
  */
@@ -620,6 +622,8 @@ class Enemy {
         scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__explosion__["a" /* default */](this._hitArea.x, this._hitArea.y, scene));
         // スコアを加算する。
         scene.addScore(this._score);
+        // チキンゲージを増加させる。
+        scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
         // 自分自身を削除する。
         scene.removeCharacter(this);
         this._sprite.remove();
@@ -648,6 +652,8 @@ class Enemy {
         if (this._deathInterval > STATE_INTERVAL) {
             // スコアを加算する。
             scene.addScore(this._score);
+            // チキンゲージを増加させる。
+            scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
             // ステージクリア処理を行う。
             scene.stageClear();
             // 自分自身を削除する。
@@ -4840,10 +4846,7 @@ class Player {
                 this._checkGraze(scene);
                 // シールド使用時はチキンゲージを消費する。
                 if (this._shield) {
-                    this._chickenGauge -= CONSUMPTION_GAUGE;
-                    if (this._chickenGauge < 0) {
-                        this._chickenGauge = 0;
-                    }
+                    this.addChickenGauge(-CONSUMPTION_GAUGE);
                 }
             }
             // 通常状態の場合
@@ -4942,6 +4945,23 @@ class Player {
             .set({ alpha: 1 })
             .setLoop(true)
             .play();
+    }
+    /**
+     * チキンゲージを増加する。
+     * @param increase 増加量（マイナスの場合、減少）
+     * @return 自インスタンス
+     */
+    addChickenGauge(increase) {
+        this._chickenGauge += increase;
+        // 下限値を下回った場合は下限値にする。
+        if (this._chickenGauge < 0) {
+            this._chickenGauge = 0;
+        }
+        // 上限値を超えた場合は上限値にする。
+        if (this._chickenGauge > 1) {
+            this._chickenGauge = 1;
+        }
+        return this;
     }
     /**
      * 座標を変更し、各種当たり判定処理を行う。
@@ -5046,11 +5066,7 @@ class Player {
         for (let character of hitCharacters) {
             if (__WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].isEnemyShot(character)) {
                 // チキンゲージを増加させる。
-                this._chickenGauge += character.graze();
-                // 上限値を超えた場合は上限値に補正する。
-                if (this._chickenGauge > 1) {
-                    this._chickenGauge = 1;
-                }
+                this.addChickenGauge(character.graze());
             }
         }
     }
@@ -5678,6 +5694,13 @@ class PlayingScene {
      */
     addScore(score) {
         this._score += score;
+    }
+    /**
+     *
+     * @param increase
+     */
+    addChickenGauge(increase) {
+        this._player.addChickenGauge(increase);
     }
     /**
      * ブロックマップを取得する。

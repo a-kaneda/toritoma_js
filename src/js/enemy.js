@@ -4,6 +4,8 @@ import Character from './character';
 import Explosion from './explosion';
 import ScreenSize from './screensize';
 import { DeathEffect } from './character';
+// 敵撃破時のチキンゲージ増加量
+const INCREMENT_CHICKEN_GAUGE = 0.005;
 /**
  * 敵キャラクター。
  */
@@ -128,6 +130,8 @@ class Enemy {
         scene.addCharacter(new Explosion(this._hitArea.x, this._hitArea.y, scene));
         // スコアを加算する。
         scene.addScore(this._score);
+        // チキンゲージを増加させる。
+        scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
         // 自分自身を削除する。
         scene.removeCharacter(this);
         this._sprite.remove();
@@ -156,6 +160,8 @@ class Enemy {
         if (this._deathInterval > STATE_INTERVAL) {
             // スコアを加算する。
             scene.addScore(this._score);
+            // チキンゲージを増加させる。
+            scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
             // ステージクリア処理を行う。
             scene.stageClear();
             // 自分自身を削除する。

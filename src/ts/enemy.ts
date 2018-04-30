@@ -9,6 +9,9 @@ import Rect from './rect'
 import ScreenSize from './screensize'
 import {DeathEffect} from './character'
 
+// 敵撃破時のチキンゲージ増加量
+const INCREMENT_CHICKEN_GAUGE = 0.005;
+
 /**
  * 敵キャラクター。
  */
@@ -185,6 +188,9 @@ abstract class Enemy implements CharacterIF {
         // スコアを加算する。
         scene.addScore(this._score);
 
+        // チキンゲージを増加させる。
+        scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
+
         // 自分自身を削除する。
         scene.removeCharacter(this);
         this._sprite.remove();
@@ -222,6 +228,9 @@ abstract class Enemy implements CharacterIF {
             // スコアを加算する。
             scene.addScore(this._score);
 
+            // チキンゲージを増加させる。
+            scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
+            
             // ステージクリア処理を行う。
             scene.stageClear();
 
