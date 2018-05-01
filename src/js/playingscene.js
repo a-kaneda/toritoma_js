@@ -45,7 +45,7 @@ const GAMEOVER_LABEL_POS_Y = Math.round(ScreenSize.STAGE_RECT.height * ScreenSiz
 // 初期ステージ番号
 const INITIAL_STAGE = 1;
 // ステージ数
-const STAGE_COUNT = 2;
+const STAGE_COUNT = 3;
 // ステージクリア後の待機フレーム数
 const STAGE_CLEAR_WAIT = 540;
 // ステージクリアラベルの配置位置y座標
