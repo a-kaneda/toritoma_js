@@ -934,8 +934,8 @@
                  "type":"bgm",
                  "visible":true,
                  "width":16,
-                 "x":1536,
-                 "y":16
+                 "x":1472,
+                 "y":0
                 }],
          "opacity":1,
          "type":"objectgroup",

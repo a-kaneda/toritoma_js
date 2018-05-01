@@ -131,8 +131,8 @@
                  "type":"bgm",
                  "visible":true,
                  "width":16,
-                 "x":1536,
-                 "y":16
+                 "x":1456,
+                 "y":0
                 }, 
                 {
                  "height":16,
