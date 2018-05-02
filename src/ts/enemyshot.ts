@@ -226,6 +226,11 @@ class EnemyShot implements CharacterIF {
         this._hitArea.x += this._speedX;
         this._hitArea.y += this._speedY;
 
+        // スクロールに合わせて移動する場合
+        if (this._isScroll) {
+            this._hitArea.x -= scene.scrollSpeed;
+        }
+
         // 座標をスプライトに適用する。
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
 

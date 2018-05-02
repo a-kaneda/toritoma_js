@@ -65,6 +65,16 @@ const enemy = {
         score: 200,
         death: DeathEffect.NORMAL,
     },
+    // ミノムシ
+    bagworm: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 30,
+        defense: 0,
+        score: 300,
+        death: DeathEffect.NORMAL,
+    },
     // カブトムシ
     rhinocerosbeetle: {
         size: 64,

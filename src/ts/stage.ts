@@ -7,6 +7,7 @@ import Dragonfly from './dragonfly'
 import Ant from './ant'
 import Butterfly from './butterfly'
 import Ladybug from './ladybug'
+import Bagworm from './bagworm'
 import RhinocerosBeetle from './rhinocerosbeetle'
 import Mantis from './mantis'
 
@@ -234,6 +235,9 @@ class Stage {
                 break;
             case 'ladybug':
                 scene.addCharacter(new Ladybug(x, y, scene));
+                break;
+            case 'bagworm':
+                scene.addCharacter(new Bagworm(x, y, scene));
                 break;
             case 'rhinocerosbeetle':
                 scene.addCharacter(new RhinocerosBeetle(x, y, scene));

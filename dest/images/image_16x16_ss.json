@@ -3,7 +3,7 @@
         "width": 16,
         "height": 16,
         "cols": 8,
-        "rows": 3
+        "rows": 4
     },
     "animations": {
         "player_normal": {
@@ -50,6 +50,11 @@
             "frames": [22, 23],
             "next": "ladybug",
             "frequency": 6
+        },
+        "bagworm": {
+            "frames": [24],
+            "next": "bagworm",
+            "frequency": 12
         }
     }
 }
