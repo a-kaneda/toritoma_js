@@ -75,6 +75,16 @@ const enemy = {
         score: 300,
         death: DeathEffect.NORMAL,
     },
+    // セミ
+    cicada: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 20,
+        defense: 0,
+        score: 200,
+        death: DeathEffect.NORMAL,
+    },
     // カブトムシ
     rhinocerosbeetle: {
         size: 64,

@@ -55,6 +55,16 @@
             "frames": [24],
             "next": "bagworm",
             "frequency": 12
+        },
+        "cicada": {
+            "frames": [25],
+            "next": "cicada",
+            "frequency": 12
+        },
+        "cicada_fly": {
+            "frames": [26, 27],
+            "next": "cicada_fly",
+            "frequency": 6
         }
     }
 }
