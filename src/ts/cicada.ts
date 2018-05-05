@@ -27,7 +27,7 @@ class Cicada extends Enemy {
 
     /** 弾発射間隔。 */
     private _shotInterval: number;
-    /** 状態。左移動、弾発射、右移動と遷移する。 */
+    /** 状態 */
     private _state: number;
     /** 次の状態に遷移するまでの間隔。 */
     private _stateChangeInterval: number;

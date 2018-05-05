@@ -1,6 +1,7 @@
 import Util from './util.js';
 import EnemyShot from './enemyshot.js';
 import Enemy from './enemy.js';
+import WalkingCharacter from './walkingcharacter';
 // 弾のスピード
 const SHOT_SPEED = 0.5;
 // 移動スピード
@@ -45,7 +46,8 @@ class Ant extends Enemy {
         // 状態変化間隔を初期化する。
         this._stateChangeInterval = 0;
         // 上下の障害物との距離から逆さまかどうかを判定する。
-        this._isUpsideDown = this._checkUpsideDown(scene);
+        const walkingCharacter = new WalkingCharacter();
+        this._isUpsideDown = walkingCharacter.checkUpsideDown(this._hitArea, scene);
         // 逆さまな場合は画像の上下を反転する。
         if (this._isUpsideDown) {
             this._sprite.scaleY = -1;
@@ -131,82 +133,11 @@ class Ant extends Enemy {
                 break;
         }
         // 障害物との衝突判定を行う。
-        this._checkBlockHit(scene);
-    }
-    /**
-     * 逆さま判定。上下の障害物の距離を調べ、上の障害物の方が近い場合は上下反転しているものとする。
-     * @param scene シーン
-     * @return 逆さまかどうか
-     */
-    _checkUpsideDown(scene) {
-        // 上方向の障害物を検索する。
-        const upsideBlock = this._hitArea.getBlockY(true, this._hitArea.x, scene.getStagePosition(), scene.getBlockMap());
-        // 下方向の障害物を検索する。
-        const downsideBlock = this._hitArea.getBlockY(false, this._hitArea.x, scene.getStagePosition(), scene.getBlockMap());
-        // 上方向の障害物の方が近い場合は逆さまと判断する。
-        if (this._hitArea.y - (upsideBlock.y + upsideBlock.height / 2) < (downsideBlock.y - downsideBlock.height / 2) - this._hitArea.y) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    /**
-     * 障害物との衝突を処理する。
-     * 通常は自分の足元の一番上の障害物の位置にy座標を合わせ、逆さまの場合は一番下の障害物に合わせる。
-     * ブロック半分までの段差は超えられるものとし、それ以上の段差がある場合は手前の障害物の上で停止する。
-     * @param scene シーン
-     */
-    _checkBlockHit(scene) {
-        // 移動可能な段差
-        const MOVABLE_STEP = 8;
-        // 左側の足元の障害物を検索する。
-        const leftBlock = this._hitArea.getBlockY(this._isUpsideDown, this._hitArea.x - this._hitArea.width / 2, scene.getStagePosition(), scene.getBlockMap());
-        // 右側の足元の障害物を検索する。
-        const rightBlock = this._hitArea.getBlockY(this._isUpsideDown, this._hitArea.x + this._hitArea.width / 2, scene.getStagePosition(), scene.getBlockMap());
-        // 逆さまの場合は障害物の上端の値を使用し、通常の場合は下端の値を使用する。
-        let leftBlockPos = 0;
-        let rightBlockPos = 0;
-        if (this._isUpsideDown) {
-            leftBlockPos = leftBlock.y + leftBlock.height / 2;
-            rightBlockPos = rightBlock.y + rightBlock.height / 2;
-        }
-        else {
-            leftBlockPos = leftBlock.y - leftBlock.height / 2;
-            rightBlockPos = rightBlock.y - rightBlock.height / 2;
-        }
-        // 左右の段差が移動可能な段差を超えている場合
-        if (Math.abs(leftBlockPos - rightBlockPos) > MOVABLE_STEP) {
-            // 左右それぞれの移動後の位置を計算する。
-            let moveLeftPosY = 0;
-            let moveRightPosY = 0;
-            if (this._isUpsideDown) {
-                moveRightPosY = rightBlock.y + rightBlock.width / 2 + this._hitArea.height / 2;
-                moveLeftPosY = leftBlock.y + leftBlock.width / 2 + this._hitArea.height / 2;
-            }
-            else {
-                moveRightPosY = rightBlock.y - rightBlock.width / 2 - this._hitArea.height / 2;
-                moveLeftPosY = leftBlock.y - leftBlock.width / 2 - this._hitArea.height / 2;
-            }
-            // 現在の位置からy方向に近いほうに合わせる。
-            if (Math.abs(this._hitArea.y - moveRightPosY) < Math.abs(this._hitArea.y - moveLeftPosY)) {
-                this._hitArea.x = rightBlock.x - rightBlock.width / 2 + this._hitArea.width / 2;
-                this._hitArea.y = moveRightPosY;
-            }
-            else {
-                this._hitArea.x = leftBlock.x - leftBlock.width / 2 + this._hitArea.width / 2;
-                this._hitArea.y = moveLeftPosY;
-            }
-        }
-        else {
-            // 逆さまの場合は下の方に合わせる。
-            if (this._isUpsideDown) {
-                this._hitArea.y = Math.max(leftBlockPos, rightBlockPos) + this._hitArea.height / 2;
-            }
-            else {
-                this._hitArea.y = Math.min(leftBlockPos, rightBlockPos) - this._hitArea.height / 2;
-            }
-        }
+        const walkingCharacter = new WalkingCharacter();
+        walkingCharacter.checkBlockHit(this._hitArea, this._isUpsideDown, scene);
+        // 移動後の位置にキャラクターを移動する。
+        this._hitArea.x = walkingCharacter.movePosition.x;
+        this._hitArea.y = walkingCharacter.movePosition.y;
     }
 }
 export default Ant;

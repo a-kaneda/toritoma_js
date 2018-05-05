@@ -177,6 +177,31 @@ class Collider {
         }
     }
     /**
+     * 衝突しているブロックがないかを検索し、衝突している場合は自分の位置を移動する。
+     * @param prevX 移動前x座標
+     * @param prevY 移動前y座標
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     */
+    collideBlock(prevX, prevY, stagePosition, blockMap) {
+        // 衝突しているブロックがないか調べる。
+        let block = this.checkCollidedBlock(this, stagePosition, blockMap);
+        // 衝突しているブロックがある場合は移動する。
+        while (block != null) {
+            // 移動位置を計算する。
+            const newPosition = this.moveByBlock(this, prevX, prevY, block, stagePosition, blockMap);
+            // 移動できない場合はループを抜ける。
+            if (this.x === newPosition.x && this.y === newPosition.y) {
+                break;
+            }
+            // 移動後の座標を反映する。
+            this.x = newPosition.x;
+            this.y = newPosition.y;
+            // 移動後に再度衝突していないかチェックする。
+            block = this.checkCollidedBlock(this, stagePosition, blockMap);
+        }
+    }
+    /**
      * 衝突しているブロックを調べる。
      * キャラクターの周囲にあるマップを探し、衝突しているブロックがあれば
      * そのブロックの座標とサイズを返す。衝突していなければnullを返す。

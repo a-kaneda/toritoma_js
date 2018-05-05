@@ -1,4 +1,3 @@
-/** @module collider */
 import Util from './util.js'
 import Stage from './stage.js'
 import ScreenSize from './screensize.js'
@@ -228,6 +227,42 @@ class Collider implements Rect {
         }
         else {
             return false;
+        }
+    }
+
+    /**
+     * 衝突しているブロックがないかを検索し、衝突している場合は自分の位置を移動する。
+     * @param prevX 移動前x座標
+     * @param prevY 移動前y座標
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     */
+    public collideBlock(
+        prevX: number, 
+        prevY: number, 
+        stagePosition: number,
+        blockMap: TileMapObject[][]): void {
+
+        // 衝突しているブロックがないか調べる。
+        let block = this.checkCollidedBlock(this, stagePosition, blockMap);
+
+        // 衝突しているブロックがある場合は移動する。
+        while (block != null) {
+
+            // 移動位置を計算する。
+            const newPosition = this.moveByBlock(this, prevX, prevY, block, stagePosition, blockMap);
+
+            // 移動できない場合はループを抜ける。
+            if (this.x === newPosition.x && this.y === newPosition.y) {
+                break;
+            }
+            
+            // 移動後の座標を反映する。
+            this.x = newPosition.x;
+            this.y = newPosition.y;
+
+            // 移動後に再度衝突していないかチェックする。
+            block = this.checkCollidedBlock(this, stagePosition, blockMap);
         }
     }
 

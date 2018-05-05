@@ -85,6 +85,16 @@ const enemy = {
         score: 200,
         death: DeathEffect.NORMAL,
     },
+    // バッタ
+    grasshopper: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 9,
+        defense: 0,
+        score: 200,
+        death: DeathEffect.NORMAL,
+    },
     // カブトムシ
     rhinocerosbeetle: {
         size: 64,

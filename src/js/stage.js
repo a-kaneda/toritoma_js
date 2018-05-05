@@ -7,6 +7,7 @@ import Butterfly from './butterfly';
 import Ladybug from './ladybug';
 import Bagworm from './bagworm';
 import Cicada from './cicada';
+import Grasshopper from './grasshopper';
 import RhinocerosBeetle from './rhinocerosbeetle';
 import Mantis from './mantis';
 // タイルのサイズ
@@ -185,6 +186,9 @@ class Stage {
                 break;
             case 'cicada':
                 scene.addCharacter(new Cicada(x, y, scene));
+                break;
+            case 'grasshopper':
+                scene.addCharacter(new Grasshopper(x, y, scene));
                 break;
             case 'rhinocerosbeetle':
                 scene.addCharacter(new RhinocerosBeetle(x, y, scene));

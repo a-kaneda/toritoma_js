@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 33);
+/******/ 	return __webpack_require__(__webpack_require__.s = 35);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -396,6 +396,16 @@ const enemy = {
         score: 200,
         death: DeathEffect.NORMAL,
     },
+    // バッタ
+    grasshopper: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 9,
+        defense: 0,
+        score: 200,
+        death: DeathEffect.NORMAL,
+    },
     // カブトムシ
     rhinocerosbeetle: {
         size: 64,
@@ -470,7 +480,7 @@ class Character {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 /** @module enemy */
 
@@ -1195,6 +1205,31 @@ class Collider {
         }
     }
     /**
+     * 衝突しているブロックがないかを検索し、衝突している場合は自分の位置を移動する。
+     * @param prevX 移動前x座標
+     * @param prevY 移動前y座標
+     * @param stagePosition ステージ位置
+     * @param blockMap ブロックマップ
+     */
+    collideBlock(prevX, prevY, stagePosition, blockMap) {
+        // 衝突しているブロックがないか調べる。
+        let block = this.checkCollidedBlock(this, stagePosition, blockMap);
+        // 衝突しているブロックがある場合は移動する。
+        while (block != null) {
+            // 移動位置を計算する。
+            const newPosition = this.moveByBlock(this, prevX, prevY, block, stagePosition, blockMap);
+            // 移動できない場合はループを抜ける。
+            if (this.x === newPosition.x && this.y === newPosition.y) {
+                break;
+            }
+            // 移動後の座標を反映する。
+            this.x = newPosition.x;
+            this.y = newPosition.y;
+            // 移動後に再度衝突していないかチェックする。
+            block = this.checkCollidedBlock(this, stagePosition, blockMap);
+        }
+    }
+    /**
      * 衝突しているブロックを調べる。
      * キャラクターの周囲にあるマップを探し、衝突しているブロックがあれば
      * そのブロックの座標とサイズを返す。衝突していなければnullを返す。
@@ -1537,9 +1572,9 @@ class Collider {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cursor__ = __webpack_require__(11);
@@ -2391,7 +2426,7 @@ class ImageBUtton {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(45);
 
 /**
  * ローカライズを行うクラス。
@@ -2767,16 +2802,18 @@ class PlayerShot {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__bagworm__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__cicada__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__rhinocerosbeetle__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__mantis__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__bagworm__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__cicada__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__grasshopper__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rhinocerosbeetle__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__mantis__ = __webpack_require__(36);
 /** @module stage */
+
 
 
 
@@ -2964,11 +3001,14 @@ class Stage {
             case 'cicada':
                 scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_7__cicada__["a" /* default */](x, y, scene));
                 break;
+            case 'grasshopper':
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_8__grasshopper__["a" /* default */](x, y, scene));
+                break;
             case 'rhinocerosbeetle':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_8__rhinocerosbeetle__["a" /* default */](x, y, scene));
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_9__rhinocerosbeetle__["a" /* default */](x, y, scene));
                 break;
             case 'mantis':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_9__mantis__["a" /* default */](x, y, scene));
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_10__mantis__["a" /* default */](x, y, scene));
                 break;
             default:
                 console.log(`Error: Unknwon enemy type: ${type}`);
@@ -2981,6 +3021,111 @@ class Stage {
 
 /***/ }),
 /* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * 歩行キャラクターの共通処理。
+ */
+class WalkingCharacter {
+    /**
+     * コンストラクタ。
+     */
+    constructor() {
+        // 移動後の位置を初期化する。
+        this._movePosition = { x: 0, y: 0 };
+    }
+    /** 移動後の位置 */
+    get movePosition() {
+        return this._movePosition;
+    }
+    /**
+     * 逆さま判定。上下の障害物の距離を調べ、上の障害物の方が近い場合は上下反転しているものとする。
+     * @param character キャラクター
+     * @param scene シーン
+     * @return 逆さまかどうか
+     */
+    checkUpsideDown(character, scene) {
+        // 上方向の障害物を検索する。
+        const upsideBlock = character.getBlockY(true, character.x, scene.getStagePosition(), scene.getBlockMap());
+        // 下方向の障害物を検索する。
+        const downsideBlock = character.getBlockY(false, character.x, scene.getStagePosition(), scene.getBlockMap());
+        // 上方向の障害物の方が近い場合は逆さまと判断する。
+        if (character.y - (upsideBlock.y + upsideBlock.height / 2) < (downsideBlock.y - downsideBlock.height / 2) - character.y) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /**
+     * 障害物との衝突を処理する。
+     * 通常は自分の足元の一番上の障害物の位置にy座標を合わせ、逆さまの場合は一番下の障害物に合わせる。
+     * ブロック半分までの段差は超えられるものとし、それ以上の段差がある場合は手前の障害物の上で停止する。
+     * @param character キャラクター
+     * @param isUpsideDown 逆さまかどうか
+     * @param scene シーン
+     */
+    checkBlockHit(character, isUpsideDown, scene) {
+        // 移動可能な段差
+        const MOVABLE_STEP = 8;
+        // 移動後の位置を初期化する。
+        this._movePosition.x = character.x;
+        this._movePosition.y = character.y;
+        // 左側の足元の障害物を検索する。
+        const leftBlock = character.getBlockY(isUpsideDown, character.x - character.width / 2, scene.getStagePosition(), scene.getBlockMap());
+        // 右側の足元の障害物を検索する。
+        const rightBlock = character.getBlockY(isUpsideDown, character.x + character.width / 2, scene.getStagePosition(), scene.getBlockMap());
+        // 逆さまの場合は障害物の上端の値を使用し、通常の場合は下端の値を使用する。
+        let leftBlockPos = 0;
+        let rightBlockPos = 0;
+        if (isUpsideDown) {
+            leftBlockPos = leftBlock.y + leftBlock.height / 2;
+            rightBlockPos = rightBlock.y + rightBlock.height / 2;
+        }
+        else {
+            leftBlockPos = leftBlock.y - leftBlock.height / 2;
+            rightBlockPos = rightBlock.y - rightBlock.height / 2;
+        }
+        // 左右の段差が移動可能な段差を超えている場合
+        if (Math.abs(leftBlockPos - rightBlockPos) > MOVABLE_STEP) {
+            // 左右それぞれの移動後の位置を計算する。
+            let moveLeftPosY = 0;
+            let moveRightPosY = 0;
+            if (isUpsideDown) {
+                moveRightPosY = rightBlock.y + rightBlock.width / 2 + character.height / 2;
+                moveLeftPosY = leftBlock.y + leftBlock.width / 2 + character.height / 2;
+            }
+            else {
+                moveRightPosY = rightBlock.y - rightBlock.width / 2 - character.height / 2;
+                moveLeftPosY = leftBlock.y - leftBlock.width / 2 - character.height / 2;
+            }
+            // 現在の位置からy方向に近いほうに合わせる。
+            if (Math.abs(character.y - moveRightPosY) < Math.abs(character.y - moveLeftPosY)) {
+                this._movePosition.x = rightBlock.x - rightBlock.width / 2 + character.width / 2;
+                this._movePosition.y = moveRightPosY;
+            }
+            else {
+                this._movePosition.x = leftBlock.x - leftBlock.width / 2 + character.width / 2;
+                this._movePosition.y = moveLeftPosY;
+            }
+        }
+        else {
+            // 逆さまの場合は下の方に合わせる。
+            if (isUpsideDown) {
+                this._movePosition.y = Math.max(leftBlockPos, rightBlockPos) + character.height / 2;
+            }
+            else {
+                this._movePosition.y = Math.min(leftBlockPos, rightBlockPos) - character.height / 2;
+            }
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (WalkingCharacter);
+
+
+/***/ }),
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3075,13 +3220,15 @@ var LabelAreaExDummy = 0;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__walkingcharacter__ = __webpack_require__(19);
+
 
 
 
@@ -3129,7 +3276,8 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
         // 状態変化間隔を初期化する。
         this._stateChangeInterval = 0;
         // 上下の障害物との距離から逆さまかどうかを判定する。
-        this._isUpsideDown = this._checkUpsideDown(scene);
+        const walkingCharacter = new __WEBPACK_IMPORTED_MODULE_3__walkingcharacter__["a" /* default */]();
+        this._isUpsideDown = walkingCharacter.checkUpsideDown(this._hitArea, scene);
         // 逆さまな場合は画像の上下を反転する。
         if (this._isUpsideDown) {
             this._sprite.scaleY = -1;
@@ -3215,89 +3363,18 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
                 break;
         }
         // 障害物との衝突判定を行う。
-        this._checkBlockHit(scene);
-    }
-    /**
-     * 逆さま判定。上下の障害物の距離を調べ、上の障害物の方が近い場合は上下反転しているものとする。
-     * @param scene シーン
-     * @return 逆さまかどうか
-     */
-    _checkUpsideDown(scene) {
-        // 上方向の障害物を検索する。
-        const upsideBlock = this._hitArea.getBlockY(true, this._hitArea.x, scene.getStagePosition(), scene.getBlockMap());
-        // 下方向の障害物を検索する。
-        const downsideBlock = this._hitArea.getBlockY(false, this._hitArea.x, scene.getStagePosition(), scene.getBlockMap());
-        // 上方向の障害物の方が近い場合は逆さまと判断する。
-        if (this._hitArea.y - (upsideBlock.y + upsideBlock.height / 2) < (downsideBlock.y - downsideBlock.height / 2) - this._hitArea.y) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    /**
-     * 障害物との衝突を処理する。
-     * 通常は自分の足元の一番上の障害物の位置にy座標を合わせ、逆さまの場合は一番下の障害物に合わせる。
-     * ブロック半分までの段差は超えられるものとし、それ以上の段差がある場合は手前の障害物の上で停止する。
-     * @param scene シーン
-     */
-    _checkBlockHit(scene) {
-        // 移動可能な段差
-        const MOVABLE_STEP = 8;
-        // 左側の足元の障害物を検索する。
-        const leftBlock = this._hitArea.getBlockY(this._isUpsideDown, this._hitArea.x - this._hitArea.width / 2, scene.getStagePosition(), scene.getBlockMap());
-        // 右側の足元の障害物を検索する。
-        const rightBlock = this._hitArea.getBlockY(this._isUpsideDown, this._hitArea.x + this._hitArea.width / 2, scene.getStagePosition(), scene.getBlockMap());
-        // 逆さまの場合は障害物の上端の値を使用し、通常の場合は下端の値を使用する。
-        let leftBlockPos = 0;
-        let rightBlockPos = 0;
-        if (this._isUpsideDown) {
-            leftBlockPos = leftBlock.y + leftBlock.height / 2;
-            rightBlockPos = rightBlock.y + rightBlock.height / 2;
-        }
-        else {
-            leftBlockPos = leftBlock.y - leftBlock.height / 2;
-            rightBlockPos = rightBlock.y - rightBlock.height / 2;
-        }
-        // 左右の段差が移動可能な段差を超えている場合
-        if (Math.abs(leftBlockPos - rightBlockPos) > MOVABLE_STEP) {
-            // 左右それぞれの移動後の位置を計算する。
-            let moveLeftPosY = 0;
-            let moveRightPosY = 0;
-            if (this._isUpsideDown) {
-                moveRightPosY = rightBlock.y + rightBlock.width / 2 + this._hitArea.height / 2;
-                moveLeftPosY = leftBlock.y + leftBlock.width / 2 + this._hitArea.height / 2;
-            }
-            else {
-                moveRightPosY = rightBlock.y - rightBlock.width / 2 - this._hitArea.height / 2;
-                moveLeftPosY = leftBlock.y - leftBlock.width / 2 - this._hitArea.height / 2;
-            }
-            // 現在の位置からy方向に近いほうに合わせる。
-            if (Math.abs(this._hitArea.y - moveRightPosY) < Math.abs(this._hitArea.y - moveLeftPosY)) {
-                this._hitArea.x = rightBlock.x - rightBlock.width / 2 + this._hitArea.width / 2;
-                this._hitArea.y = moveRightPosY;
-            }
-            else {
-                this._hitArea.x = leftBlock.x - leftBlock.width / 2 + this._hitArea.width / 2;
-                this._hitArea.y = moveLeftPosY;
-            }
-        }
-        else {
-            // 逆さまの場合は下の方に合わせる。
-            if (this._isUpsideDown) {
-                this._hitArea.y = Math.max(leftBlockPos, rightBlockPos) + this._hitArea.height / 2;
-            }
-            else {
-                this._hitArea.y = Math.min(leftBlockPos, rightBlockPos) - this._hitArea.height / 2;
-            }
-        }
+        const walkingCharacter = new __WEBPACK_IMPORTED_MODULE_3__walkingcharacter__["a" /* default */]();
+        walkingCharacter.checkBlockHit(this._hitArea, this._isUpsideDown, scene);
+        // 移動後の位置にキャラクターを移動する。
+        this._hitArea.x = walkingCharacter.movePosition.x;
+        this._hitArea.y = walkingCharacter.movePosition.y;
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Ant);
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3347,7 +3424,7 @@ class Bagworm extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3402,7 +3479,7 @@ class BossLifeGauge {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3487,7 +3564,7 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3544,7 +3621,7 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3665,7 +3742,7 @@ class Cicada extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3790,7 +3867,7 @@ class CreditScene {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3845,7 +3922,7 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3922,7 +3999,154 @@ class Explosion {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__walkingcharacter__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__enemyshot_js__ = __webpack_require__(4);
+
+
+
+
+// 状態
+const STATE = {
+    WAIT: 1,
+    LEFT_MOVE: 2,
+};
+// 移動スピード
+const MOVE_SPEED = -0.5;
+// ジャンプのスピード
+const JUMP_SPEED = 2.0;
+// 重力加速度
+const GRAVITATION_ACCELERATION = 0.075;
+// 左移動間隔
+const LEFT_MOVE_INTERVAL = 60;
+// 待機間隔
+const WAIT_INTERVAL = 60;
+// 弾発射間隔
+const SHOT_INTERVAL = 30;
+// 弾のスピード
+const SHOT_SPEED = 0.75;
+/**
+ * 敵キャラクター、バッタ。
+ */
+class Grasshopper extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param scene シーン
+     */
+    constructor(x, y, scene) {
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'grasshopper', scene);
+        // 弾発射間隔を初期化する。
+        this._shotInterval = 0;
+        // 状態を初期化する。
+        this._state = STATE.WAIT;
+        // 状態変化間隔を初期化する。
+        this._stateChangeInterval = 0;
+        // 速度を初期化する。
+        this._speedX = 0;
+        this._speedY = 0;
+        this._accelerationY = 0;
+        // 上下の障害物との距離から逆さまかどうかを判定する。
+        const walkingCharacter = new __WEBPACK_IMPORTED_MODULE_1__walkingcharacter__["a" /* default */]();
+        this._isUpsideDown = walkingCharacter.checkUpsideDown(this._hitArea, scene);
+        // 逆さまな場合は画像の上下を反転する。
+        if (this._isUpsideDown) {
+            this._sprite.scaleY = -1;
+        }
+    }
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * 地面または天井を移動する。左方向へジャンプ、着地して弾発射を繰り返す。
+     * @param scene シーン
+     */
+    action(scene) {
+        // 移動前の位置を記憶しておく。
+        const prevX = this._hitArea.x;
+        const prevY = this._hitArea.y;
+        // スクロールに合わせて移動する。
+        this._hitArea.x -= scene.scrollSpeed;
+        // 左移動中の場合
+        switch (this._state) {
+            case STATE.LEFT_MOVE:// 左移動
+                // 加速度に応じて速度を変更する。
+                this._speedY += this._accelerationY;
+                // 一定時間経過したら次の状態へ進める。
+                this._stateChangeInterval++;
+                if (this._stateChangeInterval > LEFT_MOVE_INTERVAL) {
+                    // 弾発射の状態へ遷移する。
+                    this._state = STATE.WAIT;
+                    // 停止する。
+                    this._speedX = 0;
+                    // 状態変化間隔を初期化する。
+                    this._stateChangeInterval = 0;
+                }
+                break;
+            case STATE.WAIT:// 待機
+                // 待機時間が経過している場合
+                this._stateChangeInterval++;
+                if (this._stateChangeInterval > WAIT_INTERVAL) {
+                    // 左方向へのスピードを設定する。
+                    this._speedX = MOVE_SPEED;
+                    // ジャンプする方向へ加速する。
+                    if (this._isUpsideDown) {
+                        this._speedY = JUMP_SPEED;
+                    }
+                    else {
+                        this._speedY = -JUMP_SPEED;
+                    }
+                    // 重力加速度を設定する。
+                    if (this._isUpsideDown) {
+                        this._accelerationY = -GRAVITATION_ACCELERATION;
+                    }
+                    else {
+                        this._accelerationY = GRAVITATION_ACCELERATION;
+                    }
+                    // 左移動の状態へ遷移する。
+                    this._state = STATE.LEFT_MOVE;
+                    // ジャンプ時の画像に切替える。
+                    this._animation.gotoAndPlay('grasshopper_jump');
+                    // 状態変化間隔を初期化する。
+                    this._stateChangeInterval = 0;
+                }
+                break;
+            default:
+                break;
+        }
+        // 弾発射間隔経過で自機に向かって1-way弾を発射する。
+        this._shotInterval++;
+        if (this._shotInterval > SHOT_INTERVAL) {
+            // 自機へ向けて弾を発射する。
+            __WEBPACK_IMPORTED_MODULE_3__enemyshot_js__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_2__util_js__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 1, 0, SHOT_SPEED, false, scene);
+            this._shotInterval = 0;
+        }
+        // 速度に応じて移動する。
+        this._hitArea.x += this._speedX;
+        this._hitArea.y += this._speedY;
+        // 衝突しているブロックがある場合は移動する。
+        this._hitArea.collideBlock(prevX, prevY, scene.getStagePosition(), scene.getBlockMap());
+        // 落ちていく方向に移動しようとして、座標が変わっていない場合は障害物に着地したものとして停止する。
+        if ((!this._isUpsideDown && this._speedY > 0 && this._hitArea.y <= prevY) ||
+            (this._isUpsideDown && this._speedY < 0 && this._hitArea.y >= prevY)) {
+            this._speedX = 0;
+            this._speedY = 0;
+            this._accelerationY = 0;
+            // 着地時の画像に切替える。
+            this._animation.gotoAndPlay('grasshopper');
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Grasshopper);
+
+
+/***/ }),
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4064,13 +4288,13 @@ class HowToPlayPage {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(31);
 
 
 
@@ -4121,7 +4345,7 @@ class HowToPlayScene {
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4177,7 +4401,7 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4262,7 +4486,7 @@ class Life {
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4271,7 +4495,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(20);
 
 
 
@@ -4447,7 +4671,7 @@ phina.main(function () {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4699,7 +4923,7 @@ class Mantis extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4886,7 +5110,7 @@ class MenuLayer {
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4894,8 +5118,8 @@ class MenuLayer {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(40);
 
 
 
@@ -5184,22 +5408,8 @@ class Player {
             this._hitArea.x = x;
             this._hitArea.y = y;
         }
-        // 衝突しているブロックがないか調べる。
-        let block = this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap());
         // 衝突しているブロックがある場合は移動する。
-        while (block != null) {
-            // 移動位置を計算する。
-            const newPosition = this._hitArea.moveByBlock(this._hitArea, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
-            // 移動できない場合はループを抜ける。
-            if (this._hitArea.x == newPosition.x && this._hitArea.y == newPosition.y) {
-                break;
-            }
-            // 移動後の座標を反映する。
-            this._hitArea.x = newPosition.x;
-            this._hitArea.y = newPosition.y;
-            // 移動後に再度衝突していないかチェックする。
-            block = this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap());
-        }
+        this._hitArea.collideBlock(prevX, prevY, scene.getStagePosition(), scene.getBlockMap());
         // 画面外に出ていないかチェックする。
         this._checkScreenArea();
         // オプションがある場合はオプションを移動前の座標へ移動する。
@@ -5307,7 +5517,7 @@ class Player {
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5388,7 +5598,7 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5608,7 +5818,7 @@ class PlayerOption {
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5617,15 +5827,15 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__player__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__life__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chickengauge__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__player__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__life__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chickengauge__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(43);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__imagebutton__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(44);
 
 
 
@@ -6541,7 +6751,7 @@ class PlayingScene {
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6783,7 +6993,7 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6875,7 +7085,7 @@ class ShieldButton {
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6965,7 +7175,7 @@ class StageStatus {
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7103,7 +7313,7 @@ var StringResource = {
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

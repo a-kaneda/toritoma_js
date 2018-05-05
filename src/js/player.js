@@ -286,22 +286,8 @@ class Player {
             this._hitArea.x = x;
             this._hitArea.y = y;
         }
-        // 衝突しているブロックがないか調べる。
-        let block = this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap());
         // 衝突しているブロックがある場合は移動する。
-        while (block != null) {
-            // 移動位置を計算する。
-            const newPosition = this._hitArea.moveByBlock(this._hitArea, prevX, prevY, block, scene.getStagePosition(), scene.getBlockMap());
-            // 移動できない場合はループを抜ける。
-            if (this._hitArea.x == newPosition.x && this._hitArea.y == newPosition.y) {
-                break;
-            }
-            // 移動後の座標を反映する。
-            this._hitArea.x = newPosition.x;
-            this._hitArea.y = newPosition.y;
-            // 移動後に再度衝突していないかチェックする。
-            block = this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap());
-        }
+        this._hitArea.collideBlock(prevX, prevY, scene.getStagePosition(), scene.getBlockMap());
         // 画面外に出ていないかチェックする。
         this._checkScreenArea();
         // オプションがある場合はオプションを移動前の座標へ移動する。

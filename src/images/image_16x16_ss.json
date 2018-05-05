@@ -65,6 +65,16 @@
             "frames": [26, 27],
             "next": "cicada_fly",
             "frequency": 6
+        },
+        "grasshopper": {
+            "frames": [28],
+            "next": "grasshopper",
+            "frequency": 12
+        },
+        "grasshopper_jump": {
+            "frames": [29],
+            "next": "grasshopper_jump",
+            "frequency": 12
         }
     }
 }
