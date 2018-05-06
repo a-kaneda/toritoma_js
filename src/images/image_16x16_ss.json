@@ -75,6 +75,11 @@
             "frames": [29],
             "next": "grasshopper_jump",
             "frequency": 12
+        },
+        "hornet": {
+            "frames": [30, 31],
+            "next": "hornet",
+            "frequency": 6
         }
     }
 }

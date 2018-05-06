@@ -2,6 +2,14 @@ import Util from './util.js';
 import EnemyShot from './enemyshot.js';
 import Enemy from './enemy.js';
 import WalkingCharacter from './walkingcharacter';
+// 状態
+var STATE;
+(function (STATE) {
+    STATE[STATE["LEFT_MOVE"] = 0] = "LEFT_MOVE";
+    STATE[STATE["RIGHT_MOVE"] = 1] = "RIGHT_MOVE";
+    STATE[STATE["FIRE"] = 2] = "FIRE";
+})(STATE || (STATE = {}));
+;
 // 弾のスピード
 const SHOT_SPEED = 0.5;
 // 移動スピード
@@ -12,12 +20,6 @@ const MOVE_FRAME = 120;
 const SHOT_INTERVAL = 30;
 // 弾発射時間
 const SHOT_FRAME = 120;
-// 状態
-const STATE = {
-    LEFT_MOVE: 1,
-    RIGHT_MOVE: 2,
-    FIRE: 3,
-};
 /**
  * 敵キャラクター、アリ。
  * 天井または地面に張り付いて歩く。
@@ -71,7 +73,7 @@ class Ant extends Enemy {
     action(scene) {
         // スクロールに合わせて移動する。
         this._hitArea.x -= scene.scrollSpeed;
-        // 状態によって処理を分岐する
+        // 状態によって処理を分岐する。
         switch (this._state) {
             case STATE.LEFT_MOVE:// 左移動
                 // 左へ移動する。
