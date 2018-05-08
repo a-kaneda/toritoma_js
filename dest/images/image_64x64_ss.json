@@ -3,7 +3,7 @@
         "width": 64,
         "height": 64,
         "cols": 3,
-        "rows": 2
+        "rows": 3
     },
     "animations": {
         "rhinocerosbeetle": {
@@ -19,12 +19,17 @@
         "mantis_uphand_1": {
             "frames": [4],
             "next": "mantis_uphand_1",
-            "frequency": 12            
+            "frequency": 12
         },
         "mantis_uphand_2": {
             "frames": [5],
             "next": "mantis_uphand_2",
-            "frequency": 12            
+            "frequency": 12
+        },
+        "honeycomb": {
+            "frames": [6],
+            "next": "honeycomb",
+            "frequency": 12         
         }
     }
 }

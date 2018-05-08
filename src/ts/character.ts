@@ -145,7 +145,17 @@ const enemy: { [key: string]: EnemyParam} = {
         width: 64,
         height: 64,
         hp: 1300,
-        defense: 3,
+        defense: 99,
+        score: 3000,
+        death: DeathEffect.BOSS,
+    },
+    // ハチの巣
+    honeycomb: {
+        size: 64,
+        width: 64,
+        height: 64,
+        hp: 1200,
+        defense: 99,
         score: 3000,
         death: DeathEffect.BOSS,
     },

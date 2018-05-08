@@ -13,6 +13,7 @@ import Grasshopper from './grasshopper'
 import Hornet from './hornet'
 import RhinocerosBeetle from './rhinocerosbeetle'
 import Mantis from './mantis'
+import Hoenycomb from './honeycomb'
 
 // タイルのサイズ
 const TILE_SIZE = 16;
@@ -256,6 +257,9 @@ class Stage {
                 break;
             case 'mantis':
                 scene.addCharacter(new Mantis(x, y, scene));
+                break;
+            case 'honeycomb':
+                scene.addCharacter(new Hoenycomb(x, y, scene));
                 break;
             default:
                 console.log(`Error: Unknwon enemy type: ${type}`);
