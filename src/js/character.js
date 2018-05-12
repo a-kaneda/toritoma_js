@@ -135,6 +135,16 @@ const enemy = {
         score: 3000,
         death: DeathEffect.BOSS,
     },
+    // クモ
+    spider: {
+        size: 64,
+        width: 64,
+        height: 64,
+        hp: 1600,
+        defense: 0,
+        score: 3000,
+        death: DeathEffect.BOSS,
+    },
 };
 /**
  * キャラクターに関する定数を管理する。
