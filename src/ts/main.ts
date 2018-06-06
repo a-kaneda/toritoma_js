@@ -1,8 +1,10 @@
-import PointDevice from './pointdevice'
-import ScreenSize from './screensize'
-import MyColor from './mycolor'
-import TitleScene from './titlescene'
-import LabelAreaExDummy from './labelareaex'
+import PointDevice from './pointdevice';
+import ScreenSize from './screensize';
+import MyColor from './mycolor';
+import TitleScene from './titlescene';
+import LabelAreaExDummy from './labelareaex';
+import PixiLayerDummy from './pixilayer';
+import PixiSpriteDummy from './pixisprite';
 
 declare global {
     interface Window {
@@ -12,8 +14,10 @@ declare global {
 }
 window.debug = {};
 
-// LabelAreaExが取り込まれるようにダミー変数を使用する。
+// phina.defineしかないソースが取り込まれるようにダミー変数を使用する。
 LabelAreaExDummy;
+PixiLayerDummy;
+PixiSpriteDummy;
 
 // マウスが接続されているかどうかを調べる。
 PointDevice.checkDeviceType();

@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 37);
+/******/ 	return __webpack_require__(__webpack_require__.s = 39);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -117,7 +117,7 @@ class ScreenSize {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
 /** @module enemy */
 
@@ -1602,9 +1602,9 @@ class Collider {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controlsize__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cursor__ = __webpack_require__(11);
@@ -1660,13 +1660,17 @@ class TitleScene {
         this._gamepadManager = gamepadManager;
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
+        // PIXI用レイヤーを作成する。
+        this._pixiLayer = new phina.display.PixiLayer({
+            width: __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_WIDTH,
+            height: __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
         // タイトルロゴを作成する。
-        const title = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.height)
-            .addChildTo(this._rootNode)
-            .setPosition(TITLE_POS_X, TITLE_POS_Y);
-        title.srcRect.set(__WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.x, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.y, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.height);
-        title.scaleX = __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO;
-        title.scaleY = __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO;
+        const title = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.height)
+            .addChildTo(this._pixiLayer)
+            .setPosition(TITLE_POS_X, TITLE_POS_Y)
+            .setScale(__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO)
+            .setSrcRect(__WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.x, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.y, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.height);
         // ボタン配列を作成する。
         this._buttons = [];
         // ゲームスタートボタンを作成する。
@@ -2569,7 +2573,7 @@ class ImageBUtton {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(50);
 
 /**
  * ローカライズを行うクラス。
@@ -2945,19 +2949,19 @@ class PlayerShot {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__bagworm__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__cicada__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__grasshopper__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__bagworm__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__cicada__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__grasshopper__ = __webpack_require__(33);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__hornet__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__rhinocerosbeetle__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__mantis__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__honeycomb__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__spider__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__rhinocerosbeetle__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__mantis__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__honeycomb__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__spider__ = __webpack_require__(48);
 /** @module stage */
 
 
@@ -3382,6 +3386,127 @@ var LabelAreaExDummy = 0;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+phina.define('phina.display.PixiLayer', {
+    superClass: 'phina.display.Layer',
+    stage: null,
+    renderer: null,
+    /** 子供を 自分のCanvasRenderer で描画するか */
+    renderChildBySelf: true,
+    init: function (options) {
+        this.superInit();
+        options = (options || {}).$safe({
+            width: 640,
+            height: 640
+        });
+        this.stage = new PIXI.Container();
+        this.renderer = PIXI.autoDetectRenderer(options.width, options.height, { transparent: true });
+        this.on('enterframe', function () {
+            this.renderer.render(this.stage);
+        });
+    },
+    draw: function (canvas) {
+        var domElement = this.renderer.view;
+        canvas.context.drawImage(domElement, 0, 0, domElement.width, domElement.height);
+    },
+    addChild: function (child) {
+        if (child.pixiObject) {
+            this.stage.addChild(child.pixiObject);
+        }
+        return phina.display.Layer.prototype.addChild.apply(this, arguments);
+    },
+    removeChild: function (child) {
+        if (child.pixiObject) {
+            this.stage.removeChild(child.pixiObject);
+        }
+        return phina.display.Layer.prototype.removeChild.apply(this, arguments);
+    }
+});
+// exportするものがないのでダミー変数をexportする。
+var PixiLayerDummy = 0;
+/* harmony default export */ __webpack_exports__["a"] = (PixiLayerDummy);
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+phina.define('phina.pixi.Sprite', {
+    superClass: 'phina.display.Sprite',
+    pixiObject: null,
+    init: function (image, width, height) {
+        this.superInit(image, width, height);
+        this.pixiObject = PIXI.Sprite.fromImage(this.image.src, false, PIXI.SCALE_MODES.NEAREST);
+        this.pixiObject.anchor.set(0.5, 0.5);
+        this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
+        this.pixiObject.texture.baseTexture.height = this.image.domElement.height;
+        this.on('enterframe', function (e) {
+            // Elementと必要な情報を同期
+            this.pixiObject.position.set(this.x, this.y);
+            this.pixiObject.rotation = this.rotation * (Math.PI / 180);
+            this.pixiObject.scale.set(this.scaleX, this.scaleY);
+            this.pixiObject.anchor.set(this.originX, this.originY);
+            this.pixiObject.alpha = this.alpha;
+        });
+    },
+    setFrameIndex: function (index, width, height) {
+        phina.display.Sprite.prototype.setFrameIndex.apply(this, arguments);
+        this.pixiObject.texture.frame = new PIXI.Rectangle(this.srcRect.x, this.srcRect.y, this.srcRect.width, this.srcRect.height);
+        return this;
+    },
+    setImage: function (image, width, height) {
+        let newImage;
+        if (typeof image === 'string') {
+            newImage = phina.asset.AssetManager.get('image', image);
+        }
+        else {
+            newImage = image;
+        }
+        this._image = newImage;
+        this.pixiObject = PIXI.Sprite.fromImage(newImage.src, false, PIXI.SCALE_MODES.NEAREST);
+        this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
+        this.pixiObject.texture.baseTexture.height = this.image.domElement.height;
+        this.width = this._image.domElement.width;
+        this.height = this._image.domElement.height;
+        if (width) {
+            this.width = width;
+        }
+        if (height) {
+            this.height = height;
+        }
+        this.frameIndex = 0;
+        this.pixiObject.texture.frame = new PIXI.Rectangle(this.srcRect.x, this.srcRect.y, this.srcRect.width, this.srcRect.height);
+        return this;
+    },
+    setPosition: function (x, y) {
+        this.pixiObject.position.set(x, y);
+        return phina.display.Sprite.prototype.setPosition.apply(this, arguments);
+    },
+    setOrigin: function (x, y) {
+        this.pixiObject.anchor.set(x, y);
+        return phina.display.Sprite.prototype.setOrigin.apply(this, arguments);
+    },
+    setScale: function (x, y) {
+        y = y || x;
+        this.pixiObject.scale.set(x, y);
+        return phina.display.Sprite.prototype.setScale.apply(this, arguments);
+    },
+    setSrcRect: function (x, y, w, h) {
+        this.srcRect.set(x, y, w, h);
+        this.pixiObject.texture.frame = new PIXI.Rectangle(this.srcRect.x, this.srcRect.y, this.srcRect.width, this.srcRect.height);
+        return this;
+    },
+});
+// exportするものがないのでダミー変数をexportする。
+var PixiSpriteDummy = 0;
+/* harmony default export */ __webpack_exports__["a"] = (PixiSpriteDummy);
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util_js__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot_js__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(1);
@@ -3534,7 +3659,7 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3584,7 +3709,7 @@ class Bagworm extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3639,7 +3764,7 @@ class BossLifeGauge {
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3724,7 +3849,7 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3781,7 +3906,7 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3902,7 +4027,7 @@ class Cicada extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4027,7 +4152,7 @@ class CreditScene {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4082,7 +4207,7 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4159,7 +4284,7 @@ class Explosion {
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4306,7 +4431,7 @@ class Grasshopper extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4502,7 +4627,7 @@ class Hoenycomb extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4644,13 +4769,13 @@ class HowToPlayPage {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(35);
 
 
 
@@ -4701,7 +4826,7 @@ class HowToPlayScene {
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4757,7 +4882,7 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4842,7 +4967,7 @@ class Life {
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4852,14 +4977,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__pixilayer__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pixisprite__ = __webpack_require__(23);
+
+
 
 
 
 
 
 window.debug = {};
-// LabelAreaExが取り込まれるようにダミー変数を使用する。
+// phina.defineしかないソースが取り込まれるようにダミー変数を使用する。
 __WEBPACK_IMPORTED_MODULE_4__labelareaex__["a" /* default */];
+__WEBPACK_IMPORTED_MODULE_5__pixilayer__["a" /* default */];
+__WEBPACK_IMPORTED_MODULE_6__pixisprite__["a" /* default */];
 // マウスが接続されているかどうかを調べる。
 __WEBPACK_IMPORTED_MODULE_0__pointdevice__["a" /* default */].checkDeviceType();
 /**
@@ -5027,7 +5158,7 @@ phina.main(function () {
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5279,7 +5410,7 @@ class Mantis extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5466,7 +5597,7 @@ class MenuLayer {
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5474,8 +5605,8 @@ class MenuLayer {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(44);
 
 
 
@@ -5873,7 +6004,7 @@ class Player {
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5954,7 +6085,7 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6174,7 +6305,7 @@ class PlayerOption {
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6183,15 +6314,15 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__player__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__life__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chickengauge__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__player__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__life__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chickengauge__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__imagebutton__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(49);
 
 
 
@@ -7107,7 +7238,7 @@ class PlayingScene {
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7349,7 +7480,7 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7441,7 +7572,7 @@ class ShieldButton {
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7739,7 +7870,7 @@ class Spider extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7829,7 +7960,7 @@ class StageStatus {
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7967,7 +8098,7 @@ var StringResource = {
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

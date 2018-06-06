@@ -45,6 +45,8 @@ class TitleScene implements Scene {
     private _gamepadManager: phina.input.GamepadManager;
     /** 全ノードのルート */
     private _rootNode: phina.display.DisplayElement;
+    /** PIXI用レイヤー */
+    private _pixiLayer: phina.display.PixiLayer;
     /** ボタン */
     private _buttons: LabelButton[];
     /** カーソル */
@@ -69,18 +71,23 @@ class TitleScene implements Scene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
 
+        // PIXI用レイヤーを作成する。
+        this._pixiLayer = new phina.display.PixiLayer({
+            width: ScreenSize.SCREEN_WIDTH, 
+            height: ScreenSize.SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
+
         // タイトルロゴを作成する。
-        const title = new phina.display.Sprite('control', 
+        const title = new phina.pixi.Sprite('control', 
             ControlSize.title.width, 
             ControlSize.title.height)
-        .addChildTo(this._rootNode)
-        .setPosition(TITLE_POS_X, TITLE_POS_Y);
-        title.srcRect.set(ControlSize.title.x,
+        .addChildTo(this._pixiLayer)
+        .setPosition(TITLE_POS_X, TITLE_POS_Y)
+        .setScale(ScreenSize.ZOOM_RATIO, ScreenSize.ZOOM_RATIO)
+        .setSrcRect(ControlSize.title.x,
             ControlSize.title.y,
             ControlSize.title.width,
             ControlSize.title.height);
-        title.scaleX = ScreenSize.ZOOM_RATIO;
-        title.scaleY = ScreenSize.ZOOM_RATIO;
 
         // ボタン配列を作成する。
         this._buttons = [];

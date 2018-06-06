@@ -14,11 +14,14 @@ declare module phina {
 
         class Element extends phina.util.EventDispatcher {
             tweener: phina.accessory.Tweener;
+            addChild(child: phina.app.Element): phina.app.Element;
             addChildTo(parent: phina.app.Element): this;
             remove(): this;
+            removeChild(child: phina.app.Element): this;
         }
 
         class Object2D extends phina.app.Element {
+            rotation: number;
             children: phina.app.Element[];
             x: number;
             y: number;
@@ -26,9 +29,12 @@ declare module phina {
             height: number;
             scaleX: number;
             scaleY: number;
+            originX: number;
+            originY: number;
             setPosition(x: number, y: number): this;
             setOrigin(x: number, y: number): this;
             setInteractive(flag: boolean, type?: string): this;
+            setScale(x: number, y?: number): this;
         }
 
         class Scene extends phina.app.Element {
@@ -62,8 +68,10 @@ declare module phina {
         }
         
         class Sprite extends phina.display.DisplayElement {
+            image: phina.asset.Texture;
             srcRect: phina.geom.Rect;
             constructor(image: string | phina.asset.Texture, width?: number, height?: number);
+            setFrameIndex(index: number, width: number, height: number): this;
         }
 
         class Label extends phina.display.Shape {
@@ -83,6 +91,14 @@ declare module phina {
         }
 
         class CanvasApp extends phina.display.DomApp {
+
+        }
+
+        class Layer extends phina.display.DisplayElement {
+
+        }
+
+        class PixiLayer extends phina.display.Layer {
 
         }
     }
@@ -123,7 +139,7 @@ declare module phina {
     module asset {
 
         class Asset extends phina.util.EventDispatcher {
-
+            src: string;
         }
 
         class AssetLoader extends phina.util.EventDispatcher {
@@ -131,7 +147,7 @@ declare module phina {
             load(params?: any): this;
         }
 
-        class Texture {
+        class Texture extends Asset {
             domElement: HTMLImageElement;
             constructor();
         }
@@ -236,6 +252,14 @@ declare module phina {
 
         class LabelAreaEx extends phina.ui.LabelArea {
             
+        }
+    }
+
+    module pixi {
+
+        class Sprite extends phina.display.Sprite {
+            pixiObject: PIXI.Sprite;
+            setSrcRect(x: number, y: number, w: number, h: number): phina.pixi.Sprite;
         }
     }
 }
