@@ -26,7 +26,7 @@ const OPTION_SPACE = 20;
 class PlayerOption implements CharacterIF {
 
     /** スプライト */
-    private _sprite: phina.display.Sprite;
+    private _sprite: phina.pixi.Sprite;
     /** アニメーション */
     private _animation: phina.accessory.FrameAnimation;
     /** シールド使用不使用 */

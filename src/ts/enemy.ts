@@ -18,7 +18,7 @@ const INCREMENT_CHICKEN_GAUGE = 0.005;
 abstract class Enemy implements CharacterIF {
 
     /** スプライト */
-    protected _sprite: phina.display.Sprite;
+    protected _sprite: phina.pixi.Sprite;
     /** 当たり判定 */
     protected _hitArea: Collider;
     /** HP */

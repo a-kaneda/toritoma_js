@@ -11,7 +11,7 @@ import Character from './character'
 class PlayerDeathEffect implements CharacterIF {
 
     /** スプライト */
-    private _sprite: phina.display.Sprite;
+    private _sprite: phina.pixi.Sprite;
     /** アニメーション */
     private _animation: phina.accessory.FrameAnimation;
 
