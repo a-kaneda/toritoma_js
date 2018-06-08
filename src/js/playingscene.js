@@ -83,7 +83,10 @@ class PlayingScene {
         this._backgroundLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._backgroundLayer.scaleY = ScreenSize.ZOOM_RATIO;
         // キャラクターレイヤーを作成する。
-        this._characterLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._characterLayer = new phina.display.PixiLayer({
+            width: ScreenSize.SCREEN_WIDTH,
+            height: ScreenSize.SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
         // キャラクターレイヤーの位置、サイズを設定する。
         this._characterLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO, ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this._characterLayer.scaleX = ScreenSize.ZOOM_RATIO;

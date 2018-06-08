@@ -13,10 +13,10 @@ phina.define('phina.display.PixiLayer', {
         this.stage = new PIXI.Container();
         this.renderer = PIXI.autoDetectRenderer(options.width, options.height, { transparent: true });
         this.on('enterframe', function () {
-            this.renderer.render(this.stage);
         });
     },
     draw: function (canvas) {
+        this.renderer.render(this.stage);
         var domElement = this.renderer.view;
         canvas.context.drawImage(domElement, 0, 0, domElement.width, domElement.height);
     },

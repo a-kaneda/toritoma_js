@@ -259,7 +259,6 @@ declare module phina {
 
         class Sprite extends phina.display.Sprite {
             pixiObject: PIXI.Sprite;
-            setSrcRect(x: number, y: number, w: number, h: number): phina.pixi.Sprite;
         }
     }
 }

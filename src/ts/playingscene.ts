@@ -87,7 +87,7 @@ class PlayingScene implements Scene {
     /** 背景レイヤー。 */
     private _backgroundLayer: phina.display.DisplayElement;
     /** キャラクターレイヤー。 */
-    private _characterLayer: phina.display.DisplayElement;
+    private _characterLayer: phina.display.PixiLayer;
     /** 枠レイヤー。 */
     private _frameLayer: phina.display.DisplayElement;
     /** 情報レイヤー。 */
@@ -157,7 +157,10 @@ class PlayingScene implements Scene {
         this._backgroundLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // キャラクターレイヤーを作成する。
-        this._characterLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._characterLayer = new phina.display.PixiLayer({
+            width: ScreenSize.SCREEN_WIDTH, 
+            height: ScreenSize.SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
 
         // キャラクターレイヤーの位置、サイズを設定する。
         this._characterLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,

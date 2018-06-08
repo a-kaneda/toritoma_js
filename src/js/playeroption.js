@@ -26,7 +26,7 @@ class PlayerOption {
      */
     constructor(x, y, shield, scene) {
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // シールド使用不使用を設定する。

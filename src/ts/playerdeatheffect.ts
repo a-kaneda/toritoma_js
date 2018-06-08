@@ -26,7 +26,7 @@ class PlayerDeathEffect implements CharacterIF {
     constructor(x: number, y: number, scene: PlayingScene) {
 
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
 
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);

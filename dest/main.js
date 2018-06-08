@@ -145,7 +145,7 @@ class Enemy {
         const imageFile = 'image_' + size + 'x' + size;
         const ssFile = 'image_' + size + 'x' + size + '_ss';
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite(imageFile, 16, 16);
+        this._sprite = new phina.pixi.Sprite(imageFile, 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -405,7 +405,7 @@ class EnemyShot {
      */
     constructor(position, angle, speed, isScroll, scene) {
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_8x8', 8, 8);
+        this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -1669,8 +1669,8 @@ class TitleScene {
         const title = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.height)
             .addChildTo(this._pixiLayer)
             .setPosition(TITLE_POS_X, TITLE_POS_Y)
-            .setScale(__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO)
-            .setSrcRect(__WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.x, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.y, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.height);
+            .setScale(__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].ZOOM_RATIO);
+        title.srcRect.set(__WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.x, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.y, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.width, __WEBPACK_IMPORTED_MODULE_4__controlsize__["a" /* default */].title.height);
         // ボタン配列を作成する。
         this._buttons = [];
         // ゲームスタートボタンを作成する。
@@ -2851,7 +2851,7 @@ class PlayerShot {
      */
     constructor(x, y, isOption, scene) {
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_8x8', 8, 8);
+        this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -3401,10 +3401,10 @@ phina.define('phina.display.PixiLayer', {
         this.stage = new PIXI.Container();
         this.renderer = PIXI.autoDetectRenderer(options.width, options.height, { transparent: true });
         this.on('enterframe', function () {
-            this.renderer.render(this.stage);
         });
     },
     draw: function (canvas) {
+        this.renderer.render(this.stage);
         var domElement = this.renderer.view;
         canvas.context.drawImage(domElement, 0, 0, domElement.width, domElement.height);
     },
@@ -3436,7 +3436,7 @@ phina.define('phina.pixi.Sprite', {
     pixiObject: null,
     init: function (image, width, height) {
         this.superInit(image, width, height);
-        this.pixiObject = PIXI.Sprite.fromImage(this.image.src, false, PIXI.SCALE_MODES.NEAREST);
+        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromImage(this.image.src, false, PIXI.SCALE_MODES.NEAREST)));
         this.pixiObject.anchor.set(0.5, 0.5);
         this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
         this.pixiObject.texture.baseTexture.height = this.image.domElement.height;
@@ -3447,6 +3447,10 @@ phina.define('phina.pixi.Sprite', {
             this.pixiObject.scale.set(this.scaleX, this.scaleY);
             this.pixiObject.anchor.set(this.originX, this.originY);
             this.pixiObject.alpha = this.alpha;
+            this.pixiObject.texture.frame.x = this.srcRect.x;
+            this.pixiObject.texture.frame.y = this.srcRect.y;
+            this.pixiObject.texture.frame.width = this.srcRect.width;
+            this.pixiObject.texture.frame.height = this.srcRect.height;
         });
     },
     setFrameIndex: function (index, width, height) {
@@ -3490,11 +3494,6 @@ phina.define('phina.pixi.Sprite', {
         y = y || x;
         this.pixiObject.scale.set(x, y);
         return phina.display.Sprite.prototype.setScale.apply(this, arguments);
-    },
-    setSrcRect: function (x, y, w, h) {
-        this.srcRect.set(x, y, w, h);
-        this.pixiObject.texture.frame = new PIXI.Rectangle(this.srcRect.x, this.srcRect.y, this.srcRect.width, this.srcRect.height);
-        return this;
     },
 });
 // exportするものがないのでダミー変数をexportする。
@@ -4227,7 +4226,7 @@ class Explosion {
      */
     constructor(x, y, scene) {
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -5656,7 +5655,7 @@ class Player {
      */
     constructor(x, y, scene) {
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -6025,7 +6024,7 @@ class PlayerDeathEffect {
      */
     constructor(x, y, scene) {
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -6120,7 +6119,7 @@ class PlayerOption {
      */
     constructor(x, y, shield, scene) {
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // シールド使用不使用を設定する。
@@ -6408,7 +6407,10 @@ class PlayingScene {
         this._backgroundLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         this._backgroundLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         // キャラクターレイヤーを作成する。
-        this._characterLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._characterLayer = new phina.display.PixiLayer({
+            width: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH,
+            height: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
         // キャラクターレイヤーの位置、サイズを設定する。
         this._characterLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO);
         this._characterLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;

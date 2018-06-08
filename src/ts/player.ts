@@ -47,7 +47,7 @@ const CONSUMPTION_GAUGE = 0.005;
 class Player implements CharacterIF {
 
     /** スプライト */
-    private _sprite: phina.display.Sprite;
+    private _sprite: phina.pixi.Sprite;
     /** アニメーション */
     private _animation: phina.accessory.FrameAnimation;
     /** 当たり判定 */
@@ -80,7 +80,7 @@ class Player implements CharacterIF {
     constructor(x: number, y: number, scene: PlayingScene) {
 
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_16x16', 16, 16);
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
 
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);

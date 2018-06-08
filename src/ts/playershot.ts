@@ -42,7 +42,7 @@ class PlayerShot implements CharacterIF {
     constructor(x: number, y: number, isOption: boolean, scene: PlayingScene) {
 
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite('image_8x8', 8, 8);
+        this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
 
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);

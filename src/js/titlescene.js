@@ -59,8 +59,8 @@ class TitleScene {
         const title = new phina.pixi.Sprite('control', ControlSize.title.width, ControlSize.title.height)
             .addChildTo(this._pixiLayer)
             .setPosition(TITLE_POS_X, TITLE_POS_Y)
-            .setScale(ScreenSize.ZOOM_RATIO, ScreenSize.ZOOM_RATIO)
-            .setSrcRect(ControlSize.title.x, ControlSize.title.y, ControlSize.title.width, ControlSize.title.height);
+            .setScale(ScreenSize.ZOOM_RATIO, ScreenSize.ZOOM_RATIO);
+        title.srcRect.set(ControlSize.title.x, ControlSize.title.y, ControlSize.title.width, ControlSize.title.height);
         // ボタン配列を作成する。
         this._buttons = [];
         // ゲームスタートボタンを作成する。

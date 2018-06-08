@@ -6,7 +6,7 @@ phina.define('phina.pixi.Sprite', {
     init: function (image: string | phina.asset.Texture, width?: number, height?: number): void {
         this.superInit(image, width, height);
 
-        this.pixiObject = PIXI.Sprite.fromImage(this.image.src, false, PIXI.SCALE_MODES.NEAREST);
+        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromImage(this.image.src, false, PIXI.SCALE_MODES.NEAREST)));
         this.pixiObject.anchor.set(0.5, 0.5);
 
         this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
@@ -19,6 +19,10 @@ phina.define('phina.pixi.Sprite', {
             this.pixiObject.scale.set(this.scaleX, this.scaleY);
             this.pixiObject.anchor.set(this.originX, this.originY);
             this.pixiObject.alpha = this.alpha;
+            this.pixiObject.texture.frame.x = this.srcRect.x;
+            this.pixiObject.texture.frame.y = this.srcRect.y;
+            this.pixiObject.texture.frame.width = this.srcRect.width;
+            this.pixiObject.texture.frame.height = this.srcRect.height;
         });
     },
 
@@ -71,12 +75,6 @@ phina.define('phina.pixi.Sprite', {
         y = y || x;
         this.pixiObject.scale.set(x, y);
         return phina.display.Sprite.prototype.setScale.apply(this, arguments);
-    },
-
-    setSrcRect: function(x: number, y: number, w: number, h: number): phina.pixi.Sprite {
-        this.srcRect.set(x, y, w, h);
-        this.pixiObject.texture.frame = new PIXI.Rectangle(this.srcRect.x, this.srcRect.y, this.srcRect.width, this.srcRect.height);
-        return this;
     },
 });
 

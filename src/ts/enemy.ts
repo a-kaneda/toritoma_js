@@ -53,7 +53,7 @@ abstract class Enemy implements CharacterIF {
         const ssFile = 'image_' + size + 'x' + size + '_ss';
 
         // スプライト画像を読み込む。
-        this._sprite = new phina.display.Sprite(imageFile, 16, 16);
+        this._sprite = new phina.pixi.Sprite(imageFile, 16, 16);
 
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
