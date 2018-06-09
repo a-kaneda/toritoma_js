@@ -1,9 +1,6 @@
-/** @module util */
-
-import ScreenSize from './screensize'
-import Stage from './stage'
-import Point from './point'
-import Rect from './rect'
+import ScreenSize from './screensize';
+import Point from './point';
+import Rect from './rect';
 
 /**
  * アプリ全体で使用する関数群を定義する。

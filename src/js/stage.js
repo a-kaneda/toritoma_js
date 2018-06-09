@@ -1,4 +1,3 @@
-/** @module stage */
 import ScreenSize from './screensize';
 import TileMapManager from './tilemapmanager';
 import Dragonfly from './dragonfly';
@@ -27,8 +26,8 @@ class Stage {
      * コンストラクタ。
      * mapNameで指定されたマップを読み込み、background、foreground、blockのレイヤーの画像をlayerに配置する。
      * stageWidthをメンバ変数に格納する。
-     * @param {string} manName - マップ名
-     * @param {phina.display.DisplayElement} layer - ステージ画像を配置するレイヤー
+     * @param manName マップ名
+     * @param layer ステージ画像を配置するレイヤー
      */
     constructor(mapName, layer) {
         // スクロールスピードを初期化する。
@@ -44,7 +43,7 @@ class Stage {
         // 背景画像を読み込む。
         const backgroundTexture = this._mapManager.getIamge('background');
         if (backgroundTexture !== null) {
-            this._background = new phina.display.Sprite(backgroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._background = new phina.pixi.Sprite(backgroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         }
         else {
             this._background = null;
@@ -52,7 +51,7 @@ class Stage {
         // 前景画像を読み込む。
         const foregroundTexture = this._mapManager.getIamge('foreground');
         if (foregroundTexture != null) {
-            this._foreground = new phina.display.Sprite(foregroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._foreground = new phina.pixi.Sprite(foregroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         }
         else {
             this._foreground = null;
@@ -60,7 +59,7 @@ class Stage {
         // 障害物画像を読み込む。
         const blockTexture = this._mapManager.getIamge('block');
         if (blockTexture != null) {
-            this._block = new phina.display.Sprite(blockTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._block = new phina.pixi.Sprite(blockTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         }
         else {
             this._block = null;

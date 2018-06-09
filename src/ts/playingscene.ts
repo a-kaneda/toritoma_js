@@ -1,22 +1,21 @@
-import PointDevice from './pointdevice'
-import MyColor from './mycolor'
-import ScreenSize from './screensize'
-import ControlSize from './controlsize'
-import Character from './character'
-import Stage from './stage'
-import Player from './player'
-import Life from './life'
-import ChickenGauge from './chickengauge'
-import BossLifeGauge from './bosslifegauge'
-import ShieldButton from './shieldbutton'
-import CharacterIF from './characterif'
-import Point from './point'
-import Scene from './scene'
-import TitleScene from './titlescene'
-import MainScene from './mainscene.d'
-import MenuLayer from './menulayer'
-import ImageButton from './imagebutton'
-import StageStatus from './stagestatus'
+import PointDevice from './pointdevice';
+import MyColor from './mycolor';
+import ScreenSize from './screensize';
+import ControlSize from './controlsize';
+import Character from './character';
+import Player from './player';
+import Life from './life';
+import ChickenGauge from './chickengauge';
+import BossLifeGauge from './bosslifegauge';
+import ShieldButton from './shieldbutton';
+import CharacterIF from './characterif';
+import Point from './point';
+import Scene from './scene';
+import TitleScene from './titlescene';
+import MainScene from './mainscene.d';
+import MenuLayer from './menulayer';
+import ImageButton from './imagebutton';
+import StageStatus from './stagestatus';
 
 // 初期残機
 const INITIAL_LIFE = 2;
@@ -85,7 +84,7 @@ class PlayingScene implements Scene {
     /** 全ノードのルート */
     private _rootNode: phina.display.DisplayElement;
     /** 背景レイヤー。 */
-    private _backgroundLayer: phina.display.DisplayElement;
+    private _backgroundLayer: phina.display.PixiLayer;
     /** キャラクターレイヤー。 */
     private _characterLayer: phina.display.PixiLayer;
     /** 枠レイヤー。 */
@@ -148,7 +147,7 @@ class PlayingScene implements Scene {
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
 
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._backgroundLayer = new phina.display.PixiLayer().addChildTo(this._rootNode);
 
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,

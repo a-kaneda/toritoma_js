@@ -12,8 +12,6 @@ phina.define('phina.display.PixiLayer', {
         });
         this.stage = new PIXI.Container();
         this.renderer = PIXI.autoDetectRenderer(options.width, options.height, { transparent: true });
-        this.on('enterframe', function () {
-        });
     },
     draw: function (canvas) {
         this.renderer.render(this.stage);

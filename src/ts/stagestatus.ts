@@ -1,4 +1,4 @@
-import Stage from './stage'
+import Stage from './stage';
 import PlayingScene from './playingscene';
 
 // ステージクリア後の待機フレーム数
@@ -22,7 +22,7 @@ class StageStatus {
      * @param stage ステージ番号
      * @param backgroundLayer 背景レイヤー
      */
-    constructor(stage: number, backgroundLayer: phina.display.DisplayElement) {
+    constructor(stage: number, backgroundLayer: phina.display.PixiLayer) {
 
         // ステージ番号を変更する。
         this._stageNumber = stage;

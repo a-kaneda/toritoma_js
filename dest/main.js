@@ -966,7 +966,6 @@ class Character {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/** @module util */
 /**
  * アプリ全体で使用する関数群を定義する。
  */
@@ -2962,7 +2961,6 @@ class PlayerShot {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__mantis__ = __webpack_require__(40);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__honeycomb__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__spider__ = __webpack_require__(48);
-/** @module stage */
 
 
 
@@ -2991,8 +2989,8 @@ class Stage {
      * コンストラクタ。
      * mapNameで指定されたマップを読み込み、background、foreground、blockのレイヤーの画像をlayerに配置する。
      * stageWidthをメンバ変数に格納する。
-     * @param {string} manName - マップ名
-     * @param {phina.display.DisplayElement} layer - ステージ画像を配置するレイヤー
+     * @param manName マップ名
+     * @param layer ステージ画像を配置するレイヤー
      */
     constructor(mapName, layer) {
         // スクロールスピードを初期化する。
@@ -3008,7 +3006,7 @@ class Stage {
         // 背景画像を読み込む。
         const backgroundTexture = this._mapManager.getIamge('background');
         if (backgroundTexture !== null) {
-            this._background = new phina.display.Sprite(backgroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._background = new phina.pixi.Sprite(backgroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         }
         else {
             this._background = null;
@@ -3016,7 +3014,7 @@ class Stage {
         // 前景画像を読み込む。
         const foregroundTexture = this._mapManager.getIamge('foreground');
         if (foregroundTexture != null) {
-            this._foreground = new phina.display.Sprite(foregroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._foreground = new phina.pixi.Sprite(foregroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         }
         else {
             this._foreground = null;
@@ -3024,7 +3022,7 @@ class Stage {
         // 障害物画像を読み込む。
         const blockTexture = this._mapManager.getIamge('block');
         if (blockTexture != null) {
-            this._block = new phina.display.Sprite(blockTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._block = new phina.pixi.Sprite(blockTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
         }
         else {
             this._block = null;
@@ -3400,8 +3398,6 @@ phina.define('phina.display.PixiLayer', {
         });
         this.stage = new PIXI.Container();
         this.renderer = PIXI.autoDetectRenderer(options.width, options.height, { transparent: true });
-        this.on('enterframe', function () {
-        });
     },
     draw: function (canvas) {
         this.renderer.render(this.stage);
@@ -3436,7 +3432,7 @@ phina.define('phina.pixi.Sprite', {
     pixiObject: null,
     init: function (image, width, height) {
         this.superInit(image, width, height);
-        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromImage(this.image.src, false, PIXI.SCALE_MODES.NEAREST)));
+        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
         this.pixiObject.anchor.set(0.5, 0.5);
         this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
         this.pixiObject.texture.baseTexture.height = this.image.domElement.height;
@@ -3467,7 +3463,7 @@ phina.define('phina.pixi.Sprite', {
             newImage = image;
         }
         this._image = newImage;
-        this.pixiObject = PIXI.Sprite.fromImage(newImage.src, false, PIXI.SCALE_MODES.NEAREST);
+        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
         this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
         this.pixiObject.texture.baseTexture.height = this.image.domElement.height;
         this.width = this._image.domElement.width;
@@ -6401,7 +6397,7 @@ class PlayingScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._backgroundLayer = new phina.display.PixiLayer().addChildTo(this._rootNode);
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO);
         this._backgroundLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
