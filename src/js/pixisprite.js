@@ -3,7 +3,6 @@ phina.define('phina.pixi.Sprite', {
     pixiObject: null,
     init: function (image, width, height, shareTexture) {
         this.superInit(image, width, height);
-        //        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
         if (shareTexture) {
             this.pixiObject = new PIXI.Sprite(shareTexture);
         }
@@ -24,6 +23,7 @@ phina.define('phina.pixi.Sprite', {
             this.pixiObject.texture.frame.y = this.srcRect.y;
             this.pixiObject.texture.frame.width = this.srcRect.width;
             this.pixiObject.texture.frame.height = this.srcRect.height;
+            this.pixiObject.texture._updateUvs();
         });
     },
     setFrameIndex: function (index, width, height) {

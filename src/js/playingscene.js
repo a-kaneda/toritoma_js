@@ -77,7 +77,7 @@ class PlayingScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.PixiLayer().addChildTo(this._rootNode);
+        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO, ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this._backgroundLayer.scaleX = ScreenSize.ZOOM_RATIO;

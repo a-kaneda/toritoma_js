@@ -3022,11 +3022,10 @@ class Stage {
         // 背景画像を読み込む。
         const backgroundTexture = this._mapManager.getIamge('background');
         if (backgroundTexture !== null) {
-            this._background = new phina.pixi.Sprite(backgroundTexture)
+            this._background = new phina.display.Sprite(backgroundTexture)
                 .setOrigin(0, 0)
                 .setPosition(0, 0)
                 .addChildTo(layer);
-            this._background.srcRect.width = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].STAGE_RECT.width;
         }
         else {
             this._background = null;
@@ -3034,11 +3033,10 @@ class Stage {
         // 前景画像を読み込む。
         const foregroundTexture = this._mapManager.getIamge('foreground');
         if (foregroundTexture != null) {
-            this._foreground = new phina.pixi.Sprite(foregroundTexture)
+            this._foreground = new phina.display.Sprite(foregroundTexture)
                 .setOrigin(0, 0)
                 .setPosition(0, 0)
                 .addChildTo(layer);
-            this._foreground.srcRect.width = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].STAGE_RECT.width;
         }
         else {
             this._foreground = null;
@@ -3046,11 +3044,10 @@ class Stage {
         // 障害物画像を読み込む。
         const blockTexture = this._mapManager.getIamge('block');
         if (blockTexture != null) {
-            this._block = new phina.pixi.Sprite(blockTexture)
+            this._block = new phina.display.Sprite(blockTexture)
                 .setOrigin(0, 0)
                 .setPosition(0, 0)
                 .addChildTo(layer);
-            this._block.srcRect.width = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].STAGE_RECT.width;
         }
         else {
             this._block = null;
@@ -3144,13 +3141,13 @@ class Stage {
         this._x -= this._speed;
         // 各画像を座標に合わせて移動する。
         if (this._background !== null) {
-            this._background.srcRect.x = Math.floor(-this._x);
+            this._background.x = Math.floor(this._x);
         }
         if (this._foreground !== null) {
-            this._foreground.srcRect.x = Math.floor(-this._x);
+            this._foreground.x = Math.floor(this._x);
         }
         if (this._block !== null) {
-            this._block.srcRect.x = Math.floor(-this._x);
+            this._block.x = Math.floor(this._x);
         }
     }
     /**
@@ -3460,7 +3457,6 @@ phina.define('phina.pixi.Sprite', {
     pixiObject: null,
     init: function (image, width, height, shareTexture) {
         this.superInit(image, width, height);
-        //        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
         if (shareTexture) {
             this.pixiObject = new PIXI.Sprite(shareTexture);
         }
@@ -3481,6 +3477,7 @@ phina.define('phina.pixi.Sprite', {
             this.pixiObject.texture.frame.y = this.srcRect.y;
             this.pixiObject.texture.frame.width = this.srcRect.width;
             this.pixiObject.texture.frame.height = this.srcRect.height;
+            this.pixiObject.texture._updateUvs();
         });
     },
     setFrameIndex: function (index, width, height) {
@@ -6431,7 +6428,7 @@ class PlayingScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.PixiLayer().addChildTo(this._rootNode);
+        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO);
         this._backgroundLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
