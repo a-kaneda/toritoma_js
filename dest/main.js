@@ -404,8 +404,16 @@ class EnemyShot {
      * @param scene シーン
      */
     constructor(position, angle, speed, isScroll, scene) {
-        // スプライト画像を読み込む。
-        this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
+        // テクスチャのキャッシュがある場合
+        if (EnemyShot._textureCache) {
+            // テクスチャキャッシュを使用してスプライトを作成する。
+            this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8, EnemyShot._textureCache);
+        }
+        else {
+            // スプライト画像を読み込んで、テクスチャをキャッシュに保存する。
+            this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
+            EnemyShot._textureCache = this._sprite.pixiObject.texture;
+        }
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -2849,8 +2857,16 @@ class PlayerShot {
      * @param scene シーン
      */
     constructor(x, y, isOption, scene) {
-        // スプライト画像を読み込む。
-        this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
+        // テクスチャのキャッシュがある場合
+        if (PlayerShot._textureCache) {
+            // テクスチャキャッシュを使用してスプライトを作成する。
+            this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8, PlayerShot._textureCache);
+        }
+        else {
+            // スプライト画像を読み込んで、テクスチャをキャッシュに保存する。
+            this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
+            PlayerShot._textureCache = this._sprite.pixiObject.texture;
+        }
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -3006,7 +3022,11 @@ class Stage {
         // 背景画像を読み込む。
         const backgroundTexture = this._mapManager.getIamge('background');
         if (backgroundTexture !== null) {
-            this._background = new phina.pixi.Sprite(backgroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._background = new phina.pixi.Sprite(backgroundTexture)
+                .setOrigin(0, 0)
+                .setPosition(0, 0)
+                .addChildTo(layer);
+            this._background.srcRect.width = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].STAGE_RECT.width;
         }
         else {
             this._background = null;
@@ -3014,7 +3034,11 @@ class Stage {
         // 前景画像を読み込む。
         const foregroundTexture = this._mapManager.getIamge('foreground');
         if (foregroundTexture != null) {
-            this._foreground = new phina.pixi.Sprite(foregroundTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._foreground = new phina.pixi.Sprite(foregroundTexture)
+                .setOrigin(0, 0)
+                .setPosition(0, 0)
+                .addChildTo(layer);
+            this._foreground.srcRect.width = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].STAGE_RECT.width;
         }
         else {
             this._foreground = null;
@@ -3022,7 +3046,11 @@ class Stage {
         // 障害物画像を読み込む。
         const blockTexture = this._mapManager.getIamge('block');
         if (blockTexture != null) {
-            this._block = new phina.pixi.Sprite(blockTexture).setOrigin(0, 0).setPosition(0, 0).addChildTo(layer);
+            this._block = new phina.pixi.Sprite(blockTexture)
+                .setOrigin(0, 0)
+                .setPosition(0, 0)
+                .addChildTo(layer);
+            this._block.srcRect.width = __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].STAGE_RECT.width;
         }
         else {
             this._block = null;
@@ -3116,13 +3144,13 @@ class Stage {
         this._x -= this._speed;
         // 各画像を座標に合わせて移動する。
         if (this._background !== null) {
-            this._background.x = Math.floor(this._x);
+            this._background.srcRect.x = Math.floor(-this._x);
         }
         if (this._foreground !== null) {
-            this._foreground.x = Math.floor(this._x);
+            this._foreground.srcRect.x = Math.floor(-this._x);
         }
         if (this._block !== null) {
-            this._block.x = Math.floor(this._x);
+            this._block.srcRect.x = Math.floor(-this._x);
         }
     }
     /**
@@ -3430,9 +3458,15 @@ var PixiLayerDummy = 0;
 phina.define('phina.pixi.Sprite', {
     superClass: 'phina.display.Sprite',
     pixiObject: null,
-    init: function (image, width, height) {
+    init: function (image, width, height, shareTexture) {
         this.superInit(image, width, height);
-        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
+        //        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
+        if (shareTexture) {
+            this.pixiObject = new PIXI.Sprite(shareTexture);
+        }
+        else {
+            this.pixiObject = new PIXI.Sprite(PIXI.Texture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST));
+        }
         this.pixiObject.anchor.set(0.5, 0.5);
         this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
         this.pixiObject.texture.baseTexture.height = this.image.domElement.height;

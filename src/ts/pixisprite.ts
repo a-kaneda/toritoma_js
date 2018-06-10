@@ -3,10 +3,16 @@ phina.define('phina.pixi.Sprite', {
 
     pixiObject: null,
 
-    init: function (image: string | phina.asset.Texture, width?: number, height?: number): void {
+    init: function (image: string | phina.asset.Texture, width?: number, height?: number, shareTexture?: PIXI.Texture): void {
         this.superInit(image, width, height);
 
-        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
+//        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
+        if (shareTexture) {
+            this.pixiObject = new PIXI.Sprite(shareTexture);
+        }
+        else {
+            this.pixiObject = new PIXI.Sprite(PIXI.Texture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST));
+        }
         this.pixiObject.anchor.set(0.5, 0.5);
 
         this.pixiObject.texture.baseTexture.width = this.image.domElement.width;

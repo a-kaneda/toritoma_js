@@ -258,6 +258,7 @@ declare module phina {
     module pixi {
 
         class Sprite extends phina.display.Sprite {
+            constructor(image: string | phina.asset.Texture, width?: number, height?: number, sharedTexture?: PIXI.Texture);
             pixiObject: PIXI.Sprite;
         }
     }

@@ -1,9 +1,15 @@
 phina.define('phina.pixi.Sprite', {
     superClass: 'phina.display.Sprite',
     pixiObject: null,
-    init: function (image, width, height) {
+    init: function (image, width, height, shareTexture) {
         this.superInit(image, width, height);
-        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
+        //        this.pixiObject = new PIXI.Sprite(new PIXI.Texture(PIXI.BaseTexture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST)));
+        if (shareTexture) {
+            this.pixiObject = new PIXI.Sprite(shareTexture);
+        }
+        else {
+            this.pixiObject = new PIXI.Sprite(PIXI.Texture.fromCanvas(this.image.domElement, PIXI.SCALE_MODES.NEAREST));
+        }
         this.pixiObject.anchor.set(0.5, 0.5);
         this.pixiObject.texture.baseTexture.width = this.image.domElement.width;
         this.pixiObject.texture.baseTexture.height = this.image.domElement.height;

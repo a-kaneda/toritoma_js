@@ -23,6 +23,8 @@ const HIT_HEIGHT = 3;
  */
 class PlayerShot implements CharacterIF {
 
+    /** 自機弾インスタンスで共有するテクスチャ */
+    private static _textureCache: PIXI.Texture;
     /** スプライト */
     private _sprite: phina.pixi.Sprite;
     /** アニメーション */
@@ -41,8 +43,16 @@ class PlayerShot implements CharacterIF {
      */
     constructor(x: number, y: number, isOption: boolean, scene: PlayingScene) {
 
-        // スプライト画像を読み込む。
-        this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
+        // テクスチャのキャッシュがある場合
+        if (PlayerShot._textureCache) {
+            // テクスチャキャッシュを使用してスプライトを作成する。
+            this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8, PlayerShot._textureCache);
+        }
+        else {
+            // スプライト画像を読み込んで、テクスチャをキャッシュに保存する。
+            this._sprite = new phina.pixi.Sprite('image_8x8', 8, 8);
+            PlayerShot._textureCache = this._sprite.pixiObject.texture;
+        }
 
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
