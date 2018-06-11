@@ -8,6 +8,7 @@ import Bagworm from './bagworm';
 import Cicada from './cicada';
 import Grasshopper from './grasshopper';
 import Hornet from './hornet';
+import Snail from './snail';
 import RhinocerosBeetle from './rhinocerosbeetle';
 import Mantis from './mantis';
 import Hoenycomb from './honeycomb';
@@ -203,6 +204,9 @@ class Stage {
                 break;
             case 'hornet':
                 scene.addCharacter(new Hornet(x, y, scene));
+                break;
+            case 'snail':
+                scene.addCharacter(new Snail(x, y, scene));
                 break;
             case 'rhinocerosbeetle':
                 scene.addCharacter(new RhinocerosBeetle(x, y, scene));

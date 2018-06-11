@@ -1,8 +1,8 @@
-import Util from './util.js'
-import EnemyShot from './enemyshot.js'
-import Enemy from './enemy.js'
-import PlayingScene from './playingscene'
-import WalkingCharacter from './walkingcharacter'
+import Util from './util';
+import EnemyShot from './enemyshot';
+import Enemy from './enemy.js';
+import PlayingScene from './playingscene';
+import WalkingCharacter from './walkingcharacter';
 
 // 状態
 enum STATE {
@@ -23,14 +23,6 @@ const SHOT_FRAME = 120;
 
 /**
  * 敵キャラクター、アリ。
- * 天井または地面に張り付いて歩く。
- *
- * 左移動:左方向への移動。一定時間経過後に弾発射に遷移する。
- * 
- * 弾発射:停止して弾の発射。自機に向かって1-wayを一定数発射する。
- * 一定時間経過後に右移動に遷移する。
- * 
- * 右移動:地面右方向への移動。一定時間経過後に弾発射に遷移する。
  */
 class Ant extends Enemy {
 

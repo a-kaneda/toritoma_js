@@ -3,7 +3,7 @@
         "width": 16,
         "height": 16,
         "cols": 8,
-        "rows": 4
+        "rows": 5
     },
     "animations": {
         "player_normal": {
@@ -80,6 +80,11 @@
             "frames": [30, 31],
             "next": "hornet",
             "frequency": 6
+        },
+        "snail": {
+            "frames": [32, 33],
+            "next": "snail",
+            "frequency": 30
         }
     }
 }
