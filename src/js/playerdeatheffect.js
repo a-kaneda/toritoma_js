@@ -50,8 +50,14 @@ class PlayerDeathEffect {
         // アニメーションが終了すると自分自身を削除する。
         if (this._animation.finished) {
             scene.removeCharacter(this);
-            this._sprite.remove();
         }
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
     }
     /**
      * アニメーションを停止する。

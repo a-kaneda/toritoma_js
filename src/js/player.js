@@ -168,6 +168,13 @@ class Player {
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
+    }
+    /**
      * アニメーションを停止する。
      * @return 自インスタンス
      */
@@ -330,7 +337,7 @@ class Player {
             const topCharacter = hitCharacters[0];
             // 敵弾の場合は削除する。
             if (Character.isEnemyShot(topCharacter)) {
-                topCharacter.remove(scene);
+                scene.removeCharacter(topCharacter);
             }
             // 敵キャラクターに接触した場合は死亡処理を行う。
             if (!this._noDeath) {

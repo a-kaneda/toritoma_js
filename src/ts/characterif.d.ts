@@ -18,6 +18,11 @@ interface CharacterIF {
     update(scene: PlayingScene): void;
 
     /**
+     * シーンから取り除く。
+     */
+    remove(): this;
+
+    /**
      * アニメーションを停止する。
      * @return 自インスタンス
      */

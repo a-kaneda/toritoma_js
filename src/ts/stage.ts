@@ -1,19 +1,7 @@
 import ScreenSize from './screensize';
 import TileMapManager from './tilemapmanager';
 import PlayingScene from './playingscene';
-import Dragonfly from './dragonfly';
-import Ant from './ant';
-import Butterfly from './butterfly';
-import Ladybug from './ladybug';
-import Bagworm from './bagworm';
-import Cicada from './cicada';
-import Grasshopper from './grasshopper';
-import Hornet from './hornet';
-import Snail from './snail';
-import RhinocerosBeetle from './rhinocerosbeetle';
-import Mantis from './mantis';
-import Hoenycomb from './honeycomb';
-import Spider from './spider';
+import EnemyFactory from './enemyfactory';
 
 // タイルのサイズ
 const TILE_SIZE = 16;
@@ -236,49 +224,13 @@ class Stage {
      * @param scene シーン
      */
     private _createEnemy(type: string, x: number, y: number, scene: PlayingScene): void {
-        switch (type) {
-            case 'dragonfly':
-                scene.addCharacter(new Dragonfly(x, y, scene));
-                break;
-            case 'ant':
-                scene.addCharacter(new Ant(x, y, scene));
-                break;
-            case 'butterfly':
-                scene.addCharacter(new Butterfly(x, y, scene));
-                break;
-            case 'ladybug':
-                scene.addCharacter(new Ladybug(x, y, scene));
-                break;
-            case 'bagworm':
-                scene.addCharacter(new Bagworm(x, y, scene));
-                break;
-            case 'cicada':
-                scene.addCharacter(new Cicada(x, y, scene));
-                break;
-            case 'grasshopper':
-                scene.addCharacter(new Grasshopper(x, y, scene));
-                break;
-            case 'hornet':
-                scene.addCharacter(new Hornet(x, y,scene));
-                break;
-            case 'snail':
-                scene.addCharacter(new Snail(x, y, scene));
-                break;
-            case 'rhinocerosbeetle':
-                scene.addCharacter(new RhinocerosBeetle(x, y, scene));
-                break;
-            case 'mantis':
-                scene.addCharacter(new Mantis(x, y, scene));
-                break;
-            case 'honeycomb':
-                scene.addCharacter(new Hoenycomb(x, y, scene));
-                break;
-            case 'spider':
-                scene.addCharacter(new Spider(x, y, scene));
-                break;
-            default:
-                console.log(`Error: Unknwon enemy type: ${type}`);
-                break;
+
+        // 敵キャラクターを作成する。
+        const enemy = EnemyFactory.create(x, y, type, scene);
+        if (enemy) {
+
+            // シーンに追加する。
+            scene.addCharacter(enemy);
         }
     }
 }

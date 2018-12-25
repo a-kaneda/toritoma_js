@@ -112,6 +112,7 @@ declare module phina {
         class FrameAnimation extends phina.accessory.Accessory {
             paused: boolean;
             finished: boolean;
+            currentFrameIndex: number;
             constructor(ss: string);
             gotoAndPlay(name: string): this;
         }

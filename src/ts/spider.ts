@@ -1,8 +1,9 @@
-import Enemy from './enemy'
-import PlayingScene from './playingscene'
-import Point from './point'
-import EnemyShot from './enemyshot'
-import Util from './util'
+import Enemy from './enemy';
+import PlayingScene from './playingscene';
+import Point from './point';
+import EnemyShot from './enemyshot';
+import Util from './util';
+import EnemyParam from './enemyparam';
 
 // 状態
 enum STATE {
@@ -109,12 +110,13 @@ class Spider extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: PlayingScene) {
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'spider', scene);
+        super(x, y, 'spider', param, scene);
 
         // 状態を初期化する。
         this._state = STATE.INIT;

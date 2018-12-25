@@ -32,11 +32,12 @@ class Hornet extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'hornet', scene);
+        super(x, y, 'hornet', param, scene);
         // 初期状態は左移動とする。
         this._state = STATE.MOVE_IN;
         // 状態変化間隔を初期化する。

@@ -1,0 +1,25 @@
+{
+    "frame": {
+        "width": 32,
+        "height": 32,
+        "cols": 5,
+        "rows": 1
+    },
+    "animations": {
+        "centipede": {
+            "frames": [0],
+            "next": "centipede",
+            "frequency": 12
+        },
+        "centipede_body": {
+            "frames": [1, 2],
+            "next": "centipede_body",
+            "frequency": 12
+        },
+        "centipede_tail": {
+            "frames": [3, 4],
+            "next": "centipede_tail",
+            "frequency": 12
+        }
+    }
+}

@@ -238,6 +238,14 @@ class Player implements CharacterIF {
     }
 
     /**
+     * シーンから取り除く。
+     */
+    public remove(): this {
+        this._sprite.remove();
+        return this;
+    }
+
+    /**
      * アニメーションを停止する。
      * @return 自インスタンス
      */
@@ -446,7 +454,7 @@ class Player implements CharacterIF {
 
             // 敵弾の場合は削除する。
             if (Character.isEnemyShot(topCharacter)) {
-                topCharacter.remove(scene);
+                scene.removeCharacter(topCharacter);
             }
 
             // 敵キャラクターに接触した場合は死亡処理を行う。

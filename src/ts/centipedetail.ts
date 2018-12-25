@@ -1,0 +1,174 @@
+import Enemy from './enemy';
+import PlayingScene from './playingscene';
+import CentipedeIF from './centipedeif';
+import {STATE} from './centipedeif';
+import Point from './point';
+import EnemyShot from './enemyshot';
+import Util from './util';
+import EnemyParam from './enemyparam';
+
+// 3-way弾の発射間隔
+const N3WAY_SHOT_INTERVAL = 30;
+// 3-way弾の弾数
+const N3WAY_SHOT_COUNT = 3;
+// 3-way弾の角度の間隔
+const N3WAY_SHOT_ANGLE = Math.PI / 8;
+// 3-way弾のスピード
+const N3WAY_SHOT_SPEED = 0.75;
+// 3-way弾発射までの間
+const N3WAY_SHOT_WATI = 220;
+
+/**
+ * 敵キャラ、ムカデの尻尾。
+ */
+class CentipedeTail extends Enemy implements CentipedeIF {
+
+    /** ひとつ前の体 */
+    private _parent: CentipedeIF | null;
+    /** ひとつ後ろの体 */
+    private _child: CentipedeIF | null;
+    /** 移動履歴 */
+    private _moveHistory: Point[];
+    /** 状態 */
+    private _state: STATE;
+    /** 弾発射間隔 */
+    private _shotInterval: number;
+    
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param param 敵キャラクターパラメータ
+     * @param scene シーン
+     */
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
+
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'centipede_tail', param, scene);
+
+        // 移動履歴を初期化する。
+        this._moveHistory = [{x: x, y: y}];
+
+        // 状態を初期化する。
+        this._state = STATE.ENTRY;
+
+        // 弾発射間隔を初期化する。
+        this._shotInterval = 0;
+
+        // ひとつ前の体を初期化する。。
+        this._parent = null;
+
+        // 後ろの体を初期化する。
+        this._child = null;
+    }
+
+    /** ひとつ前の体 */
+    public get parent(): CentipedeIF | null {
+        return this._parent;
+    }
+
+    /** ひとつ前の体 */
+    public set parent(value: CentipedeIF | null) {
+        this._parent = value;
+    }
+
+    /** ひとつ後ろの体 */
+    public get child(): CentipedeIF | null {
+        return this._child;
+    }
+
+    /** ひとつ後ろの体 */
+    public set child(value: CentipedeIF | null) {
+        this._child = value;
+    }
+
+    /** ヒットポイント */
+    public get hp(): number {
+        return this._hp;
+    }
+
+    /** ヒットポイント */
+    public set hp(value: number) {
+        this._hp = value;
+    }
+
+    /**
+     * 一番古い移動履歴を取得する。
+     * @return 一番古い移動履歴
+     */
+    public getFirstMoveHistory(): Point {
+        return this._moveHistory[0];
+    }
+
+    /**
+     * 状態を設定する。
+     * @param state 状態
+     */
+    public setState(state: number): this {
+        
+        // 自分の状態を設定する。
+        this._state = state;
+
+        // 子オブジェクトに現在の状態を通知する。
+        if (this._child) {
+            this._child.setState(this._state);
+        }
+
+        return this;
+    }
+
+    /**
+     * アニメーションフレームを設定する。
+     * @param frame アニメーションフレーム
+     */
+    public setAnimationFrame(frame: number): this {
+        this._animation.currentFrameIndex = frame;
+        return this;
+    }
+
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * @param scene シーン
+     */
+    protected action(scene: PlayingScene): void {
+
+        // 一つ前の体がメンバに設定されていない場合は処理しない。
+        if (!this._parent) {
+            return;
+        }
+
+        // 移動前の位置を記憶しておく。
+        const prevPosition = {x: this._hitArea.x, y: this._hitArea.y};
+
+        // 移動履歴の末尾を自分の座標に設定する。
+        this._hitArea.x = this._parent.getFirstMoveHistory().x;
+        this._hitArea.y = this._parent.getFirstMoveHistory().y;
+
+        // 前回位置との差から体の向きを決める。
+        const dx = this._hitArea.x - prevPosition.x;
+        const dy = this._hitArea.y - prevPosition.y;
+        const angle = Math.atan2(dy, dx);
+
+        // 画像を回転させる。
+        this._sprite.rotation = angle * 180 / Math.PI;
+
+        // 定周期に3-way弾を発射する。
+        this._shotInterval++;
+        if (this._shotInterval > N3WAY_SHOT_WATI + N3WAY_SHOT_INTERVAL) {
+
+            // 自機へ向けて弾を発射する。
+            EnemyShot.fireNWay(this._hitArea,
+                Util.calcAngle(this._hitArea, scene.playerPosition),
+                N3WAY_SHOT_COUNT,
+                N3WAY_SHOT_ANGLE,
+                N3WAY_SHOT_SPEED,
+                false,
+                scene);
+
+            // 弾発射間隔を初期化する。
+            this._shotInterval = N3WAY_SHOT_WATI;
+        }
+    }
+}
+
+export default CentipedeTail;

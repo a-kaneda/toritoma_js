@@ -78,7 +78,6 @@ class PlayerShot {
                 topCharacter.attack(this._power);
                 // 敵キャラクターに接触した場合は自分自身は削除する。
                 scene.removeCharacter(this);
-                this._sprite.remove();
                 // ヒット音を再生するために自機弾衝突フラグを立てる。
                 // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
                 scene.isHitPlayerShot = true;
@@ -90,7 +89,6 @@ class PlayerShot {
         if (this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
         // 画面外の敵にダメージを与えないように画面端付近で攻撃力を0にする。
@@ -100,9 +98,15 @@ class PlayerShot {
         // 画面外に出た場合は自分自身を削除する。
         if (this._hitArea.x > ScreenSize.STAGE_RECT.width + 4) {
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
     }
     /**
      * アニメーションを停止する。

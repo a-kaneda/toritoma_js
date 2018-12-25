@@ -169,7 +169,6 @@ class EnemyShot {
                     topCharacter.attack(REFLECTION_POWER);
                     // 敵キャラクターに接触した場合は自分自身は削除する。
                     scene.removeCharacter(this);
-                    this._sprite.remove();
                     // ヒット音を再生するために自機弾衝突フラグを立てる。
                     // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
                     scene.isHitPlayerShot = true;
@@ -192,7 +191,6 @@ class EnemyShot {
         if (this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
         // 画面外に出た場合は自分自身を削除する。
@@ -201,9 +199,15 @@ class EnemyShot {
             this._hitArea.y < -this._hitArea.height * 2 ||
             this._hitArea.y > ScreenSize.STAGE_RECT.height + this._hitArea.height * 2) {
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
     }
     /**
      * アニメーションを停止する。
@@ -220,15 +224,6 @@ class EnemyShot {
     startAnimation() {
         this._animation.paused = false;
         return this;
-    }
-    /**
-     * 削除する。
-     * @param scene シーン
-     */
-    remove(scene) {
-        // 自分自身を削除する。
-        scene.removeCharacter(this);
-        this._sprite.remove();
     }
     /**
      * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。

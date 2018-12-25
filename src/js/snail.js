@@ -1,4 +1,4 @@
-import Enemy from './enemy.js';
+import Enemy from './enemy';
 import WalkingCharacter from './walkingcharacter';
 import EnemyShot from './enemyshot';
 import Util from './util';
@@ -16,11 +16,12 @@ class Snail extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'snail', scene);
+        super(x, y, 'snail', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
         // 上下の障害物との距離から逆さまかどうかを判定する。

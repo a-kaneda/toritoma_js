@@ -1,5 +1,5 @@
 import Enemy from './enemy';
-import Util from './util.js';
+import Util from './util';
 import EnemyShot from './enemyshot';
 // 状態
 const STATE = {
@@ -25,11 +25,12 @@ class Cicada extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'cicada', scene);
+        super(x, y, 'cicada', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
         // 初期状態は停止とする。

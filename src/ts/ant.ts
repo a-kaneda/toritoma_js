@@ -3,6 +3,7 @@ import EnemyShot from './enemyshot';
 import Enemy from './enemy.js';
 import PlayingScene from './playingscene';
 import WalkingCharacter from './walkingcharacter';
+import EnemyParam from './enemyparam';
 
 // 状態
 enum STATE {
@@ -39,12 +40,13 @@ class Ant extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: PlayingScene) {
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'ant', scene);
+        super(x, y, 'ant', param, scene);
 
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;

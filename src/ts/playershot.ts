@@ -112,7 +112,6 @@ class PlayerShot implements CharacterIF {
 
                 // 敵キャラクターに接触した場合は自分自身は削除する。
                 scene.removeCharacter(this);
-                this._sprite.remove();
 
                 // ヒット音を再生するために自機弾衝突フラグを立てる。
                 // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
@@ -127,7 +126,6 @@ class PlayerShot implements CharacterIF {
         if (this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
 
@@ -139,9 +137,16 @@ class PlayerShot implements CharacterIF {
         // 画面外に出た場合は自分自身を削除する。
         if (this._hitArea.x > ScreenSize.STAGE_RECT.width + 4) {
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
+    }
+
+    /**
+     * シーンから取り除く。
+     */
+    public remove(): this {
+        this._sprite.remove();
+        return this;
     }
 
     /**

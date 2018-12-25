@@ -12,11 +12,12 @@ class Bagworm extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'bagworm', scene);
+        super(x, y, 'bagworm', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
     }

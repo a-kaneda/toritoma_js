@@ -31,12 +31,14 @@ const ASSETS = {
         'control': './images/control.png',
         'image_8x8': './images/image_8x8.png',
         'image_16x16': './images/image_16x16.png',
+        'image_32x32': './images/image_32x32.png',
         'image_64x64': './images/image_64x64.png',
         'howtoimage': './images/howtoimage.png',
     },
     spritesheet: {
         'image_8x8_ss': './images/image_8x8_ss.json',
         'image_16x16_ss': './images/image_16x16_ss.json',
+        'image_32x32_ss': './images/image_32x32_ss.json',
         'image_64x64_ss': './images/image_64x64_ss.json',
     },
     sound: {

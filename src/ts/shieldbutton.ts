@@ -101,6 +101,9 @@ class ShieldButton {
         this._touch = false;
         this._offImage.alpha = 1;
         this._onImage.alpha = 0;
+
+        // 初期値は有効とする。
+        this._enable = true;
     }
 
     /** 画像、ボタンを合わせたスプライト。 */

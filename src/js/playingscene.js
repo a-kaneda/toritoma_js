@@ -263,10 +263,13 @@ class PlayingScene {
      * @param character 削除するキャラクター
      */
     removeCharacter(character) {
+        // シーン中のキャラクター配列から削除する。
         const i = this._characters.indexOf(character);
         if (i >= 0) {
             this._characters.splice(i, 1);
         }
+        // キャラクターの削除処理を行う。
+        character.remove();
     }
     /**
      * スコアを追加する。
@@ -724,7 +727,7 @@ class PlayingScene {
         for (let i = this._characters.length - 1; i >= 0; i--) {
             const character = this._characters[i];
             if (Character.isEnemyShot(character)) {
-                character.remove(this);
+                this.removeCharacter(character);
             }
         }
     }

@@ -1,7 +1,8 @@
-import Enemy from './enemy'
-import PlayingScene from './playingscene'
-import EnemyShot from './enemyshot'
-import Util from './util'
+import Enemy from './enemy';
+import PlayingScene from './playingscene';
+import EnemyShot from './enemyshot';
+import Util from './util';
+import EnemyParam from './enemyparam';
 
 // 弾発射間隔
 const SHOT_INTERVAL = 60;
@@ -16,19 +17,20 @@ const SHOT_SPEED = 0.75;
  */
 class Ladybug extends Enemy {
 
-        /** 弾発射間隔 */
+    /** 弾発射間隔 */
     private _shotInterval: number;
 
     /**
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: PlayingScene) {
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'ladybug', scene);
+        super(x, y, 'ladybug', param, scene);
 
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;

@@ -1,12 +1,11 @@
-import ScreenSize from './screensize'
-import Character from './character'
-import Util from './util'
-import Collider from './collider'
-import Player from './player'
-import PlayingScene from './playingscene'
-import Rect from './rect'
-import CharacterIF from './characterif'
-import Point from './point'
+import ScreenSize from './screensize';
+import Character from './character';
+import Util from './util';
+import Collider from './collider';
+import PlayingScene from './playingscene';
+import Rect from './rect';
+import CharacterIF from './characterif';
+import Point from './point';
 
 // 当たり判定幅
 const HIT_WIDTH = 3;
@@ -262,7 +261,6 @@ class EnemyShot implements CharacterIF {
     
                     // 敵キャラクターに接触した場合は自分自身は削除する。
                     scene.removeCharacter(this);
-                    this._sprite.remove();
     
                     // ヒット音を再生するために自機弾衝突フラグを立てる。
                     // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
@@ -290,7 +288,6 @@ class EnemyShot implements CharacterIF {
         if (this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
 
@@ -301,9 +298,16 @@ class EnemyShot implements CharacterIF {
             this._hitArea.y > ScreenSize.STAGE_RECT.height + this._hitArea.height * 2) {
 
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
+    }
+
+    /**
+     * シーンから取り除く。
+     */
+    public remove(): this {
+        this._sprite.remove();
+        return this;
     }
 
     /**
@@ -324,17 +328,6 @@ class EnemyShot implements CharacterIF {
         return this;
     }
     
-    /**
-     * 削除する。
-     * @param scene シーン
-     */
-    public remove(scene: PlayingScene): void {
-
-        // 自分自身を削除する。
-        scene.removeCharacter(this);
-        this._sprite.remove();
-    }
-
     /**
      * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
      * @return ゲージ増加比率

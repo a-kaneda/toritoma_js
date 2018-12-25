@@ -390,10 +390,15 @@ class PlayingScene implements Scene {
      * @param character 削除するキャラクター
      */
     public removeCharacter(character: CharacterIF): void {
+
+        // シーン中のキャラクター配列から削除する。
         const i = this._characters.indexOf(character);
         if (i >= 0) {
             this._characters.splice(i, 1);
         }
+
+        // キャラクターの削除処理を行う。
+        character.remove();
     }
 
     /**
@@ -989,7 +994,7 @@ class PlayingScene implements Scene {
 
             const character = this._characters[i];
             if (Character.isEnemyShot(character)) {
-                character.remove(this);
+                this.removeCharacter(character);
             }
         }
     }

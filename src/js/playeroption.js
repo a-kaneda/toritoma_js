@@ -93,6 +93,13 @@ class PlayerOption {
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
+    }
+    /**
      * アニメーションを停止する。
      * @return 自インスタンス
      */
@@ -162,7 +169,6 @@ class PlayerOption {
             // 0以下が指定された場合は自分自身も削除する。
             if (count <= 0) {
                 scene.removeCharacter(this);
-                this._sprite.remove();
             }
         }
     }

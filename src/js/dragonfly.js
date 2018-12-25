@@ -1,6 +1,5 @@
-/** @module dragonfly */
-import EnemyShot from './enemyshot.js';
-import Enemy from './enemy.js';
+import EnemyShot from './enemyshot';
+import Enemy from './enemy';
 // 移動スピード
 const MOVE_SPEED = 0.5;
 // 弾のスピード
@@ -17,11 +16,12 @@ class Dragonfly extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'dragonfly', scene);
+        super(x, y, 'dragonfly', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
     }

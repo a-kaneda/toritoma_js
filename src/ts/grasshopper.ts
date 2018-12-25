@@ -1,8 +1,9 @@
-import Enemy from './enemy'
-import PlayingScene from './playingscene'
-import WalkingCharacter from './walkingcharacter'
-import Util from './util.js'
-import EnemyShot from './enemyshot.js'
+import Enemy from './enemy';
+import PlayingScene from './playingscene';
+import WalkingCharacter from './walkingcharacter';
+import Util from './util';
+import EnemyShot from './enemyshot';
+import EnemyParam from './enemyparam';
 
 // 状態
 const STATE = {
@@ -48,12 +49,13 @@ class Grasshopper extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: PlayingScene) {
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'grasshopper', scene);
+        super(x, y, 'grasshopper', param, scene);
 
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;

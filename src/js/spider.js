@@ -91,11 +91,12 @@ class Spider extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'spider', scene);
+        super(x, y, 'spider', param, scene);
         // 状態を初期化する。
         this._state = STATE.INIT;
         // 移動先番号を初期化する。

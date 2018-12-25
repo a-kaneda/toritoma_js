@@ -1,9 +1,10 @@
-import Enemy from './enemy'
-import PlayingScene from './playingscene'
-import ScreenSize from './screensize'
-import EnemyShot from './enemyshot'
-import Point from './point'
-import Util from './util'
+import Enemy from './enemy';
+import PlayingScene from './playingscene';
+import ScreenSize from './screensize';
+import EnemyShot from './enemyshot';
+import Point from './point';
+import Util from './util';
+import EnemyParam from './enemyparam';
 
 // 弾発射状態
 enum SHOT_STATE {
@@ -91,16 +92,18 @@ class Mantis extends Enemy {
     private _shotInterval: number[];
     /** 状態遷移間隔。 */
     private _stateInterval: number;
+
     /**
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: PlayingScene) {
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'mantis', scene);
+        super(x, y, 'mantis', param, scene);
 
         // y座標を設定する。
         this._hitArea.y = POS_Y;

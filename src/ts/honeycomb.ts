@@ -1,9 +1,10 @@
-import Enemy from './enemy'
-import PlayingScene from './playingscene'
-import EnemyShot from './enemyshot'
-import Util from './util'
-import ScreenSize from './screensize'
-import Hornet from './hornet'
+import Enemy from './enemy';
+import PlayingScene from './playingscene';
+import EnemyShot from './enemyshot';
+import Util from './util';
+import ScreenSize from './screensize';
+import EnemyParam from './enemyparam';
+import EnemyFactory from './enemyfactory';
 
 // 状態
 enum STATE {
@@ -17,8 +18,6 @@ enum STATE {
 const STATE_INTERVAL = [340, 900, 900, 900];
 // ハチを呼び出す間隔
 const CALL_HORNET_INTERVAL = 120;
-// ハチの登場位置の数
-const CALL_HORNET_POSITION_COUNT = 3;
 // ハチの登場位置x座標
 const HORNET_X_POSITION = 192;
 // ハチの登場位置y座標
@@ -70,12 +69,13 @@ class Hoenycomb extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: PlayingScene) {
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
 
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'honeycomb', scene);
+        super(x, y, 'honeycomb', param, scene);
 
         // 弾発射間隔を初期化する。
         this._shotInterval = [0, 0, 0];
@@ -216,9 +216,12 @@ class Hoenycomb extends Enemy {
             if (this._shotInterval[2] > CALL_HORNET_INTERVAL) {
 
                 // ハチを呼ぶ。
-                scene.addCharacter(new Hornet(HORNET_X_POSITION, HORNET_Y_POSITION[this._hornetPosition], scene));
+                const hornet = EnemyFactory.create(HORNET_X_POSITION, HORNET_Y_POSITION[this._hornetPosition], 'hornet', scene);
+                if (hornet) {
+                    scene.addCharacter(hornet);
+                }
 
-                // ハチの位置を呼ぶたびに切り替える。
+                // ハチのd位置を呼ぶたびに切り替える。
                 this._hornetPosition++;
                 if (this._hornetPosition >= HORNET_Y_POSITION.length) {
                     this._hornetPosition = 0;

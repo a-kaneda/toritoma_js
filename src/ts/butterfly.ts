@@ -1,6 +1,7 @@
-import Enemy from './enemy'
-import PlayingScene from './playingscene'
-import EnemyShot from './enemyshot'
+import Enemy from './enemy';
+import PlayingScene from './playingscene';
+import EnemyShot from './enemyshot';
+import EnemyParam from './enemyparam';
 
 // 状態
 enum STATE {
@@ -37,12 +38,13 @@ class Butterfly extends Enemy {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x: number, y: number, scene: PlayingScene) {
+    constructor(x: number, y: number, param: EnemyParam, scene: PlayingScene) {
         
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'butterfly', scene);
+        super(x, y, 'butterfly', param, scene);
 
         // 初期状態は上方向への移動とする。
         this._state = STATE.UP_MOVE;

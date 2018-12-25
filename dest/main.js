@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 39);
+/******/ 	return __webpack_require__(__webpack_require__.s = 48);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -117,16 +117,10 @@ class ScreenSize {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__collider__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__explosion__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
-/** @module enemy */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
 
 
 
-
-
-// 敵撃破時のチキンゲージ増加量
-const INCREMENT_CHICKEN_GAUGE = 0.005;
 /**
  * 敵キャラクター。
  */
@@ -136,16 +130,19 @@ class Enemy {
      * @param x x座標
      * @param y y座標
      * @param type 種別。
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, type, scene) {
+    constructor(x, y, type, param, scene) {
         // サイズを取得する。
-        const size = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].size;
+        const size = param.size;
         // サイズに応じて画像、スプライトシートのファイル名を変える。
         const imageFile = 'image_' + size + 'x' + size;
         const ssFile = 'image_' + size + 'x' + size + '_ss';
         // スプライト画像を読み込む。
         this._sprite = new phina.pixi.Sprite(imageFile, 16, 16);
+        // 原点位置を設定する。
+        this._sprite.setOrigin(param.originX, param.originY);
         // スプライトをシーンに追加する。
         scene.addCharacterSprite(this._sprite);
         // アニメーションの設定を行う。
@@ -153,17 +150,13 @@ class Enemy {
         this._animation.attachTo(this._sprite);
         this._animation.gotoAndPlay(type);
         // 当たり判定を作成する。
-        this._hitArea = new __WEBPACK_IMPORTED_MODULE_0__collider__["a" /* default */](x, y, __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].width, __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].height);
+        this._hitArea = new __WEBPACK_IMPORTED_MODULE_0__collider__["a" /* default */](x, y, param.width, param.height);
         // HPを設定する。
-        this._hp = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].hp;
+        this._hp = param.hp;
         // 防御力を設定する。
-        this._defense = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].defense;
-        // スコアを設定する。
-        this._score = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].score;
-        // 死亡エフェクトを設定する。
-        this._death = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].enemy[type].death;
-        // 死亡エフェクト間隔を初期化する。
-        this._deathInterval = 0;
+        this._defense = param.defense;
+        // 死亡エフェクトを初期化する。
+        this._deathEffect = null;
         // キャラクター種別を設定する。
         this._type = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].type.ENEMY;
     }
@@ -175,28 +168,42 @@ class Enemy {
     get rect() {
         return this._hitArea;
     }
+    /** 死亡エフェクト */
+    set deathEffect(value) {
+        this._deathEffect = value;
+    }
     /**
      * 更新処理。
      * @param scene シーン
      */
     update(scene) {
         // HPが0になった場合は破壊処理を行い、自分自身を削除する。
+        // また、破壊エフェクト中に衝突処理が走らないように種別をエフェクトに変更する。
         if (this._hp <= 0) {
-            this._deathEffect(scene);
+            this._type = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].type.EFFECT;
+            if (this._deathEffect) {
+                this._deathEffect.update(scene);
+            }
             return;
         }
         // 画面外に出た場合は自分自身を削除する。
         // 画面外に出た場合は自分自身を削除する。
         if (this._hitArea.x < -this._hitArea.width * 2 ||
-            this._hitArea.x > __WEBPACK_IMPORTED_MODULE_3__screensize__["a" /* default */].STAGE_RECT.width + this._hitArea.width * 2) {
+            this._hitArea.x > __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width + this._hitArea.width * 2) {
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
         // キャラクター種別ごとの固有の処理を行う。
         this.action(scene);
         // 座標をスプライトに適用する。
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
     }
     /**
      * アニメーションを停止する。
@@ -226,70 +233,6 @@ class Enemy {
             this._hp -= power - this._defense;
         }
     }
-    /**
-     * 死亡処理。
-     * @param scene シーン
-     */
-    _deathEffect(scene) {
-        switch (this._death) {
-            case __WEBPACK_IMPORTED_MODULE_1__character__["b" /* DeathEffect */].NORMAL:
-                this._deathNormal(scene);
-                break;
-            case __WEBPACK_IMPORTED_MODULE_1__character__["b" /* DeathEffect */].BOSS:
-                this._deathBoss(scene);
-                break;
-            default:
-                break;
-        }
-    }
-    /**
-     * 雑魚敵の死亡処理。爆発アニメーションを発生させ、スコアを加算し、自分自身を削除する。
-     * @param scene シーン
-     */
-    _deathNormal(scene) {
-        // 爆発アニメーションを作成する。
-        scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__explosion__["a" /* default */](this._hitArea.x, this._hitArea.y, scene));
-        // スコアを加算する。
-        scene.addScore(this._score);
-        // チキンゲージを増加させる。
-        scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
-        // 自分自身を削除する。
-        scene.removeCharacter(this);
-        this._sprite.remove();
-    }
-    /**
-     * ボス敵の死亡処理。一定時間爆発アニメーションを発生させ、スコアを加算し、自分自身を削除する。
-     * @param scene シーン
-     */
-    _deathBoss(scene) {
-        // 爆発の間隔
-        const EXPLOSION_INTERVAL = 20;
-        // 状態遷移間隔
-        const STATE_INTERVAL = 300;
-        // ボス死亡エフェクト中はキャラクター種別をエフェクトに変更する。
-        this._type = __WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].type.EFFECT;
-        // 爆発の間隔が経過している場合は爆発を発生させる。
-        this._deathInterval++;
-        if (this._deathInterval % EXPLOSION_INTERVAL == 0) {
-            // 爆発発生位置を決める。
-            const x = this._hitArea.x + (Math.random() - 0.5) * this._hitArea.width;
-            const y = this._hitArea.y + (Math.random() - 0.5) * this._hitArea.height;
-            // 爆発アニメーションを作成する。
-            scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__explosion__["a" /* default */](x, y, scene));
-        }
-        // 状態遷移間隔が経過している場合は死亡処理を行う。
-        if (this._deathInterval > STATE_INTERVAL) {
-            // スコアを加算する。
-            scene.addScore(this._score);
-            // チキンゲージを増加させる。
-            scene.addChickenGauge(INCREMENT_CHICKEN_GAUGE);
-            // ステージクリア処理を行う。
-            scene.stageClear();
-            // 自分自身を削除する。
-            scene.removeCharacter(this);
-            this._sprite.remove();
-        }
-    }
 }
 /* harmony default export */ __webpack_exports__["a"] = (Enemy);
 
@@ -301,7 +244,7 @@ class Enemy {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__collider__ = __webpack_require__(7);
 
 
@@ -474,7 +417,6 @@ class EnemyShot {
                     topCharacter.attack(REFLECTION_POWER);
                     // 敵キャラクターに接触した場合は自分自身は削除する。
                     scene.removeCharacter(this);
-                    this._sprite.remove();
                     // ヒット音を再生するために自機弾衝突フラグを立てる。
                     // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
                     scene.isHitPlayerShot = true;
@@ -497,7 +439,6 @@ class EnemyShot {
         if (this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
         // 画面外に出た場合は自分自身を削除する。
@@ -506,9 +447,15 @@ class EnemyShot {
             this._hitArea.y < -this._hitArea.height * 2 ||
             this._hitArea.y > __WEBPACK_IMPORTED_MODULE_0__screensize__["a" /* default */].STAGE_RECT.height + this._hitArea.height * 2) {
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
     }
     /**
      * アニメーションを停止する。
@@ -525,15 +472,6 @@ class EnemyShot {
     startAnimation() {
         this._animation.paused = false;
         return this;
-    }
-    /**
-     * 削除する。
-     * @param scene シーン
-     */
-    remove(scene) {
-        // 自分自身を削除する。
-        scene.removeCharacter(this);
-        this._sprite.remove();
     }
     /**
      * かすり時のゲージ増加比率を返し、二重にかすらないようにメンバ変数の値を0にする。
@@ -578,6 +516,55 @@ class EnemyShot {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * アプリ全体で使用する関数群を定義する。
+ */
+class Util {
+    /**
+     * srcを始点、destを終点としたときの角度を求める。
+     * @param src 始点
+     * @param dest 終点
+     * @return 角度
+     */
+    static calcAngle(src, dest) {
+        // x座標の差分を計算する。
+        const diffX = dest.x - src.x;
+        // phina.jsではy座標は上が原点のため、反転させる。
+        const diffY = src.y - dest.y;
+        // 角度を計算する。
+        const ret = Math.atan2(diffY, diffX);
+        return ret;
+    }
+    /**
+     * N-Way弾の各弾の進行角度を計算する。
+     * @param center 中心角度
+     * @param count 弾数
+     * @param interval 弾の間の角度
+     * @return 各弾の角度
+     */
+    static calcNWayAngle(center, count, interval) {
+        // 戻り値を用意する。
+        let angles = [];
+        // 最小値の角度を計算する。
+        const minAngle = center - (interval * (count - 1)) / 2.0;
+        // 各弾の発射角度を計算する。
+        for (let i = 0; i < count; i++) {
+            // 弾の角度を計算する
+            const angle = minAngle + i * interval;
+            // 戻り値に追加する。
+            angles.push(angle);
+        }
+        return angles;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Util);
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -770,60 +757,10 @@ var ControlSize = {
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/**
- * アプリ全体で使用する関数群を定義する。
- */
-class Util {
-    /**
-     * srcを始点、destを終点としたときの角度を求める。
-     * @param src 始点
-     * @param dest 終点
-     * @return 角度
-     */
-    static calcAngle(src, dest) {
-        // x座標の差分を計算する。
-        const diffX = dest.x - src.x;
-        // phina.jsではy座標は上が原点のため、反転させる。
-        const diffY = src.y - dest.y;
-        // 角度を計算する。
-        const ret = Math.atan2(diffY, diffX);
-        return ret;
-    }
-    /**
-     * N-Way弾の各弾の進行角度を計算する。
-     * @param center 中心角度
-     * @param count 弾数
-     * @param interval 弾の間の角度
-     * @return 各弾の角度
-     */
-    static calcNWayAngle(center, count, interval) {
-        // 戻り値を用意する。
-        let angles = [];
-        // 最小値の角度を計算する。
-        const minAngle = center - (interval * (count - 1)) / 2.0;
-        // 各弾の発射角度を計算する。
-        for (let i = 0; i < count; i++) {
-            // 弾の角度を計算する
-            const angle = minAngle + i * interval;
-            // 戻り値に追加する。
-            angles.push(angle);
-        }
-        return angles;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Util);
-
-
-/***/ }),
 /* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return DeathEffect; });
 /**
  * キャラクター種別
  */
@@ -841,147 +778,6 @@ const type = {
     /** エフェクト */
     EFFECT: 6,
 };
-/** 敵キャラ死亡エフェクト */
-var DeathEffect;
-(function (DeathEffect) {
-    DeathEffect[DeathEffect["NORMAL"] = 0] = "NORMAL";
-    DeathEffect[DeathEffect["BOSS"] = 1] = "BOSS";
-})(DeathEffect || (DeathEffect = {}));
-/**
- * 敵キャラパラメータ定義。
- */
-const enemy = {
-    // トンボ
-    dragonfly: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 3,
-        defense: 0,
-        score: 100,
-        death: DeathEffect.NORMAL,
-    },
-    // アリ
-    ant: {
-        size: 16,
-        width: 16,
-        height: 8,
-        hp: 7,
-        defense: 0,
-        score: 200,
-        death: DeathEffect.NORMAL,
-    },
-    // チョウ
-    butterfly: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 10,
-        defense: 0,
-        score: 200,
-        death: DeathEffect.NORMAL,
-    },
-    // テントウムシ
-    ladybug: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 18,
-        defense: 0,
-        score: 200,
-        death: DeathEffect.NORMAL,
-    },
-    // ミノムシ
-    bagworm: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 30,
-        defense: 0,
-        score: 300,
-        death: DeathEffect.NORMAL,
-    },
-    // セミ
-    cicada: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 20,
-        defense: 0,
-        score: 200,
-        death: DeathEffect.NORMAL,
-    },
-    // バッタ
-    grasshopper: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 9,
-        defense: 0,
-        score: 200,
-        death: DeathEffect.NORMAL,
-    },
-    // ハチ
-    hornet: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 12,
-        defense: 0,
-        score: 200,
-        death: DeathEffect.NORMAL,
-    },
-    // カタツムリ
-    snail: {
-        size: 16,
-        width: 16,
-        height: 16,
-        hp: 13,
-        defense: 0,
-        score: 200,
-        death: DeathEffect.NORMAL,
-    },
-    // カブトムシ
-    rhinocerosbeetle: {
-        size: 64,
-        width: 64,
-        height: 40,
-        hp: 1000,
-        defense: 0,
-        score: 3000,
-        death: DeathEffect.BOSS,
-    },
-    // カマキリ
-    mantis: {
-        size: 64,
-        width: 64,
-        height: 64,
-        hp: 1300,
-        defense: 99,
-        score: 3000,
-        death: DeathEffect.BOSS,
-    },
-    // ハチの巣
-    honeycomb: {
-        size: 64,
-        width: 64,
-        height: 64,
-        hp: 1200,
-        defense: 99,
-        score: 3000,
-        death: DeathEffect.BOSS,
-    },
-    // クモ
-    spider: {
-        size: 64,
-        width: 64,
-        height: 64,
-        hp: 1600,
-        defense: 0,
-        score: 3000,
-        death: DeathEffect.BOSS,
-    },
-};
 /**
  * キャラクターに関する定数を管理する。
  */
@@ -991,12 +787,6 @@ class Character {
      */
     static get type() {
         return type;
-    }
-    /**
-     * 敵キャラクターパラメータ。
-     */
-    static get enemy() {
-        return enemy;
     }
     /**
      * 指定されたキャラクターが敵かどうかを判定する。
@@ -1071,7 +861,7 @@ class MyColor {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage_js__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 
 
@@ -1618,13 +1408,13 @@ class Collider {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(45);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controlsize__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__playingscene__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplayscene__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__creditscene__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__controlsize__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cursor__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cursor__ = __webpack_require__(17);
 
 
 
@@ -1831,6 +1621,332 @@ class TitleScene {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__dragonfly__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__butterfly__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ladybug__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__bagworm__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__cicada__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__grasshopper__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__hornet__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__snail__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rhinocerosbeetle__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__mantis__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__honeycomb__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__spider__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__centipede__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__centipedebody__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__centipedetail__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__deathnormal__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__deathboss__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__deathcentipede__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__deathnone__ = __webpack_require__(38);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 敵撃破時のチキンゲージ増加量
+const INCREMENT_CHICKEN_GAUGE = 0.005;
+/**
+ * 敵キャラパラメータ定義。
+ */
+const ENEMY_DEF = {
+    // トンボ
+    dragonfly: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 3,
+        defense: 0,
+        score: 100,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // アリ
+    ant: {
+        size: 16,
+        width: 16,
+        height: 8,
+        hp: 7,
+        defense: 0,
+        score: 200,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // チョウ
+    butterfly: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 10,
+        defense: 0,
+        score: 200,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // テントウムシ
+    ladybug: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 18,
+        defense: 0,
+        score: 200,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // ミノムシ
+    bagworm: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 30,
+        defense: 0,
+        score: 300,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // セミ
+    cicada: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 20,
+        defense: 0,
+        score: 200,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // バッタ
+    grasshopper: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 9,
+        defense: 0,
+        score: 200,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // ハチ
+    hornet: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 12,
+        defense: 0,
+        score: 200,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // カタツムリ
+    snail: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 13,
+        defense: 0,
+        score: 200,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // カブトムシ
+    rhinocerosbeetle: {
+        size: 64,
+        width: 32,
+        height: 20,
+        hp: 2000,
+        defense: 0,
+        score: 3000,
+        death: 'DeathBoss',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // カマキリ
+    mantis: {
+        size: 64,
+        width: 32,
+        height: 32,
+        hp: 2600,
+        defense: 99,
+        score: 3000,
+        death: 'DeathBoss',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // ハチの巣
+    honeycomb: {
+        size: 64,
+        width: 32,
+        height: 32,
+        hp: 2400,
+        defense: 99,
+        score: 3000,
+        death: 'DeathBoss',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // クモ
+    spider: {
+        size: 64,
+        width: 32,
+        height: 32,
+        hp: 3200,
+        defense: 0,
+        score: 3000,
+        death: 'DeathBoss',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // ムカデ
+    centipede: {
+        size: 32,
+        width: 16,
+        height: 16,
+        hp: 19,
+        defense: 99,
+        score: 3000,
+        death: 'DeathBoss',
+        originX: 0.25,
+        originY: 0.5,
+    },
+    // ムカデ（胴体）
+    centipede_body: {
+        size: 32,
+        width: 16,
+        height: 8,
+        hp: 1,
+        defense: 99,
+        score: 0,
+        death: 'DeathNone',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // ムカデ（尻尾）
+    centipede_tail: {
+        size: 32,
+        width: 24,
+        height: 24,
+        hp: 15,
+        defense: 0,
+        score: 0,
+        death: 'DeathCentipede',
+        originX: 0.75,
+        originY: 0.5,
+    },
+};
+class EnemyFactory {
+    static create(x, y, type, scene) {
+        // 敵キャラクターを作成する。
+        let enemy = null;
+        switch (type) {
+            case 'dragonfly':
+                enemy = new __WEBPACK_IMPORTED_MODULE_0__dragonfly__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'ant':
+                enemy = new __WEBPACK_IMPORTED_MODULE_1__ant__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'butterfly':
+                enemy = new __WEBPACK_IMPORTED_MODULE_2__butterfly__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'ladybug':
+                enemy = new __WEBPACK_IMPORTED_MODULE_3__ladybug__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'bagworm':
+                enemy = new __WEBPACK_IMPORTED_MODULE_4__bagworm__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'cicada':
+                enemy = new __WEBPACK_IMPORTED_MODULE_5__cicada__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'grasshopper':
+                enemy = new __WEBPACK_IMPORTED_MODULE_6__grasshopper__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'hornet':
+                enemy = new __WEBPACK_IMPORTED_MODULE_7__hornet__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'snail':
+                enemy = new __WEBPACK_IMPORTED_MODULE_8__snail__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'rhinocerosbeetle':
+                enemy = new __WEBPACK_IMPORTED_MODULE_9__rhinocerosbeetle__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'mantis':
+                enemy = new __WEBPACK_IMPORTED_MODULE_10__mantis__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'honeycomb':
+                enemy = new __WEBPACK_IMPORTED_MODULE_11__honeycomb__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'spider':
+                enemy = new __WEBPACK_IMPORTED_MODULE_12__spider__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'centipede':
+                enemy = new __WEBPACK_IMPORTED_MODULE_13__centipede__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'centipede_body':
+                enemy = new __WEBPACK_IMPORTED_MODULE_14__centipedebody__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'centipede_tail':
+                enemy = new __WEBPACK_IMPORTED_MODULE_15__centipedetail__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
+            default:
+                console.log(`Error: Unknwon enemy type: ${type}`);
+                break;
+        }
+        if (enemy) {
+            // 死亡エフェクトを作成する。
+            let death;
+            switch (ENEMY_DEF[type].death) {
+                case 'DeathNormal':
+                    death = new __WEBPACK_IMPORTED_MODULE_16__deathnormal__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    break;
+                case 'DeathBoss':
+                    death = new __WEBPACK_IMPORTED_MODULE_17__deathboss__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    break;
+                case 'DeathCentipede':
+                    death = new __WEBPACK_IMPORTED_MODULE_18__deathcentipede__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    break;
+                default:
+                    death = new __WEBPACK_IMPORTED_MODULE_19__deathnone__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    break;
+            }
+            enemy.deathEffect = death;
+        }
+        return enemy;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (EnemyFactory);
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /**
  * ポイントデバイスがマウスかタッチパネルかを調べる。
  */
@@ -1876,14 +1992,246 @@ class PointDevice {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return STATE; });
+var STATE;
+(function (STATE) {
+    STATE[STATE["ENTRY"] = 0] = "ENTRY";
+    STATE[STATE["N5WAY_SHOT"] = 1] = "N5WAY_SHOT";
+    STATE[STATE["HIGH_SPEED_SHOT"] = 2] = "HIGH_SPEED_SHOT";
+    STATE[STATE["BODY_SHOT"] = 3] = "BODY_SHOT";
+    STATE[STATE["COUNT"] = 4] = "COUNT";
+})(STATE || (STATE = {}));
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__centipedeif__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyshot__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(3);
+
+
+
+
+// 3-way弾の発射間隔
+const N3WAY_SHOT_INTERVAL = 30;
+// 3-way弾の弾数
+const N3WAY_SHOT_COUNT = 3;
+// 3-way弾の角度の間隔
+const N3WAY_SHOT_ANGLE = Math.PI / 8;
+// 3-way弾のスピード
+const N3WAY_SHOT_SPEED = 0.75;
+// 3-way弾発射までの間
+const N3WAY_SHOT_WATI = 220;
+/**
+ * 敵キャラ、ムカデの尻尾。
+ */
+class CentipedeTail extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param param 敵キャラクターパラメータ
+     * @param scene シーン
+     */
+    constructor(x, y, param, scene) {
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'centipede_tail', param, scene);
+        // 移動履歴を初期化する。
+        this._moveHistory = [{ x: x, y: y }];
+        // 状態を初期化する。
+        this._state = __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].ENTRY;
+        // 弾発射間隔を初期化する。
+        this._shotInterval = 0;
+        // ひとつ前の体を初期化する。。
+        this._parent = null;
+        // 後ろの体を初期化する。
+        this._child = null;
+    }
+    /** ひとつ前の体 */
+    get parent() {
+        return this._parent;
+    }
+    /** ひとつ前の体 */
+    set parent(value) {
+        this._parent = value;
+    }
+    /** ひとつ後ろの体 */
+    get child() {
+        return this._child;
+    }
+    /** ひとつ後ろの体 */
+    set child(value) {
+        this._child = value;
+    }
+    /** ヒットポイント */
+    get hp() {
+        return this._hp;
+    }
+    /** ヒットポイント */
+    set hp(value) {
+        this._hp = value;
+    }
+    /**
+     * 一番古い移動履歴を取得する。
+     * @return 一番古い移動履歴
+     */
+    getFirstMoveHistory() {
+        return this._moveHistory[0];
+    }
+    /**
+     * 状態を設定する。
+     * @param state 状態
+     */
+    setState(state) {
+        // 自分の状態を設定する。
+        this._state = state;
+        // 子オブジェクトに現在の状態を通知する。
+        if (this._child) {
+            this._child.setState(this._state);
+        }
+        return this;
+    }
+    /**
+     * アニメーションフレームを設定する。
+     * @param frame アニメーションフレーム
+     */
+    setAnimationFrame(frame) {
+        this._animation.currentFrameIndex = frame;
+        return this;
+    }
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * @param scene シーン
+     */
+    action(scene) {
+        // 一つ前の体がメンバに設定されていない場合は処理しない。
+        if (!this._parent) {
+            return;
+        }
+        // 移動前の位置を記憶しておく。
+        const prevPosition = { x: this._hitArea.x, y: this._hitArea.y };
+        // 移動履歴の末尾を自分の座標に設定する。
+        this._hitArea.x = this._parent.getFirstMoveHistory().x;
+        this._hitArea.y = this._parent.getFirstMoveHistory().y;
+        // 前回位置との差から体の向きを決める。
+        const dx = this._hitArea.x - prevPosition.x;
+        const dy = this._hitArea.y - prevPosition.y;
+        const angle = Math.atan2(dy, dx);
+        // 画像を回転させる。
+        this._sprite.rotation = angle * 180 / Math.PI;
+        // 定周期に3-way弾を発射する。
+        this._shotInterval++;
+        if (this._shotInterval > N3WAY_SHOT_WATI + N3WAY_SHOT_INTERVAL) {
+            // 自機へ向けて弾を発射する。
+            __WEBPACK_IMPORTED_MODULE_2__enemyshot__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_3__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), N3WAY_SHOT_COUNT, N3WAY_SHOT_ANGLE, N3WAY_SHOT_SPEED, false, scene);
+            // 弾発射間隔を初期化する。
+            this._shotInterval = N3WAY_SHOT_WATI;
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (CentipedeTail);
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(5);
+
+/**
+ * 爆発アニメーションを行う。
+ */
+class Explosion {
+    /**
+     * コンストラクタ。
+     * 座標の設定とアニメーションの設定を行う。
+     * 爆発音を再生する。
+     * @param x x座標
+     * @param y y座標
+     * @param scene シーン
+     */
+    constructor(x, y, scene) {
+        // スプライト画像を読み込む。
+        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
+        // スプライトをシーンに追加する。
+        scene.addCharacterSprite(this._sprite);
+        // アニメーションの設定を行う。
+        this._animation = new phina.accessory.FrameAnimation('image_16x16_ss');
+        this._animation.attachTo(this._sprite);
+        this._animation.gotoAndPlay('explosion');
+        // 座標をスプライトに適用する。
+        this._sprite.setPosition(Math.floor(x), Math.floor(y));
+        // 爆発音を再生する。
+        phina.asset.SoundManager.play('bomb_min');
+    }
+    /** キャラクター種別 */
+    get type() {
+        return __WEBPACK_IMPORTED_MODULE_0__character__["a" /* default */].type.EFFECT;
+    }
+    /** 位置とサイズ */
+    get rect() {
+        return {
+            x: this._sprite.x,
+            y: this._sprite.y,
+            width: this._sprite.width,
+            height: this._sprite.height,
+        };
+    }
+    /**
+     * アニメーションが終了すると自分自身を削除する。
+     * @param scene シーン
+     */
+    update(scene) {
+        // アニメーションが終了すると自分自身を削除する。
+        if (this._animation.finished) {
+            scene.removeCharacter(this);
+        }
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
+    }
+    /**
+     * アニメーションを停止する。
+     * @return 自インスタンス
+     */
+    pauseAnimation() {
+        this._animation.paused = true;
+        return this;
+    }
+    /**
+     * アニメーションを開始する。
+     * @return 自インスタンス
+     */
+    startAnimation() {
+        this._animation.paused = false;
+        return this;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Explosion);
+
+
+/***/ }),
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frame__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__frame__ = __webpack_require__(19);
 
 
 
@@ -2033,7 +2381,7 @@ class LabelButton {
 
 
 /***/ }),
-/* 11 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2138,13 +2486,153 @@ class WalkingCharacter {
 
 
 /***/ }),
-/* 12 */
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__centipedeif__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyshot__ = __webpack_require__(2);
+
+
+
+// 弾発射間隔
+const SHOT_INTERVAL = 90;
+// 弾のスピード
+const SHOT_SPEED = 0.5;
+// 移動履歴保存数
+const MOVE_HISOTRY_COUNT = 11;
+/**
+ * 敵キャラ、ムカデの胴体。
+ */
+class CentipedeBody extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param param 敵キャラクターパラメータ
+     * @param scene シーン
+     */
+    constructor(x, y, param, scene) {
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'centipede_body', param, scene);
+        // 移動履歴を初期化する。
+        this._moveHistory = [{ x: x, y: y }];
+        // 状態を初期化する。
+        this._state = __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].ENTRY;
+        // 弾発射間隔を初期化する。
+        this._shotInterval = 0;
+        // 前の体を初期化する。
+        this._parent = null;
+        // 後ろの体を初期化する。
+        this._child = null;
+    }
+    /** ひとつ前の体 */
+    get parent() {
+        return this._parent;
+    }
+    /** ひとつ前の体 */
+    set parent(value) {
+        this._parent = value;
+    }
+    /** ひとつ後ろの体 */
+    get child() {
+        return this._child;
+    }
+    /** ひとつ後ろの体 */
+    set child(value) {
+        this._child = value;
+    }
+    /** ヒットポイント */
+    get hp() {
+        return this._hp;
+    }
+    /** ヒットポイント */
+    set hp(value) {
+        this._hp = value;
+    }
+    /**
+     * 一番古い移動履歴を取得する。
+     * @return 一番古い移動履歴
+     */
+    getFirstMoveHistory() {
+        return this._moveHistory[0];
+    }
+    /**
+     * 状態を設定する。
+     * @param state 状態
+     */
+    setState(state) {
+        // 自分の状態を設定する。
+        this._state = state;
+        // 子オブジェクトに現在の状態を通知する。
+        if (this._child) {
+            this._child.setState(this._state);
+        }
+        return this;
+    }
+    /**
+     * アニメーションフレームを設定する。
+     * @param frame アニメーションフレーム
+     */
+    setAnimationFrame(frame) {
+        this._animation.currentFrameIndex = frame;
+        return this;
+    }
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * @param scene シーン
+     */
+    action(scene) {
+        // 一つ前の体がメンバに設定されていない場合は処理しない。
+        if (!this._parent) {
+            return;
+        }
+        // 移動前の位置を記憶しておく。
+        const prevPosition = { x: this._hitArea.x, y: this._hitArea.y };
+        // 移動履歴の末尾を自分の座標に設定する。
+        this._hitArea.x = this._parent.getFirstMoveHistory().x;
+        this._hitArea.y = this._parent.getFirstMoveHistory().y;
+        // 前回位置との差から体の向きを決める。
+        const dx = this._hitArea.x - prevPosition.x;
+        const dy = this._hitArea.y - prevPosition.y;
+        const angle = Math.atan2(dy, dx);
+        // 画像を回転させる。
+        this._sprite.rotation = angle * 180 / Math.PI;
+        // 移動履歴を保存する。
+        this._moveHistory.push({ x: this._hitArea.x, y: this._hitArea.y });
+        // 移動履歴が保存数を超えた場合は先頭から削除していく。
+        while (this._moveHistory.length > MOVE_HISOTRY_COUNT) {
+            this._moveHistory.shift();
+        }
+        // 胴体部分からの発射の状態の時は弾を発射する。
+        if (this._state === __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].BODY_SHOT) {
+            // 弾発射間隔経過しているときは上下方向へ弾を発射する。
+            this._shotInterval++;
+            if (this._shotInterval > SHOT_INTERVAL) {
+                // 上下へ弾を発射する。
+                __WEBPACK_IMPORTED_MODULE_2__enemyshot__["a" /* default */].fireNWay(this._hitArea, Math.PI, 2, Math.PI, SHOT_SPEED, false, scene);
+                // 弾発射間隔を初期化する。
+                this._shotInterval = 0;
+            }
+        }
+        else {
+            // 弾を発射する状態以外の場合は弾発射間隔を初期化する。
+            this._shotInterval = 0;
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (CentipedeBody);
+
+
+/***/ }),
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dpad__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dpad__ = __webpack_require__(18);
 
 
 
@@ -2273,7 +2761,7 @@ class Cursor {
 
 
 /***/ }),
-/* 13 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2359,11 +2847,11 @@ class DPad {
 
 
 /***/ }),
-/* 14 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 
 
@@ -2475,124 +2963,11 @@ class Frame {
 
 
 /***/ }),
-/* 15 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
-
-
-// 状態
-var STATE;
-(function (STATE) {
-    STATE[STATE["MOVE_IN"] = 0] = "MOVE_IN";
-    STATE[STATE["FIRE"] = 1] = "FIRE";
-    STATE[STATE["MOVE_OUT"] = 2] = "MOVE_OUT"; // 退場
-})(STATE || (STATE = {}));
-;
-// 弾の数
-const SHOT_COUNT = 5;
-// 弾のスピード
-const SHOT_SPEED = [0.75, 0.85, 0.95, 1.05, 1.15];
-// 登場時のx方向の移動スピード
-const MOVE_IN_SPEED_X = -1.0;
-// 退場時のx方向の移動スピード
-const MOVE_OUT_SPEED_X = -1.3;
-// 退場時のy方向の移動スピード
-const MOVE_OUT_SPEED_Y = -0.25;
-// 登場時移動フレーム数
-const MOVE_IN_INTERVAL = 30;
-// 弾発射までの待機フレーム数
-const WAIT_FOR_FIRE_INTERVAL = 6;
-// 退場までの待機フレーム数
-const WAIT_FOR_MOVE_OUT_INTERVAL = 12;
-/**
- * 敵キャラクター、ハチ。
- */
-class Hornet extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
-    /**
-     * コンストラクタ
-     * @param x x座標
-     * @param y y座標
-     * @param scene シーン
-     */
-    constructor(x, y, scene) {
-        // 親クラスのコンストラクタを実行する。
-        super(x, y, 'hornet', scene);
-        // 初期状態は左移動とする。
-        this._state = STATE.MOVE_IN;
-        // 状態変化間隔を初期化する。
-        this._stateChangeInterval = 0;
-        // 登場時のx方向の移動速度は固定とする。
-        this._speedX = MOVE_IN_SPEED_X;
-        // 登場時のy方向の移動速度は自機の位置に到達できるように設定する。
-        this._speedY = (scene.playerPosition.y - this._hitArea.y) / MOVE_IN_INTERVAL;
-    }
-    /**
-     * 敵キャラクター種別ごとの固有の処理。
-     * 画面上半分から登場するときは左下に向かって一定時間進み、一時停止して弾を発射、その後左上に向かって飛んで行く。
-     * 画面下半分から登城するときは左上に向かって一定時間進み、あとの処理は同じ。
-     * 弾は5種類のスピードの弾を左方向に発射する。
-     * @param scene シーン
-     */
-    action(scene) {
-        // 状態によって処理を分岐する。
-        switch (this._state) {
-            case STATE.MOVE_IN:// 登場
-                // 登場移動時間が経過している場合
-                this._stateChangeInterval++;
-                if (this._stateChangeInterval > MOVE_IN_INTERVAL) {
-                    // 停止する。
-                    this._speedX = 0;
-                    this._speedY = 0;
-                    // 弾発射の状態へ遷移する。
-                    this._state = STATE.FIRE;
-                    // 状態変化間隔を初期化する。
-                    this._stateChangeInterval = 0;
-                }
-                break;
-            case STATE.FIRE:// 弾発射
-                // 待機時間が経過している場合
-                this._stateChangeInterval++;
-                if (this._stateChangeInterval > WAIT_FOR_FIRE_INTERVAL) {
-                    // 左へ5種類の弾を発射する。
-                    for (let i = 0; i < SHOT_COUNT; i++) {
-                        __WEBPACK_IMPORTED_MODULE_1__enemyshot__["a" /* default */].fireNWay(this._hitArea, Math.PI, 3, Math.PI / 32, SHOT_SPEED[i], false, scene);
-                    }
-                    // 退場の状態へ遷移する。
-                    this._state = STATE.MOVE_OUT;
-                    // 状態変化間隔を初期化する。
-                    this._stateChangeInterval = 0;
-                }
-                break;
-            case STATE.MOVE_OUT:// 退場
-                // 待機時間が経過している場合
-                this._stateChangeInterval++;
-                if (this._stateChangeInterval > WAIT_FOR_MOVE_OUT_INTERVAL) {
-                    // 左上へ移動する。
-                    this._speedX = MOVE_OUT_SPEED_X;
-                    this._speedY = MOVE_OUT_SPEED_Y;
-                    this._stateChangeInterval = 0;
-                }
-                break;
-            default:
-                break;
-        }
-        // 速度に応じて移動する。
-        this._hitArea.x += this._speedX;
-        this._hitArea.y += this._speedY;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Hornet);
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 
 
@@ -2691,11 +3066,11 @@ class ImageBUtton {
 
 
 /***/ }),
-/* 17 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(60);
 
 /**
  * ローカライズを行うクラス。
@@ -2763,13 +3138,13 @@ class Localizer {
 
 
 /***/ }),
-/* 18 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__imagebutton__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dpad__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dpad__ = __webpack_require__(18);
 
 
 
@@ -2940,7 +3315,7 @@ class PageLayer {
 
 
 /***/ }),
-/* 19 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3027,7 +3402,6 @@ class PlayerShot {
                 topCharacter.attack(this._power);
                 // 敵キャラクターに接触した場合は自分自身は削除する。
                 scene.removeCharacter(this);
-                this._sprite.remove();
                 // ヒット音を再生するために自機弾衝突フラグを立てる。
                 // 1回のフレームで連続で音声が鳴らないようにシーン側で音声を鳴らす処理を行う。
                 scene.isHitPlayerShot = true;
@@ -3039,7 +3413,6 @@ class PlayerShot {
         if (this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックと衝突した場合は自分自身を削除する。
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
         // 画面外の敵にダメージを与えないように画面端付近で攻撃力を0にする。
@@ -3049,9 +3422,15 @@ class PlayerShot {
         // 画面外に出た場合は自分自身を削除する。
         if (this._hitArea.x > __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width + 4) {
             scene.removeCharacter(this);
-            this._sprite.remove();
             return;
         }
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
     }
     /**
      * アニメーションを停止する。
@@ -3074,37 +3453,13 @@ class PlayerShot {
 
 
 /***/ }),
-/* 20 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dragonfly__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ant__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__butterfly__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ladybug__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__bagworm__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__cicada__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__grasshopper__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__hornet__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__snail__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__rhinocerosbeetle__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__mantis__ = __webpack_require__(40);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__honeycomb__ = __webpack_require__(34);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__spider__ = __webpack_require__(49);
-
-
-
-
-
-
-
-
-
-
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyfactory__ = __webpack_require__(9);
 
 
 
@@ -3275,49 +3630,11 @@ class Stage {
      * @param scene シーン
      */
     _createEnemy(type, x, y, scene) {
-        switch (type) {
-            case 'dragonfly':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_2__dragonfly__["a" /* default */](x, y, scene));
-                break;
-            case 'ant':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_3__ant__["a" /* default */](x, y, scene));
-                break;
-            case 'butterfly':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_4__butterfly__["a" /* default */](x, y, scene));
-                break;
-            case 'ladybug':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_5__ladybug__["a" /* default */](x, y, scene));
-                break;
-            case 'bagworm':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_6__bagworm__["a" /* default */](x, y, scene));
-                break;
-            case 'cicada':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_7__cicada__["a" /* default */](x, y, scene));
-                break;
-            case 'grasshopper':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_8__grasshopper__["a" /* default */](x, y, scene));
-                break;
-            case 'hornet':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_9__hornet__["a" /* default */](x, y, scene));
-                break;
-            case 'snail':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_10__snail__["a" /* default */](x, y, scene));
-                break;
-            case 'rhinocerosbeetle':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_11__rhinocerosbeetle__["a" /* default */](x, y, scene));
-                break;
-            case 'mantis':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_12__mantis__["a" /* default */](x, y, scene));
-                break;
-            case 'honeycomb':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_13__honeycomb__["a" /* default */](x, y, scene));
-                break;
-            case 'spider':
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_14__spider__["a" /* default */](x, y, scene));
-                break;
-            default:
-                console.log(`Error: Unknwon enemy type: ${type}`);
-                break;
+        // 敵キャラクターを作成する。
+        const enemy = __WEBPACK_IMPORTED_MODULE_2__enemyfactory__["a" /* default */].create(x, y, type, scene);
+        if (enemy) {
+            // シーンに追加する。
+            scene.addCharacter(enemy);
         }
     }
 }
@@ -3325,7 +3642,7 @@ class Stage {
 
 
 /***/ }),
-/* 21 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3420,7 +3737,7 @@ var LabelAreaExDummy = 0;
 
 
 /***/ }),
-/* 22 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3463,7 +3780,7 @@ var PixiLayerDummy = 0;
 
 
 /***/ }),
-/* 23 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3544,14 +3861,14 @@ var PixiSpriteDummy = 0;
 
 
 /***/ }),
-/* 24 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemy_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__walkingcharacter__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__walkingcharacter__ = __webpack_require__(15);
 
 
 
@@ -3582,11 +3899,12 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'ant', scene);
+        super(x, y, 'ant', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
         // 初期状態は左移動とする。
@@ -3692,7 +4010,7 @@ class Ant extends __WEBPACK_IMPORTED_MODULE_2__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 25 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3712,11 +4030,12 @@ class Bagworm extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'bagworm', scene);
+        super(x, y, 'bagworm', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
     }
@@ -3742,12 +4061,12 @@ class Bagworm extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 26 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize__ = __webpack_require__(4);
 
 
 /**
@@ -3797,7 +4116,7 @@ class BossLifeGauge {
 
 
 /***/ }),
-/* 27 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3831,11 +4150,12 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'butterfly', scene);
+        super(x, y, 'butterfly', param, scene);
         // 初期状態は上方向への移動とする。
         this._state = STATE.UP_MOVE;
         // 弾発射間隔を初期化する。
@@ -3882,12 +4202,275 @@ class Butterfly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 28 */
+/* 32 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__centipedeif__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__centipedebody__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__centipedetail__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__enemyshot__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__util__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__enemyfactory__ = __webpack_require__(9);
+
+
+
+
+
+
+
+// 状態遷移間隔
+const STATE_INTERVAL = [170, 900, 900, 900];
+// 移動方向変更の境界線x方向最小値
+const MOVE_CHANGE_POINT_X_MIN = 8.0;
+// 移動方向変更の境界線x方向最大値
+const MOVE_CHANGE_POINT_X_MAX = 184.0;
+// 移動方向変更の境界線y方向最小値
+const MOVE_CHANGE_POINT_Y_MIN = 16.0;
+// 移動方向変更の境界線y方向最大値
+const MOVE_CHANGE_POINT_Y_MAX = 128.0;
+// 移動スピード
+const MOVE_SPEED = 0.5;
+// 胴体の数
+const BODY_COUNT = 18;
+// 5-way弾発射間隔
+const N5WAY_INTERVAL = 60;
+// 5-way弾スピード
+const N5WAY_SHOT_SPEED = 0.5;
+// 1-way弾の待機時間
+const N1WAY_WAIT_TIME = 10;
+// 1-way弾の発射時間
+const N1WAY_SHOT_TIME = 80;
+// 1-way弾発射間隔
+const N1WAY_INTERVAL = 20;
+// 1-way弾スピード
+const N1WAY_SHOT_SPEED = 0.75;
+// 移動履歴保存数
+const MOVE_HISOTRY_COUNT = 11;
+/**
+ * 敵キャラ、ムカデ。
+ */
+class Centipede extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param param 敵キャラクターパラメータ
+     * @param scene シーン
+     */
+    constructor(x, y, param, scene) {
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'centipede', param, scene);
+        // 初期HPを最大値として記憶しておく。
+        this._maxHP = this._hp;
+        // 移動履歴を初期化する。
+        this._moveHistory = [{ x: x, y: y }];
+        // 状態を初期化する。
+        this._state = __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].ENTRY;
+        // 弾発射間隔、状態遷移間隔を初期化する。
+        this._5wayInterval = 0;
+        this._1wayWaitInterval = 0;
+        this._1wayShotInterval = 0;
+        this._stateInverval = 0;
+        // 前後の体を初期化する。
+        this._parent = null;
+        this._child = null;
+        // 胴体部分を作成する。
+        let parent = this;
+        let animationFrame = 0;
+        for (let i = 0; i < BODY_COUNT; i++) {
+            // 胴体を作成する。
+            const body = __WEBPACK_IMPORTED_MODULE_6__enemyfactory__["a" /* default */].create(x, y, 'centipede_body', scene);
+            if (body && body instanceof __WEBPACK_IMPORTED_MODULE_2__centipedebody__["a" /* default */]) {
+                // シーンに追加する。
+                scene.addCharacter(body);
+                // 足の動きが交互になるようにアニメーションフレームを設定する。
+                body.setAnimationFrame(animationFrame);
+                animationFrame = 1 - animationFrame;
+                // 1個前の体を設定する。
+                body.parent = parent;
+                // 前の部分の体の次の部分に今回作成した体を設定する。
+                parent.child = body;
+                // 今回作成した胴体を次の胴体の前の部分に使用する。
+                parent = body;
+            }
+        }
+        // 尻尾を作成する。
+        const tail = __WEBPACK_IMPORTED_MODULE_6__enemyfactory__["a" /* default */].create(x, y, 'centipede_tail', scene);
+        if (tail && tail instanceof __WEBPACK_IMPORTED_MODULE_3__centipedetail__["a" /* default */]) {
+            // シーンに追加する。
+            scene.addCharacter(tail);
+            // 足の動きが交互になるようにアニメーションフレームを設定する。
+            tail.setAnimationFrame(animationFrame);
+            // 1個前の体を設定する。
+            tail.parent = parent;
+            // 前の部分の体の次の部分に今回作成した体を設定する。
+            parent.child = tail;
+        }
+        // 初期移動方向は左下とする。
+        this._moveDirectionX = -1;
+        this._moveDirectionY = 1;
+        // ボスHPゲージを満タンで表示する。
+        scene.bossLife = 1;
+    }
+    /** ひとつ前の体 */
+    get parent() {
+        return this._parent;
+    }
+    /** ひとつ前の体 */
+    set parent(value) {
+        this._parent = value;
+    }
+    /** ひとつ後ろの体 */
+    get child() {
+        return this._child;
+    }
+    /** ひとつ後ろの体 */
+    set child(value) {
+        this._child = value;
+    }
+    /** ヒットポイント */
+    get hp() {
+        return this._hp;
+    }
+    /** ヒットポイント */
+    set hp(value) {
+        this._hp = value;
+    }
+    /**
+     * 一番古い移動履歴を取得する。
+     * @return 一番古い移動履歴
+     */
+    getFirstMoveHistory() {
+        return this._moveHistory[0];
+    }
+    /**
+     * 状態を設定する。
+     * @param state 状態
+     */
+    setState(state) {
+        // 自分の状態を設定する。
+        this._state = state;
+        // 子オブジェクトに現在の状態を通知する。
+        if (this._child) {
+            this._child.setState(this._state);
+        }
+        return this;
+    }
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * @param scene シーン
+     */
+    action(scene) {
+        // 状態によって処理を分岐する。
+        switch (this._state) {
+            case __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].ENTRY:// 登場
+                // 左方向へ移動する。
+                this._hitArea.x -= 0.5;
+                // 画像を回転させる。
+                this._sprite.rotation = 180;
+                break;
+            case __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].N5WAY_SHOT:// 5-way弾発射
+                // 弾発射間隔時間経過したら弾を発射する。
+                this._5wayInterval++;
+                if (this._5wayInterval > N5WAY_INTERVAL) {
+                    // 自機へ向けて弾を発射する。
+                    __WEBPACK_IMPORTED_MODULE_4__enemyshot__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_5__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 5, Math.PI / 8, N5WAY_SHOT_SPEED, false, scene);
+                    // 弾発射間隔を初期化する。
+                    this._5wayInterval = 0;
+                }
+                break;
+            case __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].HIGH_SPEED_SHOT:// 1-way弾による高速弾発射
+                // 1-way弾グループの待機時間が経過している場合は1-way弾を発射し始める。
+                this._1wayWaitInterval++;
+                if (this._1wayWaitInterval > N1WAY_WAIT_TIME) {
+                    // 弾発射間隔時間経過したら弾を発射する。
+                    this._1wayShotInterval++;
+                    if (this._1wayShotInterval > N1WAY_INTERVAL) {
+                        // 自機へ向けて弾を発射する。
+                        __WEBPACK_IMPORTED_MODULE_4__enemyshot__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_5__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 1, 0, N1WAY_SHOT_SPEED, false, scene);
+                        // 弾発射間隔を初期化する。
+                        this._1wayShotInterval = 0;
+                    }
+                    // 1-way弾発射時間を経過した場合、待機時間を初期化する。
+                    if (this._1wayWaitInterval > N1WAY_WAIT_TIME + N1WAY_SHOT_TIME) {
+                        this._1wayWaitInterval = 0;
+                        this._1wayShotInterval = 0;
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        // 登場時以外は斜めに移動する。
+        // 端まで行くと向きを反転する。
+        if (this._state !== __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].ENTRY) {
+            // 下方向へ移動中に下端に達したら向きを変える。
+            // 上方向へ移動中に上端に達したら向きを変える。
+            if ((this._moveDirectionY > 0 && this._hitArea.y > MOVE_CHANGE_POINT_Y_MAX) ||
+                (this._moveDirectionY < 0 && this._hitArea.y < MOVE_CHANGE_POINT_Y_MIN)) {
+                this._moveDirectionY *= -1;
+            }
+            // 左方向へ移動中に左端に達したら向きを変える。
+            // 右方向へ移動中に右端に達したら向きを変える。
+            if ((this._moveDirectionX > 0 && this._hitArea.x > MOVE_CHANGE_POINT_X_MAX) ||
+                (this._moveDirectionX < 0 && this._hitArea.x < MOVE_CHANGE_POINT_X_MIN)) {
+                this._moveDirectionX *= -1;
+            }
+            // スピードを設定する。
+            const speedX = MOVE_SPEED * this._moveDirectionX;
+            const speedY = MOVE_SPEED * this._moveDirectionY;
+            // 移動する。
+            this._hitArea.x += speedX;
+            this._hitArea.y += speedY;
+            // 移動方向の角度を計算する。
+            const angle = Math.atan2(speedY, speedX);
+            // 画像を回転させる。
+            this._sprite.rotation = angle * 180 / Math.PI;
+        }
+        // 状態遷移間隔が経過している場合は次の状態へ進める。
+        this._stateInverval++;
+        if (this._stateInverval > STATE_INTERVAL[this._state]) {
+            // 次の状態へ進める。
+            if (this._state + 1 < __WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].COUNT) {
+                this.setState(this._state + 1);
+            }
+            else {
+                // 状態が最大を超える場合は最初の状態へループする。
+                this.setState(__WEBPACK_IMPORTED_MODULE_1__centipedeif__["a" /* STATE */].ENTRY + 1);
+            }
+            // 弾発射間隔、状態遷移間隔を初期化する。
+            this._5wayInterval = 0;
+            this._1wayWaitInterval = 0;
+            this._1wayShotInterval = 0;
+            this._stateInverval = 0;
+        }
+        // 移動履歴を保存する。
+        this._moveHistory.push({ x: this._hitArea.x, y: this._hitArea.y });
+        // 移動履歴が保存数を超えた場合は先頭から削除していく。
+        while (this._moveHistory.length > MOVE_HISOTRY_COUNT) {
+            this._moveHistory.shift();
+        }
+        // ボスHPゲージの表示を更新する。
+        if (this._hp > 0) {
+            scene.bossLife = this._hp / this._maxHP;
+        }
+        else {
+            scene.bossLife = 0;
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Centipede);
+
+
+/***/ }),
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controlsize_js__ = __webpack_require__(4);
 
 
 /**
@@ -3939,12 +4522,12 @@ class ChickenGauge {
 
 
 /***/ }),
-/* 29 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyshot__ = __webpack_require__(2);
 
 
@@ -3973,11 +4556,12 @@ class Cicada extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'cicada', scene);
+        super(x, y, 'cicada', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
         // 初期状態は停止とする。
@@ -4024,7 +4608,7 @@ class Cicada extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
                 this._shotInterval++;
                 if (this._shotInterval > SHOT_INTERVAL) {
                     // 自機へ向けて弾を発射する。
-                    __WEBPACK_IMPORTED_MODULE_2__enemyshot__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_1__util_js__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 3, Math.PI / 8, SHOT_SPEED, false, scene);
+                    __WEBPACK_IMPORTED_MODULE_2__enemyshot__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_1__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 3, Math.PI / 8, SHOT_SPEED, false, scene);
                     // 弾発射間隔を初期化する。
                     this._shotInterval = 0;
                 }
@@ -4050,7 +4634,7 @@ class Cicada extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
      */
     _calcMoveSpeed(scene) {
         // 自機との角度を計算する。
-        const angle = __WEBPACK_IMPORTED_MODULE_1__util_js__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition);
+        const angle = __WEBPACK_IMPORTED_MODULE_1__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition);
         // 縦横の速度を決定する。
         this._speedX = MOVE_SPEED * Math.cos(angle);
         this._speedY = -MOVE_SPEED * Math.sin(angle);
@@ -4060,16 +4644,16 @@ class Cicada extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 30 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pagelayer__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__pagelayer__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__localizer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__labelbutton__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__localizer__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__labelbutton__ = __webpack_require__(14);
 
 
 
@@ -4185,13 +4769,238 @@ class CreditScene {
 
 
 /***/ }),
-/* 31 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemy_js__ = __webpack_require__(1);
-/** @module dragonfly */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__explosion__ = __webpack_require__(13);
+
+/**
+ * ボスキャラクター破壊時処理。
+ */
+class DeathBoss {
+    /**
+     * コンストラクタ。
+     * @param character 対象のキャラクター
+     * @param score 破壊時に加算するスコア
+     * @param gauge 破壊時に加算するゲージ
+     */
+    constructor(character, score, gauge) {
+        // 対象のキャラクターを設定する。
+        this._target = character;
+        // 破壊時に加算するスコアを設定する。
+        this._score = score;
+        // 破壊時に加算するゲージを設定する。
+        this._gauge = gauge;
+        // 死亡エフェクト間隔を初期化する。
+        this._deathInterval = 0;
+    }
+    /**
+     * 更新処理。
+     * 一定時間爆発アニメーションを発生させ、スコアを加算し、キャラクターを削除する。
+     * @param scene シーン
+     */
+    update(scene) {
+        // 爆発の間隔
+        const EXPLOSION_INTERVAL = 20;
+        // 状態遷移間隔
+        const STATE_INTERVAL = 300;
+        // 爆発の間隔が経過している場合は爆発を発生させる。
+        this._deathInterval++;
+        if (this._deathInterval % EXPLOSION_INTERVAL == 0) {
+            // 爆発発生位置を決める。
+            const x = this._target.rect.x + (Math.random() - 0.5) * this._target.rect.width;
+            const y = this._target.rect.y + (Math.random() - 0.5) * this._target.rect.height;
+            // 爆発アニメーションを作成する。
+            scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_0__explosion__["a" /* default */](x, y, scene));
+        }
+        // 状態遷移間隔が経過している場合は死亡処理を行う。
+        if (this._deathInterval > STATE_INTERVAL) {
+            // スコアを加算する。
+            scene.addScore(this._score);
+            // チキンゲージを増加させる。
+            scene.addChickenGauge(this._gauge);
+            // ステージクリア処理を行う。
+            scene.stageClear();
+            // キャラクターを削除する。
+            scene.removeCharacter(this._target);
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (DeathBoss);
+
+
+/***/ }),
+/* 37 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__explosion__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__centipedetail__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyfactory__ = __webpack_require__(9);
+
+
+
+/**
+ * ムカデの尻尾破壊時処理。
+ */
+class DeathCentipede {
+    /**
+     * コンストラクタ。
+     * @param character 対象のキャラクター
+     * @param score 破壊時に加算するスコア
+     * @param gauge 破壊時に加算するゲージ
+     */
+    constructor(character, score, gauge) {
+        // 対象のキャラクターを設定する。
+        this._target = character;
+        // 破壊時に加算するスコアを設定する。
+        this._score = score;
+        // 破壊時に加算するゲージを設定する。
+        this._gauge = gauge;
+    }
+    /**
+     * 更新処理。
+     * 爆発アニメーションを発生させ、スコアを加算し、キャラクターを削除する。
+     * @param scene シーン
+     */
+    update(scene) {
+        // 対象のキャラクターがムカデの尻尾で、
+        // 1個前の体が設定されている場合のみ処理を行う。
+        if (this._target instanceof __WEBPACK_IMPORTED_MODULE_1__centipedetail__["a" /* default */] && this._target.parent) {
+            // 2個前の体が存在する場合（1個前が胴体の場合）と
+            // 1個前が頭の場合で処理を分岐する。
+            if (this._target.parent.parent) {
+                // 2個前の体が存在する場合（1個前が胴体の場合）
+                // 爆発アニメーションを作成する。
+                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_0__explosion__["a" /* default */](this._target.rect.x, this._target.rect.y, scene));
+                // 1個前の胴体の位置に尻尾を作成する。
+                const tail = __WEBPACK_IMPORTED_MODULE_2__enemyfactory__["a" /* default */].create(this._target.parent.rect.x, this._target.parent.rect.y, 'centipede_tail', scene);
+                if (tail && tail instanceof __WEBPACK_IMPORTED_MODULE_1__centipedetail__["a" /* default */]) {
+                    // シーンに追加する。
+                    scene.addCharacter(tail);
+                    // 前の部分の体を尻尾の親ノードとして設定する。
+                    tail.parent = this._target.parent.parent;
+                    // 前の部分の体の次の部分に今回作成した体を設定する。
+                    this._target.parent.parent.child = tail;
+                }
+                // 頭を検索する。
+                let head = this._target.parent.parent;
+                while (head.parent) {
+                    head = head.parent;
+                }
+                // 頭のヒットポイントを減らす。
+                head.hp = head.hp - 1;
+                // 1個前の体を削除する。
+                this._target.parent.hp = 0;
+            }
+            else {
+                // 1個前が頭の場合は頭を破壊する。
+                this._target.parent.hp = 0;
+            }
+        }
+        // スコアを加算する。
+        scene.addScore(this._score);
+        // チキンゲージを増加させる。
+        scene.addChickenGauge(this._gauge);
+        // キャラクターを削除する。
+        scene.removeCharacter(this._target);
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (DeathCentipede);
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * エフェクトなし敵キャラ破壊時処理。
+ */
+class DeathNormal {
+    /**
+     * コンストラクタ。
+     * @param character 対象のキャラクター
+     * @param score 破壊時に加算するスコア
+     * @param gauge 破壊時に加算するゲージ
+     */
+    constructor(character, score, gauge) {
+        // 対象のキャラクターを設定する。
+        this._target = character;
+        // 破壊時に加算するスコアを設定する。
+        this._score = score;
+        // 破壊時に加算するゲージを設定する。
+        this._gauge = gauge;
+    }
+    /**
+     * 更新処理。
+     * エフェクトなしで自分を削除する。
+     * @param scene シーン
+     */
+    update(scene) {
+        // スコアを加算する。
+        scene.addScore(this._score);
+        // チキンゲージを増加させる。
+        scene.addChickenGauge(this._gauge);
+        // キャラクターを削除する。
+        scene.removeCharacter(this._target);
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (DeathNormal);
+
+
+/***/ }),
+/* 39 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__explosion__ = __webpack_require__(13);
+
+/**
+ * 雑魚敵破壊時処理。
+ */
+class DeathNormal {
+    /**
+     * コンストラクタ。
+     * @param character 対象のキャラクター
+     * @param score 破壊時に加算するスコア
+     * @param gauge 破壊時に加算するゲージ
+     */
+    constructor(character, score, gauge) {
+        // 対象のキャラクターを設定する。
+        this._target = character;
+        // 破壊時に加算するスコアを設定する。
+        this._score = score;
+        // 破壊時に加算するゲージを設定する。
+        this._gauge = gauge;
+    }
+    /**
+     * 更新処理。
+     * 爆発アニメーションを発生させ、スコアを加算し、キャラクターを削除する。
+     * @param scene シーン
+     */
+    update(scene) {
+        // 爆発アニメーションを作成する。
+        scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_0__explosion__["a" /* default */](this._target.rect.x, this._target.rect.y, scene));
+        // スコアを加算する。
+        scene.addScore(this._score);
+        // チキンゲージを増加させる。
+        scene.addChickenGauge(this._gauge);
+        // キャラクターを削除する。
+        scene.removeCharacter(this._target);
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (DeathNormal);
+
+
+/***/ }),
+/* 40 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemyshot__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemy__ = __webpack_require__(1);
 
 
 // 移動スピード
@@ -4205,16 +5014,17 @@ const SHOT_INTERVAL = 120;
  * 左方向に直進する。
  * 左方向に直進する弾を発射する。
  */
-class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default */] {
+class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy__["a" /* default */] {
     /**
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'dragonfly', scene);
+        super(x, y, 'dragonfly', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
     }
@@ -4231,7 +5041,7 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
         // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
         this._shotInterval++;
         if (this._shotInterval >= SHOT_INTERVAL) {
-            __WEBPACK_IMPORTED_MODULE_0__enemyshot_js__["a" /* default */].fireNWay(this._hitArea, Math.PI, 1, 0, SHOT_SPEED, false, scene);
+            __WEBPACK_IMPORTED_MODULE_0__enemyshot__["a" /* default */].fireNWay(this._hitArea, Math.PI, 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
     }
@@ -4240,91 +5050,14 @@ class Dragonfly extends __WEBPACK_IMPORTED_MODULE_1__enemy_js__["a" /* default *
 
 
 /***/ }),
-/* 32 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(5);
-
-/**
- * 爆発アニメーションを行う。
- */
-class Explosion {
-    /**
-     * コンストラクタ。
-     * 座標の設定とアニメーションの設定を行う。
-     * 爆発音を再生する。
-     * @param x x座標
-     * @param y y座標
-     * @param scene シーン
-     */
-    constructor(x, y, scene) {
-        // スプライト画像を読み込む。
-        this._sprite = new phina.pixi.Sprite('image_16x16', 16, 16);
-        // スプライトをシーンに追加する。
-        scene.addCharacterSprite(this._sprite);
-        // アニメーションの設定を行う。
-        this._animation = new phina.accessory.FrameAnimation('image_16x16_ss');
-        this._animation.attachTo(this._sprite);
-        this._animation.gotoAndPlay('explosion');
-        // 座標をスプライトに適用する。
-        this._sprite.setPosition(Math.floor(x), Math.floor(y));
-        // 爆発音を再生する。
-        phina.asset.SoundManager.play('bomb_min');
-    }
-    /** キャラクター種別 */
-    get type() {
-        return __WEBPACK_IMPORTED_MODULE_0__character__["a" /* default */].type.EFFECT;
-    }
-    /** 位置とサイズ */
-    get rect() {
-        return {
-            x: this._sprite.x,
-            y: this._sprite.y,
-            width: this._sprite.width,
-            height: this._sprite.height,
-        };
-    }
-    /**
-     * アニメーションが終了すると自分自身を削除する。
-     * @param scene シーン
-     */
-    update(scene) {
-        // アニメーションが終了すると自分自身を削除する。
-        if (this._animation.finished) {
-            scene.removeCharacter(this);
-            this._sprite.remove();
-        }
-    }
-    /**
-     * アニメーションを停止する。
-     * @return 自インスタンス
-     */
-    pauseAnimation() {
-        this._animation.paused = true;
-        return this;
-    }
-    /**
-     * アニメーションを開始する。
-     * @return 自インスタンス
-     */
-    startAnimation() {
-        this._animation.paused = false;
-        return this;
-    }
-}
-/* harmony default export */ __webpack_exports__["a"] = (Explosion);
-
-
-/***/ }),
-/* 33 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__walkingcharacter__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__enemyshot_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__walkingcharacter__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__enemyshot__ = __webpack_require__(2);
 
 
 
@@ -4356,11 +5089,12 @@ class Grasshopper extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'grasshopper', scene);
+        super(x, y, 'grasshopper', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
         // 状態を初期化する。
@@ -4441,7 +5175,7 @@ class Grasshopper extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */
         this._shotInterval++;
         if (this._shotInterval > SHOT_INTERVAL) {
             // 自機へ向けて弾を発射する。
-            __WEBPACK_IMPORTED_MODULE_3__enemyshot_js__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_2__util_js__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 1, 0, SHOT_SPEED, false, scene);
+            __WEBPACK_IMPORTED_MODULE_3__enemyshot__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 1, 0, SHOT_SPEED, false, scene);
             this._shotInterval = 0;
         }
         // 速度に応じて移動する。
@@ -4464,15 +5198,15 @@ class Grasshopper extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */
 
 
 /***/ }),
-/* 34 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__hornet__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__enemyfactory__ = __webpack_require__(9);
 
 
 
@@ -4492,8 +5226,6 @@ var STATE;
 const STATE_INTERVAL = [340, 900, 900, 900];
 // ハチを呼び出す間隔
 const CALL_HORNET_INTERVAL = 120;
-// ハチの登場位置の数
-const CALL_HORNET_POSITION_COUNT = 3;
 // ハチの登場位置x座標
 const HORNET_X_POSITION = 192;
 // ハチの登場位置y座標
@@ -4530,11 +5262,12 @@ class Hoenycomb extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'honeycomb', scene);
+        super(x, y, 'honeycomb', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = [0, 0, 0];
         // 状態遷移間隔を初期化する。
@@ -4615,8 +5348,11 @@ class Hoenycomb extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
             this._shotInterval[2]++;
             if (this._shotInterval[2] > CALL_HORNET_INTERVAL) {
                 // ハチを呼ぶ。
-                scene.addCharacter(new __WEBPACK_IMPORTED_MODULE_4__hornet__["a" /* default */](HORNET_X_POSITION, HORNET_Y_POSITION[this._hornetPosition], scene));
-                // ハチの位置を呼ぶたびに切り替える。
+                const hornet = __WEBPACK_IMPORTED_MODULE_4__enemyfactory__["a" /* default */].create(HORNET_X_POSITION, HORNET_Y_POSITION[this._hornetPosition], 'hornet', scene);
+                if (hornet) {
+                    scene.addCharacter(hornet);
+                }
+                // ハチのd位置を呼ぶたびに切り替える。
                 this._hornetPosition++;
                 if (this._hornetPosition >= HORNET_Y_POSITION.length) {
                     this._hornetPosition = 0;
@@ -4660,15 +5396,129 @@ class Hoenycomb extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] 
 
 
 /***/ }),
-/* 35 */
+/* 43 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
+
+
+// 状態
+var STATE;
+(function (STATE) {
+    STATE[STATE["MOVE_IN"] = 0] = "MOVE_IN";
+    STATE[STATE["FIRE"] = 1] = "FIRE";
+    STATE[STATE["MOVE_OUT"] = 2] = "MOVE_OUT"; // 退場
+})(STATE || (STATE = {}));
+;
+// 弾の数
+const SHOT_COUNT = 5;
+// 弾のスピード
+const SHOT_SPEED = [0.75, 0.85, 0.95, 1.05, 1.15];
+// 登場時のx方向の移動スピード
+const MOVE_IN_SPEED_X = -1.0;
+// 退場時のx方向の移動スピード
+const MOVE_OUT_SPEED_X = -1.3;
+// 退場時のy方向の移動スピード
+const MOVE_OUT_SPEED_Y = -0.25;
+// 登場時移動フレーム数
+const MOVE_IN_INTERVAL = 30;
+// 弾発射までの待機フレーム数
+const WAIT_FOR_FIRE_INTERVAL = 6;
+// 退場までの待機フレーム数
+const WAIT_FOR_MOVE_OUT_INTERVAL = 12;
+/**
+ * 敵キャラクター、ハチ。
+ */
+class Hornet extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param param 敵キャラクターパラメータ
+     * @param scene シーン
+     */
+    constructor(x, y, param, scene) {
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'hornet', param, scene);
+        // 初期状態は左移動とする。
+        this._state = STATE.MOVE_IN;
+        // 状態変化間隔を初期化する。
+        this._stateChangeInterval = 0;
+        // 登場時のx方向の移動速度は固定とする。
+        this._speedX = MOVE_IN_SPEED_X;
+        // 登場時のy方向の移動速度は自機の位置に到達できるように設定する。
+        this._speedY = (scene.playerPosition.y - this._hitArea.y) / MOVE_IN_INTERVAL;
+    }
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * 画面上半分から登場するときは左下に向かって一定時間進み、一時停止して弾を発射、その後左上に向かって飛んで行く。
+     * 画面下半分から登城するときは左上に向かって一定時間進み、あとの処理は同じ。
+     * 弾は5種類のスピードの弾を左方向に発射する。
+     * @param scene シーン
+     */
+    action(scene) {
+        // 状態によって処理を分岐する。
+        switch (this._state) {
+            case STATE.MOVE_IN:// 登場
+                // 登場移動時間が経過している場合
+                this._stateChangeInterval++;
+                if (this._stateChangeInterval > MOVE_IN_INTERVAL) {
+                    // 停止する。
+                    this._speedX = 0;
+                    this._speedY = 0;
+                    // 弾発射の状態へ遷移する。
+                    this._state = STATE.FIRE;
+                    // 状態変化間隔を初期化する。
+                    this._stateChangeInterval = 0;
+                }
+                break;
+            case STATE.FIRE:// 弾発射
+                // 待機時間が経過している場合
+                this._stateChangeInterval++;
+                if (this._stateChangeInterval > WAIT_FOR_FIRE_INTERVAL) {
+                    // 左へ5種類の弾を発射する。
+                    for (let i = 0; i < SHOT_COUNT; i++) {
+                        __WEBPACK_IMPORTED_MODULE_1__enemyshot__["a" /* default */].fireNWay(this._hitArea, Math.PI, 3, Math.PI / 32, SHOT_SPEED[i], false, scene);
+                    }
+                    // 退場の状態へ遷移する。
+                    this._state = STATE.MOVE_OUT;
+                    // 状態変化間隔を初期化する。
+                    this._stateChangeInterval = 0;
+                }
+                break;
+            case STATE.MOVE_OUT:// 退場
+                // 待機時間が経過している場合
+                this._stateChangeInterval++;
+                if (this._stateChangeInterval > WAIT_FOR_MOVE_OUT_INTERVAL) {
+                    // 左上へ移動する。
+                    this._speedX = MOVE_OUT_SPEED_X;
+                    this._speedY = MOVE_OUT_SPEED_Y;
+                    this._stateChangeInterval = 0;
+                }
+                break;
+            default:
+                break;
+        }
+        // 速度に応じて移動する。
+        this._hitArea.x += this._speedX;
+        this._hitArea.y += this._speedY;
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (Hornet);
+
+
+/***/ }),
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__localizer__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__frame__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__mycolor__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pointdevice__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pointdevice__ = __webpack_require__(10);
 
 
 
@@ -4802,13 +5652,13 @@ class HowToPlayPage {
 
 
 /***/ }),
-/* 36 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pagelayer__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__howtoplaypage__ = __webpack_require__(44);
 
 
 
@@ -4859,13 +5709,13 @@ class HowToPlayScene {
 
 
 /***/ }),
-/* 37 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(3);
 
 
 
@@ -4884,11 +5734,12 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'ladybug', scene);
+        super(x, y, 'ladybug', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
     }
@@ -4915,13 +5766,13 @@ class Ladybug extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 38 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__mycolor_js__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__controlsize_js__ = __webpack_require__(4);
 /** @module life */
 
 
@@ -5000,18 +5851,18 @@ class Life {
 
 
 /***/ }),
-/* 39 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mycolor__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__pixilayer__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pixisprite__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__labelareaex__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__pixilayer__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pixisprite__ = __webpack_require__(27);
 
 
 
@@ -5035,12 +5886,14 @@ const ASSETS = {
         'control': './images/control.png',
         'image_8x8': './images/image_8x8.png',
         'image_16x16': './images/image_16x16.png',
+        'image_32x32': './images/image_32x32.png',
         'image_64x64': './images/image_64x64.png',
         'howtoimage': './images/howtoimage.png',
     },
     spritesheet: {
         'image_8x8_ss': './images/image_8x8_ss.json',
         'image_16x16_ss': './images/image_16x16_ss.json',
+        'image_32x32_ss': './images/image_32x32_ss.json',
         'image_64x64_ss': './images/image_64x64_ss.json',
     },
     sound: {
@@ -5191,14 +6044,14 @@ phina.main(function () {
 
 
 /***/ }),
-/* 40 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyshot__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(3);
 
 
 
@@ -5283,11 +6136,12 @@ class Mantis extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'mantis', scene);
+        super(x, y, 'mantis', param, scene);
         // y座標を設定する。
         this._hitArea.y = POS_Y;
         // 弾発射間隔を初期化する。
@@ -5443,14 +6297,14 @@ class Mantis extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 41 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__labelbutton__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__cursor__ = __webpack_require__(17);
 
 
 
@@ -5630,16 +6484,16 @@ class MenuLayer {
 
 
 /***/ }),
-/* 42 */
+/* 51 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__character__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__collider__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__playershot__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__playerdeatheffect__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__playeroption__ = __webpack_require__(53);
 
 
 
@@ -5810,6 +6664,13 @@ class Player {
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
+    }
+    /**
      * アニメーションを停止する。
      * @return 自インスタンス
      */
@@ -5972,7 +6833,7 @@ class Player {
             const topCharacter = hitCharacters[0];
             // 敵弾の場合は削除する。
             if (__WEBPACK_IMPORTED_MODULE_1__character__["a" /* default */].isEnemyShot(topCharacter)) {
-                topCharacter.remove(scene);
+                scene.removeCharacter(topCharacter);
             }
             // 敵キャラクターに接触した場合は死亡処理を行う。
             if (!this._noDeath) {
@@ -6037,7 +6898,7 @@ class Player {
 
 
 /***/ }),
-/* 43 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6094,8 +6955,14 @@ class PlayerDeathEffect {
         // アニメーションが終了すると自分自身を削除する。
         if (this._animation.finished) {
             scene.removeCharacter(this);
-            this._sprite.remove();
         }
+    }
+    /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
     }
     /**
      * アニメーションを停止する。
@@ -6118,13 +6985,13 @@ class PlayerDeathEffect {
 
 
 /***/ }),
-/* 44 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__character__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__collider__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__playershot__ = __webpack_require__(23);
 /** @module playeroption */
 
 
@@ -6220,6 +7087,13 @@ class PlayerOption {
         this._sprite.setPosition(Math.floor(this._hitArea.x), Math.floor(this._hitArea.y));
     }
     /**
+     * シーンから取り除く。
+     */
+    remove() {
+        this._sprite.remove();
+        return this;
+    }
+    /**
      * アニメーションを停止する。
      * @return 自インスタンス
      */
@@ -6289,7 +7163,6 @@ class PlayerOption {
             // 0以下が指定された場合は自分自身も削除する。
             if (count <= 0) {
                 scene.removeCharacter(this);
-                this._sprite.remove();
             }
         }
     }
@@ -6338,24 +7211,24 @@ class PlayerOption {
 
 
 /***/ }),
-/* 45 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__pointdevice__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mycolor__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__controlsize__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__character__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__player__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__life__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chickengauge__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__player__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__life__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chickengauge__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__bosslifegauge__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__shieldbutton__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__titlescene__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__imagebutton__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__imagebutton__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(59);
 
 
 
@@ -6621,10 +7494,13 @@ class PlayingScene {
      * @param character 削除するキャラクター
      */
     removeCharacter(character) {
+        // シーン中のキャラクター配列から削除する。
         const i = this._characters.indexOf(character);
         if (i >= 0) {
             this._characters.splice(i, 1);
         }
+        // キャラクターの削除処理を行う。
+        character.remove();
     }
     /**
      * スコアを追加する。
@@ -7082,7 +7958,7 @@ class PlayingScene {
         for (let i = this._characters.length - 1; i >= 0; i--) {
             const character = this._characters[i];
             if (__WEBPACK_IMPORTED_MODULE_4__character__["a" /* default */].isEnemyShot(character)) {
-                character.remove(this);
+                this.removeCharacter(character);
             }
         }
     }
@@ -7274,13 +8150,13 @@ class PlayingScene {
 
 
 /***/ }),
-/* 46 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util_js__ = __webpack_require__(3);
 
 
 
@@ -7352,11 +8228,12 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'rhinocerosbeetle', scene);
+        super(x, y, 'rhinocerosbeetle', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = [0, 0];
         // 状態遷移間隔を初期化する。
@@ -7516,11 +8393,11 @@ class RhinocerosBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* defau
 
 
 /***/ }),
-/* 47 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__controlsize_js__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__screensize_js__ = __webpack_require__(0);
 /** @module shieldbutton */
 
@@ -7584,6 +8461,8 @@ class ShieldButton {
         this._touch = false;
         this._offImage.alpha = 1;
         this._onImage.alpha = 0;
+        // 初期値は有効とする。
+        this._enable = true;
     }
     /** 画像、ボタンを合わせたスプライト。 */
     get sprite() {
@@ -7608,14 +8487,14 @@ class ShieldButton {
 
 
 /***/ }),
-/* 48 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__walkingcharacter__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__walkingcharacter__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyshot__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__util__ = __webpack_require__(3);
 
 
 
@@ -7629,16 +8508,17 @@ const SHOT_INTERVAL = 90;
 /**
  * 敵キャラクター、カタツムリ。
  */
-class Snail extends __WEBPACK_IMPORTED_MODULE_0__enemy_js__["a" /* default */] {
+class Snail extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
     /**
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'snail', scene);
+        super(x, y, 'snail', param, scene);
         // 弾発射間隔を初期化する。
         this._shotInterval = 0;
         // 上下の障害物との距離から逆さまかどうかを判定する。
@@ -7677,13 +8557,13 @@ class Snail extends __WEBPACK_IMPORTED_MODULE_0__enemy_js__["a" /* default */] {
 
 
 /***/ }),
-/* 49 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(3);
 
 
 
@@ -7777,11 +8657,12 @@ class Spider extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
      * コンストラクタ
      * @param x x座標
      * @param y y座標
+     * @param param 敵キャラクターパラメータ
      * @param scene シーン
      */
-    constructor(x, y, scene) {
+    constructor(x, y, param, scene) {
         // 親クラスのコンストラクタを実行する。
-        super(x, y, 'spider', scene);
+        super(x, y, 'spider', param, scene);
         // 状態を初期化する。
         this._state = STATE.INIT;
         // 移動先番号を初期化する。
@@ -7975,11 +8856,11 @@ class Spider extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 
 
 /***/ }),
-/* 50 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage__ = __webpack_require__(24);
 
 // ステージクリア後の待機フレーム数
 const STAGE_CLEAR_WAIT = 540;
@@ -8065,7 +8946,7 @@ class StageStatus {
 
 
 /***/ }),
-/* 51 */
+/* 60 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8203,7 +9084,7 @@ var StringResource = {
 
 
 /***/ }),
-/* 52 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
