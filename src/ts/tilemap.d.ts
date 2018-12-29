@@ -1,15 +1,25 @@
+type CustomProperty = {
+    name: string,
+    type: string,
+    value: any,
+}
+
 type TileMapObject = {
     height: number,
     id: number,
     name: string,
-    properties?: {[key: string]: any},
-    propertytypes?: {[key: string]: string},
+    properties?: CustomProperty[],
     rotation: number,
     type: string,
     visible: boolean,
     width: number,
     x: number,
     y: number,
+}
+
+type Tile = {
+    id: number,
+    objectgroup: ObjectGroup,
 }
 
 type ObjectGroup = {
@@ -57,9 +67,7 @@ type TileSet = {
     spacing: number,
     tilecount: number,
     tileheight: number,
-    tiles: {[key: string]: {
-        objectgroup: ObjectGroup,
-    }},
+    tiles: Tile[],
     tilewidth: number,
     transparentcolor: string,
 }

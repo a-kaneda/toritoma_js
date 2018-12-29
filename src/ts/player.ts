@@ -18,9 +18,9 @@ const SPEED_BY_GAMEPAD = 3;
 // 自機弾発射間隔
 const SHOT_INTERVAL = 12;
 // 当たり判定幅
-const HIT_WIDTH = 4;
+const HIT_WIDTH = 2;
 // 当たり判定高さ
-const HIT_HEIGHT = 4;
+const HIT_HEIGHT = 2;
 // かすり当たり判定幅
 const GRAZE_WIDTH = 16;
 // かすり当たり判定高さ

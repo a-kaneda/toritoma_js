@@ -170,7 +170,12 @@ class Stage {
                     case 'speed':
                         // スクロールスピードを変更する。
                         if (obj.properties !== undefined) {
-                            this._speed = obj.properties.speed;
+                            for (let p of obj.properties) {
+                                if (p.name =='speed') {
+                                    this._speed = p.value;
+                                    break;
+                                }
+                            }
                         }
                         break;
                     case 'enemy':

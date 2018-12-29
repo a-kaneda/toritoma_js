@@ -86,22 +86,23 @@ class TileMapManager {
             if (gid > 0) {
                 // gidに対応するタイルセットを検索する。
                 for (let j = 0; j < this._map.tilesets.length; j++) {
-                    // タイルがあった場合
-                    const tile = this._map.tilesets[j].tiles[gid - 1];
-                    if (tile) {
-                        // 指定された種別のオブジェクトを検索する。
-                        for (let k = 0; k < tile.objectgroup.objects.length; k++) {
-                            const obj = tile.objectgroup.objects[k];
-                            if (obj.type === type) {
-                                // 一次元配列になっているので、x座標とy座標を計算する。
-                                const x = i % layer.width;
-                                const y = Math.floor(i / layer.width);
-                                // オブジェクトマップにオブジェクトを格納する。
-                                this._objectMap[type][y][x] = obj;
-                                break;
+                    for (let tile of this._map.tilesets[j].tiles) {
+                        // タイルがあった場合
+                        if (tile.id == gid - 1) {
+                            // 指定された種別のオブジェクトを検索する。
+                            for (let k = 0; k < tile.objectgroup.objects.length; k++) {
+                                const obj = tile.objectgroup.objects[k];
+                                if (obj.type === type) {
+                                    // 一次元配列になっているので、x座標とy座標を計算する。
+                                    const x = i % layer.width;
+                                    const y = Math.floor(i / layer.width);
+                                    // オブジェクトマップにオブジェクトを格納する。
+                                    this._objectMap[type][y][x] = obj;
+                                    break;
+                                }
                             }
+                            break;
                         }
-                        break;
                     }
                 }
             }

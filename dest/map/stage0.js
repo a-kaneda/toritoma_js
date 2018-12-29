@@ -68,13 +68,12 @@
                  "height":16,
                  "id":11,
                  "name":"start",
-                 "properties":
+                 "properties":[
                         {
                          "name":"speed",
                          "type":"float",
-                         "speed":0.25,
                          "value":0.25
-                        },
+                        }],
                  "rotation":0,
                  "type":"speed",
                  "visible":true,
