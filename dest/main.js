@@ -7281,7 +7281,7 @@ const GAMEOVER_LABEL_POS_Y = Math.round(__WEBPACK_IMPORTED_MODULE_2__screensize_
 // 初期ステージ番号
 const INITIAL_STAGE = 1;
 // ステージ数
-const STAGE_COUNT = 5;
+const STAGE_COUNT = 6;
 // ステージクリア後の待機フレーム数
 const STAGE_CLEAR_WAIT = 540;
 // ステージクリアラベルの配置位置y座標
