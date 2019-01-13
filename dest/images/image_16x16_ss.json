@@ -90,6 +90,11 @@
             "frames": [34, 35, 36, 37],
             "next": "stagbeetle",
             "frequency": 6
+        },
+        "cockroach": {
+            "frames": [38, 39],
+            "next": "cockroach",
+            "frequency": 6
         }
     }
 }
