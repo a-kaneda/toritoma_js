@@ -1630,17 +1630,19 @@ class TitleScene {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__grasshopper__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__hornet__ = __webpack_require__(43);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__snail__ = __webpack_require__(57);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rhinocerosbeetle__ = __webpack_require__(55);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__mantis__ = __webpack_require__(49);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__honeycomb__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__spider__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__centipede__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__centipedebody__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__centipedetail__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__deathnormal__ = __webpack_require__(39);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__deathboss__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__deathcentipede__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__deathnone__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__stagbeetle__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__rhinocerosbeetle__ = __webpack_require__(55);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__mantis__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__honeycomb__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__spider__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__centipede__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__centipedebody__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__centipedetail__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__deathnormal__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__deathboss__ = __webpack_require__(36);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__deathcentipede__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__deathnone__ = __webpack_require__(38);
+
 
 
 
@@ -1775,6 +1777,18 @@ const ENEMY_DEF = {
         originX: 0.5,
         originY: 0.5,
     },
+    // クワガタ
+    stagbeetle: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 20,
+        defense: 0,
+        score: 300,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
     // カブトムシ
     rhinocerosbeetle: {
         size: 64,
@@ -1892,26 +1906,29 @@ class EnemyFactory {
             case 'snail':
                 enemy = new __WEBPACK_IMPORTED_MODULE_8__snail__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
+            case 'stagbeetle':
+                enemy = new __WEBPACK_IMPORTED_MODULE_9__stagbeetle__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                break;
             case 'rhinocerosbeetle':
-                enemy = new __WEBPACK_IMPORTED_MODULE_9__rhinocerosbeetle__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                enemy = new __WEBPACK_IMPORTED_MODULE_10__rhinocerosbeetle__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
             case 'mantis':
-                enemy = new __WEBPACK_IMPORTED_MODULE_10__mantis__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                enemy = new __WEBPACK_IMPORTED_MODULE_11__mantis__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
             case 'honeycomb':
-                enemy = new __WEBPACK_IMPORTED_MODULE_11__honeycomb__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                enemy = new __WEBPACK_IMPORTED_MODULE_12__honeycomb__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
             case 'spider':
-                enemy = new __WEBPACK_IMPORTED_MODULE_12__spider__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                enemy = new __WEBPACK_IMPORTED_MODULE_13__spider__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
             case 'centipede':
-                enemy = new __WEBPACK_IMPORTED_MODULE_13__centipede__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                enemy = new __WEBPACK_IMPORTED_MODULE_14__centipede__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
             case 'centipede_body':
-                enemy = new __WEBPACK_IMPORTED_MODULE_14__centipedebody__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                enemy = new __WEBPACK_IMPORTED_MODULE_15__centipedebody__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
             case 'centipede_tail':
-                enemy = new __WEBPACK_IMPORTED_MODULE_15__centipedetail__["a" /* default */](x, y, ENEMY_DEF[type], scene);
+                enemy = new __WEBPACK_IMPORTED_MODULE_16__centipedetail__["a" /* default */](x, y, ENEMY_DEF[type], scene);
                 break;
             default:
                 console.log(`Error: Unknwon enemy type: ${type}`);
@@ -1922,16 +1939,16 @@ class EnemyFactory {
             let death;
             switch (ENEMY_DEF[type].death) {
                 case 'DeathNormal':
-                    death = new __WEBPACK_IMPORTED_MODULE_16__deathnormal__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    death = new __WEBPACK_IMPORTED_MODULE_17__deathnormal__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
                     break;
                 case 'DeathBoss':
-                    death = new __WEBPACK_IMPORTED_MODULE_17__deathboss__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    death = new __WEBPACK_IMPORTED_MODULE_18__deathboss__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
                     break;
                 case 'DeathCentipede':
-                    death = new __WEBPACK_IMPORTED_MODULE_18__deathcentipede__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    death = new __WEBPACK_IMPORTED_MODULE_19__deathcentipede__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
                     break;
                 default:
-                    death = new __WEBPACK_IMPORTED_MODULE_19__deathnone__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    death = new __WEBPACK_IMPORTED_MODULE_20__deathnone__["a" /* default */](enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
                     break;
             }
             enemy.deathEffect = death;
@@ -3070,7 +3087,7 @@ class ImageBUtton {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stringresource__ = __webpack_require__(61);
 
 /**
  * ローカライズを行うクラス。
@@ -3458,7 +3475,7 @@ class PlayerShot {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__screensize__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tilemapmanager__ = __webpack_require__(62);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__enemyfactory__ = __webpack_require__(9);
 
 
@@ -7233,7 +7250,7 @@ class PlayerOption {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__titlescene__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__menulayer__ = __webpack_require__(50);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__imagebutton__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__stagestatus__ = __webpack_require__(60);
 
 
 
@@ -8865,6 +8882,85 @@ class Spider extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__enemy__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__enemyshot__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(3);
+
+
+
+// 弾発射間隔
+const SHOT_INTERVAL = 60;
+// 移動スピード
+const MOVE_SPEED = 0.65;
+// 弾のスピード
+const SHOT_SPEED = 0.75;
+// 方向転換を行うまでの間隔
+const CHANGE_DIRECTION_INTERVAL = 120;
+/**
+ * 敵キャラ、クワガタ。
+ * 登場時に自機の方向へ進行方向を決めて真っ直ぐ飛ぶ。定周期で3-way弾を発射する。
+ * 途中で方向転換を行い、自機の方向へ向き直す。ただし、後ろの方向には戻らないようにx方向は常に左にする。
+ */
+class StagBeetle extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
+    /**
+     * コンストラクタ
+     * @param x x座標
+     * @param y y座標
+     * @param param 敵キャラクターパラメータ
+     * @param scene シーン
+     */
+    constructor(x, y, param, scene) {
+        // 親クラスのコンストラクタを実行する。
+        super(x, y, 'stagbeetle', param, scene);
+        // 自機との角度を計算する。
+        const angle = __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition);
+        // 縦横の速度を決定する
+        // ただし、後ろには戻らないようにx方向は絶対値とする
+        this._speedX = -1.0 * Math.abs(MOVE_SPEED * Math.cos(angle));
+        this._speedY = -1.0 * MOVE_SPEED * Math.sin(angle);
+        // 各変数を初期化する。
+        this._shotInterval = 0;
+        this._changeDirectionInterval = 0;
+    }
+    /**
+     * 敵キャラクター種別ごとの固有の処理。
+     * 左方向に直進する。
+     * 左方向に直進する弾を発射する。
+     * 画面外に出ると自分自身を削除する。
+     * @param scene シーン
+     */
+    action(scene) {
+        // 移動する。
+        this._hitArea.x += this._speedX;
+        this._hitArea.y += this._speedY;
+        // 弾発射間隔経過しているときは左方向へ1-way弾を発射する
+        this._shotInterval++;
+        if (this._shotInterval >= SHOT_INTERVAL) {
+            // 自機へ向けて弾を発射する。
+            __WEBPACK_IMPORTED_MODULE_1__enemyshot__["a" /* default */].fireNWay(this._hitArea, __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition), 3, Math.PI / 8.0, SHOT_SPEED, false, scene);
+            this._shotInterval = 0;
+        }
+        // 方向転換間隔経過しているときは移動方向を変更する。
+        this._changeDirectionInterval++;
+        if (this._changeDirectionInterval >= CHANGE_DIRECTION_INTERVAL) {
+            // 自機との角度を計算する。
+            const angle = __WEBPACK_IMPORTED_MODULE_2__util__["a" /* default */].calcAngle(this._hitArea, scene.playerPosition);
+            // 縦横の速度を決定する
+            // ただし、後ろには戻らないようにx方向は絶対値とする
+            this._speedX = -1.0 * Math.abs(MOVE_SPEED * Math.cos(angle));
+            this._speedY = -1.0 * MOVE_SPEED * Math.sin(angle);
+            this._changeDirectionInterval = 0;
+        }
+    }
+}
+/* harmony default export */ __webpack_exports__["a"] = (StagBeetle);
+
+
+/***/ }),
+/* 60 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stage__ = __webpack_require__(24);
 
 // ステージクリア後の待機フレーム数
@@ -8951,7 +9047,7 @@ class StageStatus {
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9089,7 +9185,7 @@ var StringResource = {
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

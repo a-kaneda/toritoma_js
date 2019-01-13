@@ -10,6 +10,7 @@ import Cicada from './cicada';
 import Grasshopper from './grasshopper';
 import Hornet from './hornet';
 import Snail from './snail';
+import StagBeetle from './stagbeetle';
 import RhinocerosBeetle from './rhinocerosbeetle';
 import Mantis from './mantis';
 import Hoenycomb from './honeycomb';
@@ -138,6 +139,18 @@ const ENEMY_DEF: { [key: string]: EnemyParam} = {
         originX: 0.5,
         originY: 0.5,
     },
+    // クワガタ
+    stagbeetle: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 20,
+        defense: 0,
+        score: 300,
+        death: 'DeathNormal',
+        originX: 0.5,
+        originY: 0.5,
+    },
     // カブトムシ
     rhinocerosbeetle: {
         size: 64,
@@ -257,6 +270,9 @@ class EnemyFactory {
             break;
         case 'snail':
             enemy = new Snail(x, y, ENEMY_DEF[type], scene);
+            break;
+        case 'stagbeetle':
+            enemy = new StagBeetle(x, y, ENEMY_DEF[type], scene);
             break;
         case 'rhinocerosbeetle':
             enemy = new RhinocerosBeetle(x, y, ENEMY_DEF[type], scene);

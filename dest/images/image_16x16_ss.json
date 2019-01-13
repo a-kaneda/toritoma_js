@@ -85,6 +85,11 @@
             "frames": [32, 33],
             "next": "snail",
             "frequency": 30
+        },
+        "stagbeetle": {
+            "frames": [34, 35, 36, 37],
+            "next": "stagbeetle",
+            "frequency": 6
         }
     }
 }
