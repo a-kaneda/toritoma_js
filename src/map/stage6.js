@@ -1877,7 +1877,7 @@
                  "type":"enemy",
                  "visible":true,
                  "width":16,
-                 "x":1760,
+                 "x":1776,
                  "y":64
                 }],
          "opacity":1,

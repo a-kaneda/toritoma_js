@@ -3,7 +3,7 @@
         "width": 32,
         "height": 32,
         "cols": 5,
-        "rows": 1
+        "rows": 2
     },
     "animations": {
         "centipede": {
@@ -20,6 +20,11 @@
             "frames": [3, 4],
             "next": "centipede_tail",
             "frequency": 12
+        },
+        "fly": {
+            "frames": [5, 6],
+            "next": "fly",
+            "frequency": 6
         }
     }
 }

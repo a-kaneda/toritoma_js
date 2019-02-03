@@ -129,19 +129,19 @@
                  "type":"bgm",
                  "visible":true,
                  "width":16,
-                 "x":272,
+                 "x":256,
                  "y":0
                 }, 
                 {
                  "height":16,
                  "id":576,
-                 "name":"centipede",
+                 "name":"fly",
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":16,
-                 "x":352,
-                 "y":48
+                 "x":272,
+                 "y":64
                 }],
          "opacity":1,
          "type":"objectgroup",

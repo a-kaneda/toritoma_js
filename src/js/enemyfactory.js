@@ -16,10 +16,13 @@ import Spider from './spider';
 import Centipede from './centipede';
 import CentipedeBody from './centipedebody';
 import CentipedeTail from './centipedetail';
+import Maggot from './maggot';
+import Fly from './fly';
 import DeathNormal from './deathnormal';
 import DeathBoss from './deathboss';
 import DeathCentipede from './deathcentipede';
 import DeathNone from './deathnone';
+import DeathMaggot from './deathmaggot';
 // 敵撃破時のチキンゲージ増加量
 const INCREMENT_CHICKEN_GAUGE = 0.005;
 /**
@@ -242,6 +245,30 @@ const ENEMY_DEF = {
         originX: 0.75,
         originY: 0.5,
     },
+    // ウジ
+    maggot: {
+        size: 16,
+        width: 16,
+        height: 16,
+        hp: 150,
+        defense: 0,
+        score: 500,
+        death: 'DeathMaggot',
+        originX: 0.5,
+        originY: 0.5,
+    },
+    // ハエ
+    fly: {
+        size: 32,
+        width: 16,
+        height: 16,
+        hp: 1500,
+        defense: 0,
+        score: 8000,
+        death: 'DeathBoss',
+        originX: 0.5,
+        originY: 0.5,
+    },
 };
 class EnemyFactory {
     static create(x, y, type, scene) {
@@ -302,6 +329,12 @@ class EnemyFactory {
             case 'centipede_tail':
                 enemy = new CentipedeTail(x, y, ENEMY_DEF[type], scene);
                 break;
+            case 'maggot':
+                enemy = new Maggot(x, y, ENEMY_DEF[type], scene);
+                break;
+            case 'fly':
+                enemy = new Fly(x, y, ENEMY_DEF[type], scene);
+                break;
             default:
                 console.log(`Error: Unknwon enemy type: ${type}`);
                 break;
@@ -318,6 +351,9 @@ class EnemyFactory {
                     break;
                 case 'DeathCentipede':
                     death = new DeathCentipede(enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
+                    break;
+                case 'DeathMaggot':
+                    death = new DeathMaggot(enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);
                     break;
                 default:
                     death = new DeathNone(enemy, ENEMY_DEF[type].score, INCREMENT_CHICKEN_GAUGE);

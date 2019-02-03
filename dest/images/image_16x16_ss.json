@@ -3,7 +3,7 @@
         "width": 16,
         "height": 16,
         "cols": 8,
-        "rows": 5
+        "rows": 6
     },
     "animations": {
         "player_normal": {
@@ -95,6 +95,11 @@
             "frames": [38, 39],
             "next": "cockroach",
             "frequency": 6
+        },
+        "maggot": {
+            "frames": [40, 41],
+            "next": "maggot",
+            "frequency": 30
         }
     }
 }

@@ -101,11 +101,11 @@
     <property name="speed" type="float" value="0"/>
    </properties>
   </object>
-  <object id="575" name="boss" type="bgm" x="272" y="0" width="16" height="16">
+  <object id="575" name="boss" type="bgm" x="256" y="0" width="16" height="16">
    <properties>
     <property name="speed" type="float" value="0.25"/>
    </properties>
   </object>
-  <object id="576" name="centipede" type="enemy" x="352" y="48" width="16" height="16"/>
+  <object id="576" name="fly" type="enemy" x="272" y="64" width="16" height="16"/>
  </objectgroup>
 </map>

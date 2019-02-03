@@ -44,6 +44,10 @@ class Enemy {
     get type() {
         return this._type;
     }
+    /** キャラクター種別。 */
+    set type(value) {
+        this._type = value;
+    }
     /** 位置とサイズ。 */
     get rect() {
         return this._hitArea;
@@ -69,7 +73,7 @@ class Enemy {
         // 画面外に出た場合は自分自身を削除する。
         // 画面外に出た場合は自分自身を削除する。
         if (this._hitArea.x < -this._hitArea.width * 2 ||
-            this._hitArea.x > ScreenSize.STAGE_RECT.width + this._hitArea.width * 2) {
+            this._hitArea.x > ScreenSize.STAGE_RECT.width + this._hitArea.width * 4) {
             scene.removeCharacter(this);
             return;
         }
