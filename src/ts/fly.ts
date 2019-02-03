@@ -88,7 +88,7 @@ const ALL_DIRECTION_ROTATION_SPEED = 0.1;
 // 全画面弾の発射間隔
 const ALL_RANGE_INTERVAL = 60;
 // 全画面弾の弾の位置の間隔
-const ALL_RANGE_POSITION_INTERVAL = 50;
+const ALL_RANGE_POSITION_INTERVAL = 25;
 // 全画面弾のスピード
 const ALL_RANGE_SPEED = 0.4;
 // 全画面弾の発射位置移動スピード
@@ -264,7 +264,7 @@ class Fly extends Enemy implements FlyIF {
                 // キャラクター種別を敵キャラクターに戻す。
                 this.type = Character.type.ENEMY;
 
-                // 登場時にBGMを変更する。。
+                // 登場時にBGMを変更する。
                 phina.asset.SoundManager.playMusic('lastboss');
             }
 
@@ -383,7 +383,7 @@ class Fly extends Enemy implements FlyIF {
 
             // 全画面弾の発射間隔が経過している場合は弾を発射する。
             this._shotInterval[0]++;
-            if (this._shotInterval[0] > ALL_DIRECTION_INTERVAL) {
+            if (this._shotInterval[0] > ALL_RANGE_INTERVAL) {
 
                 // 上方向から下方向への弾を発射する。
                 for (let i = -this._allRangePosition; i < ScreenSize.STAGE_RECT.width; i += ALL_RANGE_POSITION_INTERVAL) {
@@ -394,7 +394,7 @@ class Fly extends Enemy implements FlyIF {
                     }
                    
                     EnemyShot.fireNWay({x: i, y: ScreenSize.STAGE_RECT.height - 18},
-                        -Math.PI / 2,
+                        Math.PI / 2,
                         1,
                         0,
                         ALL_RANGE_SPEED,

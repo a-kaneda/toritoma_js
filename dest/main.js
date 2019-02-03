@@ -5481,7 +5481,7 @@ const ALL_DIRECTION_ROTATION_SPEED = 0.1;
 // 全画面弾の発射間隔
 const ALL_RANGE_INTERVAL = 60;
 // 全画面弾の弾の位置の間隔
-const ALL_RANGE_POSITION_INTERVAL = 50;
+const ALL_RANGE_POSITION_INTERVAL = 25;
 // 全画面弾のスピード
 const ALL_RANGE_SPEED = 0.4;
 // 全画面弾の発射位置移動スピード
@@ -5596,7 +5596,7 @@ class Fly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
                     this._sprite.alpha = 1;
                     // キャラクター種別を敵キャラクターに戻す。
                     this.type = __WEBPACK_IMPORTED_MODULE_6__character__["a" /* default */].type.ENEMY;
-                    // 登場時にBGMを変更する。。
+                    // 登場時にBGMを変更する。
                     phina.asset.SoundManager.playMusic('lastboss');
                 }
                 // 次の移動位置を設定する。
@@ -5659,14 +5659,14 @@ class Fly extends __WEBPACK_IMPORTED_MODULE_0__enemy__["a" /* default */] {
             case SHOT_STATE.ALL_RANGE:// 全画面弾発射
                 // 全画面弾の発射間隔が経過している場合は弾を発射する。
                 this._shotInterval[0]++;
-                if (this._shotInterval[0] > ALL_DIRECTION_INTERVAL) {
+                if (this._shotInterval[0] > ALL_RANGE_INTERVAL) {
                     // 上方向から下方向への弾を発射する。
                     for (let i = -this._allRangePosition; i < __WEBPACK_IMPORTED_MODULE_7__screensize__["a" /* default */].STAGE_RECT.width; i += ALL_RANGE_POSITION_INTERVAL) {
                         // 画面外の座標は飛ばす
                         if (i < 0) {
                             continue;
                         }
-                        __WEBPACK_IMPORTED_MODULE_1__enemyshot__["a" /* default */].fireNWay({ x: i, y: __WEBPACK_IMPORTED_MODULE_7__screensize__["a" /* default */].STAGE_RECT.height - 18 }, -Math.PI / 2, 1, 0, ALL_RANGE_SPEED, true, scene);
+                        __WEBPACK_IMPORTED_MODULE_1__enemyshot__["a" /* default */].fireNWay({ x: i, y: __WEBPACK_IMPORTED_MODULE_7__screensize__["a" /* default */].STAGE_RECT.height - 18 }, Math.PI / 2, 1, 0, ALL_RANGE_SPEED, true, scene);
                     }
                     // 右方向から左方向への弾を発射する
                     for (let i = -this._allRangePosition; i < __WEBPACK_IMPORTED_MODULE_7__screensize__["a" /* default */].STAGE_RECT.height; i += ALL_RANGE_POSITION_INTERVAL) {
