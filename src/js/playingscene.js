@@ -77,7 +77,10 @@ class PlayingScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._backgroundLayer = new phina.display.PixiLayer({
+            width: ScreenSize.SCREEN_WIDTH,
+            height: ScreenSize.SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO, ScreenSize.STAGE_RECT.y * ScreenSize.ZOOM_RATIO);
         this._backgroundLayer.scaleX = ScreenSize.ZOOM_RATIO;
@@ -92,7 +95,10 @@ class PlayingScene {
         this._characterLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._characterLayer.scaleY = ScreenSize.ZOOM_RATIO;
         // 枠レイヤーを作成する。
-        this._frameLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._frameLayer = new phina.display.PixiLayer({
+            width: ScreenSize.SCREEN_WIDTH,
+            height: ScreenSize.SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
         // 枠レイヤーの位置、サイズを設定する。
         this._frameLayer.scaleX = ScreenSize.ZOOM_RATIO;
         this._frameLayer.scaleY = ScreenSize.ZOOM_RATIO;
@@ -587,7 +593,7 @@ class PlayingScene {
             // 背景を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBack.width) {
                 for (let j = 0; j < height; j += ControlSize.frameBack.height) {
-                    const back = new phina.display.Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
+                    const back = new phina.pixi.Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
                     back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
@@ -609,7 +615,7 @@ class PlayingScene {
             // 背景を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBack.width) {
                 for (let j = 0; j < height; j += ControlSize.frameBack.height) {
-                    const back = new phina.display.Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
+                    const back = new phina.pixi.Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
                     back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
@@ -626,7 +632,7 @@ class PlayingScene {
             // 背景を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBack.width) {
                 for (let j = 0; j < height; j += ControlSize.frameBack.height) {
-                    const back = new phina.display.Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
+                    const back = new phina.pixi.Sprite('control', ControlSize.frameBack.width, ControlSize.frameBack.height);
                     back.srcRect.set(ControlSize.frameBack.x, ControlSize.frameBack.y, ControlSize.frameBack.width, ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
@@ -645,7 +651,7 @@ class PlayingScene {
             const height = ScreenSize.STAGE_RECT.height;
             // 枠を並べる。
             for (let i = 0; i < height; i += ControlSize.frameLeft.height) {
-                const bar = new phina.display.Sprite('control', ControlSize.frameLeft.width, ControlSize.frameLeft.height);
+                const bar = new phina.pixi.Sprite('control', ControlSize.frameLeft.width, ControlSize.frameLeft.height);
                 bar.srcRect.set(ControlSize.frameLeft.x, ControlSize.frameLeft.y, ControlSize.frameLeft.width, ControlSize.frameLeft.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
@@ -658,7 +664,7 @@ class PlayingScene {
             const height = ScreenSize.STAGE_RECT.height;
             // 枠を並べる。
             for (let i = 0; i < height; i += ControlSize.frameRight.height) {
-                const bar = new phina.display.Sprite('control', ControlSize.frameRight.width, ControlSize.frameRight.height);
+                const bar = new phina.pixi.Sprite('control', ControlSize.frameRight.width, ControlSize.frameRight.height);
                 bar.srcRect.set(ControlSize.frameRight.x, ControlSize.frameRight.y, ControlSize.frameRight.width, ControlSize.frameRight.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
@@ -672,7 +678,7 @@ class PlayingScene {
             const width = ScreenSize.STAGE_RECT.width;
             // 枠を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBottom.width) {
-                const bar = new phina.display.Sprite('control', ControlSize.frameBottom.width, ControlSize.frameBottom.height);
+                const bar = new phina.pixi.Sprite('control', ControlSize.frameBottom.width, ControlSize.frameBottom.height);
                 bar.srcRect.set(ControlSize.frameBottom.x, ControlSize.frameBottom.y, ControlSize.frameBottom.width, ControlSize.frameBottom.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x + i, y);
@@ -684,7 +690,7 @@ class PlayingScene {
             const x = ScreenSize.STAGE_RECT.x - ControlSize.frameBottomLeft.width;
             const y = ScreenSize.STAGE_RECT.height;
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', ControlSize.frameBottomLeft.width, ControlSize.frameBottomLeft.height);
+            const bar = new phina.pixi.Sprite('control', ControlSize.frameBottomLeft.width, ControlSize.frameBottomLeft.height);
             bar.srcRect.set(ControlSize.frameBottomLeft.x, ControlSize.frameBottomLeft.y, ControlSize.frameBottomLeft.width, ControlSize.frameBottomLeft.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);
@@ -695,7 +701,7 @@ class PlayingScene {
             const x = ScreenSize.STAGE_RECT.x + ScreenSize.STAGE_RECT.width;
             const y = ScreenSize.STAGE_RECT.height;
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', ControlSize.frameBottomRight.width, ControlSize.frameBottomRight.height);
+            const bar = new phina.pixi.Sprite('control', ControlSize.frameBottomRight.width, ControlSize.frameBottomRight.height);
             bar.srcRect.set(ControlSize.frameBottomRight.x, ControlSize.frameBottomRight.y, ControlSize.frameBottomRight.width, ControlSize.frameBottomRight.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);

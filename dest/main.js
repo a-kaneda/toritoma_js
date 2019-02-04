@@ -3132,7 +3132,7 @@ class Frame {
      */
     _createFrame(x, y, type) {
         // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].height);
+        const frame = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].height);
         frame.srcRect.set(__WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].x, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].y, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].width, __WEBPACK_IMPORTED_MODULE_0__controlsize__["a" /* default */][type].height);
         frame.scaleX = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
         frame.scaleY = __WEBPACK_IMPORTED_MODULE_1__screensize__["a" /* default */].ZOOM_RATIO;
@@ -3675,7 +3675,7 @@ class Stage {
         // 背景画像を読み込む。
         const backgroundTexture = this._mapManager.getIamge('background');
         if (backgroundTexture !== null) {
-            this._background = new phina.display.Sprite(backgroundTexture)
+            this._background = new phina.pixi.Sprite(backgroundTexture)
                 .setOrigin(0, 0)
                 .setPosition(0, 0)
                 .addChildTo(layer);
@@ -3686,7 +3686,7 @@ class Stage {
         // 前景画像を読み込む。
         const foregroundTexture = this._mapManager.getIamge('foreground');
         if (foregroundTexture != null) {
-            this._foreground = new phina.display.Sprite(foregroundTexture)
+            this._foreground = new phina.pixi.Sprite(foregroundTexture)
                 .setOrigin(0, 0)
                 .setPosition(0, 0)
                 .addChildTo(layer);
@@ -3697,7 +3697,7 @@ class Stage {
         // 障害物画像を読み込む。
         const blockTexture = this._mapManager.getIamge('block');
         if (blockTexture != null) {
-            this._block = new phina.display.Sprite(blockTexture)
+            this._block = new phina.pixi.Sprite(blockTexture)
                 .setOrigin(0, 0)
                 .setPosition(0, 0)
                 .addChildTo(layer);
@@ -8092,7 +8092,10 @@ class PlayingScene {
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._backgroundLayer = new phina.display.PixiLayer({
+            width: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH,
+            height: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO, __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.y * __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO);
         this._backgroundLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
@@ -8107,7 +8110,10 @@ class PlayingScene {
         this._characterLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         this._characterLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         // 枠レイヤーを作成する。
-        this._frameLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._frameLayer = new phina.display.PixiLayer({
+            width: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH,
+            height: __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
         // 枠レイヤーの位置、サイズを設定する。
         this._frameLayer.scaleX = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
         this._frameLayer.scaleY = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].ZOOM_RATIO;
@@ -8602,7 +8608,7 @@ class PlayingScene {
             // 背景を並べる。
             for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width) {
                 for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height) {
-                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
+                    const back = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
                     back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
@@ -8624,7 +8630,7 @@ class PlayingScene {
             // 背景を並べる。
             for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width) {
                 for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height) {
-                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
+                    const back = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
                     back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
@@ -8641,7 +8647,7 @@ class PlayingScene {
             // 背景を並べる。
             for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width) {
                 for (let j = 0; j < height; j += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height) {
-                    const back = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
+                    const back = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBack.height);
                     back.setOrigin(0, 0);
                     back.setPosition(x + i, y + j);
@@ -8660,7 +8666,7 @@ class PlayingScene {
             const height = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
             for (let i = 0; i < height; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.height) {
-                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.height);
+                const bar = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.height);
                 bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameLeft.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
@@ -8673,7 +8679,7 @@ class PlayingScene {
             const height = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
             for (let i = 0; i < height; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.height) {
-                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.height);
+                const bar = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.height);
                 bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameRight.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x, i);
@@ -8687,7 +8693,7 @@ class PlayingScene {
             const width = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width;
             // 枠を並べる。
             for (let i = 0; i < width; i += __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.width) {
-                const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.height);
+                const bar = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.height);
                 bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottom.height);
                 bar.setOrigin(0, 0);
                 bar.setPosition(x + i, y);
@@ -8699,7 +8705,7 @@ class PlayingScene {
             const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x - __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.width;
             const y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.height);
+            const bar = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.height);
             bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomLeft.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);
@@ -8710,7 +8716,7 @@ class PlayingScene {
             const x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.x + __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.width;
             const y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].STAGE_RECT.height;
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.height);
+            const bar = new phina.pixi.Sprite('control', __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.height);
             bar.srcRect.set(__WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.x, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.y, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.width, __WEBPACK_IMPORTED_MODULE_3__controlsize__["a" /* default */].frameBottomRight.height);
             bar.setOrigin(0, 0);
             bar.setPosition(x, y);

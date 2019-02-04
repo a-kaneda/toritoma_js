@@ -126,7 +126,7 @@ class Frame {
     private _createFrame(x: number, y: number, type: string): void {
 
         // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control',
+        const frame = new phina.pixi.Sprite('control',
             ControlSize[type].width,
             ControlSize[type].height);
         frame.srcRect.set(ControlSize[type].x,

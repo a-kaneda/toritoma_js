@@ -96,7 +96,7 @@ class Frame {
      */
     _createFrame(x, y, type) {
         // 枠の画像を読み込む。
-        const frame = new phina.display.Sprite('control', ControlSize[type].width, ControlSize[type].height);
+        const frame = new phina.pixi.Sprite('control', ControlSize[type].width, ControlSize[type].height);
         frame.srcRect.set(ControlSize[type].x, ControlSize[type].y, ControlSize[type].width, ControlSize[type].height);
         frame.scaleX = ScreenSize.ZOOM_RATIO;
         frame.scaleY = ScreenSize.ZOOM_RATIO;

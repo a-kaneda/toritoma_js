@@ -25,11 +25,11 @@ class Stage {
     /** タイルマップ管理クラス。 */
     private _mapManager: TileMapManager;
     /** 背景画像。 */
-    private _background: phina.display.Sprite | null;
+    private _background: phina.pixi.Sprite | null;
     /** 前景画像。 */
-    private _foreground: phina.display.Sprite | null;
+    private _foreground: phina.pixi.Sprite | null;
     /** 障害物画像。 */
-    private _block: phina.display.Sprite | null;
+    private _block: phina.pixi.Sprite | null;
 
     /**
      * コンストラクタ。
@@ -58,7 +58,7 @@ class Stage {
         // 背景画像を読み込む。
         const backgroundTexture = this._mapManager.getIamge('background');
         if (backgroundTexture !== null) {
-            this._background = new phina.display.Sprite(backgroundTexture)
+            this._background = new phina.pixi.Sprite(backgroundTexture)
             .setOrigin(0, 0)
             .setPosition(0, 0)
             .addChildTo(layer);
@@ -70,7 +70,7 @@ class Stage {
         // 前景画像を読み込む。
         const foregroundTexture = this._mapManager.getIamge('foreground');
         if (foregroundTexture != null) {
-            this._foreground = new phina.display.Sprite(foregroundTexture)
+            this._foreground = new phina.pixi.Sprite(foregroundTexture)
             .setOrigin(0, 0)
             .setPosition(0, 0)
             .addChildTo(layer);
@@ -82,7 +82,7 @@ class Stage {
         // 障害物画像を読み込む。
         const blockTexture = this._mapManager.getIamge('block');
         if (blockTexture != null) {
-            this._block = new phina.display.Sprite(blockTexture)
+            this._block = new phina.pixi.Sprite(blockTexture)
             .setOrigin(0, 0)
             .setPosition(0, 0)
             .addChildTo(layer);

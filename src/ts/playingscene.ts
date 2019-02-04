@@ -84,11 +84,11 @@ class PlayingScene implements Scene {
     /** 全ノードのルート */
     private _rootNode: phina.display.DisplayElement;
     /** 背景レイヤー。 */
-    private _backgroundLayer: phina.display.DisplayElement;
+    private _backgroundLayer: phina.display.PixiLayer;
     /** キャラクターレイヤー。 */
     private _characterLayer: phina.display.PixiLayer;
     /** 枠レイヤー。 */
-    private _frameLayer: phina.display.DisplayElement;
+    private _frameLayer: phina.display.PixiLayer;
     /** 情報レイヤー。 */
     private _infoLayer: phina.display.DisplayElement;
     /** ステージ状態 */
@@ -147,7 +147,10 @@ class PlayingScene implements Scene {
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
 
         // 背景レイヤーを作成する。
-        this._backgroundLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._backgroundLayer = new phina.display.PixiLayer({
+            width: ScreenSize.SCREEN_WIDTH, 
+            height: ScreenSize.SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
 
         // 背景レイヤーの位置、サイズを設定する。
         this._backgroundLayer.setPosition(ScreenSize.STAGE_RECT.x * ScreenSize.ZOOM_RATIO,
@@ -168,7 +171,10 @@ class PlayingScene implements Scene {
         this._characterLayer.scaleY = ScreenSize.ZOOM_RATIO;
 
         // 枠レイヤーを作成する。
-        this._frameLayer = new phina.display.DisplayElement().addChildTo(this._rootNode);
+        this._frameLayer = new phina.display.PixiLayer({
+            width: ScreenSize.SCREEN_WIDTH, 
+            height: ScreenSize.SCREEN_HEIGHT
+        }).addChildTo(this._rootNode);
 
         // 枠レイヤーの位置、サイズを設定する。
         this._frameLayer.scaleX = ScreenSize.ZOOM_RATIO;
@@ -790,7 +796,7 @@ class PlayingScene implements Scene {
             // 背景を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBack.width) {
                 for (let j = 0; j < height; j += ControlSize.frameBack.height) {
-                    const back = new phina.display.Sprite('control', 
+                    const back = new phina.pixi.Sprite('control', 
                         ControlSize.frameBack.width, 
                         ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
@@ -820,7 +826,7 @@ class PlayingScene implements Scene {
             // 背景を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBack.width) {
                 for (let j = 0; j < height; j += ControlSize.frameBack.height) {
-                    const back = new phina.display.Sprite('control', 
+                    const back = new phina.pixi.Sprite('control', 
                         ControlSize.frameBack.width, 
                         ControlSize.frameBack.height);
                     back.setOrigin(0, 0);
@@ -844,7 +850,7 @@ class PlayingScene implements Scene {
             // 背景を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBack.width) {
                 for (let j = 0; j < height; j += ControlSize.frameBack.height) {
-                    const back = new phina.display.Sprite('control', 
+                    const back = new phina.pixi.Sprite('control', 
                         ControlSize.frameBack.width, 
                         ControlSize.frameBack.height);
                     back.srcRect.set(ControlSize.frameBack.x, 
@@ -871,7 +877,7 @@ class PlayingScene implements Scene {
 
             // 枠を並べる。
             for (let i = 0; i < height; i += ControlSize.frameLeft.height) {
-                const bar = new phina.display.Sprite('control', 
+                const bar = new phina.pixi.Sprite('control', 
                     ControlSize.frameLeft.width, 
                     ControlSize.frameLeft.height);
                 bar.srcRect.set(ControlSize.frameLeft.x, 
@@ -891,7 +897,7 @@ class PlayingScene implements Scene {
 
             // 枠を並べる。
             for (let i = 0; i < height; i += ControlSize.frameRight.height) {
-                const bar = new phina.display.Sprite('control', 
+                const bar = new phina.pixi.Sprite('control', 
                     ControlSize.frameRight.width, 
                     ControlSize.frameRight.height);
                 bar.srcRect.set(ControlSize.frameRight.x, 
@@ -912,7 +918,7 @@ class PlayingScene implements Scene {
 
             // 枠を並べる。
             for (let i = 0; i < width; i += ControlSize.frameBottom.width) {
-                const bar = new phina.display.Sprite('control', 
+                const bar = new phina.pixi.Sprite('control', 
                     ControlSize.frameBottom.width, 
                     ControlSize.frameBottom.height);
                 bar.srcRect.set(ControlSize.frameBottom.x, 
@@ -931,7 +937,7 @@ class PlayingScene implements Scene {
             const y = ScreenSize.STAGE_RECT.height;
 
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', 
+            const bar = new phina.pixi.Sprite('control', 
                 ControlSize.frameBottomLeft.width, 
                 ControlSize.frameBottomLeft.height);
             bar.srcRect.set(ControlSize.frameBottomLeft.x,
@@ -949,7 +955,7 @@ class PlayingScene implements Scene {
             const y = ScreenSize.STAGE_RECT.height;
 
             // 枠を並べる。
-            const bar = new phina.display.Sprite('control', 
+            const bar = new phina.pixi.Sprite('control', 
                 ControlSize.frameBottomRight.width, 
                 ControlSize.frameBottomRight.height);
             bar.srcRect.set(ControlSize.frameBottomRight.x,
