@@ -7296,6 +7296,10 @@ const SHOT_INTERVAL = 12;
 const HIT_WIDTH = 2;
 // 当たり判定高さ
 const HIT_HEIGHT = 2;
+// ブロックとの当たり判定幅
+const BLOCK_HIT_WIDTH = 4;
+// ブロックとの当たり判定高さ
+const BLOCK_HIT_HEIGHT = 4;
 // かすり当たり判定幅
 const GRAZE_WIDTH = 16;
 // かすり当たり判定高さ
@@ -7336,6 +7340,8 @@ class Player {
         this._animation.gotoAndPlay('player_normal');
         // 当たり判定を作成する。
         this._hitArea = new __WEBPACK_IMPORTED_MODULE_2__collider__["a" /* default */](x, y, HIT_WIDTH, HIT_HEIGHT);
+        // 壁との当たり判定を作成する。
+        this._blockHitArea = new __WEBPACK_IMPORTED_MODULE_2__collider__["a" /* default */](x, y, BLOCK_HIT_WIDTH, BLOCK_HIT_HEIGHT);
         // かすり当たり判定を作成する。
         this._grazeArea = new __WEBPACK_IMPORTED_MODULE_2__collider__["a" /* default */](x, y, GRAZE_WIDTH, GRAZE_HEIGHT);
         // 弾発射間隔を初期化する。
@@ -7397,12 +7403,15 @@ class Player {
      * @param scene シーン
      */
     update(scene) {
+        // 壁との当たり判定の位置を更新する。
+        this._blockHitArea.x = this._hitArea.x;
+        this._blockHitArea.y = this._hitArea.y;
         // ブロックと衝突している場合
-        if (this._hitArea.checkCollidedBlock(this._hitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
+        if (this._blockHitArea.checkCollidedBlock(this._blockHitArea, scene.getStagePosition(), scene.getBlockMap()) != null) {
             // ブロックによって押されて移動する。
-            const dest = this._hitArea.pushCharacter(this._hitArea, scene.getStagePosition(), scene.getBlockMap(), false);
-            this._hitArea.x = dest.x;
-            this._hitArea.y = dest.y;
+            const dest = this._blockHitArea.pushCharacter(this._blockHitArea, scene.getStagePosition(), scene.getBlockMap(), false);
+            this._blockHitArea.x = this._hitArea.x = dest.x;
+            this._blockHitArea.y = this._hitArea.y = dest.y;
         }
         // 無敵状態の場合
         if (this._status === STATUS.INVINCIBLE) {
@@ -7565,18 +7574,21 @@ class Player {
      */
     _move(x, y, scene) {
         // 前回値を保存する。
-        const prevX = this._hitArea.x;
-        const prevY = this._hitArea.y;
+        const prevX = this._blockHitArea.x;
+        const prevY = this._blockHitArea.y;
         // 死亡中でない場合のみ移動を行う。
         if (this._status != STATUS.DEATH) {
             // 現在の座標を変更する。
-            this._hitArea.x = x;
-            this._hitArea.y = y;
+            this._blockHitArea.x = x;
+            this._blockHitArea.y = y;
         }
         // 衝突しているブロックがある場合は移動する。
-        this._hitArea.collideBlock(prevX, prevY, scene.getStagePosition(), scene.getBlockMap());
+        this._blockHitArea.collideBlock(prevX, prevY, scene.getStagePosition(), scene.getBlockMap());
         // 画面外に出ていないかチェックする。
         this._checkScreenArea();
+        // 移動した結果を当たり判定に反映させる。
+        this._hitArea.x = this._blockHitArea.x;
+        this._hitArea.y = this._blockHitArea.y;
         // オプションがある場合はオプションを移動前の座標へ移動する。
         if (this._option !== null) {
             this._option.move(prevX, prevY);
