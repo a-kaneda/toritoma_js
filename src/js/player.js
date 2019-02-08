@@ -304,11 +304,11 @@ class Player {
         }
         // 衝突しているブロックがある場合は移動する。
         this._blockHitArea.collideBlock(prevX, prevY, scene.getStagePosition(), scene.getBlockMap());
-        // 画面外に出ていないかチェックする。
-        this._checkScreenArea();
         // 移動した結果を当たり判定に反映させる。
         this._hitArea.x = this._blockHitArea.x;
         this._hitArea.y = this._blockHitArea.y;
+        // 画面外に出ていないかチェックする。
+        this._checkScreenArea();
         // オプションがある場合はオプションを移動前の座標へ移動する。
         if (this._option !== null) {
             this._option.move(prevX, prevY);

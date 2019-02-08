@@ -28,7 +28,7 @@ const SCORE_POS_Y = 12;
 // 復活待機フレーム数
 const REBIRTH_WAIT = 60;
 // チキンゲージ位置(画面下からの位置)
-const CHICKEN_GAUGE_POS_Y = 12;
+const CHICKEN_GAUGE_POS_Y = 36;
 // シールドボタン位置x座標(画面右からの位置)
 const SHIELD_BUTTON_POS_X = 50;
 // シールドボタン位置y座標(画面下からの位置)
