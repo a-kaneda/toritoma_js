@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 phina.define('phina.display.PixiLayer', {
     superClass: 'phina.display.Layer',
 
@@ -28,14 +30,14 @@ phina.define('phina.display.PixiLayer', {
         if (child.pixiObject) {
             this.stage.addChild(child.pixiObject);
         }
-        return phina.display.Layer.prototype.addChild.apply(this, arguments);
+        return phina.display.Layer.prototype.addChild.call(this, child);
     },
 
     removeChild: function (child: phina.pixi.Sprite) {
         if (child.pixiObject) {
             this.stage.removeChild(child.pixiObject);
         }
-        return phina.display.Layer.prototype.removeChild.apply(this, arguments);
+        return phina.display.Layer.prototype.removeChild.call(this, child);
     }
 });
 

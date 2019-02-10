@@ -6,6 +6,9 @@ import LabelAreaExDummy from './labelareaex';
 import PixiLayerDummy from './pixilayer';
 import PixiSpriteDummy from './pixisprite';
 
+declare function require(x: string): any;
+var phina = require('phina.js');
+
 declare global {
     interface Window {
         // デバッグ用グローバル変数

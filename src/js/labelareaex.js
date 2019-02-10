@@ -1,3 +1,4 @@
+var phina = require('phina.js');
 /**
  * LabelArea拡張クラス。
  * 単語の途中で改行を行わないようにするオプションkeepWordを追加。

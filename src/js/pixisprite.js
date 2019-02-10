@@ -27,7 +27,7 @@ phina.define('phina.pixi.Sprite', {
         });
     },
     setFrameIndex: function (index, width, height) {
-        phina.display.Sprite.prototype.setFrameIndex.apply(this, arguments);
+        phina.display.Sprite.prototype.setFrameIndex.call(this, index, width, height);
         this.pixiObject.texture.frame = new PIXI.Rectangle(this.srcRect.x, this.srcRect.y, this.srcRect.width, this.srcRect.height);
         return this;
     },
@@ -57,16 +57,16 @@ phina.define('phina.pixi.Sprite', {
     },
     setPosition: function (x, y) {
         this.pixiObject.position.set(x, y);
-        return phina.display.Sprite.prototype.setPosition.apply(this, arguments);
+        return phina.display.Sprite.prototype.setPosition.call(this, x, y);
     },
     setOrigin: function (x, y) {
         this.pixiObject.anchor.set(x, y);
-        return phina.display.Sprite.prototype.setOrigin.apply(this, arguments);
+        return phina.display.Sprite.prototype.setOrigin.call(this, x, y);
     },
     setScale: function (x, y) {
         y = y || x;
         this.pixiObject.scale.set(x, y);
-        return phina.display.Sprite.prototype.setScale.apply(this, arguments);
+        return phina.display.Sprite.prototype.setScale.call(this, x, y);
     },
 });
 // exportするものがないのでダミー変数をexportする。

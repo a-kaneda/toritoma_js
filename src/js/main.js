@@ -5,6 +5,7 @@ import TitleScene from './titlescene';
 import LabelAreaExDummy from './labelareaex';
 import PixiLayerDummy from './pixilayer';
 import PixiSpriteDummy from './pixisprite';
+var phina = require('phina.js');
 window.debug = {};
 // phina.defineしかないソースが取り込まれるようにダミー変数を使用する。
 LabelAreaExDummy;
