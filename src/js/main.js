@@ -52,6 +52,15 @@ const ASSETS = {
     font: {
         'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',
     },
+    json: {
+        'stage0': './map/stage0.json',
+        'stage1': './map/stage1.json',
+        'stage2': './map/stage2.json',
+        'stage3': './map/stage3.json',
+        'stage4': './map/stage4.json',
+        'stage5': './map/stage5.json',
+        'stage6': './map/stage6.json',
+    },
 };
 /**
  * ローディングシーン。

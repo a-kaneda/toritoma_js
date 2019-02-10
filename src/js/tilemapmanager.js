@@ -11,7 +11,7 @@ class TileMapManager {
      */
     constructor(mapName) {
         // マップ名に対応するマップを取得する。
-        this._map = TileMaps[mapName];
+        this._map = phina.asset.AssetManager.get('json', mapName).data;
         // オブジェクトマップを初期化する。
         this._objectMap = {};
     }
