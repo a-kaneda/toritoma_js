@@ -76,15 +76,14 @@ class Cursor {
     /**
      * 入力処理を行う。
      * @param keyboard キーボード
-     * @param gamepad ゲームパッド
      */
-    input(keyboard, gamepad) {
+    input(keyboard) {
         // 有効な場合は処理を行う。
         if (this._enable) {
             // キーボードの入力処理を行う。
             this._inputKeyboard(keyboard);
             // ゲームパッドの入力処理を行う。
-            this._dpad.input(gamepad);
+            this._dpad.input();
         }
         return this;
     }

@@ -110,9 +110,8 @@ class Cursor {
     /**
      * 入力処理を行う。
      * @param keyboard キーボード
-     * @param gamepad ゲームパッド
      */
-    public input(keyboard: phina.input.Keyboard, gamepad: phina.input.Gamepad): this {
+    public input(keyboard: phina.input.Keyboard): this {
 
         // 有効な場合は処理を行う。
         if (this._enable) {
@@ -121,7 +120,7 @@ class Cursor {
             this._inputKeyboard(keyboard);
 
             // ゲームパッドの入力処理を行う。
-            this._dpad.input(gamepad);
+            this._dpad.input();
         }
 
         return this;

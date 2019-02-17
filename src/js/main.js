@@ -141,10 +141,8 @@ phina.define('MainScene', {
         // BGMとSEの音量を設定する。
         phina.asset.SoundManager.setVolume(0.5);
         phina.asset.SoundManager.setVolumeMusic(0.2);
-        // ゲームパッドマネージャーを作成する。
-        const gamepadManager = new phina.input.GamepadManager();
         // 初期シーンを設定する。
-        this.scene = new TitleScene(this, gamepadManager);
+        this.scene = new TitleScene(this);
     },
     /**
      * 更新処理。内部のシーン処理の更新処理を実行する。

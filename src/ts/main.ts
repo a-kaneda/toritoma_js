@@ -5,6 +5,7 @@ import TitleScene from './titlescene';
 import LabelAreaExDummy from './labelareaex';
 import PixiLayerDummy from './pixilayer';
 import PixiSpriteDummy from './pixisprite';
+import GamepadManager from './gamepadmanager'; 
 
 declare function require(x: string): any;
 var phina = require('phina.js');
@@ -172,11 +173,8 @@ phina.define('MainScene', {
         phina.asset.SoundManager.setVolume(0.5);
         phina.asset.SoundManager.setVolumeMusic(0.2);
         
-        // ゲームパッドマネージャーを作成する。
-        const gamepadManager = new phina.input.GamepadManager();
-
         // 初期シーンを設定する。
-        this.scene = new TitleScene(this, gamepadManager);
+        this.scene = new TitleScene(this);
     },
 
     /**

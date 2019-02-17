@@ -12,6 +12,7 @@ import TitleScene from './titlescene';
 import MenuLayer from './menulayer';
 import ImageButton from './imagebutton';
 import StageStatus from './stagestatus';
+import GamepadManager from './gamepadmanager';
 // 初期残機
 const INITIAL_LIFE = 2;
 // 残機位置x座標(ステージ左端からの位置)
@@ -69,11 +70,9 @@ class PlayingScene {
      * 各種データの初期化と生成を行う。
      * @param phinaScene phina.js上のシーンインスタンス
      */
-    constructor(phinaScene, gamepadManager) {
+    constructor(phinaScene) {
         // phina.jsのシーンインスタンスを設定する。
         this._phinaScene = phinaScene;
-        // ゲームパッドマネージャーを設定する。
-        this._gamepadManager = gamepadManager;
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // 背景レイヤーを作成する。
@@ -213,7 +212,7 @@ class PlayingScene {
      */
     update(app) {
         // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
+        GamepadManager.get().update();
         // プレイ中でステージクリアフラグがたっている場合は状態を遷移する。
         if (this._state === SCENE_STATE.PLAYING && this._stageStatus.isStageCleared) {
             // ステージクリアのジングルを再生する。
@@ -406,10 +405,10 @@ class PlayingScene {
                 this._inputOnGameOver(app);
                 break;
             case SCENE_STATE.PAUSE:
-                this._pauseLayer.input(app.keyboard, this._gamepadManager.get(0));
+                this._pauseLayer.input(app.keyboard);
                 break;
             case SCENE_STATE.QUIT_MENU:
-                this._quitLayer.input(app.keyboard, this._gamepadManager.get(0));
+                this._quitLayer.input(app.keyboard);
                 break;
             default:
                 break;
@@ -452,10 +451,10 @@ class PlayingScene {
     _inputOnGameOver(app) {
         // キーボードを取得する。
         const key = app.keyboard;
-        // ゲームパッドを取得する。
-        const gamepad = this._gamepadManager.get();
+        // ゲームパッド管理クラスを取得する。
+        const gamepadManager = GamepadManager.get();
         // キーボードのzキーか、ゲームパッドのAボタンでタイトル画面に戻る。
-        if (key.getKeyDown('z') || gamepad.getKeyDown('a')) {
+        if (key.getKeyDown('z') || gamepadManager.getButtonPressed('a')) {
             this._replaceScene();
         }
     }
@@ -548,20 +547,21 @@ class PlayingScene {
             shield: false,
             pause: false,
         };
-        // ゲームパッドを取得する。
-        const gamepad = this._gamepadManager.get();
+        // ゲームパッド管理クラスを取得する。
+        const gamepadManager = GamepadManager.get();
         // アナログスティックの入力を取得する。
-        const stick = gamepad.getStickDirection(0);
+        const stick_x = gamepadManager.getAxesX(0);
+        const stick_y = gamepadManager.getAxesY(0);
         // アナログスティックの入力値が閾値を超えている場合は移動する。
-        if (stick.length() > 0.5) {
-            this._player.moveGamepad(stick.x, stick.y, this);
+        if (Math.sqrt(stick_x * stick_x + stick_y * stick_y) > 0.5) {
+            this._player.moveGamepad(stick_x, stick_y, this);
         }
         // Aボタンでシールドを使用する。
-        if (gamepad.getKey('a')) {
+        if (gamepadManager.getButtonPressed('a')) {
             inputState.shield = true;
         }
         // STARTボタンで一時停止する。
-        if (gamepad.getKeyDown('start')) {
+        if (gamepadManager.getButtonDown('start')) {
             inputState.pause = true;
         }
         return inputState;
@@ -825,7 +825,7 @@ class PlayingScene {
         // 全要素を取り除く。
         this._rootNode.remove();
         // タイトルシーンへ遷移する。
-        this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
+        this._phinaScene.scene = new TitleScene(this._phinaScene);
     }
     /**
      * ゲームを一時停止する。

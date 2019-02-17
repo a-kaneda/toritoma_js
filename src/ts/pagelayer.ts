@@ -1,6 +1,7 @@
-import ImageButton from './imagebutton'
-import ScreenSize from './screensize'
-import DPad from './dpad'
+import ImageButton from './imagebutton';
+import ScreenSize from './screensize';
+import DPad from './dpad';
+import GamepadManager from './gamepadmanager';
 
 // 戻るボタンの位置x座標(画面左からの位置)
 const BACK_BUTTON_POS_X = ScreenSize.SCREEN_WIDTH - 28;
@@ -129,12 +130,14 @@ class PageLayer {
     /**
      * 入力処理を行う。
      * @param keyboard キーボード
-     * @param gamepad ゲームパッド
      */
-    public input(keyboard: phina.input.Keyboard, gamepad: phina.input.Gamepad): void {
+    public input(keyboard: phina.input.Keyboard): void {
+
+        // ゲームパッド管理クラスを取得する。
+        const gamepadManager = GamepadManager.get();
 
         // キーボードのESCキーかゲームパッドのBボタンが押された場合は戻るボタンの処理を行う。
-        if (keyboard.getKeyDown('escape') || gamepad.getKeyDown('b')) {
+        if (keyboard.getKeyDown('escape') || gamepadManager.getButtonPressed('B')) {
             this._backButton.push();
         }
         // キーボードの左キーが押された場合は前ページボタンの処理を行う。
@@ -150,7 +153,7 @@ class PageLayer {
         }
 
         // ゲームパッドのカーソルキーの入力処理を行う。
-        this._dpad.input(gamepad);
+        this._dpad.input();
     }
 
     /**

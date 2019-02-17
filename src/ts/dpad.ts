@@ -1,3 +1,5 @@
+import GamepadManager from "./gamepadmanager";
+
 // 方向を表す文字列
 const DIRECTIONS: Direction[] = ['left', 'right', 'up', 'down'];
 
@@ -39,12 +41,15 @@ class DPad {
 
     /**
      * ゲームパッドの入力処理を行う。
-     * @param gamepad ゲームパッド
      */
-    public input(gamepad: phina.input.Gamepad): this {
+    public input(): this {
+
+        // ゲームパッド管理クラスを取得する。
+        const gamepadManager = GamepadManager.get();
 
         // アナログスティックの入力を取得する。
-        const stick = gamepad.getStickDirection(0);
+        const stick_x = gamepadManager.getAxesX(0);
+        const stick_y = gamepadManager.getAxesY(0);
 
         // アナログスティックの入力方向を調べる。
         const input = {
@@ -55,22 +60,22 @@ class DPad {
         };
 
         // 左方向に入力されている場合
-        if (stick.x < -0.5 || gamepad.getKey('left')) {
+        if (stick_x < -0.5 || gamepadManager.getButtonPressed('left')) {
             input.left = true;
         }
 
         // 右方向に入力されている場合
-        if (stick.x > 0.5 || gamepad.getKey('right')) {
+        if (stick_x > 0.5 || gamepadManager.getButtonPressed('right')) {
             input.right = true;
         }
 
         // 上方向に入力されている場合
-        if (stick.y < -0.5 || gamepad.getKey('up')) {
+        if (stick_y < -0.5 || gamepadManager.getButtonPressed('up')) {
             input.up = true;
         }
 
         // 下方向に入力されている場合
-        if (stick.y > 0.5 || gamepad.getKey('down')) {
+        if (stick_y > 0.5 || gamepadManager.getButtonPressed('down')) {
             input.down = true;
         }
 

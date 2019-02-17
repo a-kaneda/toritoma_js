@@ -5,6 +5,7 @@ import CreditScene from './creditscene';
 import ControlSize from './controlsize';
 import ScreenSize from './screensize';
 import Cursor from './cursor';
+import GamepadManager from './gamepadmanager';
 // タイトルの位置、x座標
 const TITLE_POS_X = 130;
 // タイトルの位置、y座標
@@ -51,13 +52,10 @@ class TitleScene {
      * コンストラクタ。
      * 各種データの初期化と生成を行う。
      * @param phinaScene phina.js上のシーンインスタンス
-     * @param gamepadManager ゲームパッド管理クラス
      */
-    constructor(phinaScene, gamepadManager) {
+    constructor(phinaScene) {
         // phina.jsのシーンインスタンスを設定する。
         this._phinaScene = phinaScene;
-        // ゲームパッドマネージャーを設定する。
-        this._gamepadManager = gamepadManager;
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
         // PIXI用レイヤーを作成する。
@@ -137,10 +135,12 @@ class TitleScene {
      * @param app アプリケーション
      */
     update(app) {
+        // ゲームパッドの状態を更新する。
+        GamepadManager.get().update();
         // 入力が無効になっていない場合
         if (!this._isDisableInput) {
             // カーソル移動処理を行う。
-            this._cursor.input(app.keyboard, this._gamepadManager.get());
+            this._cursor.input(app.keyboard);
             // キーボードの入力処理を行う。
             this._inputKeyboard(app);
             // ゲームパッドの入力処理を行う。。
@@ -155,13 +155,13 @@ class TitleScene {
         this._rootNode.remove();
         switch (sceneName) {
             case 'PlayingScene':
-                this._phinaScene.scene = new PlayinScene(this._phinaScene, this._gamepadManager);
+                this._phinaScene.scene = new PlayinScene(this._phinaScene);
                 break;
             case 'HowToPlayScene':
-                this._phinaScene.scene = new HowToPlayScene(this._phinaScene, this._gamepadManager);
+                this._phinaScene.scene = new HowToPlayScene(this._phinaScene);
                 break;
             case 'CreditScene':
-                this._phinaScene.scene = new CreditScene(this._phinaScene, this._gamepadManager);
+                this._phinaScene.scene = new CreditScene(this._phinaScene);
                 break;
             default:
                 break;
@@ -185,12 +185,10 @@ class TitleScene {
      * ゲームパッドの入力処理を行う。
      */
     _inputGamepad() {
-        // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
         // ゲームパッドを取得する。
-        const gamepad = this._gamepadManager.get();
+        const gamepadManager = GamepadManager.get();
         // Aボタンが押されている場合
-        if (gamepad.getKeyDown('a')) {
+        if (gamepadManager.getButtonPressed('A')) {
             // 選択中のボタンを実行する。
             this._execButton();
         }

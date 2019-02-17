@@ -1,8 +1,9 @@
-import PageLayer from './pagelayer'
-import Scene from './scene'
-import MainScene from './mainscene'
-import TitleScene from './titlescene'
-import HowToPlayPage from './howtoplaypage'
+import PageLayer from './pagelayer';
+import Scene from './scene';
+import MainScene from './mainscene';
+import TitleScene from './titlescene';
+import HowToPlayPage from './howtoplaypage';
+import GamepadManager from './gamepadmanager';
 
 /**
  * 遊び方説明シーン。
@@ -11,8 +12,6 @@ class HowToPlayScene implements Scene {
 
     /** phina.jsのシーンインスタンス */
     private _phinaScene: MainScene;
-    /** ゲームパッドマネージャー。 */
-    private _gamepadManager: phina.input.GamepadManager;
     /** ルートノード */
     private _rootNode: phina.display.DisplayElement;
     /** ページレイヤー */
@@ -21,15 +20,11 @@ class HowToPlayScene implements Scene {
     /**
      * コンストラクタ。
      * @param phinaScene phina.js上のシーンインスタンス
-     * @param gamepadManager ゲームパッド管理クラス
      */
-    constructor(phinaScene: MainScene, gamepadManager: phina.input.GamepadManager) {
+    constructor(phinaScene: MainScene) {
 
         // phina.jsのシーンインスタンスを設定する。
         this._phinaScene = phinaScene;
-
-        // ゲームパッドマネージャーを設定する。
-        this._gamepadManager = gamepadManager;
 
         // ルートノードを作成し、シーンに配置する。
         this._rootNode = new phina.display.DisplayElement().addChildTo(this._phinaScene);
@@ -39,12 +34,12 @@ class HowToPlayScene implements Scene {
         .addChildTo(this._rootNode)
         .onBackButton(() => {
             this._rootNode.remove();
-            this._phinaScene.scene = new TitleScene(this._phinaScene, this._gamepadManager);
+            this._phinaScene.scene = new TitleScene(this._phinaScene);
         });
 
         // 各ページを作成する。
         for (let i = 0; i < HowToPlayPage.PAGE_COUNT; i++) {
-            this._pageLayer.addPage(new HowToPlayPage(i, this._gamepadManager));
+            this._pageLayer.addPage(new HowToPlayPage(i));
         }
     }
 
@@ -55,16 +50,13 @@ class HowToPlayScene implements Scene {
     public update(app: phina.game.GameApp): void {
 
         // ゲームパッドの状態を更新する。
-        this._gamepadManager.update();
+        GamepadManager.get().update();
 
         // キーボードを取得する。
         const keyboard = app.keyboard;
 
-        // ゲームパッドを取得する。
-        const gamepad = this._gamepadManager.get(0);
-
         // レイヤーの入力処理を行う。
-        this._pageLayer.input(keyboard, gamepad);
+        this._pageLayer.input(keyboard);
     }
 }
 

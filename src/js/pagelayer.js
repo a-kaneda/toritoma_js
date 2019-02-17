@@ -1,6 +1,7 @@
 import ImageButton from './imagebutton';
 import ScreenSize from './screensize';
 import DPad from './dpad';
+import GamepadManager from './gamepadmanager';
 // 戻るボタンの位置x座標(画面左からの位置)
 const BACK_BUTTON_POS_X = ScreenSize.SCREEN_WIDTH - 28;
 // 戻るボタンの位置y座標(画面上からの位置)
@@ -92,11 +93,12 @@ class PageLayer {
     /**
      * 入力処理を行う。
      * @param keyboard キーボード
-     * @param gamepad ゲームパッド
      */
-    input(keyboard, gamepad) {
+    input(keyboard) {
+        // ゲームパッド管理クラスを取得する。
+        const gamepadManager = GamepadManager.get();
         // キーボードのESCキーかゲームパッドのBボタンが押された場合は戻るボタンの処理を行う。
-        if (keyboard.getKeyDown('escape') || gamepad.getKeyDown('b')) {
+        if (keyboard.getKeyDown('escape') || gamepadManager.getButtonPressed('B')) {
             this._backButton.push();
         }
         else if (keyboard.getKeyDown('left')) {
@@ -109,7 +111,7 @@ class PageLayer {
             // その他のキー入力は処理しない。
         }
         // ゲームパッドのカーソルキーの入力処理を行う。
-        this._dpad.input(gamepad);
+        this._dpad.input();
     }
     /**
      * カーソルキー入力時の処理。

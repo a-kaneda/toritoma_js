@@ -1,8 +1,8 @@
-import LabelButton from './labelbutton'
-import MyColor from './mycolor'
-import ScreenSize from './screensize'
-import ControlSize from './controlsize'
-import Cursor from './cursor'
+import LabelButton from './labelbutton';
+import MyColor from './mycolor';
+import ScreenSize from './screensize';
+import Cursor from './cursor';
+import GamepadManager from './gamepadmanager';
 
 // ラベルの位置、x座標
 const LABEL_POS_X = Math.floor(ScreenSize.SCREEN_WIDTH * 0.5);
@@ -175,18 +175,20 @@ class MenuLayer {
     /**
      * 入力処理を行う。
      * @param keyboard キーボード
-     * @param gamepad ゲームパッド
      */
-    public input(keyboard: phina.input.Keyboard, gamepad: phina.input.Gamepad): void {
+    public input(keyboard: phina.input.Keyboard): void {
 
         // 入力が有効な場合に処理を行う。
         if (this._enable) {
 
+            // ゲームパッド管理クラスを取得する。
+            const gamepadManager = GamepadManager.get();
+
             // カーソルの移動処理を行う。
-            this._cursor.input(keyboard, gamepad);
+            this._cursor.input(keyboard);
 
             // キーボードのzキーかゲームパッドのAボタンが押された場合は選択中のボタンの処理を行う。
-            if (keyboard.getKeyDown('z') || gamepad.getKeyDown('a')) {
+            if (keyboard.getKeyDown('z') || gamepadManager.getButtonPressed('a')) {
 
                 this._buttons[this._cursor.position].select();
             }
