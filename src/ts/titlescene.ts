@@ -12,13 +12,24 @@ import Cursor from './cursor'
 const TITLE_POS_X = 130;
 // タイトルの位置、y座標
 const TITLE_POS_Y = ScreenSize.SCREEN_HEIGHT / 2;
+
 // ボタンの数
-const BUTTON_NUM = 3;
+const BUTTON_NUM = (() => {
+    // electronの場合のみQUITボタンが必要なので4つになる。
+    if (Platform.name === 'electron') {
+        return 4;
+    }
+    else {
+        return 3;
+    }
+})();
+
 // ボタンのID
 enum BUTTON_ID {
     GAME_START = 0,
     HOW_TO_PLAY,
     CREDIT,
+    QUIT,
 };
 // ボタンの位置、x座標
 const BUTTON_POS_X = 360;
@@ -26,7 +37,8 @@ const BUTTON_POS_X = 360;
 const BUTTON_POS_Y = [
     Math.round(ScreenSize.SCREEN_HEIGHT / (BUTTON_NUM + 1)),
     Math.round((ScreenSize.SCREEN_HEIGHT * 2) / (BUTTON_NUM + 1)),
-    Math.round((ScreenSize.SCREEN_HEIGHT * 3) / (BUTTON_NUM + 1))];
+    Math.round((ScreenSize.SCREEN_HEIGHT * 3) / (BUTTON_NUM + 1)),
+    Math.round((ScreenSize.SCREEN_HEIGHT * 4) / (BUTTON_NUM + 1))];
 // ボタンの幅
 const BUTTON_WIDTH = 176;
 // ボタンの高さ
@@ -118,6 +130,18 @@ class TitleScene implements Scene {
         .onEffect(() => {this._disableInput()})
         .onPush(() => {this._replaceScene('CreditScene')})
         this._buttons.push(creditButton);
+
+        if (Platform.name === 'electron') {
+
+            // 終了ボタンを作成する。
+            const quitButton = new LabelButton(BUTTON_WIDTH, BUTTON_HEIGHT)
+            .addChildTo(this._rootNode)
+            .setLabel('QUIT')
+            .setPosition(BUTTON_POS_X, BUTTON_POS_Y[3])
+            .onEffect(() => {this._disableInput()})
+            .onPush(() => {Platform.close()})
+            this._buttons.push(quitButton);
+        }
 
         // カーソルを作成する。
         this._cursor = new Cursor()

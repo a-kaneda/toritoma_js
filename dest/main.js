@@ -7247,13 +7247,22 @@ const TITLE_POS_X = 130;
 // タイトルの位置、y座標
 const TITLE_POS_Y = __WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_HEIGHT / 2;
 // ボタンの数
-const BUTTON_NUM = 3;
+const BUTTON_NUM = (() => {
+    // electronの場合のみQUITボタンが必要なので4つになる。
+    if (Platform.name === 'electron') {
+        return 4;
+    }
+    else {
+        return 3;
+    }
+})();
 // ボタンのID
 var BUTTON_ID;
 (function (BUTTON_ID) {
     BUTTON_ID[BUTTON_ID["GAME_START"] = 0] = "GAME_START";
     BUTTON_ID[BUTTON_ID["HOW_TO_PLAY"] = 1] = "HOW_TO_PLAY";
     BUTTON_ID[BUTTON_ID["CREDIT"] = 2] = "CREDIT";
+    BUTTON_ID[BUTTON_ID["QUIT"] = 3] = "QUIT";
 })(BUTTON_ID || (BUTTON_ID = {}));
 ;
 // ボタンの位置、x座標
@@ -7262,7 +7271,8 @@ const BUTTON_POS_X = 360;
 const BUTTON_POS_Y = [
     Math.round(__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_HEIGHT / (BUTTON_NUM + 1)),
     Math.round((__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_HEIGHT * 2) / (BUTTON_NUM + 1)),
-    Math.round((__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_HEIGHT * 3) / (BUTTON_NUM + 1))
+    Math.round((__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_HEIGHT * 3) / (BUTTON_NUM + 1)),
+    Math.round((__WEBPACK_IMPORTED_MODULE_5__screensize__["a" /* default */].SCREEN_HEIGHT * 4) / (BUTTON_NUM + 1))
 ];
 // ボタンの幅
 const BUTTON_WIDTH = 176;
@@ -7324,6 +7334,16 @@ class TitleScene {
             .onEffect(() => { this._disableInput(); })
             .onPush(() => { this._replaceScene('CreditScene'); });
         this._buttons.push(creditButton);
+        if (Platform.name === 'electron') {
+            // 終了ボタンを作成する。
+            const quitButton = new __WEBPACK_IMPORTED_MODULE_0__labelbutton__["a" /* default */](BUTTON_WIDTH, BUTTON_HEIGHT)
+                .addChildTo(this._rootNode)
+                .setLabel('QUIT')
+                .setPosition(BUTTON_POS_X, BUTTON_POS_Y[3])
+                .onEffect(() => { this._disableInput(); })
+                .onPush(() => { Platform.close(); });
+            this._buttons.push(quitButton);
+        }
         // カーソルを作成する。
         this._cursor = new __WEBPACK_IMPORTED_MODULE_6__cursor__["a" /* default */]()
             .addChildTo(this._rootNode);
@@ -64776,48 +64796,48 @@ __WEBPACK_IMPORTED_MODULE_0__pointdevice__["a" /* default */].checkDeviceType();
  */
 const ASSETS = {
     image: {
-        'back': './images/back.png',
-        'control': './images/control.png',
-        'image_8x8': './images/image_8x8.png',
-        'image_16x16': './images/image_16x16.png',
-        'image_32x32': './images/image_32x32.png',
-        'image_64x64': './images/image_64x64.png',
-        'howtoimage': './images/howtoimage.png',
+        'back': Platform.workDir + 'images/back.png',
+        'control': Platform.workDir + 'images/control.png',
+        'image_8x8': Platform.workDir + 'images/image_8x8.png',
+        'image_16x16': Platform.workDir + 'images/image_16x16.png',
+        'image_32x32': Platform.workDir + 'images/image_32x32.png',
+        'image_64x64': Platform.workDir + 'images/image_64x64.png',
+        'howtoimage': Platform.workDir + 'images/howtoimage.png',
     },
     spritesheet: {
-        'image_8x8_ss': './images/image_8x8_ss.json',
-        'image_16x16_ss': './images/image_16x16_ss.json',
-        'image_32x32_ss': './images/image_32x32_ss.json',
-        'image_64x64_ss': './images/image_64x64_ss.json',
+        'image_8x8_ss': Platform.workDir + 'images/image_8x8_ss.json',
+        'image_16x16_ss': Platform.workDir + 'images/image_16x16_ss.json',
+        'image_32x32_ss': Platform.workDir + 'images/image_32x32_ss.json',
+        'image_64x64_ss': Platform.workDir + 'images/image_64x64_ss.json',
     },
     sound: {
-        'stage1': './sound/stage1.mp3',
-        'stage2': './sound/stage2.mp3',
-        'stage3': './sound/stage3.mp3',
-        'stage4': './sound/stage4.mp3',
-        'stage5': './sound/stage5.mp3',
-        'stage6': './sound/stage6.mp3',
-        'boss': './sound/boss.mp3',
-        'lastboss': './sound/lastboss.mp3',
-        'clear': './sound/clear.mp3',
-        'select': './sound/select.mp3',
-        'cursor': './sound/cursor.mp3',
-        'hit': './sound/hit.mp3',
-        'bomb_min': './sound/bomb_min.mp3',
-        'miss': './sound/miss.mp3',
-        'pause': './sound/pause.mp3',
+        'stage1': Platform.workDir + 'sound/stage1.mp3',
+        'stage2': Platform.workDir + 'sound/stage2.mp3',
+        'stage3': Platform.workDir + 'sound/stage3.mp3',
+        'stage4': Platform.workDir + 'sound/stage4.mp3',
+        'stage5': Platform.workDir + 'sound/stage5.mp3',
+        'stage6': Platform.workDir + 'sound/stage6.mp3',
+        'boss': Platform.workDir + 'sound/boss.mp3',
+        'lastboss': Platform.workDir + 'sound/lastboss.mp3',
+        'clear': Platform.workDir + 'sound/clear.mp3',
+        'select': Platform.workDir + 'sound/select.mp3',
+        'cursor': Platform.workDir + 'sound/cursor.mp3',
+        'hit': Platform.workDir + 'sound/hit.mp3',
+        'bomb_min': Platform.workDir + 'sound/bomb_min.mp3',
+        'miss': Platform.workDir + 'sound/miss.mp3',
+        'pause': Platform.workDir + 'sound/pause.mp3',
     },
     font: {
-        'noto': './fonts/NotoSansCJKjp-Regular-min.ttf',
+        'noto': Platform.workDir + 'fonts/NotoSansCJKjp-Regular-min.ttf',
     },
     json: {
-        'stage0': './map/stage0.json',
-        'stage1': './map/stage1.json',
-        'stage2': './map/stage2.json',
-        'stage3': './map/stage3.json',
-        'stage4': './map/stage4.json',
-        'stage5': './map/stage5.json',
-        'stage6': './map/stage6.json',
+        'stage0': Platform.workDir + 'map/stage0.json',
+        'stage1': Platform.workDir + 'map/stage1.json',
+        'stage2': Platform.workDir + 'map/stage2.json',
+        'stage3': Platform.workDir + 'map/stage3.json',
+        'stage4': Platform.workDir + 'map/stage4.json',
+        'stage5': Platform.workDir + 'map/stage5.json',
+        'stage6': Platform.workDir + 'map/stage6.json',
     },
 };
 /**
@@ -66280,15 +66300,20 @@ class PlayingScene {
         this._lifeLabel.life = INITIAL_LIFE;
         // シールドボタンを作成する。
         this._shieldButton = new __WEBPACK_IMPORTED_MODULE_9__shieldbutton__["a" /* default */]();
-        // シールドボタンの位置を設定する。
-        this._shieldButton.sprite.addChildTo(this._infoLayer);
-        this._shieldButton.sprite.x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
-        this._shieldButton.sprite.y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
+        // モバイル機器の場合のみシールドボタンを配置する。
+        if (Platform.isMobile()) {
+            this._shieldButton.sprite.addChildTo(this._infoLayer);
+            this._shieldButton.sprite.x = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
+            this._shieldButton.sprite.y = __WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
+        }
         // 一時停止ボタンを作成する。
-        this._pauseButton = new __WEBPACK_IMPORTED_MODULE_12__imagebutton__["a" /* default */]('pauseButton')
-            .setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - PUASE_BUTTON_POS_X, PAUSE_BUTTON_POS_Y)
-            .onPush(() => { this._pause(); })
-            .addChildTo(this._infoLayer);
+        this._pauseButton = new __WEBPACK_IMPORTED_MODULE_12__imagebutton__["a" /* default */]('pauseButton');
+        // モバイル機器の場合のみ一時停止ボタンを配置する。
+        if (Platform.isMobile()) {
+            this._pauseButton.setPosition(__WEBPACK_IMPORTED_MODULE_2__screensize__["a" /* default */].SCREEN_WIDTH - PUASE_BUTTON_POS_X, PAUSE_BUTTON_POS_Y)
+                .onPush(() => { this._pause(); })
+                .addChildTo(this._infoLayer);
+        }
         // チキンゲージを作成する。
         this._chickenGauge = new __WEBPACK_IMPORTED_MODULE_7__chickengauge__["a" /* default */]();
         // チキンゲージの位置を設定する。

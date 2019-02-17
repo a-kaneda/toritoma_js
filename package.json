@@ -2,17 +2,20 @@
   "name": "toritoma_js",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/main.js",
+  "main": "./src/electron/index.js",
   "scripts": {
     "build": "npm-run-all tsc webpack",
     "tsc": "tsc -p ./tsconfig.json",
     "webpack": "webpack",
     "start": "http-server ./dest -p 8080",
     "copyall": "npm-run-all copy:*",
-    "copy:html": "cpx \"./src/html/{*.html,*.css}\" ./dest",
+    "copy:html": "cpx \"./src/html/{*.html,*.css,*.js}\" ./dest",
     "copy:resource": "cpx \"./src/**/{*.png,*.json,*.mp3}\" ./dest",
     "copy:font": "cpx \"./src/fonts/NotoSansCJKjp-Regular-min.ttf\" ./dest/fonts",
-    "copy:map": "cpx \"./src/map/*.json\" ./dest/map"
+    "copy:map": "cpx \"./src/map/*.json\" ./dest/map",
+    "electron": "electron .", 
+    "build_win": "electron-packager . toritoma --icon=src/images/icon.ico --overwrite --platform=win32 --arch=x64 -electron-version=4.0.4",
+    "build_mac": "electron-packager . toritoma --icon=src/images/icon.ico --overwrite --platform=darwin --arch=x64 -electron-version=4.0.4"
   },
   "repository": {
     "type": "git",
@@ -27,6 +30,8 @@
   "devDependencies": {
     "@types/pixi.js": "^4.7.3",
     "cpx": "^1.5.0",
+    "electron": "^4.0.4",
+    "electron-packager": "^13.0.1",
     "html-loader": "^0.5.0",
     "http-server": "^0.10.0",
     "jsdoc": "^3.5.5",

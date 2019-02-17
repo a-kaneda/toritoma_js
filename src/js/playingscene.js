@@ -134,15 +134,20 @@ class PlayingScene {
         this._lifeLabel.life = INITIAL_LIFE;
         // シールドボタンを作成する。
         this._shieldButton = new ShieldButton();
-        // シールドボタンの位置を設定する。
-        this._shieldButton.sprite.addChildTo(this._infoLayer);
-        this._shieldButton.sprite.x = ScreenSize.SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
-        this._shieldButton.sprite.y = ScreenSize.SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
+        // モバイル機器の場合のみシールドボタンを配置する。
+        if (Platform.isMobile()) {
+            this._shieldButton.sprite.addChildTo(this._infoLayer);
+            this._shieldButton.sprite.x = ScreenSize.SCREEN_WIDTH - SHIELD_BUTTON_POS_X;
+            this._shieldButton.sprite.y = ScreenSize.SCREEN_HEIGHT - SHIELD_BUTTON_POS_Y;
+        }
         // 一時停止ボタンを作成する。
-        this._pauseButton = new ImageButton('pauseButton')
-            .setPosition(ScreenSize.SCREEN_WIDTH - PUASE_BUTTON_POS_X, PAUSE_BUTTON_POS_Y)
-            .onPush(() => { this._pause(); })
-            .addChildTo(this._infoLayer);
+        this._pauseButton = new ImageButton('pauseButton');
+        // モバイル機器の場合のみ一時停止ボタンを配置する。
+        if (Platform.isMobile()) {
+            this._pauseButton.setPosition(ScreenSize.SCREEN_WIDTH - PUASE_BUTTON_POS_X, PAUSE_BUTTON_POS_Y)
+                .onPush(() => { this._pause(); })
+                .addChildTo(this._infoLayer);
+        }
         // チキンゲージを作成する。
         this._chickenGauge = new ChickenGauge();
         // チキンゲージの位置を設定する。
