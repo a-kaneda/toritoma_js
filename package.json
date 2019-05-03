@@ -9,7 +9,7 @@
     "webpack": "webpack",
     "start": "http-server ./dest -p 8080",
     "copyall": "npm-run-all copy:*",
-    "copy:html": "cpx \"./src/html/{*.html,*.css,*.js}\" ./dest",
+    "copy:html": "cpx \"./src/html/{*.html,*.css,*.js,*.json}\" ./dest",
     "copy:resource": "cpx \"./src/**/{*.png,*.json,*.mp3}\" ./dest",
     "copy:font": "cpx \"./src/fonts/NotoSansCJKjp-Regular-min.ttf\" ./dest/fonts",
     "copy:map": "cpx \"./src/map/*.json\" ./dest/map",

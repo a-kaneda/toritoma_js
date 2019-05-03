@@ -1,0 +1,17 @@
+{
+    "name": "Toritoma",
+    "short_name": "Toritoma",
+    "description": "モノクロドット絵横スクロールシューティング",
+    "start_url": ".",
+    "display": "fullscreen",
+    "orientation": "landscape",
+    "background_color": "#9cb389",
+    "theme_color": "#12241A",
+    "icons": [
+        {
+            "src": "./images/icon_192.png",
+            "size": "192x192",
+            "type": "image/png"
+        }
+    ]
+}
