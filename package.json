@@ -38,8 +38,7 @@
     "jsdoc": "^3.5.5",
     "npm-run-all": "^4.1.2",
     "typescript": "^2.6.2",
-    "webpack": "^2.7.0",
-    "webpack-dev-server": "^2.6.1"
+    "webpack": "^2.7.0"
   },
   "dependencies": {
     "phina.js": "^0.2.3",
