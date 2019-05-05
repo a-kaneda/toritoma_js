@@ -11,6 +11,17 @@
 
     <title>とりとま</title>
 
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('serviceworker.js').then(function(registration) {
+          // Registration was successful
+        }, function(err) {
+          // registration failed :(
+        });
+      });
+    }
+    </script>
     <script type="text/javascript" src="platformweb.js"></script>
     <script type="text/javascript" src="main.js"></script>
   </head>
