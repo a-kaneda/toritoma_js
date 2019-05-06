@@ -1,63 +1,79 @@
 'use strict';
 
-var CACHE_NAME = 'toritoma-cache-20190505';
+var CACHE_NAME = 'toritoma-cache-20190506';
 var urlsToCache = [
-    '/',
-    '/fonts/',
-    '/images/',
-    '/map/',
-    '/sound/'
+    './favicon.ico',
+    './index.html',
+    './main.js',
+    './manifest.json',
+    './platformweb.js',
+    './serviceworker.js',
+    './style.css',
+    './fonts/NotoSansCJKjp-Regular-min.ttf',
+    './images/back.png',
+    './images/control.png',
+    './images/howtoimage.png',
+    './images/icon_192.png',
+    './images/image_16x16.png',
+    './images/image_16x16_ss.json',
+    './images/image_32x32.png',
+    './images/image_32x32_ss.json',
+    './images/image_64x64.png',
+    './images/image_64x64_ss.json',
+    './images/image_8x8.png',
+    './images/image_8x8_ss.json',
+    './map/stage0.json',
+    './map/stage1.json',
+    './map/stage2.json',
+    './map/stage3.json',
+    './map/stage4.json',
+    './map/stage5.json',
+    './map/stage6.json',
+    './sound/bomb_min.mp3',
+    './sound/boss.mp3',
+    './sound/clear.mp3',
+    './sound/cursor.mp3',
+    './sound/hit.mp3',
+    './sound/lastboss.mp3',
+    './sound/miss.mp3',
+    './sound/pause.mp3',
+    './sound/select.mp3',
+    './sound/stage1.mp3',
+    './sound/stage2.mp3',
+    './sound/stage3.mp3',
+    './sound/stage4.mp3',
+    './sound/stage5.mp3',
+    './sound/stage6.mp3',
 ];
 
 self.addEventListener('install', function(event) {
     // Perform install steps
     event.waitUntil(
-    caches.open(CACHE_NAME)
-        .then(function(cache) {
-            return cache.addAll(urlsToCache);
-        })
-    );
+        caches.open(CACHE_NAME)
+            .then(function(cache) {
+                // console.log('Opened cache');
+                return cache.addAll(urlsToCache);
+            })
+            .catch(function(reason) {
+                console.log('Install error: ' + reason);
+            })
+        );
 });
 
 self.addEventListener('fetch', function(event) {
     event.respondWith(
         caches.match(event.request)
             .then(function(response) {
-
                 // Cache hit - return response
                 if (response) {
                     return response;
                 }
-                
-                // IMPORTANT:Clone the request. A request is a stream and
-                // can only be consumed once. Since we are consuming this
-                // once by cache and once by the browser for fetch, we need
-                // to clone the response.
-                var fetchRequest = event.request.clone();
-                
-                return fetch(fetchRequest).then(
-                    function(response) {
-                        // Check if we received a valid response
-                        if(!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-
-                    // IMPORTANT:Clone the response. A response is a stream
-                    // and because we want the browser to consume the response
-                    // as well as the cache consuming the response, we need
-                    // to clone it so we have two streams.
-                    var responseToCache = response.clone();
-
-                    caches.open(CACHE_NAME)
-                        .then(function(cache) {
-                            cache.put(event.request, responseToCache);
-                    });
-
-                    return response;
-                });
-            }
-        )
-    );
+                return fetch(event.request);
+            })
+            .catch(function(reason) {
+                console.log('Fetch error: ' + reason);
+            })
+        );
 });
 
 self.addEventListener('activate', function(event) {
@@ -65,14 +81,18 @@ self.addEventListener('activate', function(event) {
     var cacheWhitelist = [CACHE_NAME];
   
     event.waitUntil(
-        caches.keys().then(function(cacheNames) {
-            return Promise.all(
-                cacheNames.map(function(cacheName) {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
+        caches.keys()
+            .then(function(cacheNames) {
+                return Promise.all(
+                    cacheNames.map(function(cacheName) {
+                        if (cacheWhitelist.indexOf(cacheName) === -1) {
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            })
+            .catch(function(reason) {
+                console.log('Activate error: ' + reason);
+            })
     );
 });
